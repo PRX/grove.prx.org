@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "prx-ng-serve dev",
+    "build": "ng build --prod --aot",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "serve": "prx-ng-serve dist"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +21,8 @@
     "@angular/platform-browser-dynamic": "~7.2.0",
     "@angular/router": "~7.2.0",
     "core-js": "^2.5.4",
+    "ngx-prx-styleguide": "2.13.0",
+    "prx-ng-serve": "^1.0.0",
     "rxjs": "~6.3.3",
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
