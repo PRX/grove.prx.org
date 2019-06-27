@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { concatMap, first, withLatestFrom } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
