@@ -1,0 +1,14 @@
+grove:
+  build: .
+  volumes:
+    - ./bin:/app/bin
+    - ./e2e:/app/e2e
+    - ./src:/app/src
+  env_file:
+    - .env
+  ports:
+    - "4204:4204"
+  command: start
+  environment:
+    VIRTUAL_HOST: grove.prx.docker
+    HOST: https://grove.prx.docker
