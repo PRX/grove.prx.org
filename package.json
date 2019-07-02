@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "prx-ng-serve dist",
-    "ci": "ng test --watch=false --browsers=PhantomJS --code-coverage && codecov"
+    "ci": "ng test --watch=false --code-coverage && codecov"
   },
   "private": true,
   "dependencies": {
