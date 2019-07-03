@@ -1,0 +1,18 @@
+# (1) cp env-example .env
+# (2) add your ENV overrides here
+# (3) profit
+LOCAL_ENV=true
+
+# prx auth
+AUTH_HOST=id.staging.prx.tech
+# for https://grove.prx.docker
+AUTH_CLIENT_ID=
+
+# monitoring
+NEW_RELIC_APP_NAME=
+NEW_RELIC_LICENSE_KEY=
+GA_KEY=
+
+# dev server
+PORT=4204
+HOST=https://grove.prx.docker
