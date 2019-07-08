@@ -5,7 +5,7 @@ CMD_ARGS=
 CMD=
 
 ApplicationUsage () {
-  echo "usage: application [ serve | help | -- COMMAND ]"
+  echo "usage: application [ serve/web | help | -- COMMAND ]"
 }
 
 ApplicationParseOpts () {
@@ -33,7 +33,7 @@ ApplicationRun () {
   elif [ "$PROCESS" = "--" ] ; then
     UpdateEnvironment
     CMD=
-  elif [ "$PROCESS" = "serve" ] ; then
+  elif [ "$PROCESS" = "serve" ] || [ "$PROCESS" = "web" ] ; then
     UpdateEnvironment
     CMD="npm run-script serve"
   else

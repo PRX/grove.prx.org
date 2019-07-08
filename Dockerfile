@@ -22,8 +22,9 @@ RUN mkdir -p $APP_HOME
 WORKDIR $APP_HOME
 EXPOSE 4204
 
+RUN apk add --no-cache tini
 ENTRYPOINT [ "/tini", "--", "./bin/application" ]
-CMD [ "serve" ]
+CMD [ "web" ]
 
 ADD ./package.json ./
 ADD ./yarn.lock ./
