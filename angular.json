@@ -24,6 +24,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/assets",
+              "src/favicon.ico",
               {
                 "glob": "**/*",
                 "input": "node_modules/ngx-prx-styleguide/assets",
