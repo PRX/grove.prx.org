@@ -6,7 +6,8 @@ declare const window: any;
 
 const DEFAULTS = {
   AUTH_HOST: 'id.prx.org',
-  AUTH_CLIENT_ID: '3c027cfb956b2ba731149bbd934fc019d81fa0ae'
+  AUTH_CLIENT_ID: '3c027cfb956b2ba731149bbd934fc019d81fa0ae',
+  GA_KEY: ''
 };
 
 const addScheme = (name: string, value: any): any => {
@@ -46,4 +47,5 @@ const getNumber = (name: string): number => {
 export class Env {
   public static get AUTH_HOST(): string { return getVar('AUTH_HOST'); }
   public static get AUTH_CLIENT_ID(): string { return getVar('AUTH_CLIENT_ID'); }
+  public static get GA_KEY(): string { return getVar('GA_KEY'); }
 }

@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { concatMap, first, withLatestFrom } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from './core/core.env';
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 
 @Component({
   selector: 'grove-root',
@@ -20,8 +21,11 @@ export class AppComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private user: UserinfoService
-  ) {}
+    private user: UserinfoService,
+    private angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics
+  ) {
+    angulartics2GoogleAnalytics.startTracking();
+  }
 
   ngOnInit() {
     this.user.config(this.authHost);

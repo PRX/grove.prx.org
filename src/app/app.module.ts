@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
+import { Angulartics2Module } from 'angulartics2';
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,8 @@ import { SharedModule } from './shared/shared.module';
     AppRoutingModule,
     AuthModule,
     CoreModule,
-    SharedModule
+    SharedModule,
+    Angulartics2Module.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
