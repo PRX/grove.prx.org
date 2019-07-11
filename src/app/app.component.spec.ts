@@ -8,6 +8,8 @@ import { AuthService, UserinfoService, Userinfo } from 'ngx-prx-styleguide';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
+import { Angulartics2 } from 'angulartics2';
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga'
 
 const userinfo = new Userinfo();
 userinfo.preferred_username = 'Someone';
@@ -40,7 +42,14 @@ describe('AppComponent', () => {
             config: () => {},
             getUserinfo: () => of(userinfo)
           }
-        }
+        },
+        {
+          provide: Angulartics2GoogleAnalytics,
+          useValue: {
+            startTracking: () => {}
+          }
+        },
+        Angulartics2
       ]
     }).compileComponents().then(() => {
       fix = TestBed.createComponent(AppComponent);
