@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SpinnerModule, ImageModule } from 'ngx-prx-styleguide';
+import { AuthGuard, DeactivateGuard, UnauthGuard, SpinnerModule, ImageModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [],
@@ -10,6 +10,11 @@ import { SpinnerModule, ImageModule } from 'ngx-prx-styleguide';
   exports: [
     SpinnerModule,
     ImageModule
+  ],
+  providers: [
+    AuthGuard,
+    DeactivateGuard,
+    UnauthGuard
   ]
 })
 export class SharedModule { }

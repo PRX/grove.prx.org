@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { concatMap, first, withLatestFrom } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { concatMap, first, withLatestFrom, tap } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from './core/core.env';
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
     private user: UserinfoService,
     private angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics
   ) {
-    angulartics2GoogleAnalytics.startTracking();
+    this.angulartics2GoogleAnalytics.startTracking();
   }
 
   ngOnInit() {
@@ -33,8 +33,12 @@ export class AppComponent implements OnInit {
       first(),
       withLatestFrom(this.user.getUserinfo()),
       concatMap(([token, userinfo]) => {
-        this.loggedIn = true;
-        this.authorized = this.auth.parseToken(token);
+        if (token) {
+          this.loggedIn = true;
+          this.authorized = this.auth.parseToken(token);
+        } else {
+          this.loggedIn = false;
+        }
         this.userinfo = userinfo;
         return this.user.getUserDoc(userinfo);
       })

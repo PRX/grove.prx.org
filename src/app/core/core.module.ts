@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderModule, FooterModule, HalService } from 'ngx-prx-styleguide';
+import { HeaderModule, FooterModule, HalService, ModalModule, ModalService } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [],
@@ -9,10 +9,12 @@ import { HeaderModule, FooterModule, HalService } from 'ngx-prx-styleguide';
   ],
   exports: [
     FooterModule,
-    HeaderModule
+    HeaderModule,
+    ModalModule
   ],
   providers: [
-    HalService
+    HalService,
+    ModalService
   ]
 })
 export class CoreModule { }
