@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderModule, FooterModule, HalService, ModalModule, ModalService } from 'ngx-prx-styleguide';
+import { AuguryService } from './augury.service';
 
 @NgModule({
   declarations: [],
@@ -14,7 +15,8 @@ import { HeaderModule, FooterModule, HalService, ModalModule, ModalService } fro
   ],
   providers: [
     HalService,
-    ModalService
+    ModalService,
+    AuguryService
   ]
 })
 export class CoreModule { }

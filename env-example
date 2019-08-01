@@ -3,6 +3,10 @@
 # (3) profit
 LOCAL_ENV=true
 
+# prx api
+AUGURY_HOST=augury.staging.prx.tech
+AUGURY_TTL=
+
 # prx auth
 AUTH_HOST=id.staging.prx.tech
 # for https://grove.prx.docker

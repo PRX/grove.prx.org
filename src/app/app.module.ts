@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ErrorHandler } from '@angular/core';
 
+import { Angulartics2Module } from 'angulartics2';
+
 import { AuthModule } from 'ngx-prx-styleguide';
 import { ErrorService } from './error/error.service';
 
@@ -9,7 +11,7 @@ import { AppComponent } from './app.component';
 
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
-import { Angulartics2Module } from 'angulartics2';
+import { CampaignModule } from './campaign/campaign.module';
 
 @NgModule({
   declarations: [
@@ -22,7 +24,8 @@ import { Angulartics2Module } from 'angulartics2';
     AuthModule,
     CoreModule,
     SharedModule,
-    Angulartics2Module.forRoot()
+    Angulartics2Module.forRoot(),
+    CampaignModule
   ],
   providers: [
     {provide: ErrorHandler, useClass: ErrorService}
