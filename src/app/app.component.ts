@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { concatMap, first, withLatestFrom, tap } from 'rxjs/operators';
+import { Observable, of, combineLatest } from 'rxjs';
+import { concatMap, first, withLatestFrom, catchError, mergeMap } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from './core/core.env';
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
@@ -31,7 +31,13 @@ export class AppComponent implements OnInit {
     this.user.config(this.authHost);
     this.userImageDoc$ = this.auth.token.pipe(
       first(),
-      withLatestFrom(this.user.getUserinfo()),
+      mergeMap(token => {
+        if (token) {
+          return combineLatest(of(token), this.user.getUserinfo());
+        } else {
+          return of([]);
+        }
+      }),
       concatMap(([token, userinfo]) => {
         if (token) {
           this.loggedIn = true;
@@ -39,8 +45,12 @@ export class AppComponent implements OnInit {
         } else {
           this.loggedIn = false;
         }
-        this.userinfo = userinfo;
-        return this.user.getUserDoc(userinfo);
+        if (userinfo) {
+          this.userinfo = userinfo;
+          return this.user.getUserDoc(userinfo);
+        } else {
+          return of();
+        }
       })
     );
   }
