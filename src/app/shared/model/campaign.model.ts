@@ -40,11 +40,17 @@ export class CampaignModel extends BaseModel {
   }
 
   decode() {
+    // tslint:disable-next-line: no-string-literal
     this.id = this.doc['id'];
+    // tslint:disable-next-line: no-string-literal
     this.name = this.doc['name'] || '';
+    // tslint:disable-next-line: no-string-literal
     this.type = this.doc['type'] || '';
+    // tslint:disable-next-line: no-string-literal
     this.status = this.doc['status'] || '';
+    // tslint:disable-next-line: no-string-literal
     this.repName = this.doc['repName'];
+    // tslint:disable-next-line: no-string-literal
     this.notes = this.doc['notes'];
   }
 

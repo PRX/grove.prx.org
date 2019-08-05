@@ -5,7 +5,7 @@ import { CampaignModel } from '../shared/model/campaign.model';
 import { CampaignService } from './campaign.service';
 
 @Component({
-  selector: 'app-campaign-status',
+  selector: 'grove-campaign-status',
   template: `
     <prx-status-bar prxSticky="all" class="status_bar">
       <a prx-status-bar-link routerLink="/">

@@ -2,9 +2,9 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CampaignModel } from '../shared/model/campaign.model';
 
 @Component({
-  selector: 'app-campaign',
+  selector: 'grove-campaign',
   template: `
-    <app-campaign-status [campaign]="campaign"></app-campaign-status>
+    <grove-campaign-status [campaign]="campaign"></grove-campaign-status>
 
     <prx-tabs [model]="campaign">
       <nav>

@@ -6,8 +6,8 @@ import { CampaignService } from './campaign.service';
 
 @Component({
   template: `
-    <app-campaign [id]="id" [campaign]="campaign$ | async">
-    </app-campaign>
+    <grove-campaign [id]="id" [campaign]="campaign$ | async">
+    </grove-campaign>
   `
 })
 export class CampaignContainerComponent implements OnInit {

@@ -1,12 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TabService } from 'ngx-prx-styleguide';
 import { AdvertiserService } from './advertiser.service';
 import { CampaignModel } from '../shared/model/campaign.model';
+import { UserService } from '../core/user.service';
 @Component({
   template: `
     <form *ngIf="campaign">
+      <prx-fancy-field
+        label="Owner"
+        [model]="campaign" name="accountId" [select]="accountOptions$ | async" required>
+      </prx-fancy-field>
+
       <prx-fancy-field
       label="Campaign Name"
         textinput [model]="campaign" name="name"  required>
@@ -42,6 +48,7 @@ import { CampaignModel } from '../shared/model/campaign.model';
 })
 export class CampaignFormComponent implements OnInit {
   advertiserOptions$: Observable<(string | number)[][]>;
+  accountOptions$: Observable<string[][]>;
   campaign: CampaignModel;
   typeOptions = [
     ['Paid Campaign', 'paid_campaign'],
@@ -62,13 +69,17 @@ export class CampaignFormComponent implements OnInit {
   ];
 
   constructor(private tab: TabService,
-              private advertiserService: AdvertiserService) {}
+              private advertiserService: AdvertiserService,
+              private userService: UserService) {}
 
   ngOnInit() {
     this.tab.model.subscribe(campaign => this.campaign = campaign as CampaignModel);
     this.advertiserOptions$ = this.advertiserService.advertisers.pipe(
       map(advertisers =>
         advertisers.map(a => [a.name, a.id]))
+    );
+    this.accountOptions$ = this.userService.accounts.pipe(
+      map(accounts => accounts.map(doc => [doc['name'], doc.id]))
     );
   }
 }
