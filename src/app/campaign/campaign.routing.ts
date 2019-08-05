@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { CampaignListComponent } from './campaign-list.component';
+import { CampaignContainerComponent } from './campaign-container.component';
 import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './campaign-form.component';
 import { CampaignStatusComponent } from './campaign-status.component';
@@ -14,14 +15,14 @@ const campaignChildRoutes = [
 export const campaignRoutes: Routes = [
   {
     path: 'campaign/new',
-    component: CampaignComponent,
+    component: CampaignContainerComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard],
     children: campaignChildRoutes
   },
   {
     path: 'campaign/:id',
-    component: CampaignComponent,
+    component: CampaignContainerComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard],
     children: campaignChildRoutes
@@ -30,6 +31,7 @@ export const campaignRoutes: Routes = [
 
 export const campaignComponents: any[] = [
   CampaignListComponent,
+  CampaignContainerComponent,
   CampaignComponent,
   CampaignFormComponent,
   CampaignStatusComponent

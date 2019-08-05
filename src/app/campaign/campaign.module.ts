@@ -5,6 +5,7 @@ import { SharedModule } from '../shared/shared.module';
 import { TabModule } from 'ngx-prx-styleguide';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 import { CampaignListComponent } from './campaign-list.component';
+import { AdvertiserService } from './advertiser.service';
 import { CampaignService } from './campaign.service';
 
 @NgModule({
@@ -21,6 +22,7 @@ import { CampaignService } from './campaign.service';
     CampaignListComponent
   ],
   providers: [
+    AdvertiserService,
     CampaignService
   ]
 })

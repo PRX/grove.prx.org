@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { withLatestFrom, switchMap } from 'rxjs/operators';
+import { Component, OnInit, Input } from '@angular/core';
 import { CampaignModel } from '../shared/model/campaign.model';
-import { CampaignService } from './campaign.service';
 
 @Component({
+  selector: 'app-campaign',
   template: `
-    <app-campaign-status [campaign]="campaign$ | async"></app-campaign-status>
+    <app-campaign-status [campaign]="campaign"></app-campaign-status>
 
-    <prx-tabs [model]="campaign$ | async">
+    <prx-tabs [model]="campaign">
       <nav>
         <a routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" [routerLink]="base">Campaign Meta Data</a>
         <a routerLinkActive="active" [routerLink]="[base, 'flights']">Flight 1</a>
@@ -18,19 +15,12 @@ import { CampaignService } from './campaign.service';
   `
 })
 export class CampaignComponent implements OnInit {
-  id: number;
+  @Input() id: number;
+  @Input() campaign: CampaignModel;
   base: string;
-  campaign$: Observable<CampaignModel>;
-
-  constructor(private route: ActivatedRoute,
-              private campaignService: CampaignService) {}
 
   ngOnInit() {
-    this.route.params.forEach(params => {
-      this.id = +params.id;
-      this.base = '/campaign/' + (this.id || 'new');
-      this.campaign$ = this.campaignService.findCampaignById(this.id);
-    });
+    this.base = '/campaign/' + (this.id || 'new');
   }
 
 }

@@ -1,0 +1,27 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
+import { CampaignModel } from '../shared/model/campaign.model';
+import { CampaignService } from './campaign.service';
+
+@Component({
+  template: `
+    <app-campaign [id]="id" [campaign]="campaign$ | async">
+    </app-campaign>
+  `
+})
+export class CampaignContainerComponent implements OnInit {
+  id: number;
+  campaign$: Observable<CampaignModel>;
+
+  constructor(private route: ActivatedRoute,
+              private campaignService: CampaignService) {}
+
+  ngOnInit() {
+    this.route.params.forEach(params => {
+      this.id = +params.id;
+      this.campaign$ = this.campaignService.findCampaignById(this.id);
+    });
+  }
+
+}

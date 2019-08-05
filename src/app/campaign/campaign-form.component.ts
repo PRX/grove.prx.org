@@ -1,25 +1,47 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { TabService } from 'ngx-prx-styleguide';
+import { AdvertiserService } from './advertiser.service';
 import { CampaignModel } from '../shared/model/campaign.model';
 @Component({
   template: `
     <form *ngIf="campaign">
-      <prx-fancy-field textinput [model]="campaign" name="name" label="Campaign Name" required>
+      <prx-fancy-field
+      label="Campaign Name"
+        textinput [model]="campaign" name="name"  required>
       </prx-fancy-field>
 
-      <prx-fancy-field [model]="campaign" name="type" [select]="typeOptions"  small="1" required>
+      <prx-fancy-field
+        label="Advertiser"
+        [model]="campaign" name="advertiser" [select]="advertiserOptions$ | async" required>
       </prx-fancy-field>
 
-      <prx-fancy-field [model]="campaign" name="status" [select]="statusOptions"  small="1" required>
+      <prx-fancy-field
+        label="Campaign Status"
+        [model]="campaign" name="type" [select]="typeOptions" required>
       </prx-fancy-field>
 
-      <prx-fancy-field textinput [model]="campaign" name="repName" label="Campaign Representative" required>
+      <prx-fancy-field
+        label="Campaign Type"
+        [model]="campaign" name="status" [select]="statusOptions" required>
+      </prx-fancy-field>
+
+      <prx-fancy-field
+        label="Campaign Rep"
+        textinput [model]="campaign" name="repName" required>
+      </prx-fancy-field>
+
+      <prx-fancy-field
+        label="Campaign Notes"
+        textinput [model]="campaign" name="notes" required>
       </prx-fancy-field>
 
     </form>
   `
 })
 export class CampaignFormComponent implements OnInit {
+  advertiserOptions$: Observable<(string | number)[][]>;
   campaign: CampaignModel;
   typeOptions = [
     ['Paid Campaign', 'paid_campaign'],
@@ -31,17 +53,22 @@ export class CampaignFormComponent implements OnInit {
     ['Survey', 'survey']
   ];
   statusOptions = [
-    ['draft'],
-    ['hold'],
-    ['sold'],
-    ['approved'],
-    ['paused'],
-    ['canceled']
+    ['Draft', 'draft'],
+    ['Hold', 'hold'],
+    ['sold', 'sold'],
+    ['Approved', 'approved'],
+    ['Paused', 'paused'],
+    ['Canceled', 'canceled']
   ];
 
-  constructor(private tab: TabService) {}
+  constructor(private tab: TabService,
+              private advertiserService: AdvertiserService) {}
 
   ngOnInit() {
     this.tab.model.subscribe(campaign => this.campaign = campaign as CampaignModel);
+    this.advertiserOptions$ = this.advertiserService.advertisers.pipe(
+      map(advertisers =>
+        advertisers.map(a => [a.name, a.id]))
+    );
   }
 }

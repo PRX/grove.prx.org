@@ -1,18 +1,20 @@
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { BaseModel, HalDoc } from 'ngx-prx-styleguide';
+import { AdvertiserModel } from './advertiser.model';
 
 export class CampaignModel extends BaseModel {
   public id: number;
   public accountId: number;
   public name = '';
-  // public advertiser: Advertiser;
+  public advertiser: AdvertiserModel;
   public type: string;
   public status: string;
   public repName: string;
   public notes: string;
-  // public flights: Flight[]
+  // public flights: FlightModel[]
 
-  SETABLE = ['name', 'type', 'status', 'repName', 'notes'];
+  SETABLE = ['name', 'advertiser', 'type', 'status', 'repName', 'notes'];
 
   constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
     super();
@@ -28,7 +30,7 @@ export class CampaignModel extends BaseModel {
   }
 
   related() {
-    const advertiser = of('');
+    const advertiser = this.doc ? this.doc.follow('prx:advertiser').pipe(map(doc => new AdvertiserModel(this.doc, doc))) : of();
     const flights = of([]);
 
     return {
