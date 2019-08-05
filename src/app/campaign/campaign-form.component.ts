@@ -40,7 +40,7 @@ import { UserService } from '../core/user.service';
 
       <prx-fancy-field
         label="Campaign Notes"
-        textinput [model]="campaign" name="notes" required>
+        textarea [model]="campaign" name="notes" required>
       </prx-fancy-field>
 
     </form>

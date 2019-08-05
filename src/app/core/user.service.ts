@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { of, combineLatest, Observable } from 'rxjs';
+import { of, combineLatest, Observable, BehaviorSubject } from 'rxjs';
 import { concatMap, first, tap } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from './core.env';
@@ -12,7 +12,12 @@ export class UserService {
   loggedIn = true; // until proven otherwise
   authorized = false; // until proven otherwise, to avoid nav "jump"
   userinfo: Userinfo;
-  userDoc: HalDoc;
+
+  // tslint:disable-next-line: variable-name
+  private _userDoc = new BehaviorSubject(null);
+  get userDoc(): Observable<HalDoc> {
+    return this._userDoc.asObservable();
+  }
 
   constructor(private authService: AuthService,
               private userinfoService: UserinfoService) {
@@ -45,10 +50,14 @@ export class UserService {
         }
       }),
       tap(console.log)
-    ).subscribe(userDoc => this.userDoc = userDoc);
+    ).subscribe(doc => {
+      this._userDoc.next(doc);
+    });
   }
 
   get accounts(): Observable<HalDoc[]> {
-    return this.userDoc && this.userDoc.followItems('prx:accounts');
+    return this.userDoc.pipe(
+      concatMap(doc => doc ? doc.followItems('prx:accounts') : of([]))
+    );
   }
 }

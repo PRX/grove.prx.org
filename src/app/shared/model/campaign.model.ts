@@ -14,7 +14,7 @@ export class CampaignModel extends BaseModel {
   public notes: string;
   // public flights: FlightModel[]
 
-  SETABLE = ['name', 'advertiser', 'type', 'status', 'repName', 'notes'];
+  SETABLE = ['accountId', 'name', 'advertiser', 'type', 'status', 'repName', 'notes'];
 
   constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
     super();
@@ -40,32 +40,23 @@ export class CampaignModel extends BaseModel {
   }
 
   decode() {
-    // tslint:disable-next-line: no-string-literal
     this.id = this.doc['id'];
-    // tslint:disable-next-line: no-string-literal
+    this.accountId = this.doc['accountId'];
     this.name = this.doc['name'] || '';
-    // tslint:disable-next-line: no-string-literal
     this.type = this.doc['type'] || '';
-    // tslint:disable-next-line: no-string-literal
     this.status = this.doc['status'] || '';
-    // tslint:disable-next-line: no-string-literal
     this.repName = this.doc['repName'];
-    // tslint:disable-next-line: no-string-literal
     this.notes = this.doc['notes'];
   }
 
   encode(): {} {
     const data = {} as any;
+    data.accountId = this.accountId;
     data.name = this.name;
     data.type = this.type;
     data.status = this.status;
     data.repName = this.repName;
     data.notes = this.notes;
-    if (this.changed('accountId')) {
-      const accountDoc = this.isNew ? this.parent.expand('self') : this.doc.expand('prx:account');
-      const newAccountURI = accountDoc.replace(`${this.original['accountId']}`, `${this.accountId}`);
-      data.set_account_uri = newAccountURI;
-    }
     return data;
   }
 

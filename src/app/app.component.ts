@@ -11,7 +11,7 @@ import { UserService } from './core/user.service';
       <prx-navitem *ngIf="userService.loggedIn" route="/" text="Home"></prx-navitem>
       <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
         <prx-spinner class="user-loading"></prx-spinner>
-        <prx-image *ngIf="userService.userDoc" class="user-loaded" [imageDoc]="userService.userDoc"></prx-image>
+        <prx-image *ngIf="userService.userDoc | async as userDoc" class="user-loaded" [imageDoc]="userDoc"></prx-image>
       </prx-navuser>
     </prx-header>
     <main>
