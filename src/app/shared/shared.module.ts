@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthGuard, DeactivateGuard, UnauthGuard,
-  FancyFormModule, ImageModule, SpinnerModule, SelectModule  } from 'ngx-prx-styleguide';
+  FancyFormModule, ImageModule, SelectModule, SpinnerModule,
+  StatusBarModule, StickyModule, ToastrModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [],
@@ -12,7 +13,10 @@ import { AuthGuard, DeactivateGuard, UnauthGuard,
     FancyFormModule,
     ImageModule,
     SelectModule,
-    SpinnerModule
+    SpinnerModule,
+    StatusBarModule,
+    StickyModule,
+    ToastrModule
   ],
   providers: [
     AuthGuard,

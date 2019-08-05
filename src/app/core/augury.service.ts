@@ -18,8 +18,4 @@ export class AuguryService extends HalBaseService {
     return Env.AUGURY_TTL;
   }
 
-  get auth(): HalObservable<HalDoc> {
-    return this.follow('prx:authorization');
-  }
-
 }

@@ -14,12 +14,9 @@ export class CampaignModel extends BaseModel {
 
   SETABLE = ['name', 'type', 'status', 'repName', 'notes'];
 
-  constructor(account: HalDoc, campaign?: HalDoc, loadRelated = false) {
+  constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
     super();
-    this.init(account, campaign, loadRelated);
-    if (account) {
-      this.set('accountId', account.id, true);
-    }
+    this.init(parent, campaign, loadRelated);
   }
 
   key() {
@@ -65,6 +62,6 @@ export class CampaignModel extends BaseModel {
   }
 
   saveNew(data: {}): Observable<HalDoc> {
-    return this.parent.create('prx:series', {}, data);
+    return this.parent.create('prx:campaign', {}, data);
   }
 }

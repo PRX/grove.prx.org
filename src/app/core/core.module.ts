@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderModule, FooterModule, HalService, ModalModule, ModalService } from 'ngx-prx-styleguide';
+import { HeaderModule, FooterModule, HalService, ModalModule, ModalService, ToastrModule, ToastrService } from 'ngx-prx-styleguide';
 import { AuguryService } from './augury.service';
 
 @NgModule({
@@ -11,12 +11,14 @@ import { AuguryService } from './augury.service';
   exports: [
     FooterModule,
     HeaderModule,
-    ModalModule
+    ModalModule,
+    ToastrModule
   ],
   providers: [
     HalService,
     ModalService,
-    AuguryService
+    AuguryService,
+    ToastrService
   ]
 })
 export class CoreModule { }
