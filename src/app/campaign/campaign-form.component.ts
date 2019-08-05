@@ -1,7 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { TabService } from 'ngx-prx-styleguide';
+import { map, withLatestFrom } from 'rxjs/operators';
+import { TabService, HalDoc } from 'ngx-prx-styleguide';
 import { AdvertiserService } from './advertiser.service';
 import { CampaignModel } from '../shared/model/campaign.model';
 import { UserService } from '../core/user.service';
@@ -48,7 +48,7 @@ import { UserService } from '../core/user.service';
 })
 export class CampaignFormComponent implements OnInit {
   advertiserOptions$: Observable<(string | number)[][]>;
-  accountOptions$: Observable<string[][]>;
+  accountOptions$: Observable<any[][]>;
   campaign: CampaignModel;
   typeOptions = [
     ['Paid Campaign', 'paid_campaign'],
@@ -79,7 +79,11 @@ export class CampaignFormComponent implements OnInit {
         advertisers.map(a => [a.name, a.id]))
     );
     this.accountOptions$ = this.userService.accounts.pipe(
-      map(accounts => accounts.map(doc => [doc['name'], doc.id]))
+      withLatestFrom(this.userService.defaultAccount),
+      map(([accounts, defaultAccount]) => {
+        const defaultAccountOption = [defaultAccount['name'], defaultAccount.id];
+        return [defaultAccountOption].concat(accounts.map(doc => [doc['name'], doc.id]));
+      })
     );
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { of, combineLatest, Observable, BehaviorSubject } from 'rxjs';
-import { concatMap, first, tap } from 'rxjs/operators';
+import { concatMap, first } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from './core.env';
 
@@ -48,8 +48,7 @@ export class UserService {
         } else {
           return of();
         }
-      }),
-      tap(console.log)
+      })
     ).subscribe(doc => {
       this._userDoc.next(doc);
     });
@@ -57,7 +56,16 @@ export class UserService {
 
   get accounts(): Observable<HalDoc[]> {
     return this.userDoc.pipe(
-      concatMap(doc => doc ? doc.followItems('prx:accounts') : of([]))
+      concatMap(doc => {
+        const per = doc['_links']['prx:accounts']['count'];
+        return doc ? doc.followItems('prx:accounts', {per}) : of([]);
+      })
+    );
+  }
+
+  get defaultAccount(): Observable<HalDoc> {
+    return this.userDoc.pipe(
+      concatMap(doc => doc ? doc.follow('prx:default-account') : of())
     );
   }
 }

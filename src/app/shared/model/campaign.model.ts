@@ -57,6 +57,11 @@ export class CampaignModel extends BaseModel {
     data.status = this.status;
     data.repName = this.repName;
     data.notes = this.notes;
+    if (this.changed('accountId')) {
+      const accountDoc = this.isNew ? this.parent.expand('self') : this.doc.expand('prx:account');
+      const newAccountURI = accountDoc.replace(`${this.original['accountId']}`, `${this.accountId}`);
+      data.set_account_uri = newAccountURI;
+    }
     return data;
   }
 
