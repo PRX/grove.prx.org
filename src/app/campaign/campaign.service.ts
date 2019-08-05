@@ -14,10 +14,6 @@ export class CampaignService {
     this.loadCampaigns();
   }
 
-  get root(): Observable<HalDoc> {
-    return this.augury.root;
-  }
-
   get campaigns(): Observable<CampaignModel[]> {
     return this._campaigns.asObservable();
   }

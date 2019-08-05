@@ -1,57 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of, combineLatest } from 'rxjs';
-import { concatMap, first, withLatestFrom, catchError, mergeMap } from 'rxjs/operators';
-import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
-import { Env } from './core/core.env';
+import { Component } from '@angular/core';
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
+import { Env } from './core/core.env';
+import { UserService } from './core/user.service';
 
 @Component({
   selector: 'grove-root',
-  templateUrl: './app.component.html',
+  template: `
+    <prx-auth [host]="authHost" [client]="authClient"></prx-auth>
+    <prx-header prxSticky="all">
+      <prx-navitem *ngIf="userService.loggedIn" route="/" text="Home"></prx-navitem>
+      <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
+        <prx-spinner class="user-loading"></prx-spinner>
+        <prx-image *ngIf="userService.userDoc" class="user-loaded" [imageDoc]="userService.userDoc"></prx-image>
+      </prx-navuser>
+    </prx-header>
+    <main>
+      <article>
+        <router-outlet></router-outlet>
+      </article>
+    </main>
+    <prx-footer></prx-footer>
+    <prx-modal></prx-modal>
+    <prx-toastr></prx-toastr>
+  `,
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   authHost = Env.AUTH_HOST;
   authClient = Env.AUTH_CLIENT_ID;
 
-  loggedIn = true; // until proven otherwise
-  authorized = false; // until proven otherwise, to avoid nav "jump"
-  userinfo: Userinfo;
-  userImageDoc$: Observable<HalDoc>;
-
   constructor(
-    private auth: AuthService,
-    private user: UserinfoService,
+    public userService: UserService,
     private angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics
   ) {
     this.angulartics2GoogleAnalytics.startTracking();
-  }
-
-  ngOnInit() {
-    this.user.config(this.authHost);
-    this.userImageDoc$ = this.auth.token.pipe(
-      first(),
-      mergeMap(token => {
-        if (token) {
-          return combineLatest(of(token), this.user.getUserinfo());
-        } else {
-          return of([]);
-        }
-      }),
-      concatMap(([token, userinfo]) => {
-        if (token) {
-          this.loggedIn = true;
-          this.authorized = this.auth.parseToken(token);
-        } else {
-          this.loggedIn = false;
-        }
-        if (userinfo) {
-          this.userinfo = userinfo;
-          return this.user.getUserDoc(userinfo);
-        } else {
-          return of();
-        }
-      })
-    );
   }
 }

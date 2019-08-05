@@ -1,6 +1,6 @@
 
 import { Injectable } from '@angular/core';
-import { HalBaseService, HalDoc, HalObservable } from 'ngx-prx-styleguide';
+import { HalBaseService } from 'ngx-prx-styleguide';
 import { Env } from './core.env';
 
 @Injectable()
