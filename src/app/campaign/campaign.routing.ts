@@ -6,7 +6,7 @@ import { CampaignListComponent } from './list/campaign-list.component';
 import { CampaignListPagingComponent } from './list/campaign-list-paging.component';
 import { CampaignContainerComponent } from './campaign-container.component';
 import { CampaignComponent } from './campaign.component';
-import { CampaignFormComponent } from './campaign-form.component';
+import { CampaignFormComponent } from './form/campaign-form.component';
 import { CampaignStatusComponent } from './campaign-status.component';
 
 const campaignChildRoutes = [

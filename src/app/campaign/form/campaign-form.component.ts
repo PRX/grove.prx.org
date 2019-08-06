@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { TabService } from 'ngx-prx-styleguide';
-import { AdvertiserService } from './service/advertiser.service';
-import { CampaignModel } from '../shared/model/campaign.model';
-import { UserService } from '../core/user.service';
+import { AdvertiserService } from '../service/advertiser.service';
+import { CampaignModel } from '../../shared/model/campaign.model';
+import { UserService } from '../../core/user.service';
+
 @Component({
   template: `
     <form *ngIf="campaign">

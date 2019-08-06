@@ -14,10 +14,6 @@ export class AdvertiserService {
     this.loadAdvertisers();
   }
 
-  get root(): Observable<HalDoc> {
-    return this.augury.root;
-  }
-
   get advertisers(): Observable<AdvertiserModel[]> {
     return this._advertisers.asObservable();
   }
@@ -38,6 +34,7 @@ export class AdvertiserService {
   }
 
   save(advertiser: AdvertiserModel): Observable<boolean> {
+    // TODO: error handling - does save throw an error, return a status?
     const saveAction = advertiser.save();
 
     saveAction.pipe(

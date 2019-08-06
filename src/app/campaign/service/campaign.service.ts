@@ -41,6 +41,7 @@ export class CampaignService {
   }
 
   save(campaign: CampaignModel): Observable<boolean> {
+    // TODO: error handling - does save throw an error, return a status?
     const saveAction = campaign.save();
 
     saveAction.pipe(

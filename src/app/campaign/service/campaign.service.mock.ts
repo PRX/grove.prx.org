@@ -40,4 +40,8 @@ export class CampaignServiceMock {
       })
     );
   }
+
+  save(): Observable<{}> {
+    return of();
+  }
 }
