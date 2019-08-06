@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-prx-styleguide';
 import { CampaignModel } from '../shared/model/campaign.model';
-import { CampaignService } from './campaign.service';
+import { CampaignService } from './service/campaign.service';
 
 @Component({
   selector: 'grove-campaign-status',

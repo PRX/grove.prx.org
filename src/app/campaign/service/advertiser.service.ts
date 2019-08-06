@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { AuguryService } from '../core/augury.service';
-import { AdvertiserModel } from '../shared/model/advertiser.model';
+import { AuguryService } from '../../core/augury.service';
+import { AdvertiserModel } from '../../shared/model/advertiser.model';
 
 @Injectable()
 export class AdvertiserService {
@@ -25,7 +25,6 @@ export class AdvertiserService {
   loadAdvertisers() {
     this.augury.followItems('prx:advertisers').pipe(withLatestFrom(this.augury.root)).subscribe(([advertisers, root]) => {
       this._advertisers.next(advertisers.map(s => new AdvertiserModel(root, s, false)));
-      console.log(this._advertisers.getValue());
     });
   }
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CampaignModel } from '../shared/model/campaign.model';
-import { CampaignService } from './campaign.service';
+import { CampaignService } from './service/campaign.service';
 
 @Component({
   template: `

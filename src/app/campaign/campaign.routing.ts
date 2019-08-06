@@ -2,7 +2,8 @@ import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
-import { CampaignListComponent } from './campaign-list.component';
+import { CampaignListComponent } from './list/campaign-list.component';
+import { CampaignListPagingComponent } from './list/campaign-list-paging.component';
 import { CampaignContainerComponent } from './campaign-container.component';
 import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './campaign-form.component';
@@ -31,6 +32,7 @@ export const campaignRoutes: Routes = [
 
 export const campaignComponents: any[] = [
   CampaignListComponent,
+  CampaignListPagingComponent,
   CampaignContainerComponent,
   CampaignComponent,
   CampaignFormComponent,

@@ -51,16 +51,21 @@ export class CampaignModel extends BaseModel {
 
   encode(): {} {
     const data = {} as any;
-    data.accountId = this.accountId;
+    // data.accountId = this.accountId;
     data.name = this.name;
     data.type = this.type;
     data.status = this.status;
     data.repName = this.repName;
     data.notes = this.notes;
     if (this.changed('accountId')) {
+      // TODO: this.parent.expand('self') is the augury root, nope
+      // Seems like this should be the id account self? nope, it's a CMS link. I do not like that.
       const accountDoc = this.isNew ? this.parent.expand('self') : this.doc.expand('prx:account');
       const newAccountURI = accountDoc.replace(`${this.original['accountId']}`, `${this.accountId}`);
       data.set_account_uri = newAccountURI;
+    }
+    if (this.changed('advertiser')) {
+
     }
     return data;
   }
