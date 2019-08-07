@@ -7,6 +7,7 @@ export class CampaignModel extends BaseModel {
   public id: number;
   public accountId: number;
   public name = '';
+  public advertiserId: number;
   public advertiser: AdvertiserModel;
   public type: string;
   public status: string;
@@ -14,7 +15,7 @@ export class CampaignModel extends BaseModel {
   public notes: string;
   // public flights: FlightModel[]
 
-  SETABLE = ['accountId', 'name', 'advertiser', 'type', 'status', 'repName', 'notes'];
+  SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes'];
 
   constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
     super();
@@ -60,12 +61,13 @@ export class CampaignModel extends BaseModel {
     if (this.changed('accountId')) {
       // TODO: this.parent.expand('self') is the augury root, nope
       // Seems like this should be the id account self? nope, it's a CMS link. I do not like that.
-      const accountDoc = this.isNew ? this.parent.expand('self') : this.doc.expand('prx:account');
+      const accountDoc = this.isNew ? '/api/v1/accounts/' + this.accountId : this.doc.expand('prx:account');
       const newAccountURI = accountDoc.replace(`${this.original['accountId']}`, `${this.accountId}`);
       data.set_account_uri = newAccountURI;
     }
-    if (this.changed('advertiser')) {
-
+    if (this.changed('advertiser') || this.changed('advertiserId')) {
+      console.log(this.advertiser, this.advertiserId);
+      data.set_advertiser_uri = '/api/v1/advertisers/' + this.advertiserId;
     }
     return data;
   }
