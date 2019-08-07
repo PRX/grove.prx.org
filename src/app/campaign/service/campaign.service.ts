@@ -26,7 +26,7 @@ export class CampaignService {
       withLatestFrom(this.augury.root)
     ).subscribe(([campaigns, root]) => {
       this.total = campaigns.length ? campaigns[0]['_total'] : 0;
-      this._campaigns.next(campaigns.map(s => new CampaignModel(root, s, false)));
+      this._campaigns.next(campaigns.map(s => new CampaignModel(root, s, true)));
     });
   }
 
@@ -42,17 +42,21 @@ export class CampaignService {
 
   save(campaign: CampaignModel): Observable<boolean> {
     // TODO: error handling - does save throw an error, return a status?
-    const saveAction = campaign.save();
+    const saveAction = campaign.save(); // TODO: seems like save() is nulling out fields like id, accountId, etc
 
     saveAction.pipe(
       withLatestFrom(this.campaigns),
     ).subscribe(([saveStatus, campaigns]) => {
       const index = campaigns.findIndex((c: CampaignModel) => c.id === campaign.id);
-      this._campaigns.next([
-        ...campaigns.slice(0, index),
-        campaign,
-        ...campaigns.slice(index + 1)
-      ]);
+      if (index > -1) {
+        this._campaigns.next([
+          ...campaigns.slice(0, index),
+          campaign,
+          ...campaigns.slice(index + 1)
+        ]);
+      } else {
+        this._campaigns.next([...campaigns, campaign]);
+      }
     });
 
     return saveAction;

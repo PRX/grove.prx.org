@@ -41,11 +41,15 @@ export class AdvertiserService {
       withLatestFrom(this.advertisers),
     ).subscribe(([saveStatus, advertisers]) => {
       const index = advertisers.findIndex((a: AdvertiserModel) => a.id === advertiser.id);
-      this._advertisers.next([
-        ...advertisers.slice(0, index),
-        advertiser,
-        ...advertisers.slice(index + 1)
-      ]);
+      if (index > -1) {
+        this._advertisers.next([
+          ...advertisers.slice(0, index),
+          advertiser,
+          ...advertisers.slice(index + 1)
+        ]);
+      } else {
+        this._advertisers.next([...advertisers, advertiser]);
+      }
     });
 
     return saveAction;
