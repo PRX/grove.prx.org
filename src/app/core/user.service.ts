@@ -57,7 +57,7 @@ export class UserService {
   get accounts(): Observable<HalDoc[]> {
     return this.userDoc.pipe(
       concatMap(doc => {
-        const per = doc['_links']['prx:accounts']['count'];
+        const per = doc && doc['_links']['prx:accounts']['count'];
         return doc ? doc.followItems('prx:accounts', {per}) : of([]);
       })
     );
