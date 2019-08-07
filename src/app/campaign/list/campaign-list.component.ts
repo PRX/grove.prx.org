@@ -7,7 +7,9 @@ import { CampaignService } from '../service/campaign.service';
   selector: 'grove-campaign-list',
   template: `
     <ul>
-      <li *ngFor="let campaign of campaigns$ | async">{{ campaign.name }}</li>
+      <li *ngFor="let campaign of campaigns$ | async">
+        <a routerLink="{{'/campaign/' + campaign.id}}">{{ campaign.name }}</a>
+      </li>
     </ul>
     <grove-campaign-list-paging
       [currentPage]="currentPage"
