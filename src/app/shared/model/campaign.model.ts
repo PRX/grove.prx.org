@@ -31,7 +31,17 @@ export class CampaignModel extends BaseModel {
   }
 
   related() {
-    const advertiser = this.doc ? this.doc.follow('prx:advertiser').pipe(map(doc => new AdvertiserModel(this.doc, doc))) : of();
+    let advertiser;
+    if (this.doc) {
+      advertiser = this.doc.follow('prx:advertiser').pipe(
+        map(doc => {
+          this.set('advertiserId', doc.id, true);
+          return new AdvertiserModel(this.doc, doc);
+        })
+      );
+    } else {
+      advertiser = of();
+    }
     const flights = of([]);
 
     return {
@@ -42,7 +52,10 @@ export class CampaignModel extends BaseModel {
 
   decode() {
     this.id = this.doc['id'];
-    this.accountId = this.doc['accountId'];
+    if (this.doc && this.doc['_links']) {
+      const accountUrl = this.doc['_links']['prx:account']['href'].split('/');
+      this.accountId = parseInt(accountUrl[accountUrl.length - 1], 10);
+    }
     this.name = this.doc['name'] || '';
     this.type = this.doc['type'] || '';
     this.status = this.doc['status'] || '';
@@ -52,7 +65,6 @@ export class CampaignModel extends BaseModel {
 
   encode(): {} {
     const data = {} as any;
-    // data.accountId = this.accountId;
     data.name = this.name;
     data.type = this.type;
     data.status = this.status;

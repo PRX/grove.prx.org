@@ -75,7 +75,10 @@ export class CampaignFormComponent implements OnInit {
               private userService: UserService) {}
 
   ngOnInit() {
-    this.tab.model.subscribe(campaign => this.campaign = campaign as CampaignModel);
+    this.tab.model.subscribe(campaign => {
+      console.log(campaign);
+      this.campaign = campaign as CampaignModel;
+    });
     this.advertiserOptions$ = this.advertiserService.advertisers.pipe(
       map(advertisers =>
         advertisers.map(a => [a.name, a.id]))
