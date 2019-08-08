@@ -65,10 +65,11 @@ export class CampaignModel extends BaseModel {
     }
     if (this.changed('advertiserId')) {
       console.log(this.advertiser, this.advertiserId);
-      // data.set_advertiser_uri = '/api/v1/advertisers/' + this.advertiserId;
-      const advertiserDoc = this.advertiser.doc.expand('self');
-      const newAdvertiserURI = advertiserDoc.replace(`${this.original['advertiserId']}`, `${this.advertiserId}`);
-      data.set_advertiser_uri = newAdvertiserURI;
+      data.set_advertiser_uri = '/api/v1/advertisers/' + this.advertiserId;
+      // This full url does not actually save the change, but the partial one above does
+      // const advertiserDoc = this.advertiser.doc.expand('self');
+      // const newAdvertiserURI = advertiserDoc.replace(`${this.original['advertiserId']}`, `${this.advertiserId}`);
+      // data.set_advertiser_uri = newAdvertiserURI;
     }
     return data;
   }

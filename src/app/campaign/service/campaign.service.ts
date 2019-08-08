@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { map, withLatestFrom, share } from 'rxjs/operators';
 import { AuguryService } from '../../core/augury.service';
 import { CampaignModel } from '../../shared/model/campaign.model';
 
@@ -42,7 +42,7 @@ export class CampaignService {
 
   save(campaign: CampaignModel): Observable<boolean> {
     // TODO: error handling - does save throw an error, return a status?
-    const saveAction = campaign.save(); // TODO: seems like save() is nulling out fields like id, accountId, etc
+    const saveAction = campaign.save().pipe(share()); // TODO: seems like save() is nulling out fields like id, accountId, etc
 
     saveAction.pipe(
       withLatestFrom(this.campaigns),

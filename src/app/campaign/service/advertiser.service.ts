@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
-import { HalDoc } from 'ngx-prx-styleguide';
+import { map, withLatestFrom, share } from 'rxjs/operators';
 import { AuguryService } from '../../core/augury.service';
 import { AdvertiserModel } from '../../shared/model/advertiser.model';
 
@@ -35,7 +34,7 @@ export class AdvertiserService {
 
   save(advertiser: AdvertiserModel): Observable<boolean> {
     // TODO: error handling - does save throw an error, return a status?
-    const saveAction = advertiser.save();
+    const saveAction = advertiser.save().pipe(share());
 
     saveAction.pipe(
       withLatestFrom(this.advertisers),
