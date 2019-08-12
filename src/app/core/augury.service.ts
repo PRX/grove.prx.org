@@ -5,13 +5,14 @@ import { Env } from './core.env';
 
 @Injectable()
 export class AuguryService extends HalBaseService {
+  static ROOT_PATH = '/api/v1';
 
   get host(): string {
     return Env.AUGURY_HOST;
   }
 
   get path(): string {
-    return '/api/v1';
+    return AuguryService.ROOT_PATH;
   }
 
   get ttl(): number {

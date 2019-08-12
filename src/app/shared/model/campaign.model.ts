@@ -2,6 +2,7 @@ import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseModel, HalDoc } from 'ngx-prx-styleguide';
 import { AdvertiserModel } from './advertiser.model';
+import { AuguryService } from '../../core/augury.service';
 
 export class CampaignModel extends BaseModel {
   public id: number;
@@ -71,17 +72,20 @@ export class CampaignModel extends BaseModel {
     data.repName = this.repName;
     data.notes = this.notes;
     if (this.changed('accountId')) {
-      const accountDoc = this.isNew ? '/api/v1/accounts/' + this.accountId : this.doc.expand('prx:account');
-      const newAccountURI = accountDoc.replace(`${this.original['accountId']}`, `${this.accountId}`);
+      const accountDoc = this.isNew ?
+        `${AuguryService.ROOT_PATH}/accounts/${this.accountId}` :
+        this.doc.expand('prx:account');
+      const parts = accountDoc.split('/');
+      const newAccountURI = [...parts.slice(0, parts.length - 1), this.accountId.toString()].join('/');
       data.set_account_uri = newAccountURI;
     }
     if (this.changed('advertiserId')) {
-      console.log(this.advertiser, this.advertiserId);
-      data.set_advertiser_uri = '/api/v1/advertisers/' + this.advertiserId;
-      // This full url does not actually save the change, but the partial one above does
-      // const advertiserDoc = this.advertiser.doc.expand('self');
-      // const newAdvertiserURI = advertiserDoc.replace(`${this.original['advertiserId']}`, `${this.advertiserId}`);
-      // data.set_advertiser_uri = newAdvertiserURI;
+      const advertiserDoc = this.isNew || !this.advertiser ?
+        `${AuguryService.ROOT_PATH}/advertisers/${this.advertiserId}` :
+        this.advertiser.doc.expand('self');
+      const parts = advertiserDoc.split('/');
+      const newAdvertiserURI = [...parts.slice(0, parts.length - 1), this.advertiserId.toString()].join('/');
+      data.set_advertiser_uri = newAdvertiserURI;
     }
     return data;
   }
