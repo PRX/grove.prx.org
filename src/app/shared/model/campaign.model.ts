@@ -1,6 +1,6 @@
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseModel, HalDoc } from 'ngx-prx-styleguide';
+import { BaseModel, HalDoc, REQUIRED } from 'ngx-prx-styleguide';
 import { AdvertiserModel } from './advertiser.model';
 import { AuguryService } from '../../core/augury.service';
 
@@ -17,6 +17,15 @@ export class CampaignModel extends BaseModel {
   // public flights: FlightModel[]
 
   SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes'];
+
+  VALIDATORS = {
+    accountId: [REQUIRED()],
+    name: [REQUIRED()],
+    advertiserId: [REQUIRED()],
+    type: [REQUIRED()],
+    status: [REQUIRED()],
+    repName: [REQUIRED()]
+  };
 
   constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
     super();

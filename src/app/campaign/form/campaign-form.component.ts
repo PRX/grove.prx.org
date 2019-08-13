@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { TabService } from 'ngx-prx-styleguide';
 import { AdvertiserService } from '../service/advertiser.service';
-import { AdvertiserModel } from '../../shared/model/advertiser.model';
 import { CampaignModel } from '../../shared/model/campaign.model';
 import { UserService } from '../../core/user.service';
 
@@ -42,7 +41,7 @@ import { UserService } from '../../core/user.service';
 
       <prx-fancy-field
         label="Campaign Notes"
-        textarea [model]="campaign" name="notes" required>
+        textarea [model]="campaign" name="notes">
       </prx-fancy-field>
 
     </form>
@@ -64,7 +63,7 @@ export class CampaignFormComponent implements OnInit {
   statusOptions = [
     ['Draft', 'draft'],
     ['Hold', 'hold'],
-    ['sold', 'sold'],
+    ['Sold', 'sold'],
     ['Approved', 'approved'],
     ['Paused', 'paused'],
     ['Canceled', 'canceled']
@@ -76,7 +75,6 @@ export class CampaignFormComponent implements OnInit {
 
   ngOnInit() {
     this.tab.model.subscribe(campaign => {
-      console.log(campaign);
       this.campaign = campaign as CampaignModel;
     });
     this.advertiserOptions$ = this.advertiserService.advertisers.pipe(
