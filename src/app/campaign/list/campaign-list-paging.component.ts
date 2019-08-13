@@ -18,7 +18,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
         class="pager" [class.active]="isPageActive(i + 1)"
         [disabled]="isPageActive(i + 1)"
         (click)="!isPageActive(i + 1) && showPage.emit(i + 1)"
-        title="Page {{i + 1}}">1</button>
+        title="Page {{i + 1}}">{{i + 1}}</button>
 
       <button class="pager"
         [disabled]="isPageActive(totalPages)"
