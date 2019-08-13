@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, withLatestFrom, share } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, withLatestFrom, share, mergeMap } from 'rxjs/operators';
 import { AuguryService } from '../../core/augury.service';
 import { CampaignModel } from '../../shared/model/campaign.model';
 
@@ -11,6 +11,7 @@ export class CampaignService {
   per = 10;
   page: number;
   total = 0;
+  error: Error;
 
   constructor(private augury: AuguryService) {
     this.loadCampaigns();
@@ -27,15 +28,32 @@ export class CampaignService {
     ).subscribe(([campaigns, root]) => {
       this.total = campaigns.length ? campaigns[0]['_total'] : 0;
       this._campaigns.next(campaigns.map(s => new CampaignModel(root, s, true)));
-    });
+    },
+    err => this.error = err);
   }
 
   findCampaignById(id: number): Observable<CampaignModel> {
     return this._campaigns.pipe(
+      map((campaigns) => {
+        return campaigns.find(a => a.id === id);
+      }),
       withLatestFrom(this.augury.root),
-      map(([campaigns, rootDoc]) => {
-        // TODO: lookup campaign if not found and only then if not found return model with rootDoc and null
-        return campaigns.find(c => c.id === id) || new CampaignModel(rootDoc, null, false);
+      mergeMap(([campaign, rootDoc]) => {
+        // check !NaN, else return empty campaign
+        if (!isNaN(id)) {
+          // if not found in state, make request
+          if (!campaign) {
+            return this.augury.follow('prx:campaign', {id}).pipe(
+              map(doc => {
+                return new CampaignModel(rootDoc, doc, false);
+              })
+            );
+          } else {
+            return of(campaign);
+          }
+        } else {
+          return of(new CampaignModel(rootDoc, null, false));
+        }
       })
     );
   }

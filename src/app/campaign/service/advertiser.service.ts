@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, withLatestFrom, share } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, withLatestFrom, share, mergeMap } from 'rxjs/operators';
 import { AuguryService } from '../../core/augury.service';
 import { AdvertiserModel } from '../../shared/model/advertiser.model';
 
@@ -8,6 +8,7 @@ import { AdvertiserModel } from '../../shared/model/advertiser.model';
 export class AdvertiserService {
   // tslint:disable-next-line: variable-name
   private _advertisers: BehaviorSubject<AdvertiserModel[]> = new BehaviorSubject([]);
+  error: Error;
 
   constructor(private augury: AuguryService) {
     this.loadAdvertisers();
@@ -20,14 +21,28 @@ export class AdvertiserService {
   loadAdvertisers() {
     this.augury.followItems('prx:advertisers').pipe(withLatestFrom(this.augury.root)).subscribe(([advertisers, root]) => {
       this._advertisers.next(advertisers.map(s => new AdvertiserModel(root, s, false)));
-    });
+    },
+    err => this.error = err);
   }
 
   findAdvertiserById(id: number): Observable<AdvertiserModel> {
     return this._advertisers.pipe(
+      map((advertisers) => {
+        return advertisers.find(a => a.id === id);
+      }),
       withLatestFrom(this.augury.root),
-      map(([advertisers, rootDoc]) => {
-        return advertisers.find(a => a.id === id) || new AdvertiserModel(rootDoc, null, false);
+      mergeMap(([advertiser, rootDoc]) => {
+        // TODO: apply here what I learned with campaign
+        // if not found in state, make request
+        if (!advertiser) {
+          return this.augury.follow('prx:advertisers', {id}).pipe(
+            map(doc => {
+              return new AdvertiserModel(rootDoc, doc, false);
+            })
+          );
+        } else {
+          return of(advertiser);
+        }
       })
     );
   }
