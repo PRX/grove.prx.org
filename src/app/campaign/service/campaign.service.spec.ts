@@ -96,20 +96,6 @@ describe('CampaignService', () => {
     });
   });
 
-  // TODO: MockHalDoc does not handle errors on create or update
-  xit('should handle errors on save', (done) => {
-    const newCampaign = new CampaignModel(mockAuguryService.root, new MockHalDoc({
-      name: 'Latest Campaign'
-    }));
-    mockAuguryService.mockError('prx:campaigns', 'Bad Request');
-    campaignService.save(newCampaign).pipe(
-      withLatestFrom(campaignService.campaigns)
-    ).subscribe(([saveStatus, campaigns]) => {
-      expect(campaigns.find(a => a.name === 'Latest Campaign')).not.toBeUndefined();
-      done();
-    });
-  });
-
   it('should handle errors on load', (done) => {
     mockAuguryService.mockError('prx:campaigns', 'Bad Request');
     campaignService.loadCampaigns();
