@@ -28,7 +28,6 @@ describe('AdvertiserService', () => {
           useValue: mockAuguryService
         }
       ],
-      // imports: [HttpClientTestingModule]
     });
 
     auguryService = TestBed.get(AuguryService);

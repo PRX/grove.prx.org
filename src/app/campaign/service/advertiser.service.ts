@@ -46,12 +46,12 @@ export class AdvertiserService {
   }
 
   save(advertiser: AdvertiserModel): Observable<boolean> {
-    // TODO: error handling - does save throw an error, return a status?
     const saveAction = advertiser.save().pipe(share());
 
     saveAction.pipe(
       withLatestFrom(this.advertisers),
     ).subscribe(([saveStatus, advertisers]) => {
+      // any errors are thrown to the ErrorService and raised to the whole app, so ok to ignore here
       const index = advertisers.findIndex((a: AdvertiserModel) => a.id === advertiser.id);
       if (index > -1) {
         this._advertisers.next([
