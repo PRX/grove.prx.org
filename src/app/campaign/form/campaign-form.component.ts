@@ -51,7 +51,7 @@ export class CampaignFormComponent implements OnInit {
   advertiserOptions$: Observable<(string | number)[][]>;
   accountOptions$: Observable<any[][]>;
   campaign: CampaignModel;
-  typeOptions = [
+  readonly typeOptions = [
     ['Paid Campaign', 'paid_campaign'],
     ['Cross Promo', 'cross_promo'],
     ['Cross Promo Special', 'cross_promo_special'],
@@ -60,7 +60,7 @@ export class CampaignFormComponent implements OnInit {
     ['House', 'house'],
     ['Survey', 'survey']
   ];
-  statusOptions = [
+  readonly statusOptions = [
     ['Draft', 'draft'],
     ['Hold', 'hold'],
     ['Sold', 'sold'],
