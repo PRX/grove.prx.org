@@ -8,7 +8,7 @@ grove:
     - .env
   ports:
     - "4204:4204"
-  command: web
+  command: start
   environment:
     VIRTUAL_HOST: grove.prx.docker
     HOST: https://grove.prx.docker

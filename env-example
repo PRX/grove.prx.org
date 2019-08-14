@@ -3,6 +3,10 @@
 # (3) profit
 LOCAL_ENV=true
 
+# prx api
+AUGURY_HOST=augury.staging.prx.tech
+AUGURY_TTL=
+
 # prx auth
 AUTH_HOST=id.staging.prx.tech
 # for https://grove.prx.docker
@@ -11,6 +15,7 @@ AUTH_CLIENT_ID=
 # monitoring
 NEW_RELIC_APP_NAME=
 NEW_RELIC_LICENSE_KEY=
+NEW_RELIC_NO_CONFIG_FILE=true
 GA_KEY=
 
 # dev server

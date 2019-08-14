@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SpinnerModule, ImageModule } from 'ngx-prx-styleguide';
+import { AuthGuard, DeactivateGuard, UnauthGuard,
+  FancyFormModule, ImageModule, SelectModule, SpinnerModule,
+  StatusBarModule, StickyModule, ToastrModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [],
@@ -8,8 +10,18 @@ import { SpinnerModule, ImageModule } from 'ngx-prx-styleguide';
     CommonModule
   ],
   exports: [
+    FancyFormModule,
+    ImageModule,
+    SelectModule,
     SpinnerModule,
-    ImageModule
+    StatusBarModule,
+    StickyModule,
+    ToastrModule
+  ],
+  providers: [
+    AuthGuard,
+    DeactivateGuard,
+    UnauthGuard
   ]
 })
 export class SharedModule { }

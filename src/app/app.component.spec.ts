@@ -9,7 +9,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { Angulartics2 } from 'angulartics2';
-import { Angulartics2GoogleAnalytics } from 'angulartics2/ga'
+import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 
 const userinfo = new Userinfo();
 userinfo.preferred_username = 'Someone';
@@ -68,10 +68,10 @@ describe('AppComponent', () => {
   });
 
   it('should show user info when logged in', async(() => {
-    comp.loggedIn = true;
+    comp.userService.loggedIn = true;
     fix.detectChanges();
     expect(de.query(By.css('prx-navuser'))).not.toBeNull();
-    comp.loggedIn = false;
+    comp.userService.loggedIn = false;
     fix.detectChanges();
     expect(de.query(By.css('prx-navuser'))).toBeNull();
   }));
