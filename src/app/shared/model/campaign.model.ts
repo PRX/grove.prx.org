@@ -2,6 +2,7 @@ import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { BaseModel, HalDoc, REQUIRED } from 'ngx-prx-styleguide';
 import { AdvertiserModel } from './advertiser.model';
+import { FlightModel } from './flight.model';
 import { AuguryService } from '../../core/augury.service';
 
 export class CampaignModel extends BaseModel {
@@ -14,9 +15,9 @@ export class CampaignModel extends BaseModel {
   public status: string;
   public repName: string;
   public notes: string;
-  // public flights: FlightModel[]
+  public flights: FlightModel[];
 
-  SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes'];
+  SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes', 'flights'];
 
   VALIDATORS = {
     accountId: [REQUIRED()],
@@ -42,6 +43,7 @@ export class CampaignModel extends BaseModel {
 
   related() {
     let advertiser;
+    let flights;
     if (this.doc) {
       advertiser = this.doc.follow('prx:advertiser').pipe(
         map(doc => {
@@ -49,10 +51,15 @@ export class CampaignModel extends BaseModel {
           return new AdvertiserModel(this.doc, doc);
         })
       );
+      flights = this.doc.followItems('prx:flights').pipe(
+        map(docs => {
+          return docs.map(doc => new FlightModel(this.doc, doc));
+        })
+      );
     } else {
       advertiser = of();
+      flights = of([]);
     }
-    const flights = of([]);
 
     return {
       advertiser,

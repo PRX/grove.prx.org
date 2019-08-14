@@ -15,8 +15,8 @@ import { UserService } from '../../core/user/user.service';
       </prx-fancy-field>
 
       <prx-fancy-field
-      label="Campaign Name"
-        textinput [model]="campaign" name="name"  required>
+        label="Campaign Name"
+        textinput [model]="campaign" name="name" required>
       </prx-fancy-field>
 
       <prx-fancy-field

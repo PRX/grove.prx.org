@@ -7,10 +7,12 @@ import { CampaignListPagingComponent } from './list/campaign-list-paging.compone
 import { CampaignContainerComponent } from './campaign-container.component';
 import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './form/campaign-form.component';
+import { FlightFormComponent } from './form/flight-form.component';
 import { CampaignStatusComponent } from './campaign-status.component';
 
 const campaignChildRoutes = [
-  { path: '', component: CampaignFormComponent }
+  { path: '', component: CampaignFormComponent },
+  { path: 'flight/:flightId', component: FlightFormComponent }
 ];
 
 export const campaignRoutes: Routes = [
@@ -36,6 +38,7 @@ export const campaignComponents: any[] = [
   CampaignContainerComponent,
   CampaignComponent,
   CampaignFormComponent,
+  FlightFormComponent,
   CampaignStatusComponent
 ];
 

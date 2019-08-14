@@ -48,11 +48,12 @@ describe('CampaignComponent', () => {
     });
   }));
 
-  it('should set base route', () => {
-    expect(comp.base).toContain(`/campaign/${comp.id}`);
+  it('should show tabs', () => {
+    const length = comp.campaign.flights ? 1 + comp.campaign.flights.length : 1;
+    expect(de.queryAll(By.css('prx-tabs nav > a')).length).toEqual(length);
   });
 
-  it('should show tabs', () => {
-    expect(de.queryAll(By.css('prx-tabs nav > a')).length).toEqual(2);
+  it('should allow adding a flight after the campaign has been created', () => {
+    expect(de.query(By.css('prx-tabs .links > a')).nativeElement.textContent).toContain('Add a Flight');
   });
 });
