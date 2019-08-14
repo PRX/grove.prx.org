@@ -20,11 +20,11 @@ export class CampaignModel extends BaseModel {
 
   VALIDATORS = {
     accountId: [REQUIRED()],
-    // name: [REQUIRED()],
+    name: [REQUIRED()],
     advertiserId: [REQUIRED()],
     type: [REQUIRED()],
     status: [REQUIRED()],
-    // repName: [REQUIRED()]
+    repName: [REQUIRED()]
   };
 
   constructor(parent: HalDoc, campaign?: HalDoc, loadRelated = false) {
