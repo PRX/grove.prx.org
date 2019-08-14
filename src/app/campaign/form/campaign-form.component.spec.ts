@@ -51,34 +51,27 @@ describe('CampaignFormComponent', () => {
     });
   }));
 
-  it('should get advertiser options', () => {
-    let options;
-    let advertisers;
+  it('should get advertiser options', (done) => {
     comp.advertiserOptions$.pipe(
       withLatestFrom(mockAdvertiser.advertisers)
-    ).subscribe(([optionsResult, advertisersResult]) => {
-      options = optionsResult;
-      advertisers = advertisersResult;
+    ).subscribe(([options, advertisers]) => {
+      expect(options.length).toEqual(advertisers.length);
+      expect(options[0][0]).toEqual(advertisers[0].name);
+      done();
     });
-    // synchronous observable result
-    expect(options.length).toEqual(advertisers.length);
-    expect(options[0][0]).toEqual(advertisers[0].name);
   });
 
-  it('should get account options', () => {
-    let options;
-    let accounts;
-    let defaultAccount;
+  it('should get account options', (done) => {
     comp.accountOptions$.pipe(
       withLatestFrom(mockUserService.accounts),
       withLatestFrom(mockUserService.defaultAccount)
     ).subscribe((value: [[any[][], MockHalDoc[]], MockHalDoc]) => {
-      options = value[0][0];
-      accounts = value[0][1];
-      defaultAccount = value[1];
+      const options = value[0][0];
+      const accounts = value[0][1];
+      const defaultAccount = value[1];
+      expect(options.length).toEqual(accounts.length + 1); // defaultAccount + accounts
+      expect(options[0][0]).toEqual(defaultAccount['name']);
+      done();
     });
-    // synchronous observable result
-    expect(options.length).toEqual(accounts.length + 1); // defaultAccount + accounts
-    expect(options[0][0]).toEqual(defaultAccount.name);
   });
 });
