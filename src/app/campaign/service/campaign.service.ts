@@ -60,7 +60,7 @@ export class CampaignService {
 
   save(campaign: CampaignModel): Observable<boolean> {
     // TODO: error handling - does save throw an error, return a status?
-    const saveAction = campaign.save().pipe(share()); // TODO: seems like save() is nulling out fields like id, accountId, etc
+    const saveAction = campaign.save().pipe(share());
 
     saveAction.pipe(
       withLatestFrom(this.campaigns),

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { of, combineLatest, Observable, BehaviorSubject } from 'rxjs';
 import { concatMap, first } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
-import { Env } from './core.env';
+import { Env } from '../core.env';
 
 @Injectable()
 export class UserService {

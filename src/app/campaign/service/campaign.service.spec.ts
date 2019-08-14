@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { withLatestFrom } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { CampaignService } from './campaign.service';
+import { withLatestFrom } from 'rxjs/operators';
 import { MockHalService, HalService, MockHalDoc, HalObservable } from 'ngx-prx-styleguide';
 import { AuguryService } from '../../core/augury.service';
+import { CampaignService } from './campaign.service';
 import { CampaignServiceMock } from './campaign.service.mock';
 import { CampaignModel } from '../../shared/model/campaign.model';
 
@@ -30,7 +29,7 @@ describe('CampaignService', () => {
           useValue: mockAuguryService
         }
       ],
-      imports: [HttpClientTestingModule]
+      // imports: [HttpClientTestingModule]
     });
 
     auguryService = TestBed.get(AuguryService);

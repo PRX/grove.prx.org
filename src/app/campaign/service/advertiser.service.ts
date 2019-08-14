@@ -32,8 +32,6 @@ export class AdvertiserService {
       }),
       withLatestFrom(this.augury.root),
       mergeMap(([advertiser, rootDoc]) => {
-        // TODO: apply here what I learned with campaign
-        // if not found in state, make request
         if (!advertiser) {
           return this.augury.follow('prx:advertisers', {id}).pipe(
             map(doc => {

@@ -4,7 +4,7 @@ import { map, withLatestFrom } from 'rxjs/operators';
 import { TabService } from 'ngx-prx-styleguide';
 import { AdvertiserService } from '../service/advertiser.service';
 import { CampaignModel } from '../../shared/model/campaign.model';
-import { UserService } from '../../core/user.service';
+import { UserService } from '../../core/user/user.service';
 
 @Component({
   template: `

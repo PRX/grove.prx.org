@@ -9,8 +9,8 @@ import { SharedModule } from '../../shared/shared.module';
 import { CampaignFormComponent } from './campaign-form.component';
 import { AdvertiserService } from '../service/advertiser.service';
 import { AdvertiserServiceMock } from '../service/advertiser.service.mock';
-import { UserService } from '../../core/user.service';
-import { UserServiceMock } from '../../core/user.service.mock';
+import { UserService } from '../../core/user/user.service';
+import { UserServiceMock } from '../../core/user/user.service.mock';
 
 describe('CampaignFormComponent', () => {
   let comp: CampaignFormComponent;

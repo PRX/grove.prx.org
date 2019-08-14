@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 import { Env } from './core/core.env';
-import { UserService } from './core/user.service';
+import { UserService } from './core/user/user.service';
 
 @Component({
   selector: 'grove-root',

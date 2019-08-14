@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AdvertiserService } from './advertiser.service';
+import { withLatestFrom } from 'rxjs/operators';
 import { MockHalService, HalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../../core/augury.service';
+import { AdvertiserService } from './advertiser.service';
 import { AdvertiserServiceMock } from './advertiser.service.mock';
 import { AdvertiserModel } from '../../shared/model/advertiser.model';
-import { withLatestFrom } from 'rxjs/operators';
 
 describe('AdvertiserService', () => {
   let auguryService: AuguryService;
@@ -29,7 +28,7 @@ describe('AdvertiserService', () => {
           useValue: mockAuguryService
         }
       ],
-      imports: [HttpClientTestingModule]
+      // imports: [HttpClientTestingModule]
     });
 
     auguryService = TestBed.get(AuguryService);
