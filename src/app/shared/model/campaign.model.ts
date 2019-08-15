@@ -17,7 +17,7 @@ export class CampaignModel extends BaseModel {
   public notes: string;
   public flights: FlightModel[];
 
-  SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes', 'flights'];
+  SETABLE = ['accountId', 'name', 'advertiser', 'advertiserId', 'type', 'status', 'repName', 'notes'];
 
   VALIDATORS = {
     accountId: [REQUIRED()],
@@ -53,7 +53,10 @@ export class CampaignModel extends BaseModel {
       );
       flights = this.doc.followItems('prx:flights').pipe(
         map(docs => {
-          return docs.map(doc => new FlightModel(this.doc, doc));
+          const savedFlights = docs.map(doc => new FlightModel(this.doc, doc));
+          const unsavedFlight = new FlightModel(this.doc, null);
+          const allFlights = !unsavedFlight.isDestroy ? savedFlights.concat([unsavedFlight]) : savedFlights;
+          return allFlights;
         })
       );
     } else {

@@ -11,12 +11,10 @@ import { CampaignModel } from '../shared/model/campaign.model';
         <a routerLinkActive="active"
           [routerLinkActiveOptions]="{exact:true}"
           [routerLink]="['/campaign/', (campaign?.id || 'new')]">Campaign Meta Data</a>
-        <ng-container *ngFor="let flight of campaign?.flights">
-          <a *ngIf="flight?.name"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact:true}"
-            [routerLink]="['/campaign/', campaign.id, 'flight', flight.id]">{{flight.name}}</a>
-        </ng-container>
+        <a *ngFor="let flight of flights"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact:true}"
+          [routerLink]="['/campaign/', campaign.id, 'flight', flight.id]">{{flight.name}}</a>
       </nav>
 
       <div class="links" *ngIf="campaign && !campaign?.isNew">
@@ -28,4 +26,8 @@ import { CampaignModel } from '../shared/model/campaign.model';
 export class CampaignComponent {
   @Input() id: number;
   @Input() campaign: CampaignModel;
+
+  get flights() {
+    return this.campaign && this.campaign.flights && this.campaign.flights.filter(f => !f.isNew);
+  }
 }

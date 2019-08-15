@@ -48,6 +48,6 @@ export class FlightModel extends BaseModel {
   }
 
   saveNew(data: {}): Observable<HalDoc> {
-    return this.parent.create('prx:flight', {}, data);
+    return this.parent.create('prx:flights', {}, data);
   }
 }

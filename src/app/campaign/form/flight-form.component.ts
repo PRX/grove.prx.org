@@ -35,6 +35,15 @@ export class FlightFormComponent implements OnInit {
               flight = campaign.flights.find(f => f.id === this.flightId);
             } else {
               flight = new FlightModel(campaign.doc, null);
+              if (campaign.flights) {
+                if (campaign.flights.length === 0 || campaign.flights[campaign.flights.length - 1].id) {
+                  campaign.flights.push(flight);
+                } else {
+                  flight = campaign.flights[campaign.flights.length - 1];
+                }
+              } else {
+                campaign.flights = [flight];
+              }
             }
             return flight;
           })
