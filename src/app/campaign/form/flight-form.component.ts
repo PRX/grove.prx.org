@@ -13,6 +13,14 @@ import { FlightModel } from 'src/app/shared/model/flight.model';
         label="Flight Name"
         textinput [model]="flight" name="name" required>
       </prx-fancy-field>
+
+      <prx-fancy-field label="Start and End Dates">
+        <span>Expected </span>
+        <prx-datepicker [date]="flight.startDate" (dateChange)="flight.set('startDate', $event)" [changed]="flight.changed('startDate')">
+        </prx-datepicker>
+        <prx-datepicker [date]="flight.endDate" (dateChange)="flight.set('endDate', $event)" [changed]="flight.changed('endDate')">
+        </prx-datepicker>
+      </prx-fancy-field>
     </form>
   `
 })
