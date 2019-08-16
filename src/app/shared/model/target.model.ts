@@ -1,11 +1,12 @@
 import { BaseModel, HalDoc } from 'ngx-prx-styleguide';
 import { Observable } from 'rxjs';
 
-export class ZoneModel extends BaseModel {
+export class TargetModel extends BaseModel {
   public id: number;
+  public targetType: string;
   public targetCode: string;
 
-  SETABLE = ['targetCode'];
+  SETABLE = ['targetType', 'targetCode'];
 
   constructor(parent: HalDoc, target?: HalDoc, loadRelated = false) {
     super();
@@ -28,12 +29,14 @@ export class ZoneModel extends BaseModel {
 
   decode() {
     this.id = this.doc['id'];
+    this.targetType = this.doc['targetType'];
     this.targetCode = this.doc['targetCode'];
   }
 
   encode() {
     const data = {} as any;
 
+    data.targetType = this.targetType;
     data.targetCode = this.targetCode;
 
     return data;
