@@ -40,7 +40,7 @@ export class FlightFormComponent implements OnInit {
             this.flightId = +params.flightId;
             let flight: FlightModel;
             if (!isNaN(this.flightId)) {
-              flight = campaign.flights.find(f => f.id === this.flightId);
+              flight = campaign.flights && campaign.flights.find(f => f.id === this.flightId);
             } else {
               flight = new FlightModel(campaign.doc, null);
               if (campaign.flights) {
