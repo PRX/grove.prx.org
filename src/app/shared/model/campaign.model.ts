@@ -53,10 +53,7 @@ export class CampaignModel extends BaseModel {
       );
       flights = this.doc.followItems('prx:flights').pipe(
         map(docs => {
-          const savedFlights = docs.map(doc => new FlightModel(this.doc, doc, true));
-          const unsavedFlight = new FlightModel(this.doc, null, true);
-          const allFlights = !unsavedFlight.isDestroy ? savedFlights.concat([unsavedFlight]) : savedFlights;
-          return allFlights;
+          return docs.map(doc => new FlightModel(this.doc, doc, true));
         })
       );
     }

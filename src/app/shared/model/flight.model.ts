@@ -57,8 +57,8 @@ export class FlightModel extends BaseModel {
   decode() {
     this.id = this.doc['id'];
     this.name = this.doc['name'];
-    this.startDate = this.doc['startAt'];
-    this.endDate = this.doc['endAt'];
+    this.startDate = this.doc['startAt'] ? new Date(this.doc['startAt']) : null;
+    this.endDate = this.doc['endAt'] ? new Date(this.doc['endAt']) : null;
     this.totalGoal = this.doc['totalGoal'];
     this.dailyMinimum = this.doc['dailyMinimum'];
     //this.inventoryId = this.doc['_links']['prx:inventory']['href'].split('/').pop();
@@ -72,7 +72,7 @@ export class FlightModel extends BaseModel {
     data.endAt = this.endDate;
     data.totalGoal = this.totalGoal;
     data.dailyMinimum = this.dailyMinimum;
-    if (this.changed('inventory', true)) {
+    if (this.isNew || this.changed('inventory', true)) {
       data.set_inventory_uri = `${AuguryService.ROOT_PATH}/inventory/${this.inventory.id}`;
     }
 
