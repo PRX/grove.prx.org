@@ -42,8 +42,8 @@ export class CampaignModel extends BaseModel {
   }
 
   related() {
-    let advertiser;
-    let flights;
+    let advertiser = of();
+    let flights = of([]);
     if (this.doc) {
       advertiser = this.doc.follow('prx:advertiser').pipe(
         map(doc => {
@@ -53,15 +53,12 @@ export class CampaignModel extends BaseModel {
       );
       flights = this.doc.followItems('prx:flights').pipe(
         map(docs => {
-          const savedFlights = docs.map(doc => new FlightModel(this.doc, doc));
-          const unsavedFlight = new FlightModel(this.doc, null);
+          const savedFlights = docs.map(doc => new FlightModel(this.doc, doc, true));
+          const unsavedFlight = new FlightModel(this.doc, null, true);
           const allFlights = !unsavedFlight.isDestroy ? savedFlights.concat([unsavedFlight]) : savedFlights;
           return allFlights;
         })
       );
-    } else {
-      advertiser = of();
-      flights = of([]);
     }
 
     return {

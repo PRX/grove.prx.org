@@ -26,7 +26,7 @@ export class InventoryModel extends BaseModel {
 
   decode() {
     this.id = this.doc['id'];
-    this.title = this.doc['title'];
+    this.title = this.doc['podcastTitle'];
   }
 
   encode() {

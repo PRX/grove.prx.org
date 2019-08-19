@@ -4,6 +4,7 @@ import { AuguryService } from '../../core/augury.service';
 import { ZoneModel } from './zone.model';
 import { TargetModel } from './target.model';
 import { InventoryModel } from './inventory.model';
+import { map } from 'rxjs/operators';
 
 export class FlightModel extends BaseModel {
   public id: number;
@@ -11,12 +12,12 @@ export class FlightModel extends BaseModel {
   public startDate: Date;
   public endDate: Date;
   public totalGoal: number;
-  public weeklyGoal: number;
+  public dailyMinimum: number;
   public zones: ZoneModel[];
   public targets: TargetModel[];
   public inventory: InventoryModel;
 
-  SETABLE = ['name', 'startDate', 'endDate', 'totalGoal', 'weeklyGoal'];
+  SETABLE = ['name', 'startDate', 'endDate', 'totalGoal', 'dailyMinimum'];
 
   constructor(parent: HalDoc, flight?: HalDoc, loadRelated = false) {
     super();
@@ -36,8 +37,14 @@ export class FlightModel extends BaseModel {
   related() {
     const zones = of([]);
     const targets = of([]);
-    const inventory = of();
+    let inventory = of();
     const allocations = of([]);
+
+    if (this.doc) {
+      inventory = this.doc.follow('prx:inventory').pipe(
+        map(doc => new InventoryModel(this.doc, doc))
+      );
+    }
 
     return {
       zones,
@@ -50,22 +57,24 @@ export class FlightModel extends BaseModel {
   decode() {
     this.id = this.doc['id'];
     this.name = this.doc['name'];
-    this.startDate = this.doc['startDate'];
-    this.endDate = this.doc['endDate'];
+    this.startDate = this.doc['startAt'];
+    this.endDate = this.doc['endAt'];
     this.totalGoal = this.doc['totalGoal'];
-    this.weeklyGoal = this.doc['weeklyGoal'];
+    this.dailyMinimum = this.doc['dailyMinimum'];
+    //this.inventoryId = this.doc['_links']['prx:inventory']['href'].split('/').pop();
   }
 
   encode() {
     const data = {} as any;
 
     data.name = this.name;
-    data.startDate = this.startDate;
-    data.endDate = this.endDate;
+    data.startAt = this.startDate;
+    data.endAt = this.endDate;
     data.totalGoal = this.totalGoal;
-    data.weeklyGoal = this.weeklyGoal;
-
-    data.set_inventory_uri = `${AuguryService.ROOT_PATH}/inventory/${1}`;
+    data.dailyMinimum = this.dailyMinimum;
+    if (this.changed('inventory', true)) {
+      data.set_inventory_uri = `${AuguryService.ROOT_PATH}/inventory/${this.inventory.id}`;
+    }
 
     return data;
   }

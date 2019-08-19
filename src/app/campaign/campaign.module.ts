@@ -7,12 +7,17 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
 import { CampaignListComponent } from './list/campaign-list.component';
 import { AdvertiserService } from './service/advertiser.service';
 import { CampaignService } from './service/campaign.service';
+import { InventoryService } from './service/inventory.service';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     ...campaignComponents
   ],
   imports: [
+    FormsModule,
+    NgSelectModule,
     CommonModule,
     SharedModule,
     TabModule,
@@ -23,6 +28,7 @@ import { CampaignService } from './service/campaign.service';
   ],
   providers: [
     AdvertiserService,
+    InventoryService,
     CampaignService
   ]
 })

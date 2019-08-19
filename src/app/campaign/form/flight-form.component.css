@@ -1,0 +1,31 @@
+.inventory-select {
+  display: inline-block;
+  min-width: 168px;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 1 1 215px;
+  -ms-flex: 1 1 215px;
+  flex: 1 1 215px;
+  flex-basis: 215px;
+  -ms-flex-preferred-size: 215px;
+  -webkit-flex-basis: 215px;
+}
+
+:host >>> .ng-select .ng-select-container .ng-value-container .ng-input {
+  padding-bottom: 0;
+}
+
+:host >>> .ng-select .ng-select-container .ng-value-container .ng-input > input {
+  padding: 0;
+  line-height: 28px;
+}
+
+:host >>> .max-select-one .ng-value-icon {
+  display: none !important;
+}
+
+:host >>> .max-select-one .ng-arrow-wrapper {
+  display: none !important;
+}

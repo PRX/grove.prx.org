@@ -14,7 +14,7 @@ const DEFAULTS = {
 
 const addScheme = (name: string, value: any): any => {
   if (name.match(/_HOST$/) && value && !value.startsWith('http')) {
-    const scheme = value.match(/.*\.prxu?\.(?:org|tech|dev)$/) ? 'https' : 'http';
+    const scheme = value.match(/.*\.prxu?\.(?:org|tech|dev|docker)$/) ? 'https' : 'http';
     return `${scheme}://${value}`;
   } else {
     return value;
