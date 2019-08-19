@@ -24,6 +24,11 @@ import { InventoryModel } from 'src/app/shared/model/inventory.model';
         </prx-datepicker>
       </prx-fancy-field>
 
+      <prx-fancy-field number [model]="flight" name="totalGoal" label="Total Goal">
+      </prx-fancy-field>
+      <prx-fancy-field number [model]="flight" name="dailyMinimum" label="Daily Minimum">
+      </prx-fancy-field>
+
       <div class="inventory-select">
         <ng-select
           [items]="inventoryOptions$ | async"
