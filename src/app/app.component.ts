@@ -8,7 +8,6 @@ import { UserService } from './core/user/user.service';
   template: `
     <prx-auth [host]="authHost" [client]="authClient"></prx-auth>
     <prx-header prxSticky="all">
-      <prx-navitem *ngIf="userService.loggedIn" route="/campaign/new" text="+ Add a campaign"></prx-navitem>
       <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
         <prx-spinner class="user-loading"></prx-spinner>
         <prx-image *ngIf="userService.userDoc | async as userDoc" class="user-loaded" [imageDoc]="userDoc"></prx-image>
