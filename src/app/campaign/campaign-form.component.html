@@ -1,0 +1,47 @@
+<form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()">
+  <label>
+      Owner:
+      <select formControlName="accountId">
+        <option *ngFor="let acct of accountOptions$ | async" [ngValue]="acct.value">
+          {{acct.name}}
+        </option>
+      </select>
+    </label>
+
+  <label>
+    Name:
+    <input type="text" formControlName="name" required>
+  </label>
+
+  <label>
+    Type:
+    <select formControlName="type">
+      <option *ngFor="let type of typeOptions" [ngValue]="type.value">
+        {{type.name}}
+      </option>
+    </select>
+  </label>
+
+  <label>
+    Status:
+    <select formControlName="status">
+      <option *ngFor="let status of statusOptions" [ngValue]="status.value">
+        {{status.name}}
+      </option>
+    </select>
+  </label>
+
+  <label>
+    Rep name:
+    <input type="text" formControlName="repName">
+  </label>
+
+  <label>
+    Notes:
+    <textarea formControlName="notes"></textarea>
+  </label>
+
+
+
+  <button type="submit" [disabled]="!campaignForm.valid">Submit</button>
+</form>
