@@ -41,7 +41,14 @@
     <textarea formControlName="notes"></textarea>
   </label>
 
-
+  <label>
+      Advertiser:
+      <select formControlName="set_advertiser_uri">
+        <option *ngFor="let adv of advertiserOptions$ | async" [ngValue]="adv.value">
+          {{adv.name}}
+        </option>
+      </select>
+    </label>
 
   <button type="submit" [disabled]="!campaignForm.valid">Submit</button>
 </form>

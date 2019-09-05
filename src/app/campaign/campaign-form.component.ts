@@ -10,8 +10,8 @@ import { withLatestFrom, map } from 'rxjs/operators';
   templateUrl: './campaign-form.component.html',
   styleUrls: ['./campaign-form.component.scss']
 })
-export class CampaignFormComponent implements OnInit {
 
+export class CampaignFormComponent implements OnInit {
   advertiserOptions$: Observable<{name: string, value: string}[]>;
   accountOptions$: Observable<{name: string, value: number}[]>;
   readonly typeOptions = [
@@ -48,11 +48,24 @@ export class CampaignFormComponent implements OnInit {
               private auguryService: AuguryService) { }
 
   ngOnInit() {
+    this.advertiserOptions$ = this.fetchAdvertisers();
+
     this.accountOptions$ = this.userService.accounts.pipe(
       withLatestFrom(this.userService.defaultAccount),
       map(([accounts, defaultAccount]) => {
         const defaultAccountOption = {name: defaultAccount['name'], value: defaultAccount.id};
         return [defaultAccountOption].concat(accounts.map(doc => ({name: doc['name'], value: doc.id})));
+      })
+    );
+  }
+
+  fetchAdvertisers() {
+    const resourceName = 'advertisers';
+    return this.auguryService.followItems(`prx:${resourceName}`).pipe(
+      map((advertisers) => {
+        return advertisers.map(adv => ({
+          name: adv['name'], value: [this.auguryService.path, resourceName, adv['id']].join('/')
+        }));
       })
     );
   }
