@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { UserService } from '../core/user/user.service';
 import { AuguryService } from '../core/augury.service';
 import { withLatestFrom, map } from 'rxjs/operators';
@@ -34,14 +34,21 @@ export class CampaignFormComponent implements OnInit {
   ];
 
   campaignForm = this.fb.group({
-    accountId: [''],
-    name: [''],
-    type: [''],
-    status: [''],
-    repName: [''],
+    accountId: ['', Validators.required],
+    name: ['', Validators.required],
+    type: ['', Validators.required],
+    status: ['', Validators.required],
+    repName: ['', Validators.required],
     notes: [''],
-    set_advertiser_uri: ['']
+    set_advertiser_uri: ['', Validators.required]
   });
+  get accountId() { return this.campaignForm.get('accountId'); }
+  get name() { return this.campaignForm.get('name'); }
+  get type() { return this.campaignForm.get('type'); }
+  get status() { return this.campaignForm.get('status'); }
+  get repName() { return this.campaignForm.get('repName'); }
+  get notes() { return this.campaignForm.get('notes'); }
+  get set_advertiser_uri() { return this.campaignForm.get('set_advertiser_uri'); }
 
   constructor(private fb: FormBuilder,
               private userService: UserService,
@@ -57,6 +64,7 @@ export class CampaignFormComponent implements OnInit {
         return [defaultAccountOption].concat(accounts.map(doc => ({name: doc['name'], value: doc.id})));
       })
     );
+
   }
 
   fetchAdvertisers() {

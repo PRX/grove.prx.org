@@ -1,21 +1,21 @@
-<form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()">
+<form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
   <label>
-      Owner:
-      <select formControlName="accountId">
-        <option *ngFor="let acct of accountOptions$ | async" [ngValue]="acct.value">
-          {{acct.name}}
-        </option>
-      </select>
-    </label>
+    Owner:
+    <select formControlName="accountId" required>
+      <option *ngFor="let acct of accountOptions$ | async" [ngValue]="acct.value">
+        {{acct.name}}
+      </option>
+    </select>
+  </label>
 
   <label>
     Name:
-    <input type="text" formControlName="name" required>
+    <input type="text" formControlName="name" [class.invalid]="name.invalid" required>
   </label>
 
   <label>
     Type:
-    <select formControlName="type">
+    <select formControlName="type" required>
       <option *ngFor="let type of typeOptions" [ngValue]="type.value">
         {{type.name}}
       </option>
@@ -24,7 +24,7 @@
 
   <label>
     Status:
-    <select formControlName="status">
+    <select formControlName="status" required>
       <option *ngFor="let status of statusOptions" [ngValue]="status.value">
         {{status.name}}
       </option>
@@ -33,7 +33,7 @@
 
   <label>
     Rep name:
-    <input type="text" formControlName="repName">
+    <input type="text" formControlName="repName" required>
   </label>
 
   <label>
@@ -42,13 +42,13 @@
   </label>
 
   <label>
-      Advertiser:
-      <select formControlName="set_advertiser_uri">
-        <option *ngFor="let adv of advertiserOptions$ | async" [ngValue]="adv.value">
-          {{adv.name}}
-        </option>
-      </select>
-    </label>
+    Advertiser:
+    <select formControlName="set_advertiser_uri" required>
+      <option *ngFor="let adv of advertiserOptions$ | async" [ngValue]="adv.value">
+        {{adv.name}}
+      </option>
+    </select>
+  </label>
 
-  <button type="submit" [disabled]="!campaignForm.valid">Submit</button>
+  <button type="submit">Submit</button>
 </form>
