@@ -7,6 +7,7 @@ import { withLatestFrom, map, switchMap } from 'rxjs/operators';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { ToastrService } from 'ngx-prx-styleguide';
+import { Env } from '../core/core.env';
 
 interface CampaignData {
   accountId: number;
@@ -90,7 +91,7 @@ export class CampaignFormComponent implements OnInit {
       map(([accounts, defaultAccount]) => {
         return [defaultAccount].concat(accounts).map(acct => ({
           name: acct['name'],
-          value: [this.auguryService.path, 'accounts', acct['id']].join('/')
+          value: acct.expand('self')
         }));
       })
     );
@@ -116,13 +117,13 @@ export class CampaignFormComponent implements OnInit {
 
   updateCampaignForm({name, type, status, repName, notes, advertiserId, accountId}: CampaignData) {
     this.campaignForm.patchValue({
-      set_account_id: [this.auguryService.path, 'accounts', accountId].join('/'),
+      set_account_id: Env.CMS_HOST + [this.auguryService.path, 'accounts', accountId].join('/'),
       name,
       type,
       status,
       repName,
       notes,
-      set_advertiser_uri: [this.auguryService.path, 'advertisers', advertiserId].join('/')
+      set_advertiser_uri: Env.AUGURY_HOST + [this.auguryService.path, 'advertisers', advertiserId].join('/')
     });
   }
 
@@ -135,7 +136,7 @@ export class CampaignFormComponent implements OnInit {
     return this.auguryService.followItems(`prx:${resourceName}`).pipe(
       map((advertisers) => {
         return advertisers.map(adv => ({
-          name: adv['name'], value: [this.auguryService.path, resourceName, adv['id']].join('/')
+          name: adv['name'], value: adv.expand('self')
         }));
       })
     );

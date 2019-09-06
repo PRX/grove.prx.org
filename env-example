@@ -6,6 +6,7 @@ LOCAL_ENV=true
 # prx api
 AUGURY_HOST=augury.staging.prx.tech
 AUGURY_TTL=
+CMS_HOST=cms.staging.prx.tech
 
 # prx auth
 AUTH_HOST=id.staging.prx.tech
