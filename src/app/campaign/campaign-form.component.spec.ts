@@ -36,8 +36,8 @@ describe('CampaignFormComponent', () => {
             paramMap: of({ get: jest.fn(() => '1') })
           }
         },
+        AuguryService,
         { provide: HalService, useValue: augury },
-        { provide: AuguryService, useValue: augury.root },
         { provide: UserService, useValue: user }
       ]
     }).compileComponents();
@@ -50,8 +50,10 @@ describe('CampaignFormComponent', () => {
   });
 
   describe('with an existing campaign', () => {
+    let campaign;
+
     beforeEach(() => {
-      augury.mock('prx:campaign', {
+      campaign = augury.mock('prx:campaign', {
         id: '1',
         name: 'my campaign name',
         type: 'paid_campaign',
@@ -77,10 +79,15 @@ describe('CampaignFormComponent', () => {
       expect(component.set_advertiser_uri.value).toEqual('/some/advertiser');
     });
 
-    xit('saves changes to the campaign', () => {
+    it('saves changes to the campaign', () => {
+      const spy = jest.spyOn(campaign, 'update');
+
       component.name.setValue('something else');
       component.campaignFormSubmit();
-      // TODO: how to check updated value? spy on haldoc.update?
-    })
+      expect(spy).toHaveBeenCalled();
+
+      const args = spy.mock.calls[0][0];
+      expect(args).toMatchObject({name: 'something else'});
+    });
   });
 });
