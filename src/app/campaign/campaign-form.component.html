@@ -1,7 +1,7 @@
 <form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
   <label>
     Owner:
-    <select formControlName="accountId" required>
+    <select formControlName="set_account_id" required>
       <option *ngFor="let acct of accountOptions$ | async" [ngValue]="acct.value">
         {{acct.name}}
       </option>
