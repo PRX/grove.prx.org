@@ -9,14 +9,19 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { By } from '@angular/platform-browser';
+import { DebugElement } from '@angular/core';
 
 describe('CampaignFormComponent', () => {
   let component: CampaignFormComponent;
   let fixture: ComponentFixture<CampaignFormComponent>;
+  let de: DebugElement;
+  let augury;
+  let user;
 
   beforeEach(async(() => {
-    const augury = new MockHalService();
-    const user = new UserServiceMock();
+    augury = new MockHalService();
+    user = new UserServiceMock();
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, RouterTestingModule.withRoutes([])],
       declarations: [CampaignFormComponent],
@@ -28,7 +33,7 @@ describe('CampaignFormComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of({ get: jest.fn() })
+            paramMap: of({ get: jest.fn(() => '1') })
           }
         },
         { provide: HalService, useValue: augury },
@@ -41,10 +46,19 @@ describe('CampaignFormComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CampaignFormComponent);
     component = fixture.componentInstance;
+    de = fixture.debugElement;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('should decode a campaign', () => {
+    beforeEach(() => {
+      augury.mock('prx:campaign', { id: '1', name: 'whatever' });
+      augury.mockItems('prx:advertisers', []);
+      fixture.detectChanges();
+    });
+
+    it('has campaign data in the form', () => {
+      expect(component).toBeTruthy();
+    });
   });
 });
