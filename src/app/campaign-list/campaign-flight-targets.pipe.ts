@@ -8,8 +8,8 @@ export class CampaignFlightTargetsPipe implements PipeTransform {
   transform(flights: Flight[]): string {
     if (flights && flights.some(flight => flight.targets && flight.targets.length > 0)) {
       return flights.reduce((acc, flight) => {
-        return acc += flight.targets && (acc && ' ') +
-          flight.targets.map(t => t.name).join(' ');
+        return acc += flight.targets && (acc && ', ') +
+          flight.targets.map(t => t.name).join(', ');
       }, '');
     } else {
       return '';

@@ -8,7 +8,7 @@ import { Campaign } from './campaign-list.service';
     <section>
       <div>{{campaign.flights | campaignFlightDates}}</div>
       <div class="advertiser">
-        <a routerLink="{{'/campaign/' + campaign.id}}">{{campaign.advertiser}}</a>
+        <a routerLink="{{'/campaign/' + campaign.id}}">{{campaign.advertiser.name}}</a>
       </div>
       <div>
         <span class="status {{campaign.status}}">{{campaign.status}}</span>

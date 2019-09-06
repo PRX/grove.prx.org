@@ -74,17 +74,19 @@ export class CampaignListService {
         campaigns = campaignDocs.map(doc => {
           return {
             id: doc['id'],
-            accountId: parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10),
+            accountId: doc['_links'] && parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10),
             name: doc['name'],
             // TODO: should "follow" advertiser
-            advertiser: doc['_embedded']['prx:advertiser'].name,
+            advertiser: doc['_embedded'] && {
+              id: doc['_embedded']['prx:advertiser'].id,
+              name: doc['_embedded']['prx:advertiser'].name
+            },
             type: doc['type'],
             status: doc['status'],
             repName: doc['repName'],
             notes: doc['notes']
           };
         });
-        this._campaigns.next(campaigns);
         return campaignDocs.map(campaign => campaign.followItems('prx:flights'));
       }),
       concatAll()
@@ -92,13 +94,14 @@ export class CampaignListService {
       campaigns[campaignIndex++].flights = flightDocs.map(doc => {
         return {
           name: doc['name'],
-          startAt: doc['startAt'],
-          endAt: doc['endAt'],
+          startAt: doc['startAt'] && new Date(doc['startAt']),
+          endAt: doc['endAt'] && new Date(doc['endAt']),
           zones: doc['zones']
           // TODO: no targets yet?
           // targets: Target[];
         };
       });
+      this._campaigns.next(campaigns);
     },
     err => this.error = err);
   }

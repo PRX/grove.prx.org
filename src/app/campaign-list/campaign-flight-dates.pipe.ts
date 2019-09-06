@@ -10,10 +10,10 @@ export class CampaignFlightDatesPipe implements PipeTransform {
       let startAt = acc.startAt;
       let endAt = acc.endAt;
       if (!acc.startAt || (flight.startAt && acc.startAt.valueOf() > flight.startAt.valueOf())) {
-        startAt = new Date(flight.startAt);
+        startAt = flight.startAt;
       }
       if (!acc.endAt || (flight.endAt && acc.endAt.valueOf() < flight.endAt.valueOf())) {
-        endAt = new Date(flight.endAt);
+        endAt = flight.endAt;
       }
       return {startAt, endAt};
     }, {startAt: null, endAt: null});
