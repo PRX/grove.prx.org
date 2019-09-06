@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, concat } from 'rxjs';
 import { concatMap, concatAll } from 'rxjs/operators';
-import { HalDoc, HalObservable } from 'ngx-prx-styleguide';
+import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
 export interface CampaignParams {
@@ -30,7 +30,7 @@ export interface Campaign {
   id: number;
   accountId: number;
   name: string;
-  advertiser: Advertiser;
+  advertiser?: Advertiser;
   type: string;
   status: string;
   repName: string;
@@ -77,32 +77,34 @@ export class CampaignListService {
             ...(doc['_links'] && doc['_links']['prx:account'] &&
               {accountId:  parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10)}),
             name: doc['name'],
-            // TODO: should "follow" advertiser
-            ...(doc['_embedded'] && doc['_embedded']['prx:advertiser'] &&
-              {advertiser: {
-                id: doc['_embedded']['prx:advertiser'].id,
-                name: doc['_embedded']['prx:advertiser'].name
-              }}),
             type: doc['type'],
             status: doc['status'],
             repName: doc['repName'],
             notes: doc['notes']
           };
         });
-        return campaignDocs.map(campaign => campaign.followItems('prx:flights'));
+        return campaignDocs.map(campaign => concat(
+          campaign.follow('prx:advertiser'),
+          campaign.followItems('prx:flights')
+        ));
       }),
       concatAll()
-    ).subscribe((flightDocs: HalDoc[]) => {
-      campaigns[campaignIndex++].flights = flightDocs.map(doc => {
-        return {
-          name: doc['name'],
-          startAt: doc['startAt'] && new Date(doc['startAt']),
-          endAt: doc['endAt'] && new Date(doc['endAt']),
-          zones: doc['zones']
-          // TODO: no targets yet?
-          // targets: Target[];
-        };
-      });
+    ).subscribe((results: HalDoc | HalDoc[]) => {
+      if (Array.isArray(results)) {
+        const flightDocs = results;
+        campaigns[campaignIndex++].flights = flightDocs.map(doc => {
+          return {
+            name: doc['name'],
+            startAt: doc['startAt'] && new Date(doc['startAt']),
+            endAt: doc['endAt'] && new Date(doc['endAt']),
+            zones: doc['zones']
+            // TODO: no targets yet?
+            // targets: Target[];
+          };
+        });
+      } else {
+        campaigns[campaignIndex].advertiser = {id: results['id'], name: results['name']};
+      }
       this._campaigns.next(campaigns);
     },
     err => this.error = err);

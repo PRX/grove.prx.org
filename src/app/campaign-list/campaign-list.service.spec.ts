@@ -11,6 +11,7 @@ describe('CampaignListService', () => {
 
   const mockCampaigns = mockAuguryService.mockItems('prx:campaigns', campaignsFixture);
   mockCampaigns.forEach(campaign => {
+    campaign.mock('prx:advertiser', campaign['advertiser']);
     campaign.mockItems('prx:flights', flightsFixture);
   });
 
