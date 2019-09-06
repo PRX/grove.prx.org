@@ -1,9 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
 import { MockHalService, HalService, MockHalDoc, HalObservable } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
-import { CampaignListService, Campaign } from './campaign-list.service';
+import { CampaignListService } from './campaign-list.service';
 import { campaigns as campaignsFixture, flights as flightsFixture } from './campaign-list.service.mock';
 
 describe('CampaignListService', () => {

@@ -68,6 +68,8 @@ export const campaigns = [
 
 @Injectable()
 export class CampaignListServiceMock {
+  params = {page: 1, per: 9};
+
   constructor(private augury: MockHalService) {}
 
   loadCampaignList() {}

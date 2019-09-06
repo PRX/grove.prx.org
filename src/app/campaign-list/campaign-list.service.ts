@@ -74,13 +74,15 @@ export class CampaignListService {
         campaigns = campaignDocs.map(doc => {
           return {
             id: doc['id'],
-            accountId: doc['_links'] && parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10),
+            ...(doc['_links'] && doc['_links']['prx:account'] &&
+              {accountId:  parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10)}),
             name: doc['name'],
             // TODO: should "follow" advertiser
-            advertiser: doc['_embedded'] && {
-              id: doc['_embedded']['prx:advertiser'].id,
-              name: doc['_embedded']['prx:advertiser'].name
-            },
+            ...(doc['_embedded'] && doc['_embedded']['prx:advertiser'] &&
+              {advertiser: {
+                id: doc['_embedded']['prx:advertiser'].id,
+                name: doc['_embedded']['prx:advertiser'].name
+              }}),
             type: doc['type'],
             status: doc['status'],
             repName: doc['repName'],
