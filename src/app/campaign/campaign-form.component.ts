@@ -7,7 +7,6 @@ import { withLatestFrom, map, switchMap } from 'rxjs/operators';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { ToastrService } from 'ngx-prx-styleguide';
-import { Env } from '../core/core.env';
 
 interface CampaignData {
   accountUri: string;
@@ -25,28 +24,28 @@ interface CampaignData {
   styleUrls: ['./campaign-form.component.scss']
 })
 export class CampaignFormComponent implements OnInit {
-  advertiserOptions$: Observable<{name: string, value: string}[]>;
-  accountOptions$: Observable<{name: string, value: string}[]>;
+  advertiserOptions$: Observable<{ name: string; value: string }[]>;
+  accountOptions$: Observable<{ name: string; value: string }[]>;
   campaignData$: Observable<CampaignData>;
   campaignDoc$: Observable<HalDoc>;
 
   readonly typeOptions = [
-    {name: 'Paid Campaign', value: 'paid_campaign'},
-    {name: 'Cross Promo', value: 'cross_promo'},
-    {name: 'Cross Promo Special', value: 'cross_promo_special'},
-    {name: 'Event', value: 'event'},
-    {name: 'Fundraiser', value: 'fundraiser'},
-    {name: 'House', value: 'house'},
-    {name: 'Survey', value: 'survey'}
+    { name: 'Paid Campaign', value: 'paid_campaign' },
+    { name: 'Cross Promo', value: 'cross_promo' },
+    { name: 'Cross Promo Special', value: 'cross_promo_special' },
+    { name: 'Event', value: 'event' },
+    { name: 'Fundraiser', value: 'fundraiser' },
+    { name: 'House', value: 'house' },
+    { name: 'Survey', value: 'survey' }
   ];
 
   readonly statusOptions = [
-    {name: 'Draft', value: 'draft'},
-    {name: 'Hold', value: 'hold'},
-    {name: 'Sold', value: 'sold'},
-    {name: 'Approved', value: 'approved'},
-    {name: 'Paused', value: 'paused'},
-    {name: 'Canceled', value: 'canceled'}
+    { name: 'Draft', value: 'draft' },
+    { name: 'Hold', value: 'hold' },
+    { name: 'Sold', value: 'sold' },
+    { name: 'Approved', value: 'approved' },
+    { name: 'Paused', value: 'paused' },
+    { name: 'Canceled', value: 'canceled' }
   ];
 
   campaignForm = this.fb.group({
@@ -59,32 +58,45 @@ export class CampaignFormComponent implements OnInit {
     set_advertiser_uri: ['', Validators.required]
   });
 
-  get set_account_id() { return this.campaignForm.get('set_account_id'); }
-  get name() { return this.campaignForm.get('name'); }
-  get type() { return this.campaignForm.get('type'); }
-  get status() { return this.campaignForm.get('status'); }
-  get repName() { return this.campaignForm.get('repName'); }
-  get notes() { return this.campaignForm.get('notes'); }
-  get set_advertiser_uri() { return this.campaignForm.get('set_advertiser_uri'); }
+  get set_account_id() {
+    return this.campaignForm.get('set_account_id');
+  }
+  get name() {
+    return this.campaignForm.get('name');
+  }
+  get type() {
+    return this.campaignForm.get('type');
+  }
+  get status() {
+    return this.campaignForm.get('status');
+  }
+  get repName() {
+    return this.campaignForm.get('repName');
+  }
+  get notes() {
+    return this.campaignForm.get('notes');
+  }
+  get set_advertiser_uri() {
+    return this.campaignForm.get('set_advertiser_uri');
+  }
 
-  constructor(private fb: FormBuilder,
-              private route: ActivatedRoute,
-              private router: Router,
-              private userService: UserService,
-              private auguryService: AuguryService,
-              private toastr: ToastrService) { }
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private userService: UserService,
+    private auguryService: AuguryService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit() {
     this.advertiserOptions$ = this.fetchAdvertisers();
 
-    this.campaignDoc$ = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) =>
-        this.fetchCampaign(params.get('id')))
-    );
+    this.campaignDoc$ = this.route.paramMap.pipe(switchMap((params: ParamMap) => this.fetchCampaign(params.get('id'))));
 
     this.campaignData$ = this.formDataFromDoc();
 
-    this.campaignData$.subscribe((result) => result ? this.updateCampaignForm(result) : null);
+    this.campaignData$.subscribe(result => (result ? this.updateCampaignForm(result) : null));
 
     this.accountOptions$ = this.userService.accounts.pipe(
       withLatestFrom(this.userService.defaultAccount),
@@ -95,13 +107,14 @@ export class CampaignFormComponent implements OnInit {
         }));
       })
     );
-
   }
 
   formDataFromDoc(): Observable<CampaignData | null> {
     return this.campaignDoc$.pipe(
-      map((campaign) => {
-        if (campaign === null) { return null; }
+      map(campaign => {
+        if (campaign === null) {
+          return null;
+        }
         const { name, type, status, repName, notes } = campaign as any;
         const [advertiserUri, accountUri] = ['advertiser', 'account'].map(resource => campaign.expand(`prx:${resource}`));
         return { name, type, status, repName, notes, advertiserUri, accountUri };
@@ -110,12 +123,14 @@ export class CampaignFormComponent implements OnInit {
   }
 
   fetchCampaign(id: string | null): Observable<HalDoc> | Observable<null> {
-    if (id === null) { return of(null); }
+    if (id === null) {
+      return of(null);
+    }
     const resourceName = 'campaign';
-    return this.auguryService.follow(`prx:${resourceName}`, {id});
+    return this.auguryService.follow(`prx:${resourceName}`, { id });
   }
 
-  updateCampaignForm({name, type, status, repName, notes, advertiserUri, accountUri}: CampaignData) {
+  updateCampaignForm({ name, type, status, repName, notes, advertiserUri, accountUri }: CampaignData) {
     this.campaignForm.patchValue({
       set_account_id: accountUri,
       name,
@@ -130,29 +145,34 @@ export class CampaignFormComponent implements OnInit {
   fetchAdvertisers() {
     const resourceName = 'advertisers';
     return this.auguryService.followItems(`prx:${resourceName}`).pipe(
-      map((advertisers) => {
+      map(advertisers => {
         return advertisers.map(adv => ({
-          name: adv['name'], value: adv.expand('self')
+          name: adv['name'],
+          value: adv.expand('self')
         }));
       })
     );
   }
 
   campaignFormSubmit() {
-    this.campaignDoc$.pipe(
-      withLatestFrom(this.auguryService.root),
-      map(([cmp, root]) => {
-        let resp;
-        if (cmp) {
-          resp = cmp.update(this.campaignForm.value);
-        } else {
-          resp = root.create('prx:campaign', {}, this.campaignForm.value);
-        }
-        resp.subscribe(res => {
-          this.toastr.success('Campaign saved');
-          if (!cmp) { this.router.navigate(['/campaign', res.id]); }
-        });
-      })
-    ).subscribe();
+    this.campaignDoc$
+      .pipe(
+        withLatestFrom(this.auguryService.root),
+        map(([cmp, root]) => {
+          let resp;
+          if (cmp) {
+            resp = cmp.update(this.campaignForm.value);
+          } else {
+            resp = root.create('prx:campaign', {}, this.campaignForm.value);
+          }
+          resp.subscribe(res => {
+            this.toastr.success('Campaign saved');
+            if (!cmp) {
+              this.router.navigate(['/campaign', res.id]);
+            }
+          });
+        })
+      )
+      .subscribe();
   }
 }
