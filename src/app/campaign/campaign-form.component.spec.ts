@@ -47,18 +47,40 @@ describe('CampaignFormComponent', () => {
     fixture = TestBed.createComponent(CampaignFormComponent);
     component = fixture.componentInstance;
     de = fixture.debugElement;
-    fixture.detectChanges();
   });
 
-  describe('should decode a campaign', () => {
+  describe('with an existing campaign', () => {
     beforeEach(() => {
-      augury.mock('prx:campaign', { id: '1', name: 'whatever' });
+      augury.mock('prx:campaign', {
+        id: '1',
+        name: 'my campaign name',
+        type: 'paid_campaign',
+        status: 'draft',
+        repName: 'my rep name',
+        notes: 'my notes',
+        _links: {
+          'prx:account': { href: '/some/account' },
+          'prx:advertiser': { href: '/some/advertiser' }
+        }
+      });
       augury.mockItems('prx:advertisers', []);
       fixture.detectChanges();
     });
 
-    it('has campaign data in the form', () => {
-      expect(component).toBeTruthy();
+    it('decodes the campaign', () => {
+      expect(component.set_account_id.value).toEqual('/some/account');
+      expect(component.name.value).toEqual('my campaign name');
+      expect(component.type.value).toEqual('paid_campaign');
+      expect(component.status.value).toEqual('draft');
+      expect(component.repName.value).toEqual('my rep name');
+      expect(component.notes.value).toEqual('my notes');
+      expect(component.set_advertiser_uri.value).toEqual('/some/advertiser');
     });
+
+    xit('saves changes to the campaign', () => {
+      component.name.setValue('something else');
+      component.campaignFormSubmit();
+      // TODO: how to check updated value? spy on haldoc.update?
+    })
   });
 });
