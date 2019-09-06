@@ -47,10 +47,19 @@ const getNumber = (name: string): number => {
 };
 
 export class Env {
-  public static get CMS_HOST(): string { return getVar('CMS_HOST'); }
-  public static get AUGURY_HOST(): string { return getVar('AUGURY_HOST'); }
-  public static get AUGURY_TTL(): number { return getNumber('AUGURY_TTL'); }
-  public static get AUTH_HOST(): string { return getVar('AUTH_HOST'); }
-  public static get AUTH_CLIENT_ID(): string { return getVar('AUTH_CLIENT_ID'); }
-  public static get GA_KEY(): string { return getVar('GA_KEY'); }
+  public static get AUGURY_HOST(): string {
+    return getVar('AUGURY_HOST');
+  }
+  public static get AUGURY_TTL(): number {
+    return getNumber('AUGURY_TTL');
+  }
+  public static get AUTH_HOST(): string {
+    return getVar('AUTH_HOST');
+  }
+  public static get AUTH_CLIENT_ID(): string {
+    return getVar('AUTH_CLIENT_ID');
+  }
+  public static get GA_KEY(): string {
+    return getVar('GA_KEY');
+  }
 }
