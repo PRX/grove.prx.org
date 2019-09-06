@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { CampaignModule } from './campaign/campaign.module';
+import { CampaignListModule } from './campaign-list/campaign-list.module';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { CampaignModule } from './campaign/campaign.module';
     CoreModule,
     SharedModule,
     Angulartics2Module.forRoot(),
-    CampaignModule
+    CampaignModule,
+    CampaignListModule
   ],
   providers: [
     {provide: ErrorHandler, useClass: ErrorService}

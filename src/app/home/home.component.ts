@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  template: ``
+  template: `<grove-campaign-list></grove-campaign-list>`
 })
 
 export class HomeComponent {}
