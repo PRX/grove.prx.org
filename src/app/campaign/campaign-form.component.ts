@@ -10,13 +10,13 @@ import { ToastrService } from 'ngx-prx-styleguide';
 import { Env } from '../core/core.env';
 
 interface CampaignData {
-  accountId: number;
+  accountUri: string;
   name: string;
   type: string;
   status: string;
   repName: string;
   notes: string;
-  advertiserId: number;
+  advertiserUri: string;
 }
 
 @Component({
@@ -103,8 +103,8 @@ export class CampaignFormComponent implements OnInit {
       map((campaign) => {
         if (campaign === null) { return null; }
         const { name, type, status, repName, notes } = campaign as any;
-        const [ advertiserId, accountId ] = ['advertiser', 'account'].map(key => this.extractRelationId(key, campaign));
-        return { name, type, status, repName, notes, advertiserId, accountId };
+        const [advertiserUri, accountUri] = ['advertiser', 'account'].map(resource => campaign.expand(`prx:${resource}`));
+        return { name, type, status, repName, notes, advertiserUri, accountUri };
       })
     );
   }
@@ -115,20 +115,16 @@ export class CampaignFormComponent implements OnInit {
     return this.auguryService.follow(`prx:${resourceName}`, {id});
   }
 
-  updateCampaignForm({name, type, status, repName, notes, advertiserId, accountId}: CampaignData) {
+  updateCampaignForm({name, type, status, repName, notes, advertiserUri, accountUri}: CampaignData) {
     this.campaignForm.patchValue({
-      set_account_id: Env.CMS_HOST + [this.auguryService.path, 'accounts', accountId].join('/'),
+      set_account_id: accountUri,
       name,
       type,
       status,
       repName,
       notes,
-      set_advertiser_uri: Env.AUGURY_HOST + [this.auguryService.path, 'advertisers', advertiserId].join('/')
+      set_advertiser_uri: advertiserUri
     });
-  }
-
-  extractRelationId(key: string, resource: HalDoc) {
-    return resource['_links'][`prx:${key}`]['href'].split('/').pop();
   }
 
   fetchAdvertisers() {
