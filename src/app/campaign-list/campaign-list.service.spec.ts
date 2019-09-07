@@ -43,7 +43,6 @@ describe('CampaignListService', () => {
     mockAuguryService.mockError('prx:campaigns', 'Bad Request');
     campaignListService.loadCampaignList();
     campaignListService.campaigns.subscribe((campaigns) => {
-      expect(campaigns.length).toEqual(mockCampaigns.length);
       expect(campaignListService.error).toEqual(new Error('Bad Request'));
       done();
     });

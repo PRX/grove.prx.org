@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, concat } from 'rxjs';
-import { concatMap, concatAll } from 'rxjs/operators';
+import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
+import { concatMap, concatAll, withLatestFrom, map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -42,16 +42,33 @@ export interface Campaign {
 export class CampaignListService {
   params = {page: 1, per: 9};
   total: number;
+  count: number;
   error: Error;
+  loading = false;
+  flightsLoaded: number;
   // tslint:disable-next-line: variable-name
-  private _campaigns = new BehaviorSubject([]);
+  private _campaigns = new BehaviorSubject<{[id: number]: Campaign}>({});
 
   constructor(private augury: AuguryService) {
     this.loadCampaignList();
   }
 
   get campaigns(): Observable<Campaign[]> {
-    return this._campaigns.asObservable();
+    // this._campaigns is a subject of campaign entities (an object with campaignIds mapped to campaign,) convert to array for display
+    return this._campaigns.asObservable().pipe(
+      map((campaignEntities: {}) => {
+        if (Object.keys(campaignEntities).length) {
+          return Object.keys(campaignEntities)
+            // map to array
+            .map(campaignId => campaignEntities[campaignId])
+            // sort by ?
+            .sort((a, b ) => {
+              // TODO: name seems to be the default sort on the API, but what makes sense for the dashboard?
+              return a.name - b.name;
+            });
+        }
+      })
+    );
   }
 
   loadCampaignList(params?: CampaignParams) {
@@ -62,50 +79,62 @@ export class CampaignListService {
         ...(params.per && {per: params.per})
       };
     }
-    let campaigns: Campaign[];
-    let campaignIndex = 0;
+    this.count = 0;
+    this.loading = true;
+    this.flightsLoaded = 0;
+
+    // clear campaign list
+    this._campaigns.next({});
 
     this.augury.followItems(
       'prx:campaigns',
       {page: this.params.page, per: this.params.per}
     ).pipe(
       concatMap((campaignDocs: HalDoc[]) => {
+        this.count = campaignDocs.length ? campaignDocs[0]['_count'] : 0;
         this.total = campaignDocs.length ? campaignDocs[0]['_total'] : 0;
-        campaigns = campaignDocs.map(doc => {
-          return {
-            id: doc['id'],
-            ...(doc['_links'] && doc['_links']['prx:account'] &&
-              {accountId:  parseInt(doc['_links']['prx:account']['href'].split('/').pop(), 10)}),
-            name: doc['name'],
-            type: doc['type'],
-            status: doc['status'],
-            repName: doc['repName'],
-            notes: doc['notes']
-          };
+        return campaignDocs.map(doc => {
+          return combineLatest(
+            of(doc),
+            doc.follow('prx:advertiser'),
+            doc.followItems('prx:flights')
+          );
         });
-        return campaignDocs.map(campaign => concat(
-          campaign.follow('prx:advertiser'),
-          campaign.followItems('prx:flights')
-        ));
       }),
-      concatAll()
-    ).subscribe((results: HalDoc | HalDoc[]) => {
-      if (Array.isArray(results)) {
-        const flightDocs = results;
-        campaigns[campaignIndex++].flights = flightDocs.map(doc => {
-          return {
-            name: doc['name'],
-            startAt: doc['startAt'] && new Date(doc['startAt']),
-            endAt: doc['endAt'] && new Date(doc['endAt']),
-            zones: doc['zones']
-            // TODO: no targets yet?
-            // targets: Target[];
-          };
-        });
-      } else {
-        campaigns[campaignIndex].advertiser = {id: results['id'], name: results['name']};
+      concatAll(),
+      withLatestFrom(this._campaigns),
+    ).subscribe(([[campaignDoc, advertiserDoc, flightDocs], campaigns]) => {
+      const campaign: Campaign = {
+        id: campaignDoc['id'],
+        ...(campaignDoc['_links'] && campaignDoc['_links']['prx:account'] &&
+          {accountId:  parseInt(campaignDoc['_links']['prx:account']['href'].split('/').pop(), 10)}),
+        name: campaignDoc['name'],
+        type: campaignDoc['type'],
+        status: campaignDoc['status'],
+        repName: campaignDoc['repName'],
+        notes: campaignDoc['notes'],
+        advertiser: {id: advertiserDoc['id'], name: advertiserDoc['name']},
+        flights: flightDocs.map(doc => ({
+          name: doc['name'],
+          startAt: doc['startAt'] && new Date(doc['startAt']),
+          endAt: doc['endAt'] && new Date(doc['endAt']),
+          zones: doc['zones']
+          // TODO: no targets yet?
+          // targets: Target[];
+        }))
+      };
+      if (flightDocs) {
+        this.flightsLoaded++;
+        if (this.flightsLoaded === this.count) {
+          this.loading = false;
+        }
       }
-      this._campaigns.next(campaigns);
+
+      // set _campaigns[campaign.id]
+      this._campaigns.next({
+        ...campaigns,
+        [campaign.id]: campaign
+      });
     },
     err => this.error = err);
   }
