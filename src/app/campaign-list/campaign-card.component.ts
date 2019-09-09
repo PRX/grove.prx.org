@@ -4,10 +4,14 @@ import { Campaign } from './campaign-list.service';
 @Component({
   selector: 'grove-campaign-card',
   template: `
-    <div class="header {{campaign.status}}"></div>
-    <section>
+    <div class="header {{campaign?.status}}"></div>
+    <section *ngIf="campaign">
       <div>{{campaign.flights | campaignFlightDates}}</div>
-      <h2><a routerLink="{{'/campaign/' + campaign.id}}">{{campaign.advertiser && campaign.advertiser.name}}</a></h2>
+      <h2>
+        <a routerLink="{{'/campaign/' + campaign.id}}">
+          {{campaign.advertiser && campaign.advertiser.name}}
+        </a>
+      </h2>
       <div>
         <span class="status {{campaign.status}}">{{campaign.status}}</span>
         {{campaign.type | campaignType}}
@@ -17,6 +21,9 @@ import { Campaign } from './campaign-list.service';
         {{targets}}
       </div>
       <div>{{campaign.flights | campaignFlightZones}}</div>
+    </section>
+    <section class="loading" *ngIf="!campaign">
+      <prx-spinner></prx-spinner>
     </section>
   `,
   styleUrls: ['campaign-card.component.scss']

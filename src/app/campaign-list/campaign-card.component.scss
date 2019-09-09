@@ -2,11 +2,17 @@
   display: block;
   background-color: white;
 }
-div.header {
+.header {
   height: 5px;
+  background-color: #a3a3a3;
 }
 section {
   padding: 10px;
+  min-height: 92px;
+}
+section.loading {
+  position: relative;
+  background-color: #ddd;
 }
 h2 {
   font-weight: 700;
