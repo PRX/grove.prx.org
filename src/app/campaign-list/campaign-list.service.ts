@@ -11,12 +11,13 @@ export interface CampaignParams {
 
 interface KeyValue {
   id: number;
-  name: string;
+  label: string;
 }
 
 // export type Zone = KeyValue;
 export type Target = KeyValue;
 export type Advertiser = KeyValue;
+export type Facet = KeyValue;
 
 export interface Flight {
   name: string;
@@ -41,6 +42,12 @@ export interface Campaign {
 @Injectable()
 export class CampaignListService {
   params = {page: 1, per: 12};
+  facets: {
+    advertiser: Facet[],
+    podcast: Facet[],
+    status: Facet[],
+    type: Facet[]
+  };
   total: number;
   count: number;
   error: Error;
@@ -89,8 +96,11 @@ export class CampaignListService {
       {page: this.params.page, per: this.params.per}
     ).pipe(
       concatMap((campaignDocs: HalDoc[]) => {
-        this.count = campaignDocs.length ? campaignDocs[0]['_count'] : 0;
-        this.total = campaignDocs.length ? campaignDocs[0]['_total'] : 0;
+        if (campaignDocs.length) {
+          this.count = campaignDocs[0]['_count'];
+          this.total = campaignDocs[0]['_total'];
+          this.facets = campaignDocs[0]['_facets'];
+        }
         return campaignDocs.map(doc => {
           return combineLatest(
             of(doc),
@@ -111,7 +121,7 @@ export class CampaignListService {
         status: campaignDoc['status'],
         repName: campaignDoc['repName'],
         notes: campaignDoc['notes'],
-        advertiser: {id: advertiserDoc['id'], name: advertiserDoc['name']},
+        advertiser: {id: advertiserDoc['id'], label: advertiserDoc['name']},
         flights: flightDocs.map(doc => ({
           name: doc['name'],
           startAt: doc['startAt'] && new Date(doc['startAt']),

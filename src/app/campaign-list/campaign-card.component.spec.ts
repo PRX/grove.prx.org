@@ -44,7 +44,7 @@ describe('CampaignCardComponent', () => {
   it('should show the advertiser and link to the campaign', () => {
     const link = de.query(By.css('h2 > a'));
     expect(link).toBeDefined();
-    expect(link.nativeElement.textContent).toMatch(comp.campaign.advertiser.name);
+    expect(link.nativeElement.textContent).toMatch(comp.campaign.advertiser.label);
     expect(link.nativeElement.href).toContain('/campaign/' + comp.campaign.id);
   });
 
