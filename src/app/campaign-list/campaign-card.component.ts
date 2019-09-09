@@ -17,7 +17,7 @@ import { Campaign } from './campaign-list.service';
         {{campaign.type | campaignType}}
       </div>
       <div *ngIf="campaign.flights | campaignFlightTargets as targets">
-        <prx-icon size="1em" name="globe"></prx-icon>
+        <prx-icon size="1em" name="globe-americas"></prx-icon>
         {{targets}}
       </div>
       <div>{{campaign.flights | campaignFlightZones}}</div>
