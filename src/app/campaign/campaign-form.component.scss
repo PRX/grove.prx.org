@@ -1,3 +1,8 @@
-input:not(.ng-untouched).ng-invalid, select:not(.ng-untouched).ng-invalid {
-  border: 1px solid red;
+.mat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.mat-card form > * {
+  width: 100%;
 }

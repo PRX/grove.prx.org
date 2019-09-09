@@ -1,54 +1,45 @@
-<form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
-  <label>
-    Owner:
-    <select formControlName="set_account_id" required>
-      <option *ngFor="let acct of accountOptions$ | async" [ngValue]="acct.value">
-        {{acct.name}}
-      </option>
-    </select>
-  </label>
+<mat-card>
+  <form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
+    <mat-form-field>
+      <mat-label>Owner</mat-label>
+      <mat-select formControlName="set_account_id" required>
+        <mat-option *ngFor="let acct of accountOptions$ | async" [value]="acct.value">{{ acct.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <label>
-    Name:
-    <input type="text" formControlName="name" [class.invalid]="name.invalid" required>
-  </label>
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Name" formControlName="name" required />
+    </mat-form-field>
 
-  <label>
-    Type:
-    <select formControlName="type" required>
-      <option *ngFor="let type of typeOptions" [ngValue]="type.value">
-        {{type.name}}
-      </option>
-    </select>
-  </label>
+    <mat-form-field>
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="type" required>
+        <mat-option *ngFor="let type of typeOptions" [value]="type.value">{{ type.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <label>
-    Status:
-    <select formControlName="status" required>
-      <option *ngFor="let status of statusOptions" [ngValue]="status.value">
-        {{status.name}}
-      </option>
-    </select>
-  </label>
+    <mat-form-field>
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status" required>
+        <mat-option *ngFor="let status of statusOptions" [value]="status.value">{{ status.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <label>
-    Rep name:
-    <input type="text" formControlName="repName" required>
-  </label>
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Rep name" formControlName="repName" required />
+    </mat-form-field>
 
-  <label>
-    Notes:
-    <textarea formControlName="notes"></textarea>
-  </label>
+    <mat-form-field>
+      <textarea matInput formControlName="notes" placeholder="Notes"></textarea>
+    </mat-form-field>
 
-  <label>
-    Advertiser:
-    <select formControlName="set_advertiser_uri" required>
-      <option *ngFor="let adv of advertiserOptions$ | async" [ngValue]="adv.value">
-        {{adv.name}}
-      </option>
-    </select>
-  </label>
+    <mat-form-field>
+      <mat-label>Advertiser</mat-label>
+      <mat-select formControlName="set_advertiser_uri" required>
+        <mat-option *ngFor="let adv of advertiserOptions$ | async" [value]="adv.value">{{ adv.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <button type="submit">Submit</button>
-</form>
+    <button mat-flat-button color="primary" type="submit">Submit</button>
+  </form>
+</mat-card>
