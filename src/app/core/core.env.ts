@@ -14,7 +14,7 @@ const DEFAULTS = {
 
 const addScheme = (name: string, value: any): any => {
   if (name.match(/_HOST$/) && value && !value.startsWith('http')) {
-    const scheme = value.match(/.*\.prxu?\.(?:org|tech|dev)$/) ? 'https' : 'http';
+    const scheme = value.match(/.*\.prxu?\.(?:org|tech|docker)$/) ? 'https' : 'http';
     return `${scheme}://${value}`;
   } else {
     return value;
@@ -47,9 +47,19 @@ const getNumber = (name: string): number => {
 };
 
 export class Env {
-  public static get AUGURY_HOST(): string { return getVar('AUGURY_HOST'); }
-  public static get AUGURY_TTL(): number { return getNumber('AUGURY_TTL'); }
-  public static get AUTH_HOST(): string { return getVar('AUTH_HOST'); }
-  public static get AUTH_CLIENT_ID(): string { return getVar('AUTH_CLIENT_ID'); }
-  public static get GA_KEY(): string { return getVar('GA_KEY'); }
+  public static get AUGURY_HOST(): string {
+    return getVar('AUGURY_HOST');
+  }
+  public static get AUGURY_TTL(): number {
+    return getNumber('AUGURY_TTL');
+  }
+  public static get AUTH_HOST(): string {
+    return getVar('AUTH_HOST');
+  }
+  public static get AUTH_CLIENT_ID(): string {
+    return getVar('AUTH_CLIENT_ID');
+  }
+  public static get GA_KEY(): string {
+    return getVar('GA_KEY');
+  }
 }
