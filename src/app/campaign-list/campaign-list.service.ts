@@ -40,7 +40,7 @@ export interface Campaign {
 
 @Injectable()
 export class CampaignListService {
-  params = {page: 1, per: 9};
+  params = {page: 1, per: 12};
   total: number;
   count: number;
   error: Error;
