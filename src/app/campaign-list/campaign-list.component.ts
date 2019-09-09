@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Campaign, CampaignListService } from './campaign-list.service';
 
@@ -21,7 +21,8 @@ import { Campaign, CampaignListService } from './campaign-list.service';
       (showPage)="showPage($event)">
     </prx-paging>
   `,
-  styleUrls: ['campaign-list.component.scss']
+  styleUrls: ['campaign-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignListComponent implements OnInit {
   campaigns$: Observable<Campaign[]>;
@@ -30,6 +31,7 @@ export class CampaignListComponent implements OnInit {
   constructor(private campaignListService: CampaignListService) {}
 
   ngOnInit() {
+    this.campaignListService.loadCampaignList();
     this.campaigns$ = this.campaignListService.campaigns;
   }
 

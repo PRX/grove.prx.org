@@ -29,6 +29,7 @@ describe('CampaignListService', () => {
 
     auguryService = TestBed.get(AuguryService);
     campaignListService = TestBed.get(CampaignListService);
+    campaignListService.loadCampaignList();
   });
 
   it('should load campaign list', (done) => {

@@ -49,9 +49,7 @@ export class CampaignListService {
   // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{[id: number]: Campaign}>({});
 
-  constructor(private augury: AuguryService) {
-    this.loadCampaignList();
-  }
+  constructor(private augury: AuguryService) {}
 
   get campaigns(): Observable<Campaign[]> {
     // this._campaigns is a subject of campaign entities (an object with campaignIds mapped to campaign,) convert to array for display

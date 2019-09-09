@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Campaign } from './campaign-list.service';
 
 @Component({
@@ -26,7 +26,8 @@ import { Campaign } from './campaign-list.service';
       <prx-spinner></prx-spinner>
     </section>
   `,
-  styleUrls: ['campaign-card.component.scss']
+  styleUrls: ['campaign-card.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignCardComponent {
   @Input() campaign: Campaign;
