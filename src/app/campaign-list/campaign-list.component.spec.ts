@@ -9,6 +9,7 @@ import { SharedModule } from '../shared/shared.module';
 import { CampaignListService } from './campaign-list.service';
 import { CampaignListServiceMock, campaigns as campaignsFixture } from './campaign-list.service.mock';
 import { CampaignListComponent } from './campaign-list.component';
+import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
 import { CampaignCardComponent } from './campaign-card.component';
 import { CampaignFlightDatesPipe } from './campaign-flight-dates.pipe';
 import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';
@@ -36,7 +37,8 @@ describe('CampaignListComponent', () => {
         CampaignFlightTargetsPipe,
         CampaignFlightZonesPipe,
         CampaignTypePipe,
-        CampaignListComponent
+        CampaignListComponent,
+        CampaignListTotalPagesPipe
       ],
       providers: [
         {

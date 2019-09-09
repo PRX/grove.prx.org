@@ -17,7 +17,7 @@ import { Campaign, CampaignListService } from './campaign-list.service';
     </ul>
     <prx-paging
       [currentPage]="currentPage"
-      [totalPages]="totalPages"
+      [totalPages]="totalPer | campaignListTotalPages"
       (showPage)="showPage($event)">
     </prx-paging>
   `,
@@ -47,12 +47,8 @@ export class CampaignListComponent implements OnInit {
     return this.campaignListService.params.page;
   }
 
-  get totalPages(): number {
-    // TODO: implement as pipe
-    const plusOne =
-      this.campaignListService.total === 0 ||
-      this.campaignListService.total % this.campaignListService.params.per > 0 ? 1 : 0;
-    return Math.floor(this.campaignListService.total / this.campaignListService.params.per) + plusOne;
+  get totalPer(): {total: number, per: number} {
+    return {total: this.campaignListService.total, per: this.campaignListService.params.per};
   }
 
   showPage(page: number) {

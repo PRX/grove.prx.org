@@ -10,6 +10,7 @@ import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';
 import { CampaignFlightZonesPipe } from './campaign-flight-zones.pipe';
 import { CampaignTypePipe } from './campaign-type.pipe';
 import { CampaignListComponent } from './campaign-list.component';
+import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
 import { CampaignListService } from './campaign-list.service';
 
 @NgModule({
@@ -19,7 +20,8 @@ import { CampaignListService } from './campaign-list.service';
     CampaignFlightTargetsPipe,
     CampaignFlightZonesPipe,
     CampaignTypePipe,
-    CampaignListComponent
+    CampaignListComponent,
+    CampaignListTotalPagesPipe
   ],
   imports: [
     CommonModule,
