@@ -2,18 +2,19 @@ import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
+import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './campaign-form.component';
 
 export const campaignRoutes: Routes = [
   {
     path: 'campaign/new',
-    component: CampaignFormComponent,
+    component: CampaignComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard]
   },
   {
     path: 'campaign/:id',
-    component: CampaignFormComponent,
+    component: CampaignComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard]
   }

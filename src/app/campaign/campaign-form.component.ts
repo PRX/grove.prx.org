@@ -1,33 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { UserService } from '../core/user/user.service';
-import { AuguryService } from '../core/augury.service';
-import { withLatestFrom, map, switchMap } from 'rxjs/operators';
-import { Router, ParamMap, ActivatedRoute } from '@angular/router';
-import { HalDoc } from 'ngx-prx-styleguide';
-import { ToastrService } from 'ngx-prx-styleguide';
 
 interface CampaignData {
-  accountUri: string;
+  set_account_uri: string;
   name: string;
   type: string;
   status: string;
   repName: string;
   notes: string;
-  advertiserUri: string;
+  set_advertiser_uri: string;
 }
 
 @Component({
-  selector: 'grove-campaign',
+  selector: 'grove-campaign-form',
   templateUrl: './campaign-form.component.html',
   styleUrls: ['./campaign-form.component.scss']
 })
-export class CampaignFormComponent implements OnInit {
-  advertiserOptions$: Observable<{ name: string; value: string }[]>;
-  accountOptions$: Observable<{ name: string; value: string }[]>;
-  campaignData$: Observable<CampaignData>;
-  campaignDoc$: Observable<HalDoc>;
+export class CampaignFormComponent implements OnChanges {
+  @Input() advertisers: { name: string; value: string }[];
+  @Input() accounts: { name: string; value: string }[];
+  @Input() campaign: CampaignData;
+  @Output() campaignUpdate = new EventEmitter<CampaignData>();
+  @Output() campaignSubmit = new EventEmitter<CampaignData>();
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },
@@ -49,7 +43,7 @@ export class CampaignFormComponent implements OnInit {
   ];
 
   campaignForm = this.fb.group({
-    set_account_id: ['', Validators.required],
+    set_account_uri: ['', Validators.required],
     name: ['', Validators.required],
     type: ['', Validators.required],
     status: ['', Validators.required],
@@ -58,8 +52,8 @@ export class CampaignFormComponent implements OnInit {
     set_advertiser_uri: ['', Validators.required]
   });
 
-  get set_account_id() {
-    return this.campaignForm.get('set_account_id');
+  get set_account_uri() {
+    return this.campaignForm.get('set_account_uri');
   }
   get name() {
     return this.campaignForm.get('name');
@@ -80,99 +74,27 @@ export class CampaignFormComponent implements OnInit {
     return this.campaignForm.get('set_advertiser_uri');
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private userService: UserService,
-    private auguryService: AuguryService,
-    private toastr: ToastrService
-  ) {}
+  constructor(private fb: FormBuilder) {}
 
-  ngOnInit() {
-    this.advertiserOptions$ = this.fetchAdvertisers();
-
-    this.campaignDoc$ = this.route.paramMap.pipe(switchMap((params: ParamMap) => this.fetchCampaign(params.get('id'))));
-
-    this.campaignData$ = this.formDataFromDoc();
-
-    this.campaignData$.subscribe(result => (result ? this.updateCampaignForm(result) : null));
-
-    this.accountOptions$ = this.userService.accounts.pipe(
-      withLatestFrom(this.userService.defaultAccount),
-      map(([accounts, defaultAccount]) => {
-        return [defaultAccount].concat(accounts).map(acct => ({
-          name: acct['name'],
-          value: acct.expand('self')
-        }));
-      })
-    );
-  }
-
-  formDataFromDoc(): Observable<CampaignData | null> {
-    return this.campaignDoc$.pipe(
-      map(campaign => {
-        if (campaign === null) {
-          return null;
-        }
-        const { name, type, status, repName, notes } = campaign as any;
-        const [advertiserUri, accountUri] = ['advertiser', 'account'].map(resource => campaign.expand(`prx:${resource}`));
-        return { name, type, status, repName, notes, advertiserUri, accountUri };
-      })
-    );
-  }
-
-  fetchCampaign(id: string | null): Observable<HalDoc> | Observable<null> {
-    if (id === null) {
-      return of(null);
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.campaign && changes.campaign.currentValue) {
+      this.updateCampaignForm(this.campaign);
     }
-    const resourceName = 'campaign';
-    return this.auguryService.follow(`prx:${resourceName}`, { id });
   }
 
-  updateCampaignForm({ name, type, status, repName, notes, advertiserUri, accountUri }: CampaignData) {
+  updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: CampaignData) {
     this.campaignForm.patchValue({
-      set_account_id: accountUri,
+      set_account_uri,
       name,
       type,
       status,
       repName,
       notes,
-      set_advertiser_uri: advertiserUri
+      set_advertiser_uri
     });
   }
 
-  fetchAdvertisers() {
-    const resourceName = 'advertisers';
-    return this.auguryService.followItems(`prx:${resourceName}`).pipe(
-      map(advertisers => {
-        return advertisers.map(adv => ({
-          name: adv['name'],
-          value: adv.expand('self')
-        }));
-      })
-    );
-  }
-
   campaignFormSubmit() {
-    this.campaignDoc$
-      .pipe(
-        withLatestFrom(this.auguryService.root),
-        map(([cmp, root]) => {
-          let resp;
-          if (cmp) {
-            resp = cmp.update(this.campaignForm.value);
-          } else {
-            resp = root.create('prx:campaign', {}, this.campaignForm.value);
-          }
-          resp.subscribe(res => {
-            this.toastr.success('Campaign saved');
-            if (!cmp) {
-              this.router.navigate(['/campaign', res.id]);
-            }
-          });
-        })
-      )
-      .subscribe();
+    this.campaignSubmit.emit(this.campaignForm.value);
   }
 }

@@ -2,8 +2,8 @@
   <form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
     <mat-form-field>
       <mat-label>Owner</mat-label>
-      <mat-select formControlName="set_account_id" required>
-        <mat-option *ngFor="let acct of accountOptions$ | async" [value]="acct.value">{{ acct.name }}</mat-option>
+      <mat-select formControlName="set_account_uri" required>
+        <mat-option *ngFor="let acct of accounts" [value]="acct.value">{{ acct.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -36,7 +36,7 @@
     <mat-form-field>
       <mat-label>Advertiser</mat-label>
       <mat-select formControlName="set_advertiser_uri" required>
-        <mat-option *ngFor="let adv of advertiserOptions$ | async" [value]="adv.value">{{ adv.name }}</mat-option>
+        <mat-option *ngFor="let adv of advertisers" [value]="adv.value">{{ adv.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
