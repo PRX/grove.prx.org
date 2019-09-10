@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 interface CampaignData {
@@ -16,7 +16,7 @@ interface CampaignData {
   templateUrl: './campaign-form.component.html',
   styleUrls: ['./campaign-form.component.scss']
 })
-export class CampaignFormComponent implements OnChanges {
+export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() advertisers: { name: string; value: string }[];
   @Input() accounts: { name: string; value: string }[];
   @Input() campaign: CampaignData;
@@ -75,6 +75,12 @@ export class CampaignFormComponent implements OnChanges {
   }
 
   constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.campaignForm.valueChanges.subscribe(cmp => {
+      this.campaignUpdate.emit(cmp);
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.campaign && changes.campaign.currentValue) {

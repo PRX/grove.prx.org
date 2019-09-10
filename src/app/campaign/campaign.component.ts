@@ -13,17 +13,16 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
       <a prx-status-bar-link routerLink="/">
         <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
       </a>
-      <prx-status-bar-text bold uppercase>Episode</prx-status-bar-text>
-      <prx-status-bar-text italic stretch>Honey, your puns are tearing this relationship apart</prx-status-bar-text>
-      <a prx-status-bar-link routerLink="/series/12344" alignArt="right">
-        <prx-status-bar-image src="https://placebear.com/40/40" alignAart="right"></prx-status-bar-image> Bearly Bearable
-      </a>
+      <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
+      <prx-status-bar-text italic stretch>{{ this.campaignName }}</prx-status-bar-text>
+      <button mat-flat-button color="primary">Save</button>
     </prx-status-bar>
     <grove-campaign-form
       [campaign]="campaignObject$ | async"
       [advertisers]="advertiserOptions$ | async"
       [accounts]="accountOptions$ | async"
       (campaignSubmit)="updateCampaign($event)"
+      (campaignUpdate)="campaignChanged($event)"
     ></grove-campaign-form>
   `,
   styleUrls: ['./campaign.component.scss']
@@ -33,6 +32,7 @@ export class CampaignComponent implements OnInit {
   accountOptions$: Observable<{ name: string; value: string }[]>;
   campaignDoc$: Observable<HalDoc>;
   campaignObject$: Observable<{}>;
+  campaignName: string;
 
   constructor(
     private auguryService: AuguryService,
@@ -111,5 +111,9 @@ export class CampaignComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  campaignChanged(campaign) {
+    this.campaignName = campaign.name;
   }
 }
