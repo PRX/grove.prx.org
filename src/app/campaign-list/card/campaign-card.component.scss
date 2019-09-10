@@ -3,7 +3,7 @@
   background-color: white;
 }
 .header {
-  height: 5px;
+  height: 3px;
   background-color: #a3a3a3;
 }
 section {
@@ -16,6 +16,8 @@ section.loading {
 }
 h2 {
   font-weight: 700;
+  line-height: 1.25em;
+  margin-bottom: 0.5em;
 }
 .status {
   color: white;
