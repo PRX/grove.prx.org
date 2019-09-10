@@ -5,8 +5,8 @@ import { Flight } from '../campaign-list.service';
   name: 'campaignFlightDates'
 })
 export class CampaignFlightDatesPipe implements PipeTransform {
-  transform(flights: Flight[]): string {
-    const dates = flights && flights.reduce((acc, flight) => {
+  flightDates(flights: Flight[]): {startAt: Date, endAt: Date} {
+    return flights && flights.reduce((acc, flight) => {
       let startAt = acc.startAt;
       let endAt = acc.endAt;
       if (!acc.startAt || (flight.startAt && acc.startAt.valueOf() > flight.startAt.valueOf())) {
@@ -17,6 +17,10 @@ export class CampaignFlightDatesPipe implements PipeTransform {
       }
       return {startAt, endAt};
     }, {startAt: null, endAt: null});
+  }
+
+  transform(flights: Flight[]): string {
+    const dates = this.flightDates(flights);
     if (dates && dates.startAt && dates.endAt) {
       return `${dates.startAt.getMonth() + 1}/${dates.startAt.getDate()} - ${dates.endAt.getMonth() + 1}/${dates.endAt.getDate()}`;
     }

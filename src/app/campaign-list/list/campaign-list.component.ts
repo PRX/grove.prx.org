@@ -1,10 +1,13 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Campaign, CampaignListService } from './campaign-list.service';
+import { Campaign, CampaignListService, Facets, CampaignParams } from '../campaign-list.service';
 
 @Component({
   selector: 'grove-campaign-list',
   template: `
+    <grove-campaign-filter
+      [params]="params" [facets]="facets" (loadCampaignList)="loadCampaignList($event)">
+    </grove-campaign-filter>
     <ul>
       <li *ngFor="let campaign of campaigns$ | async">
         <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
@@ -18,7 +21,7 @@ import { Campaign, CampaignListService } from './campaign-list.service';
     <prx-paging
       [currentPage]="currentPage"
       [totalPages]="totalPer | campaignListTotalPages"
-      (showPage)="showPage($event)">
+      (showPage)="loadCampaignList({page: $event})">
     </prx-paging>
   `,
   styleUrls: ['campaign-list.component.scss'],
@@ -36,7 +39,8 @@ export class CampaignListComponent implements OnInit {
   }
 
   get loadingCount(): number {
-    return this.campaignListService.count - this.campaignListService.flightsLoaded;
+    return this.campaignListService.count - this.campaignListService.flightsLoaded >= 0 ?
+      this.campaignListService.count - this.campaignListService.flightsLoaded : 0;
   }
 
   get loading(): boolean {
@@ -51,8 +55,16 @@ export class CampaignListComponent implements OnInit {
     return {total: this.campaignListService.total, per: this.campaignListService.params.per};
   }
 
-  showPage(page: number) {
-    this.campaignListService.loadCampaignList({page});
+  get params(): CampaignParams {
+    return this.campaignListService.params;
+  }
+
+  get facets(): Facets {
+    return this.campaignListService.facets;
+  }
+
+  loadCampaignList(params: CampaignParams) {
+    this.campaignListService.loadCampaignList(params);
   }
 
 }

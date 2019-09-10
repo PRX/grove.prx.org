@@ -4,13 +4,8 @@ import { concatMap, concatAll, withLatestFrom, map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
-export interface CampaignParams {
-  page?: number;
-  per?: number;
-}
-
 interface KeyValue {
-  id: number;
+  id: number | string;
   label: string;
 }
 
@@ -18,6 +13,29 @@ interface KeyValue {
 export type Target = KeyValue;
 export type Advertiser = KeyValue;
 export type Facet = KeyValue;
+export interface CampaignParams {
+  page?: number;
+  per?: number;
+  advertiser?: number;
+  podcast?: number;
+  status?: string;
+  type?: string;
+  geo?: string;
+  zone?: string;
+  text?: string;
+  representative?: string;
+  before?: Date;
+  after?: Date;
+}
+
+export interface Facets {
+  advertiser?: Facet[];
+  podcast?: Facet[];
+  status?: Facet[];
+  type?: Facet[];
+  geo?: Facet[];
+  zone?: Facet[];
+}
 
 export interface Flight {
   name: string;
@@ -41,13 +59,8 @@ export interface Campaign {
 
 @Injectable()
 export class CampaignListService {
-  params = {page: 1, per: 12};
-  facets: {
-    advertiser: Facet[],
-    podcast: Facet[],
-    status: Facet[],
-    type: Facet[]
-  };
+  params: CampaignParams = {page: 1, per: 12};
+  facets: Facets;
   total: number;
   count: number;
   error: Error;
@@ -76,14 +89,28 @@ export class CampaignListService {
     );
   }
 
-  loadCampaignList(params?: CampaignParams) {
-    if (params) {
-      this.params = {
-        ...this.params,
-        ...(params.page && {page: params.page}),
-        ...(params.per && {per: params.per})
+  takeNewParams(newParams: CampaignParams, params: CampaignParams): CampaignParams {
+    if (newParams) {
+      const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = newParams;
+      return {
+        ...params,
+        ...(page && {page}),
+        ...(per && {per}),
+        ...((advertiser || advertiser === null) && {advertiser}),
+        ...((podcast || podcast === null) && {podcast}),
+        ...((status || status === null) && {status}),
+        ...((type || type === null) && {type}),
+        ...((geo || geo === null) && {geo}),
+        ...((zone || zone === null) && {zone}),
+        ...((text || text === null || text === '') && {text}),
+        ...((representative || representative === null || representative === '') && {representative}),
+        ...((before) && {before}),
+        ...((after) && {after})
       };
     }
+  }
+
+  loadCampaignList(newParams?: CampaignParams) {
     this.count = 0;
     this.loading = true;
     this.flightsLoaded = 0;
@@ -91,9 +118,16 @@ export class CampaignListService {
     // clear campaign list
     this._campaigns.next({});
 
+    this.params = this.takeNewParams(newParams, this.params) || this.params;
+    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
+    const filters = this.getFilters({advertiser, podcast, status, type, geo, zone, text, representative, before, after});
+
     this.augury.followItems(
-      'prx:campaigns',
-      {page: this.params.page, per: this.params.per}
+      'prx:campaigns', {
+        page,
+        per,
+        ...(filters && {filters})
+      }
     ).pipe(
       concatMap((campaignDocs: HalDoc[]) => {
         if (campaignDocs.length) {
@@ -145,5 +179,67 @@ export class CampaignListService {
       });
     },
     err => this.error = err);
+  }
+
+  getFilters(params: CampaignParams) {
+    let filters = '';
+    if (params.advertiser) {
+      filters += `advertiser=${params.advertiser}`;
+    }
+    if (params.podcast) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `podcast=${params.podcast}`;
+    }
+    if (params.status) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `status=${params.status}`;
+    }
+    if (params.type) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `type=${params.type}`;
+    }
+    if (params.geo) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `geo=${params.geo}`;
+    }
+    if (params.zone) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `zone=${params.zone}`;
+    }
+    if (params.text) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `text=${params.text}`;
+    }
+    if (params.representative) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `representative=${params.representative}`;
+    }
+    if (params.before) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `before=${params.before.toISOString()}`;
+    }
+    if (params.after) {
+      if (filters) {
+        filters += ',';
+      }
+      filters += `after=${params.after.toISOString()}`;
+    }
+    return filters;
   }
 }

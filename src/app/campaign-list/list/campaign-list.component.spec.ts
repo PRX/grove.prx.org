@@ -4,17 +4,22 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '../../shared/shared.module';
 
-import { CampaignListService } from './campaign-list.service';
-import { CampaignListServiceMock, campaigns as campaignsFixture } from './campaign-list.service.mock';
-import { CampaignListComponent } from './campaign-list.component';
-import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
-import { CampaignCardComponent } from './card/campaign-card.component';
-import { CampaignFlightDatesPipe } from './card/campaign-flight-dates.pipe';
-import { CampaignFlightTargetsPipe } from './card/campaign-flight-targets.pipe';
-import { CampaignFlightZonesPipe } from './card/campaign-flight-zones.pipe';
-import { CampaignTypePipe } from './card/campaign-type.pipe';
+import { CampaignListService } from '../campaign-list.service';
+import { CampaignListServiceMock, campaigns as campaignsFixture } from '../campaign-list.service.mock';
+import {
+  CampaignListComponent,
+  CampaignListTotalPagesPipe,
+  CampaignFilterComponent,
+  FilterFacetComponent,
+  FilterTextComponent } from './';
+import {
+  CampaignCardComponent,
+  CampaignFlightDatesPipe,
+  CampaignFlightTargetsPipe,
+  CampaignFlightZonesPipe,
+  CampaignTypePipe } from '../card/';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
@@ -23,6 +28,7 @@ describe('CampaignListComponent', () => {
   let el: HTMLElement;
   const mockHal = new MockHalService();
   const mockCampaignListService = new CampaignListServiceMock(mockHal);
+  let campaignListService: CampaignListService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -38,7 +44,10 @@ describe('CampaignListComponent', () => {
         CampaignFlightZonesPipe,
         CampaignTypePipe,
         CampaignListComponent,
-        CampaignListTotalPagesPipe
+        CampaignListTotalPagesPipe,
+        CampaignFilterComponent,
+        FilterFacetComponent,
+        FilterTextComponent
       ],
       providers: [
         {
@@ -51,6 +60,7 @@ describe('CampaignListComponent', () => {
       comp = fix.componentInstance;
       de = fix.debugElement;
       el = de.nativeElement;
+      campaignListService = TestBed.get(CampaignListService);
       fix.detectChanges();
     });
   }));
@@ -59,5 +69,17 @@ describe('CampaignListComponent', () => {
     expect(de.query(By.css('prx-paging'))).toBeDefined();
     expect(de.query(By.css('prx-paging button.paging.active')).nativeElement.textContent).toMatch('1');
     expect(de.queryAll(By.css('grove-campaign-card')).length).toEqual(campaignsFixture.length);
+  });
+
+  it('should load campaign list on page change', () => {
+    jest.spyOn(campaignListService, 'loadCampaignList');
+    const buttons = de.queryAll(By.css('prx-paging button'));
+    for (const button of buttons) {
+      if (button.nativeElement.textContent === '2') {
+        button.nativeElement.click();
+        break;
+      }
+    }
+    expect(campaignListService.loadCampaignList).toHaveBeenCalledWith({page: 2});
   });
 });

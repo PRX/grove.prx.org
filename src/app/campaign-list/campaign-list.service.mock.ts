@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { Campaign, Flight } from './campaign-list.service';
+import { Campaign, Flight, Facets } from './campaign-list.service';
 
 export const flights: Flight[] = [
   {
@@ -65,6 +65,15 @@ export const campaigns = [
     flights
   }
 ];
+
+export const facets: Facets = {
+  advertiser: [{id: 3, label: 'Toyota'}, {id: 2, label: 'Griddy'}, {id: 1, label: 'Adidas'}],
+  podcast: [{id: 3, label: 'Podcast 3'}, {id: 2, label: 'Podcast 2'}, {id: 1, label: 'Podcast 1'}],
+  status: [{id: 'canceled', label: 'Canceled'}, {id: 'approved', label: 'Approved'}, {id: 'sold', label: 'Sold'}],
+  type: [{id: 'house', label: 'House'}, {id: 'paid_campaign', label: 'Paid Campaign'}],
+  geo: [{id: 'US', label: 'United States'}, {id: 'CA', label: 'Canada'}],
+  zone: [{id: 'mid_1', label: 'Midroll'}, {id: 'pre_1', label: 'Preroll'}]
+};
 
 @Injectable()
 export class CampaignListServiceMock {
