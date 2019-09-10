@@ -19,8 +19,6 @@ export const campaignRoutes: Routes = [
   }
 ];
 
-export const campaignComponents: any[] = [
-  CampaignFormComponent
-];
+export const campaignComponents: any[] = [CampaignFormComponent];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);
