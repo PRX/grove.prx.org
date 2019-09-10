@@ -1,5 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HalService, MockHalService, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
+import { MatFormFieldModule, MatInputModule, MatSelectModule,
+         MatCardModule, MatButtonModule } from '@angular/material';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { AuguryService } from '../core/augury.service';
 import { CampaignFormComponent } from './campaign-form.component';
@@ -23,7 +26,9 @@ describe('CampaignFormComponent', () => {
     augury = new MockHalService();
     user = new UserServiceMock();
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, RouterTestingModule.withRoutes([])],
+      imports: [ReactiveFormsModule, RouterTestingModule.withRoutes([]),
+                MatFormFieldModule, MatInputModule, MatSelectModule,
+                MatCardModule, MatButtonModule, NoopAnimationsModule],
       declarations: [CampaignFormComponent],
       providers: [
         {
