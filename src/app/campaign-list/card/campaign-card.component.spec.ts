@@ -3,9 +3,9 @@ import { DebugElement } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '../../shared/shared.module';
 
-import { campaigns as campaignsFixture } from './campaign-list.service.mock';
+import { campaigns as campaignsFixture } from '../campaign-list.service.mock';
 import { CampaignCardComponent } from './campaign-card.component';
 import { CampaignFlightDatesPipe } from './campaign-flight-dates.pipe';
 import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';

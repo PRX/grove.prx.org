@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { Campaign } from './campaign-list.service';
+import { Campaign } from '../campaign-list.service';
 
 @Component({
   selector: 'grove-campaign-card',

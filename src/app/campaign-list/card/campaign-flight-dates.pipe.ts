@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Flight } from './campaign-list.service';
+import { Flight } from '../campaign-list.service';
 
 @Pipe({
   name: 'campaignFlightDates'

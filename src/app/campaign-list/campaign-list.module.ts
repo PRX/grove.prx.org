@@ -4,11 +4,14 @@ import { RouterModule } from '@angular/router';
 
 import { SharedModule } from '../shared/shared.module';
 import { PagingModule } from 'ngx-prx-styleguide';
-import { CampaignCardComponent } from './campaign-card.component';
-import { CampaignFlightDatesPipe } from './campaign-flight-dates.pipe';
-import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';
-import { CampaignFlightZonesPipe } from './campaign-flight-zones.pipe';
-import { CampaignTypePipe } from './campaign-type.pipe';
+
+import {
+  CampaignCardComponent,
+  CampaignFlightDatesPipe,
+  CampaignFlightTargetsPipe,
+  CampaignFlightZonesPipe,
+  CampaignTypePipe } from './card/';
+
 import { CampaignListComponent } from './campaign-list.component';
 import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
 import { CampaignListService } from './campaign-list.service';

@@ -1,5 +1,5 @@
 import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';
-import { flights } from './campaign-list.service.mock';
+import { flights } from '../campaign-list.service.mock';
 
 describe('CampaignFlightTargetsPipe', () => {
   const pipe = new CampaignFlightTargetsPipe();

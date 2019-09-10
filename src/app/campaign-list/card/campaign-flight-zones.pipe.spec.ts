@@ -1,5 +1,5 @@
 import { CampaignFlightZonesPipe } from './campaign-flight-zones.pipe';
-import { flights } from './campaign-list.service.mock';
+import { flights } from '../campaign-list.service.mock';
 
 describe('CampaignFlightZonesPipe', () => {
   const pipe = new CampaignFlightZonesPipe();

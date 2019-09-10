@@ -10,11 +10,11 @@ import { CampaignListService } from './campaign-list.service';
 import { CampaignListServiceMock, campaigns as campaignsFixture } from './campaign-list.service.mock';
 import { CampaignListComponent } from './campaign-list.component';
 import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
-import { CampaignCardComponent } from './campaign-card.component';
-import { CampaignFlightDatesPipe } from './campaign-flight-dates.pipe';
-import { CampaignFlightTargetsPipe } from './campaign-flight-targets.pipe';
-import { CampaignFlightZonesPipe } from './campaign-flight-zones.pipe';
-import { CampaignTypePipe } from './campaign-type.pipe';
+import { CampaignCardComponent } from './card/campaign-card.component';
+import { CampaignFlightDatesPipe } from './card/campaign-flight-dates.pipe';
+import { CampaignFlightTargetsPipe } from './card/campaign-flight-targets.pipe';
+import { CampaignFlightZonesPipe } from './card/campaign-flight-zones.pipe';
+import { CampaignTypePipe } from './card/campaign-type.pipe';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
