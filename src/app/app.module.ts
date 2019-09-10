@@ -13,6 +13,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CampaignListModule } from './campaign-list/campaign-list.module';
 
 @NgModule({
   declarations: [AppComponent, routingComponents],
@@ -24,7 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SharedModule,
     Angulartics2Module.forRoot(),
     CampaignModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    CampaignListModule
   ],
   providers: [{ provide: ErrorHandler, useClass: ErrorService }],
   bootstrap: [AppComponent]

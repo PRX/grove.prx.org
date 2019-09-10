@@ -1,0 +1,34 @@
+:host {
+  display: block;
+  background-color: white;
+}
+.header {
+  height: 3px;
+  background-color: #a3a3a3;
+}
+section {
+  padding: 10px;
+  min-height: 92px;
+}
+section.loading {
+  position: relative;
+  background-color: #ddd;
+}
+h2 {
+  font-weight: 700;
+  line-height: 1.25em;
+  margin-bottom: 0.5em;
+}
+.status {
+  color: white;
+  padding: 2px 4px;
+}
+.draft, .hold, .paused, .canceled {
+  background-color: #ff9600;
+}
+.approved {
+  background-color: #61A85D;
+}
+.sold {
+  background-color: #17C9D3;
+}
