@@ -31,18 +31,18 @@ export class CampaignService {
   }
 
   putCampaign(campaign: Campaign): Observable<Campaign> {
-    if (campaign.id) {
-      return this.augury.follow('prx:campaign', { id: campaign.id }).pipe(
+    const { id, ...putableFields } = campaign;
+    if (id) {
+      return this.augury.follow('prx:campaign', { id }).pipe(
         flatMap(doc => {
-          const json = { ...doc.asJSON(), ...campaign };
-          return doc.update(json);
+          return doc.update(putableFields);
         }),
         map(this.docToCampaign)
       );
     } else {
       return this.augury.root.pipe(
         flatMap(rootDoc => {
-          return rootDoc.create('prx:campaign', {}, campaign);
+          return rootDoc.create('prx:campaign', {}, putableFields);
         }),
         map(this.docToCampaign)
       );

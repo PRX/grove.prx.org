@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
-import { AuguryService } from '../core/augury.service';
-import { map, withLatestFrom, switchMap } from 'rxjs/operators';
-import { UserService } from '../core/user/user.service';
+import { Component } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { ToastrService } from 'ngx-prx-styleguide';
+import { switchMap, first } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { AccountService, AdvertiserService, CampaignService, Account, Advertiser, Campaign } from '../core';
 
 @Component({
   selector: 'grove-campaign',
@@ -14,106 +13,59 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
         <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
       </a>
       <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
-      <prx-status-bar-text italic stretch>{{ this.campaignName }}</prx-status-bar-text>
-      <button mat-flat-button color="primary">Save</button>
+      <prx-status-bar-text italic stretch>{{ this.campaign?.name }}</prx-status-bar-text>
+      <button mat-flat-button color="primary" (click)="campaignSubmit()">Save</button>
     </prx-status-bar>
     <grove-campaign-form
-      [campaign]="campaignObject$ | async"
-      [advertisers]="advertiserOptions$ | async"
-      [accounts]="accountOptions$ | async"
-      (campaignSubmit)="updateCampaign($event)"
-      (campaignUpdate)="campaignChanged($event)"
+      [campaign]="campaign$ | async"
+      [advertisers]="advertisers$ | async"
+      [accounts]="accounts$ | async"
+      (campaignUpdate)="campaignUpdate($event)"
+      (campaignSubmit)="campaignSubmit()"
     ></grove-campaign-form>
   `,
   styleUrls: ['./campaign.component.scss']
 })
-export class CampaignComponent implements OnInit {
-  advertiserOptions$: Observable<{ name: string; value: string }[]>;
-  accountOptions$: Observable<{ name: string; value: string }[]>;
-  campaignDoc$: Observable<HalDoc>;
-  campaignObject$: Observable<{}>;
-  campaignName: string;
+export class CampaignComponent {
+  advertisers$: Observable<Advertiser[]>;
+  accounts$: Observable<Account[]>;
+  campaign$: BehaviorSubject<Campaign>;
+  campaignId: number;
 
   constructor(
-    private auguryService: AuguryService,
+    private accountService: AccountService,
+    private advertiserService: AdvertiserService,
+    private campaignService: CampaignService,
     private route: ActivatedRoute,
     private router: Router,
-    private userService: UserService,
     private toastr: ToastrService
-  ) {}
-
-  ngOnInit() {
-    this.campaignDoc$ = this.route.paramMap.pipe(switchMap((params: ParamMap) => this.fetchCampaign(params.get('id'))));
-    this.campaignObject$ = this.campaignDoc$.pipe(
-      map(campaign => {
-        if (!campaign) {
-          return null;
-        }
-        const campaignObj = campaign.asJSON();
-        campaignObj['set_advertiser_uri'] = campaign.expand('prx:advertiser');
-        campaignObj['set_account_uri'] = campaign.expand('prx:account');
-        return campaignObj;
-      })
-    );
-    this.advertiserOptions$ = this.fetchAdvertisers();
-    this.accountOptions$ = this.fetchAccounts();
+  ) {
+    this.accounts$ = this.accountService.listAccounts();
+    this.advertisers$ = this.advertiserService.listAdvertisers();
+    this.campaign$ = new BehaviorSubject(null);
+    this.route.paramMap
+      .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
+      .subscribe((campaign: Campaign) => {
+        this.campaignId = campaign ? campaign.id : null;
+        this.campaign$.next(campaign);
+      });
   }
 
-  fetchCampaign(id: string | null): Observable<HalDoc> {
-    if (id === null) {
-      return of(null);
-    }
-    const resourceName = 'campaign';
-    return this.auguryService.follow(`prx:${resourceName}`, { id });
+  campaignUpdate(updated: Campaign) {
+    this.campaign$.next(updated);
   }
 
-  fetchAdvertisers() {
-    const resourceName = 'advertisers';
-    return this.auguryService.followItems(`prx:${resourceName}`).pipe(
-      map(advertisers => {
-        return advertisers.map(adv => ({
-          name: adv['name'],
-          value: adv.expand('self')
-        }));
-      })
-    );
-  }
-
-  fetchAccounts() {
-    return this.userService.accounts.pipe(
-      withLatestFrom(this.userService.defaultAccount),
-      map(([accounts, defaultAccount]) => {
-        return [defaultAccount].concat(accounts).map(acct => ({
-          name: acct['name'],
-          value: acct.expand('self')
-        }));
-      })
-    );
-  }
-
-  updateCampaign(campaignData) {
-    this.campaignDoc$
+  campaignSubmit() {
+    this.campaign$
       .pipe(
-        withLatestFrom(this.auguryService.root),
-        map(([cmp, root]) => {
-          let resp;
-          if (cmp) {
-            resp = cmp.update(campaignData);
-          } else {
-            resp = root.create('prx:campaign', {}, campaignData);
-          }
-          resp.subscribe(res => {
-            this.toastr.success('Campaign saved');
-            if (!cmp) {
-              this.router.navigate(['/campaign', res.id]);
-            }
-          });
-        })
+        first(),
+        switchMap(campaign => this.campaignService.putCampaign(campaign))
       )
-      .subscribe();
-  }
-
-  campaignChanged(campaign) {
-    this.campaignName = campaign.name;
+      .subscribe((campaign: Campaign) => {
+        this.toastr.success('Campaign saved');
+        if (!this.campaignId) {
+          this.router.navigate(['/campaign', campaign.id]);
+        }
+      });
   }
 }

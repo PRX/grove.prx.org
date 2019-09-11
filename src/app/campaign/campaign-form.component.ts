@@ -1,15 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-
-interface CampaignData {
-  set_account_uri: string;
-  name: string;
-  type: string;
-  status: string;
-  repName: string;
-  notes: string;
-  set_advertiser_uri: string;
-}
+import { Account, Advertiser, Campaign } from '../core';
 
 @Component({
   selector: 'grove-campaign-form',
@@ -17,11 +8,11 @@ interface CampaignData {
   styleUrls: ['./campaign-form.component.scss']
 })
 export class CampaignFormComponent implements OnChanges, OnInit {
-  @Input() advertisers: { name: string; value: string }[];
-  @Input() accounts: { name: string; value: string }[];
-  @Input() campaign: CampaignData;
-  @Output() campaignUpdate = new EventEmitter<CampaignData>();
-  @Output() campaignSubmit = new EventEmitter<CampaignData>();
+  @Input() accounts: Account[];
+  @Input() advertisers: Advertiser[];
+  @Input() campaign: Campaign;
+  @Output() campaignUpdate = new EventEmitter<Campaign>();
+  @Output() campaignSubmit = new EventEmitter<Campaign>();
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },
@@ -88,7 +79,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
     }
   }
 
-  updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: CampaignData) {
+  updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
     this.campaignForm.patchValue({
       set_account_uri,
       name,
