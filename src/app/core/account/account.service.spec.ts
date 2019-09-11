@@ -1,5 +1,5 @@
 import { AccountService } from './account.service';
-import { UserServiceMock } from '../core/user/user.service.mock';
+import { UserServiceMock } from '../user/user.service.mock';
 
 describe('AccountService', () => {
   let user: UserServiceMock;

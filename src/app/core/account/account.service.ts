@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { UserService } from '../core/user/user.service';
+import { UserService } from '../user/user.service';
 
 export interface Account {
   id: number;

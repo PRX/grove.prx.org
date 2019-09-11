@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, flatMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { AuguryService } from '../core/augury.service';
+import { AuguryService } from '../augury.service';
 
 export interface Campaign {
   id: number;
@@ -19,7 +19,7 @@ export interface Campaign {
 export class CampaignService {
   constructor(private augury: AuguryService) {}
 
-  getCampaign(id: number): Observable<Campaign> {
+  getCampaign(id: number | string): Observable<Campaign> {
     if (id) {
       return this.augury.follow('prx:campaign', { id }).pipe(
         map(this.docToCampaign),

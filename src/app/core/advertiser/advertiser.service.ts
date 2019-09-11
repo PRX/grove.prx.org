@@ -2,15 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { AuguryService } from '../core/augury.service';
+import { AuguryService } from '../augury.service';
 
 export interface Advertiser {
   id: number;
   name: string;
   self_uri: string;
 }
-
-describe('something', () => {});
 
 @Injectable()
 export class AdvertiserService {

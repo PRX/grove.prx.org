@@ -1,6 +1,6 @@
 import { CampaignService, Campaign } from './campaign.service';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { AuguryService } from '../core/augury.service';
+import { AuguryService } from '../augury.service';
 
 // TODO: styleguide doesn't export HalHttpError class
 class Mock404Error extends Error {
