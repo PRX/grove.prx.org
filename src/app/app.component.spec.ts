@@ -54,7 +54,6 @@ describe('AppComponent', () => {
     }).compileComponents().then(() => {
       fix = TestBed.createComponent(AppComponent);
       comp = fix.componentInstance;
-      fix.detectChanges();
       de = fix.debugElement;
       el = de.nativeElement;
       fix.detectChanges();
@@ -62,8 +61,7 @@ describe('AppComponent', () => {
   }));
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
+    const app = de.componentInstance;
     expect(app).toBeTruthy();
   });
 

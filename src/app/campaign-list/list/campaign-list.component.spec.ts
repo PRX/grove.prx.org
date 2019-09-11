@@ -1,5 +1,6 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
+import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 
@@ -7,7 +8,7 @@ import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
 import { CampaignListService } from '../campaign-list.service';
-import { CampaignListServiceMock, campaigns as campaignsFixture } from '../campaign-list.service.mock';
+import { CampaignListServiceMock, campaigns as campaignsFixture, params } from '../campaign-list.service.mock';
 import {
   CampaignListComponent,
   CampaignListTotalPagesPipe,
@@ -71,8 +72,8 @@ describe('CampaignListComponent', () => {
     expect(de.queryAll(By.css('grove-campaign-card')).length).toEqual(campaignsFixture.length);
   });
 
-  it('should load campaign list on page change', () => {
-    jest.spyOn(campaignListService, 'loadCampaignList');
+  it('should route to params on page change', () => {
+    jest.spyOn(comp, 'routeToParams');
     const buttons = de.queryAll(By.css('prx-paging button'));
     for (const button of buttons) {
       if (button.nativeElement.textContent === '2') {
@@ -80,6 +81,14 @@ describe('CampaignListComponent', () => {
         break;
       }
     }
-    expect(campaignListService.loadCampaignList).toHaveBeenCalledWith({page: 2});
+    expect(comp.routeToParams).toHaveBeenCalledWith({page: 2});
+  });
+
+  it('should load campaign list on params change', () => {
+    jest.spyOn(campaignListService, 'loadCampaignList');
+    comp.routedParams = params;
+    fix.detectChanges();
+    comp.ngOnChanges();
+    expect(campaignListService.loadCampaignList).toHaveBeenCalledWith(params);
   });
 });

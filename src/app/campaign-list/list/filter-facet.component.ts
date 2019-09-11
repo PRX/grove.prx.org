@@ -10,7 +10,7 @@ import { Facet } from '../campaign-list.service';
         [value]="option.id"
         [selected]="selectedOption === option.id">{{option.label}}</option>
     </select>
-    <button (click)="selectOption.emit(null)" class="btn-link"><prx-icon size="1em" name="cancel"></prx-icon></button>
+    <button (click)="selectOption.emit('')" class="btn-link"><prx-icon size="1em" name="cancel"></prx-icon></button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

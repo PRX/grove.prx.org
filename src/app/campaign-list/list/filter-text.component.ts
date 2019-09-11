@@ -7,7 +7,7 @@ import { debounceTime, distinctUntilChanged, filter, tap } from 'rxjs/operators'
   template: `
     <input type="text" placeholder="Search by {{textName}}"
       [value]="inputValue || searchText || ''" (keyup)="onChange($event.target.value)">
-      <button (click)="search.emit(null)" class="btn-link"><prx-icon size="1em" name="cancel"></prx-icon></button>
+      <button (click)="inputValue = ''; search.emit(inputValue)" class="btn-link"><prx-icon size="1em" name="cancel"></prx-icon></button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

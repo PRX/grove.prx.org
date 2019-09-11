@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnChanges, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Campaign, CampaignListService, Facets, CampaignParams } from '../campaign-list.service';
 
@@ -6,7 +7,7 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
   selector: 'grove-campaign-list',
   template: `
     <grove-campaign-filter
-      [params]="params" [facets]="facets" (loadCampaignList)="loadCampaignList($event)">
+      [params]="params" [facets]="facets" (campaignListParams)="routeToParams($event)">
     </grove-campaign-filter>
     <ul>
       <li *ngFor="let campaign of campaigns$ | async">
@@ -21,21 +22,22 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
     <prx-paging
       [currentPage]="currentPage"
       [totalPages]="totalPer | campaignListTotalPages"
-      (showPage)="loadCampaignList({page: $event})">
+      (showPage)="routeToParams({page: $event})">
     </prx-paging>
   `,
   styleUrls: ['campaign-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignListComponent implements OnInit {
-  campaigns$: Observable<Campaign[]>;
+export class CampaignListComponent implements OnChanges {
+  @Input() routedParams: CampaignParams;
+  campaigns$: Observable<Campaign[]> = this.campaignListService.campaigns;
   loadingCards = Array;
 
-  constructor(private campaignListService: CampaignListService) {}
+  constructor(private campaignListService: CampaignListService,
+              private router: Router) {}
 
-  ngOnInit() {
-    this.campaignListService.loadCampaignList();
-    this.campaigns$ = this.campaignListService.campaigns;
+  ngOnChanges() {
+    this.campaignListService.loadCampaignList(this.routedParams);
   }
 
   get loadingCount(): number {
@@ -63,8 +65,22 @@ export class CampaignListComponent implements OnInit {
     return this.campaignListService.facets;
   }
 
-  loadCampaignList(params: CampaignParams) {
-    this.campaignListService.loadCampaignList(params);
+  removePer(params): CampaignParams {
+    // per is not a routable param
+    const { per, ...remainingNewParams } = params;
+    return remainingNewParams;
+  }
+
+  routeToParams(params: CampaignParams) {
+    const before = (params.before && params.before.toISOString()) || (this.params.before && this.params.before.toISOString());
+    const after = (params.after && params.after.toISOString()) || (this.params.after && this.params.after.toISOString());
+    console.log(before, after)
+    this.router.navigate(['/'], {queryParams: {
+      ...this.removePer(this.params),
+      ...this.removePer(params),
+      ...(before && {before}),
+      ...(after && {after})
+    }});
   }
 
 }
