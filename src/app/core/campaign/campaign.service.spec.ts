@@ -73,7 +73,8 @@ describe('CampaignService', () => {
     const spy = jest.spyOn(doc, 'update');
     campaign.putCampaign(campaignFixture).subscribe(camp => {
       expect(spy).toHaveBeenCalled();
-      expect(spy.mock.calls[0][0]).toMatchObject(campaignFixture);
+      const { id, ...settable } = campaignFixture;
+      expect(spy.mock.calls[0][0]).toMatchObject(settable);
       done();
     });
   });
