@@ -8,13 +8,18 @@ import { AccountService, AdvertiserService, CampaignService, Account, Advertiser
 @Component({
   selector: 'grove-campaign',
   template: `
-    <grove-campaign-status [campaign]="campaign$ | async" [isChanged]="campaignChanged" (save)="campaignSubmit()"></grove-campaign-status>
+    <grove-campaign-status
+      [campaign]="campaignLocal$ | async"
+      [isValid]="campaignValid"
+      [isSaving]="campaignSaving"
+      (save)="campaignSubmit()"
+    ></grove-campaign-status>
     <grove-campaign-form
-      [campaign]="campaign$ | async"
+      [campaign]="campaignRemote$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
-      (changed)="campaignChanged = $event"
-      (update)="campaignUpdate($event)"
+      (valid)="campaignValid = $event"
+      (update)="campaignUpdateFromForm($event)"
     ></grove-campaign-form>
   `,
   styleUrls: ['./campaign.component.scss']
@@ -22,9 +27,11 @@ import { AccountService, AdvertiserService, CampaignService, Account, Advertiser
 export class CampaignComponent {
   advertisers$: Observable<Advertiser[]>;
   accounts$: Observable<Account[]>;
-  campaign$: BehaviorSubject<Campaign>;
+  campaignRemote$ = new BehaviorSubject<Campaign>(null);
+  campaignLocal$ = new BehaviorSubject<Campaign>(null);
   campaignId: number;
-  campaignChanged: boolean;
+  campaignSaving: boolean;
+  campaignValid: boolean;
 
   constructor(
     private accountService: AccountService,
@@ -36,30 +43,35 @@ export class CampaignComponent {
   ) {
     this.accounts$ = this.accountService.listAccounts();
     this.advertisers$ = this.advertiserService.listAdvertisers();
-    this.campaign$ = new BehaviorSubject(null);
     this.route.paramMap
       .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
-      .subscribe((campaign: Campaign) => {
-        this.campaignId = campaign ? campaign.id : null;
-        this.campaign$.next(campaign);
-      });
+      .subscribe((campaign: Campaign) => this.campaignSyncFromRemote(campaign));
   }
 
-  campaignUpdate(updated: Campaign) {
-    this.campaign$.next(updated);
+  campaignSyncFromRemote(campaign: Campaign) {
+    this.campaignId = campaign ? campaign.id : null;
+    this.campaignRemote$.next(campaign);
+    this.campaignLocal$.next(campaign);
+  }
+
+  campaignUpdateFromForm(updated: Campaign) {
+    this.campaignLocal$.next(updated);
   }
 
   campaignSubmit() {
-    this.campaign$
+    this.campaignSaving = true;
+    this.campaignLocal$
       .pipe(
         first(),
-        switchMap(campaign => this.campaignService.putCampaign(campaign))
+        switchMap(campaign => this.campaignService.putCampaign({ ...campaign, id: this.campaignId }))
       )
       .subscribe((campaign: Campaign) => {
         this.toastr.success('Campaign saved');
         if (!this.campaignId) {
           this.router.navigate(['/campaign', campaign.id]);
         }
+        this.campaignSaving = false;
+        this.campaignSyncFromRemote(campaign);
       });
   }
 }

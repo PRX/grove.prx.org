@@ -11,8 +11,8 @@ export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() accounts: Account[];
   @Input() advertisers: Advertiser[];
   @Input() campaign: Campaign;
-  @Output() changed = new EventEmitter<boolean>();
-  @Output() valid = new EventEmitter<boolean>();
+  @Output() changed = new EventEmitter<boolean>(true);
+  @Output() valid = new EventEmitter<boolean>(true);
   @Output() update = new EventEmitter<Campaign>();
   @Output() submit = new EventEmitter();
 
@@ -71,8 +71,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.campaignForm.valueChanges.subscribe(cmp => {
-      this.changed.emit(this.campaignForm.dirty);
-      this.valid.emit(this.campaignForm.valid);
+      this.formStatusChanged();
       this.update.emit(cmp);
     });
   }
@@ -83,8 +82,13 @@ export class CampaignFormComponent implements OnChanges, OnInit {
     }
   }
 
+  formStatusChanged() {
+    this.changed.emit(this.campaignForm.dirty);
+    this.valid.emit(this.campaignForm.valid);
+  }
+
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    this.campaignForm.patchValue({
+    this.campaignForm.reset({
       set_account_uri,
       name,
       type,
@@ -93,6 +97,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
       notes,
       set_advertiser_uri
     });
+    this.formStatusChanged();
   }
 
   submitCampaignForm() {

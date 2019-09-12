@@ -10,7 +10,7 @@ import { Campaign } from '../../core';
       </a>
       <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
       <prx-status-bar-text italic stretch>{{ campaign?.name }}</prx-status-bar-text>
-      <prx-button [working]="isWorking" [disabled]="!isValid || !isChanged" (click)="onSave()">Save</prx-button>
+      <prx-button [working]="isSaving" [disabled]="!isValid" (click)="onSave()">Save</prx-button>
     </prx-status-bar>
   `,
   styleUrls: ['./campaign-status.component.scss']
