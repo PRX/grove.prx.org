@@ -1,76 +1,63 @@
 import { Component } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { ToastrService } from 'ngx-prx-styleguide';
-import { switchMap, first } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { AccountService, AdvertiserService, CampaignService, Account, Advertiser, Campaign } from '../core';
+import { switchMap, first } from 'rxjs/operators';
+import { CampaignService, Campaign } from '../core';
+import { CampaignFormService } from './form/campaign-form.service';
+import { ToastrService } from 'ngx-prx-styleguide';
 
 @Component({
   selector: 'grove-campaign',
   template: `
     <grove-campaign-status
-      [campaign]="campaignLocal$ | async"
-      [isValid]="campaignValid"
+      [campaign]="formSvc.campaignLocal$ | async"
+      [isValid]="formSvc.campaignValid"
       [isSaving]="campaignSaving"
-      [isChanged]="campaignChanged"
+      [isChanged]="formSvc.campaignChanged"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
-    <grove-campaign-form
-      [campaign]="campaignRemote$ | async"
-      [advertisers]="advertisers$ | async"
-      [accounts]="accounts$ | async"
-      (campaignChanged)="campaignChanged = $event"
-      (campaignValid)="campaignValid = $event"
-      (campaignUpdate)="campaignUpdateFromForm($event)"
-    ></grove-campaign-form>
+    <mat-drawer-container>
+      <mat-drawer mode="side" opened>
+        <a routerLink="">Campaign</a>
+        <a routerLink="test">Test</a>
+      </mat-drawer>
+      <mat-drawer-content>
+        <router-outlet></router-outlet>
+      </mat-drawer-content>
+    </mat-drawer-container>
   `,
   styleUrls: ['./campaign.component.scss']
 })
 export class CampaignComponent {
-  advertisers$: Observable<Advertiser[]>;
-  accounts$: Observable<Account[]>;
-  campaignRemote$ = new BehaviorSubject<Campaign>(null);
-  campaignLocal$ = new BehaviorSubject<Campaign>(null);
-  campaignId: number;
   campaignSaving: boolean;
-  campaignValid: boolean;
-  campaignChanged: boolean;
 
   constructor(
-    private accountService: AccountService,
-    private advertiserService: AdvertiserService,
-    private campaignService: CampaignService,
+    protected formSvc: CampaignFormService,
     private route: ActivatedRoute,
+    private campaignService: CampaignService,
     private router: Router,
     private toastr: ToastrService
   ) {
-    this.accounts$ = this.accountService.listAccounts();
-    this.advertisers$ = this.advertiserService.listAdvertisers();
     this.route.paramMap
       .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
       .subscribe((campaign: Campaign) => this.campaignSyncFromRemote(campaign));
   }
 
   campaignSyncFromRemote(campaign: Campaign) {
-    this.campaignId = campaign ? campaign.id : null;
-    this.campaignRemote$.next(campaign);
-    this.campaignLocal$.next(campaign);
-  }
-
-  campaignUpdateFromForm(updated: Campaign) {
-    this.campaignLocal$.next(updated);
+    this.formSvc.campaignId = campaign ? campaign.id : null;
+    this.formSvc.campaignRemote$.next(campaign);
+    this.formSvc.campaignLocal$.next(campaign);
   }
 
   campaignSubmit() {
     this.campaignSaving = true;
-    this.campaignLocal$
+    this.formSvc.campaignLocal$
       .pipe(
         first(),
-        switchMap(campaign => this.campaignService.putCampaign({ ...campaign, id: this.campaignId }))
+        switchMap(campaign => this.campaignService.putCampaign({ ...campaign, id: this.formSvc.campaignId }))
       )
       .subscribe((campaign: Campaign) => {
         this.toastr.success('Campaign saved');
-        if (!this.campaignId) {
+        if (!this.formSvc.campaignId) {
           this.router.navigate(['/campaign', campaign.id]);
         }
         this.campaignSaving = false;

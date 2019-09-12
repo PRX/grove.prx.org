@@ -5,19 +5,22 @@ import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './form/campaign-form.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
+import { CampaignFormContainerComponent } from './form/campaign-form.container';
 
 export const campaignRoutes: Routes = [
   {
     path: 'campaign/new',
     component: CampaignComponent,
     canActivate: [AuthGuard],
-    canDeactivate: [DeactivateGuard]
+    canDeactivate: [DeactivateGuard],
+    children: [{ path: '', component: CampaignFormContainerComponent }]
   },
   {
     path: 'campaign/:id',
     component: CampaignComponent,
     canActivate: [AuthGuard],
-    canDeactivate: [DeactivateGuard]
+    canDeactivate: [DeactivateGuard],
+    children: [{ path: '', component: CampaignFormContainerComponent }]
   }
 ];
 
