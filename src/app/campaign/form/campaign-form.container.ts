@@ -38,6 +38,7 @@ export class CampaignFormContainerComponent implements OnInit {
   }
 
   campaignUpdateFromForm(updated: Campaign) {
-    this.dataSvc.campaignLocal$.next(updated);
+    const campaign = this.dataSvc.campaignLocal$.getValue();
+    this.dataSvc.campaignLocal$.next({ ...campaign, ...updated });
   }
 }

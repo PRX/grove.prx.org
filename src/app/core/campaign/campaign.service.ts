@@ -3,6 +3,7 @@ import { Observable, of } from 'rxjs';
 import { map, flatMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
+import { Flight } from '../../core';
 
 export interface Campaign {
   id: number;
@@ -13,6 +14,12 @@ export interface Campaign {
   notes: string;
   set_account_uri: string;
   set_advertiser_uri: string;
+  flights: { [id: string]: Flight };
+}
+
+export interface Flight {
+  id: number;
+  name: string;
 }
 
 @Injectable()
@@ -21,8 +28,8 @@ export class CampaignService {
 
   getCampaign(id: number | string): Observable<Campaign> {
     if (id) {
-      return this.augury.follow('prx:campaign', { id }).pipe(
-        map(this.docToCampaign),
+      return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
+        flatMap(this.docToCampaign),
         catchError(this.handleError)
       );
     } else {
@@ -37,23 +44,31 @@ export class CampaignService {
         flatMap(doc => {
           return doc.update(putableFields);
         }),
-        map(this.docToCampaign)
+        flatMap(this.docToCampaign)
       );
     } else {
       return this.augury.root.pipe(
         flatMap(rootDoc => {
           return rootDoc.create('prx:campaign', {}, putableFields);
         }),
-        map(this.docToCampaign)
+        flatMap(this.docToCampaign)
       );
     }
   }
 
-  docToCampaign(doc: HalDoc): Campaign {
-    const campaign = <Campaign>doc.asJSON();
+  docToCampaign(doc: HalDoc): Observable<Campaign> {
+    const campaign = doc.asJSON() as Campaign;
     campaign.set_advertiser_uri = doc.expand('prx:advertiser');
     campaign.set_account_uri = doc.expand('prx:account');
-    return campaign;
+    return doc.followItems('prx:flights').pipe(
+      map(flights => {
+        campaign.flights = flights.reduce((prev, flight) => {
+          prev[flight.id.toString()] = (flight as any) as Flight;
+          return prev;
+        }, {});
+        return campaign;
+      })
+    );
   }
 
   handleError(err: any) {

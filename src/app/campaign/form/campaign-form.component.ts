@@ -13,7 +13,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() campaign: Campaign;
   @Output() campaignChanged = new EventEmitter<boolean>(true);
   @Output() campaignValid = new EventEmitter<boolean>(true);
-  @Output() campaignUpdate = new EventEmitter<Campaign>();
+  @Output() campaignUpdate = new EventEmitter<Campaign>(true);
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },

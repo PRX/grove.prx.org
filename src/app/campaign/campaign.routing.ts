@@ -6,6 +6,12 @@ import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './form/campaign-form.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
+import { FlightComponent } from './flight/flight.component';
+
+const campaignChildRoutes: Routes = [
+  { path: '', component: CampaignFormContainerComponent },
+  { path: 'flight/:id', component: FlightComponent }
+];
 
 export const campaignRoutes: Routes = [
   {
@@ -13,14 +19,14 @@ export const campaignRoutes: Routes = [
     component: CampaignComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard],
-    children: [{ path: '', component: CampaignFormContainerComponent }]
+    children: campaignChildRoutes
   },
   {
     path: 'campaign/:id',
     component: CampaignComponent,
     canActivate: [AuthGuard],
     canDeactivate: [DeactivateGuard],
-    children: [{ path: '', component: CampaignFormContainerComponent }]
+    children: campaignChildRoutes
   }
 ];
 

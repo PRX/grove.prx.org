@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { switchMap, first } from 'rxjs/operators';
-import { CampaignService, Campaign } from '../core';
+import { switchMap, first, map } from 'rxjs/operators';
+import { CampaignService, Campaign, Flight } from '../core';
 import { CampaignFormService } from './form/campaign-form.service';
 import { ToastrService } from 'ngx-prx-styleguide';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'grove-campaign',
@@ -18,7 +19,9 @@ import { ToastrService } from 'ngx-prx-styleguide';
     <mat-drawer-container>
       <mat-drawer mode="side" opened>
         <a routerLink="">Campaign</a>
-        <a routerLink="test">Test</a>
+        <a routerLink="flight/add">Test</a>
+        <a *ngFor="let flight of campaignFlights$ | async"> {{ flight.id }} </a>
+        <button (click)="createFlight()">+ Add a Flight</button>
       </mat-drawer>
       <mat-drawer-content>
         <router-outlet></router-outlet>
@@ -28,6 +31,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
   styleUrls: ['./campaign.component.scss']
 })
 export class CampaignComponent {
+  campaignFlights$: Observable<{ id: string; name: string }[]>;
   campaignSaving: boolean;
 
   constructor(
@@ -40,6 +44,15 @@ export class CampaignComponent {
     this.route.paramMap
       .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
       .subscribe((campaign: Campaign) => this.campaignSyncFromRemote(campaign));
+    this.campaignFlights$ = this.formSvc.campaignLocal$.pipe(
+      map(cmp => {
+        if (cmp && cmp.flights) {
+          return Object.keys(cmp.flights).map(key => ({ id: key, name: cmp.flights[key].name }));
+        } else {
+          return [];
+        }
+      })
+    );
   }
 
   campaignSyncFromRemote(campaign: Campaign) {
@@ -63,5 +76,13 @@ export class CampaignComponent {
         this.campaignSaving = false;
         this.campaignSyncFromRemote(campaign);
       });
+  }
+
+  createFlight() {
+    const campaign = this.formSvc.campaignLocal$.getValue();
+    const flightId = Date.now();
+    campaign.flights[flightId] = { id: null, name: '(Untitled)' };
+    this.formSvc.campaignLocal$.next(campaign);
+    this.router.navigate(['/campaign', campaign.id, 'flight', flightId]);
   }
 }
