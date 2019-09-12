@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Account, Advertiser, Campaign } from '../core';
+import { Account, Advertiser, Campaign } from '../../core';
 
 @Component({
   selector: 'grove-campaign-form',
@@ -11,8 +11,10 @@ export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() accounts: Account[];
   @Input() advertisers: Advertiser[];
   @Input() campaign: Campaign;
-  @Output() campaignUpdate = new EventEmitter<Campaign>();
-  @Output() campaignSubmit = new EventEmitter<Campaign>();
+  @Output() changed = new EventEmitter<boolean>();
+  @Output() valid = new EventEmitter<boolean>();
+  @Output() update = new EventEmitter<Campaign>();
+  @Output() submit = new EventEmitter();
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },
@@ -69,7 +71,9 @@ export class CampaignFormComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.campaignForm.valueChanges.subscribe(cmp => {
-      this.campaignUpdate.emit(cmp);
+      this.changed.emit(this.campaignForm.dirty);
+      this.valid.emit(this.campaignForm.valid);
+      this.update.emit(cmp);
     });
   }
 
@@ -91,7 +95,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
     });
   }
 
-  campaignFormSubmit() {
-    this.campaignSubmit.emit(this.campaignForm.value);
+  submitCampaignForm() {
+    this.submit.emit();
   }
 }

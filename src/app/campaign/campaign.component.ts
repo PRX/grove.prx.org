@@ -8,20 +8,15 @@ import { AccountService, AdvertiserService, CampaignService, Account, Advertiser
 @Component({
   selector: 'grove-campaign',
   template: `
-    <prx-status-bar>
-      <a prx-status-bar-link routerLink="/">
-        <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
-      </a>
-      <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
-      <prx-status-bar-text italic stretch>{{ this.campaign?.name }}</prx-status-bar-text>
-      <button mat-flat-button color="primary" (click)="campaignSubmit()">Save</button>
-    </prx-status-bar>
+    <grove-campaign-status
+      [campaign]="campaign$ | async"
+      (save)="campaignSubmit()"
+    ></grove-campaign-status>
     <grove-campaign-form
       [campaign]="campaign$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
-      (campaignUpdate)="campaignUpdate($event)"
-      (campaignSubmit)="campaignSubmit()"
+      (update)="campaignUpdate($event)"
     ></grove-campaign-form>
   `,
   styleUrls: ['./campaign.component.scss']

@@ -7,11 +7,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { CampaignComponent } from './campaign.component';
-import { StatusBarModule } from 'ngx-prx-styleguide';
+import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 
 @NgModule({
-  declarations: [...campaignComponents, CampaignComponent],
+  declarations: [...campaignComponents],
   imports: [
     MatCardModule,
     MatButtonModule,
@@ -21,6 +20,7 @@ import { StatusBarModule } from 'ngx-prx-styleguide';
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,
+    FancyFormModule,
     campaignRouting
   ]
 })

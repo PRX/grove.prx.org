@@ -3,7 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { CampaignComponent } from './campaign.component';
-import { CampaignFormComponent } from './campaign-form.component';
+import { CampaignFormComponent } from './form/campaign-form.component';
+import { CampaignStatusComponent } from './status/campaign-status.component';
 
 export const campaignRoutes: Routes = [
   {
@@ -20,6 +21,6 @@ export const campaignRoutes: Routes = [
   }
 ];
 
-export const campaignComponents: any[] = [CampaignFormComponent];
+export const campaignComponents: any[] = [CampaignComponent, CampaignFormComponent, CampaignStatusComponent];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);
