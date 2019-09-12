@@ -12,14 +12,16 @@ import { AccountService, AdvertiserService, CampaignService, Account, Advertiser
       [campaign]="campaignLocal$ | async"
       [isValid]="campaignValid"
       [isSaving]="campaignSaving"
+      [isChanged]="campaignChanged"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
     <grove-campaign-form
       [campaign]="campaignRemote$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
-      (valid)="campaignValid = $event"
-      (update)="campaignUpdateFromForm($event)"
+      (campaignChanged)="campaignChanged = $event"
+      (campaignValid)="campaignValid = $event"
+      (campaignUpdate)="campaignUpdateFromForm($event)"
     ></grove-campaign-form>
   `,
   styleUrls: ['./campaign.component.scss']
@@ -32,6 +34,7 @@ export class CampaignComponent {
   campaignId: number;
   campaignSaving: boolean;
   campaignValid: boolean;
+  campaignChanged: boolean;
 
   constructor(
     private accountService: AccountService,
