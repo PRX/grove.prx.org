@@ -8,14 +8,12 @@ import { AccountService, AdvertiserService, CampaignService, Account, Advertiser
 @Component({
   selector: 'grove-campaign',
   template: `
-    <grove-campaign-status
-      [campaign]="campaign$ | async"
-      (save)="campaignSubmit()"
-    ></grove-campaign-status>
+    <grove-campaign-status [campaign]="campaign$ | async" [isChanged]="campaignChanged" (save)="campaignSubmit()"></grove-campaign-status>
     <grove-campaign-form
       [campaign]="campaign$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
+      (changed)="campaignChanged = $event"
       (update)="campaignUpdate($event)"
     ></grove-campaign-form>
   `,
@@ -26,6 +24,7 @@ export class CampaignComponent {
   accounts$: Observable<Account[]>;
   campaign$: BehaviorSubject<Campaign>;
   campaignId: number;
+  campaignChanged: boolean;
 
   constructor(
     private accountService: AccountService,
