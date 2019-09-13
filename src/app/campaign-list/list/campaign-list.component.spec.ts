@@ -1,8 +1,8 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
-import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
@@ -14,7 +14,8 @@ import {
   CampaignListTotalPagesPipe,
   CampaignFilterComponent,
   FilterFacetComponent,
-  FilterTextComponent } from './';
+  FilterTextComponent,
+  FilterDateComponent } from './';
 import {
   CampaignCardComponent,
   CampaignFlightDatesPipe,
@@ -35,6 +36,7 @@ describe('CampaignListComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
+        NoopAnimationsModule,
         PagingModule,
         SharedModule
       ],
@@ -48,7 +50,8 @@ describe('CampaignListComponent', () => {
         CampaignListTotalPagesPipe,
         CampaignFilterComponent,
         FilterFacetComponent,
-        FilterTextComponent
+        FilterTextComponent,
+        FilterDateComponent
       ],
       providers: [
         {

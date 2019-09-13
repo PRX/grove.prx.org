@@ -3,6 +3,9 @@ import { DebugElement } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
+import { SharedModule } from '../shared/shared.module';
 
 import { MockHalService } from 'ngx-prx-styleguide';
 import { CampaignListService } from '../campaign-list/campaign-list.service';
@@ -10,7 +13,7 @@ import { CampaignListModule } from '../campaign-list/campaign-list.module';
 import { CampaignListServiceMock, params } from '../campaign-list/campaign-list.service.mock';
 import { HomeComponent } from './home.component';
 
-describe('AppComponent', () => {
+describe('HomeComponent', () => {
   let comp: HomeComponent;
   let fix: ComponentFixture<HomeComponent>;
   let de: DebugElement;
@@ -23,6 +26,8 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
+        SharedModule,
+        NoopAnimationsModule,
         CampaignListModule
       ],
       declarations: [

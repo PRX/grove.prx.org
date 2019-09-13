@@ -1,5 +1,12 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  MatFormFieldModule,
+  MatInputModule,
+  MatSelectModule,
+  MatDatepickerModule,
+  MatNativeDateModule } from '@angular/material';
 
 import { SharedModule } from '../../shared/shared.module';
 
@@ -8,7 +15,8 @@ import { facets } from '../campaign-list.service.mock';
 import {
   CampaignFilterComponent,
   FilterFacetComponent,
-  FilterTextComponent } from './';
+  FilterTextComponent,
+  FilterDateComponent } from './';
 
 describe('CampaignFilterComponent', () => {
   let comp: CampaignFilterComponent;
@@ -19,12 +27,19 @@ describe('CampaignFilterComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule
+        SharedModule,
+        NoopAnimationsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatNativeDateModule
       ],
       declarations: [
         CampaignFilterComponent,
         FilterFacetComponent,
-        FilterTextComponent
+        FilterTextComponent,
+        FilterDateComponent
       ]
     }).compileComponents().then(() => {
       fix = TestBed.createComponent(CampaignFilterComponent);

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MockHalService, HalService, MockHalDoc, HalObservable } from 'ngx-prx-styleguide';
+import { MockHalService, HalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 import { CampaignListService } from './campaign-list.service';
 import { campaigns as campaignsFixture, flights as flightsFixture } from './campaign-list.service.mock';
@@ -7,9 +7,9 @@ import { campaigns as campaignsFixture, flights as flightsFixture } from './camp
 describe('CampaignListService', () => {
   let auguryService: AuguryService;
   let campaignListService: CampaignListService;
-  const mockAuguryService = new MockHalService();
+  const mockHalService = new MockHalService();
 
-  const mockCampaigns = mockAuguryService.mockItems('prx:campaigns', campaignsFixture);
+  const mockCampaigns = mockHalService.mockItems('prx:campaigns', campaignsFixture);
   mockCampaigns.forEach(campaign => {
     campaign.mock('prx:advertiser', campaign['advertiser']);
     campaign.mockItems('prx:flights', flightsFixture);
@@ -22,7 +22,7 @@ describe('CampaignListService', () => {
         CampaignListService,
         {
           provide: HalService,
-          useValue: mockAuguryService
+          useValue: mockHalService
         }
       ],
     });
@@ -41,7 +41,7 @@ describe('CampaignListService', () => {
   });
 
   it('should handle errors on load', (done) => {
-    mockAuguryService.mockError('prx:campaigns', 'Bad Request');
+    mockHalService.mockError('prx:campaigns', 'Bad Request');
     campaignListService.loadCampaignList();
     campaignListService.campaigns.subscribe((campaigns) => {
       expect(campaignListService.error).toEqual(new Error('Bad Request'));

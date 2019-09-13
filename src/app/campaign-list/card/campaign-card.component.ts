@@ -7,11 +7,11 @@ import { Campaign } from '../campaign-list.service';
     <div class="header {{campaign?.status}}"></div>
     <section *ngIf="campaign">
       <div>{{campaign.flights | campaignFlightDates}}</div>
-      <h2>
+      <h3>
         <a routerLink="{{'/campaign/' + campaign.id}}">
           {{campaign.advertiser && campaign.advertiser.label}}
         </a>
-      </h2>
+      </h3>
       <div>
         <span class="status {{campaign.status}}">{{campaign.status}}</span>
         {{campaign.type | campaignType}}

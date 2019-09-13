@@ -17,7 +17,8 @@ import {
   CampaignListTotalPagesPipe,
   CampaignFilterComponent,
   FilterFacetComponent,
-  FilterTextComponent } from './list';
+  FilterTextComponent,
+  FilterDateComponent } from './list';
 
 import { CampaignListService } from './campaign-list.service';
 
@@ -31,6 +32,7 @@ import { CampaignListService } from './campaign-list.service';
     CampaignFilterComponent,
     FilterFacetComponent,
     FilterTextComponent,
+    FilterDateComponent,
     CampaignListComponent,
     CampaignListTotalPagesPipe
   ],

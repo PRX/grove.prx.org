@@ -1,0 +1,10 @@
+/* have to override the global button styles */
+::ng-deep button {
+  flex: initial;
+}
+::ng-deep button:hover, ::ng-deep button[disabled] {
+  background-color: initial;
+}
+mat-form-field + mat-form-field {
+  margin-left: 10px;
+}

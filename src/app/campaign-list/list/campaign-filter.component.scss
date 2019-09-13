@@ -1,0 +1,22 @@
+h1 {
+  font-weight: 700;
+  font-size: 1.75em;
+  line-height: 2em;
+  color: #676767;
+}
+div {
+  display: flex;
+}
+.dates {
+  justify-content: space-between;
+}
+.selects {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.text {
+  justify-content: flex-start;
+}
+grove-filter-text + grove-filter-text {
+  margin-left: 10px;
+}

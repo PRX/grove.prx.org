@@ -4,27 +4,29 @@ import { Facet } from '../campaign-list.service';
 @Component({
   selector: 'grove-filter-facet',
   template: `
-    <select (change)="onChange($event.target.value)">
-      <option disabled [selected]="!selectedOption">Filter by {{facetName}}</option>
-      <option *ngFor="let option of options"
-        [value]="option.id"
-        [selected]="selectedOption === option.id">{{option.label}}</option>
-    </select>
-    <button (click)="selectOption.emit('')" class="btn-link"><prx-icon size="1em" name="cancel"></prx-icon></button>
+    <mat-form-field>
+      <mat-select formControlName="status" placeholder="Filter by {{facetName}}" [(value)]="selectedOptions">
+        <mat-option>None</mat-option>
+        <mat-option *ngFor="let option of options" [value]="option.id">{{ option.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterFacetComponent {
   @Input() facetName: string;
   @Input() options: Facet[];
-  @Input() selectedOption: number | string;
-  @Output() selectOption = new EventEmitter<number | string>();
-
-  onChange(value: string) {
-    let selected: number | string = value;
-    if (this.options && this.options.length && typeof this.options[0].id === 'number') {
-      selected = parseInt(value, 10);
-    }
-    this.selectOption.emit(selected);
+  @Input()
+  set selectedOptions(values: number | string | number[] | string[]) {
+    this._selectedOptions = values;
+    // emits empty string instead of undefined in order to update filter via routing
+    const options = values ? values : '';
+    this.selectedOptionsChange.emit(options);
   }
+  get selectedOptions() {
+    return this._selectedOptions;
+  }
+  @Output() selectedOptionsChange = new EventEmitter<number | string | number[] | string[]>();
+  // tslint:disable-next-line: variable-name
+  _selectedOptions: number | string | number[] | string[];
 }

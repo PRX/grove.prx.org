@@ -1,6 +1,7 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
-import { By } from '@angular/platform-browser';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatFormFieldModule, MatInputModule } from '@angular/material';
 
 import { SharedModule } from '../../shared/shared.module';
 
@@ -15,7 +16,10 @@ describe('FilterTextComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule
+        SharedModule,
+        NoopAnimationsModule,
+        MatFormFieldModule,
+        MatInputModule
       ],
       declarations: [
         FilterTextComponent
