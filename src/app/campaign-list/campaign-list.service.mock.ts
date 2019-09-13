@@ -101,4 +101,8 @@ export class CampaignListServiceMock {
   get campaigns(): Observable<Campaign[]> {
     return of(campaigns);
   }
+
+  get loadedCampaigns(): Observable<Campaign[]> {
+    return of(campaigns);
+  }
 }

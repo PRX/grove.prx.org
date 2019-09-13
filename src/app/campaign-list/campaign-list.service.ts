@@ -55,6 +55,7 @@ export interface Campaign {
   repName: string;
   notes: string;
   flights?: Flight[];
+  loading?: boolean;
 }
 
 @Injectable()
@@ -64,12 +65,16 @@ export class CampaignListService {
   total: number;
   count: number;
   error: Error;
-  loading = false;
-  flightsLoaded: number;
   // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{[id: number]: Campaign}>({});
 
   constructor(private augury: AuguryService) {}
+
+  get loading(): Observable<boolean[]> {
+    return this.campaigns.pipe(
+      map(campaigns => campaigns && campaigns.filter(c => c.loading).map(c => c.loading))
+    );
+  }
 
   get campaigns(): Observable<Campaign[]> {
     // this._campaigns is a subject of campaign entities (an object with campaignIds mapped to campaign,) convert to array for display
@@ -89,10 +94,14 @@ export class CampaignListService {
     );
   }
 
+  get loadedCampaigns(): Observable<Campaign[]> {
+    return this.campaigns.pipe(
+      map((campaigns: Campaign[]) => campaigns && campaigns.filter(c => !c.loading))
+    );
+  }
+
   loadCampaignList(newParams?: CampaignParams) {
     this.count = 0;
-    this.loading = true;
-    this.flightsLoaded = 0;
 
     // clear campaign list
     this._campaigns.next({});
@@ -115,6 +124,10 @@ export class CampaignListService {
           this.total = campaignDocs[0]['_total'];
           this.facets = campaignDocs[0]['_facets'];
         }
+        this._campaigns.next(campaignDocs.reduce((acc, doc) => {
+            acc[doc.id] = {loading: true};
+            return acc;
+          }, {}));
         return campaignDocs.map(doc => {
           return combineLatest(
             of(doc),
@@ -135,6 +148,7 @@ export class CampaignListService {
         status: campaignDoc['status'],
         repName: campaignDoc['repName'],
         notes: campaignDoc['notes'],
+        loading: false,
         advertiser: {id: advertiserDoc['id'], label: advertiserDoc['name']},
         flights: flightDocs.map(doc => ({
           name: doc['name'],
@@ -145,12 +159,6 @@ export class CampaignListService {
           // targets: Target[];
         }))
       };
-      if (flightDocs) {
-        this.flightsLoaded++;
-        if (this.flightsLoaded === this.count) {
-          this.loading = false;
-        }
-      }
 
       // set _campaigns[campaign.id]
       this._campaigns.next({

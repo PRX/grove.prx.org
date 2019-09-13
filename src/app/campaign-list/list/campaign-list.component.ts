@@ -14,8 +14,8 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
       <li *ngFor="let campaign of campaigns$ | async">
         <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
       </li>
-      <ng-container *ngIf="loading">
-        <li *ngFor="let nothing of loadingCards(loadingCount); let i = index">
+      <ng-container *ngIf="loading$ | async as loading">
+        <li *ngFor="let c of loading; let i = index">
           <grove-campaign-card></grove-campaign-card>
         </li>
       </ng-container>
@@ -33,8 +33,7 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
 })
 export class CampaignListComponent implements OnChanges {
   @Input() routedParams: CampaignParams;
-  campaigns$: Observable<Campaign[]> = this.campaignListService.campaigns;
-  loadingCards = Array;
+  campaigns$: Observable<Campaign[]> = this.campaignListService.loadedCampaigns;
 
   constructor(private campaignListService: CampaignListService,
               private router: Router) {}
@@ -43,12 +42,7 @@ export class CampaignListComponent implements OnChanges {
     this.campaignListService.loadCampaignList(this.routedParams);
   }
 
-  get loadingCount(): number {
-    return this.campaignListService.count - this.campaignListService.flightsLoaded >= 0 ?
-      this.campaignListService.count - this.campaignListService.flightsLoaded : 0;
-  }
-
-  get loading(): boolean {
+  get loading$(): Observable<boolean[]> {
     return this.campaignListService.loading;
   }
 
