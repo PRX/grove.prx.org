@@ -1,23 +1,19 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { switchMap, first, map, filter } from 'rxjs/operators';
-import { CampaignService, Campaign, Flight } from '../core';
-import { CampaignFormService } from './form/campaign-form.service';
+import { switchMap, map } from 'rxjs/operators';
+import { CampaignService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
-import { Observable, of } from 'rxjs';
-import { Event, NavigationEnd } from '@angular/router';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'grove-campaign',
   template: `
     <grove-campaign-status
-      [campaign]="formSvc.campaignLocal$ | async"
-      [isValid]="formSvc.campaignValid"
+      [state]="campaignService.currentState$ | async"
       [isSaving]="campaignSaving"
-      [isChanged]="formSvc.campaignChanged"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
-    <mat-drawer-container autosize fullscreen>
+    <mat-drawer-container autosize>
       <mat-drawer role="navigation" mode="side" opened disableClose>
         <mat-nav-list>
           <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./">Campaign</a>
@@ -46,27 +42,16 @@ export class CampaignComponent {
   campaignSaving: boolean;
 
   constructor(
-    protected formSvc: CampaignFormService,
     private route: ActivatedRoute,
     private campaignService: CampaignService,
     private router: Router,
     private toastr: ToastrService
   ) {
-    this.route.paramMap
-      .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
-      .subscribe((campaign: Campaign) => this.campaignSyncFromRemote(campaign));
-    this.router.events
-      .pipe(
-        filter(e => e instanceof NavigationEnd),
-        switchMap(() => (this.route.firstChild && this.route.firstChild.params) || of({})),
-        filter(params => params.flightid),
-        map(params => params.flightid)
-      )
-      .subscribe(id => this.setFlightId(id));
-    this.campaignFlights$ = this.formSvc.campaignLocal$.pipe(
-      map(cmp => {
-        if (cmp && cmp.flights) {
-          return Object.keys(cmp.flights).map(key => ({ id: key, name: cmp.flights[key].name }));
+    this.route.paramMap.pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id')))).subscribe();
+    this.campaignFlights$ = this.campaignService.currentState$.pipe(
+      map(state => {
+        if (state && state.flights) {
+          return Object.keys(state.flights).map(key => ({ id: key, name: state.flights[key].localFlight.name }));
         } else {
           return [];
         }
@@ -74,53 +59,26 @@ export class CampaignComponent {
     );
   }
 
-  campaignSyncFromRemote(campaign: Campaign) {
-    this.formSvc.campaignId = campaign ? campaign.id : null;
-    this.formSvc.campaignRemote$.next(campaign);
-    this.formSvc.campaignLocal$.next(campaign);
-  }
-
   campaignSubmit() {
+    let isNew = false;
     this.campaignSaving = true;
-    this.formSvc.campaignLocal$
-      .pipe(
-        first(),
-        switchMap(campaign => this.campaignService.putCampaign({ ...campaign, id: this.formSvc.campaignId }))
-      )
-      .subscribe((campaign: Campaign) => {
-        this.toastr.success('Campaign saved');
-        if (!this.formSvc.campaignId) {
-          this.router.navigate(['/campaign', campaign.id]);
-        }
-        this.campaignSaving = false;
-        this.campaignSyncFromRemote(campaign);
-      });
-  }
-
-  waitForCampaign(): Observable<Campaign> {
-    return this.formSvc.campaignLocal$.pipe(
-      filter(c => !!c),
-      first()
-    );
-  }
-
-  createFlight() {
-    this.waitForCampaign().subscribe(campaign => {
-      const flightId = Date.now();
-      const num = Object.keys(campaign.flights).length + 1;
-      campaign.flights[flightId] = { id: null, name: `New Flight ${num}` };
-      this.formSvc.campaignLocal$.next(campaign);
-      this.router.navigate(['/campaign', campaign.id, 'flight', flightId]);
+    this.campaignService.putCampaign().subscribe(newState => {
+      this.toastr.success('Campaign saved');
+      if (isNew) {
+        this.router.navigate(['/campaign', newState.remoteCampaign.id]);
+      }
+      this.campaignSaving = false;
     });
   }
 
-  setFlightId(id: string) {
-    this.waitForCampaign().subscribe(campaign => {
-      if (campaign && campaign.flights[id]) {
-        console.log('GOT a FLIGHT', campaign.flights[id]);
-      } else {
-        this.router.navigate(['/campaign', campaign.id]);
-      }
+  createFlight() {
+    this.campaignService.currentStateFirst$.subscribe(state => {
+      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : null;
+      const flightId = Date.now();
+      const num = Object.keys(state.flights).length + 1;
+      state.flights[flightId] = { campaignId, localFlight: { name: `New Flight ${num}` }, changed: false, valid: true };
+      this.campaignService.currentState$.next(state);
+      this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
     });
   }
 }

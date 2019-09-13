@@ -11,9 +11,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() accounts: Account[];
   @Input() advertisers: Advertiser[];
   @Input() campaign: Campaign;
-  @Output() campaignChanged = new EventEmitter<boolean>(true);
-  @Output() campaignValid = new EventEmitter<boolean>(true);
-  @Output() campaignUpdate = new EventEmitter<Campaign>(true);
+  @Output() campaignUpdate = new EventEmitter<{ campaign: Campaign; changed: boolean; valid: boolean }>(true);
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },
@@ -70,8 +68,7 @@ export class CampaignFormComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.campaignForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged();
-      this.campaignUpdate.emit(cmp);
+      this.formStatusChanged(cmp);
     });
   }
 
@@ -81,9 +78,12 @@ export class CampaignFormComponent implements OnChanges, OnInit {
     }
   }
 
-  formStatusChanged() {
-    this.campaignChanged.emit(this.campaignForm.dirty);
-    this.campaignValid.emit(this.campaignForm.valid);
+  formStatusChanged(campaign?: Campaign) {
+    this.campaignUpdate.emit({
+      campaign,
+      changed: this.campaignForm.dirty,
+      valid: this.campaignForm.valid
+    });
   }
 
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
