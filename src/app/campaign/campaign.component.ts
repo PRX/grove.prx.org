@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { switchMap, first, map } from 'rxjs/operators';
+import { switchMap, first, map, filter } from 'rxjs/operators';
 import { CampaignService, Campaign, Flight } from '../core';
 import { CampaignFormService } from './form/campaign-form.service';
 import { ToastrService } from 'ngx-prx-styleguide';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { Event, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'grove-campaign',
@@ -16,7 +17,7 @@ import { Observable } from 'rxjs';
       [isChanged]="formSvc.campaignChanged"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
-    <mat-drawer-container autosize>
+    <mat-drawer-container autosize fullscreen>
       <mat-drawer role="navigation" mode="side" opened disableClose>
         <mat-nav-list>
           <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./">Campaign</a>
@@ -54,6 +55,14 @@ export class CampaignComponent {
     this.route.paramMap
       .pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id'))))
       .subscribe((campaign: Campaign) => this.campaignSyncFromRemote(campaign));
+    this.router.events
+      .pipe(
+        filter(e => e instanceof NavigationEnd),
+        switchMap(() => (this.route.firstChild && this.route.firstChild.params) || of({})),
+        filter(params => params.flightid),
+        map(params => params.flightid)
+      )
+      .subscribe(id => this.setFlightId(id));
     this.campaignFlights$ = this.formSvc.campaignLocal$.pipe(
       map(cmp => {
         if (cmp && cmp.flights) {
@@ -88,11 +97,30 @@ export class CampaignComponent {
       });
   }
 
+  waitForCampaign(): Observable<Campaign> {
+    return this.formSvc.campaignLocal$.pipe(
+      filter(c => !!c),
+      first()
+    );
+  }
+
   createFlight() {
-    const campaign = this.formSvc.campaignLocal$.getValue();
-    const flightId = Date.now();
-    campaign.flights[flightId] = { id: null, name: '(Untitled)' };
-    this.formSvc.campaignLocal$.next(campaign);
-    this.router.navigate(['/campaign', campaign.id, 'flight', flightId]);
+    this.waitForCampaign().subscribe(campaign => {
+      const flightId = Date.now();
+      const num = Object.keys(campaign.flights).length + 1;
+      campaign.flights[flightId] = { id: null, name: `New Flight ${num}` };
+      this.formSvc.campaignLocal$.next(campaign);
+      this.router.navigate(['/campaign', campaign.id, 'flight', flightId]);
+    });
+  }
+
+  setFlightId(id: string) {
+    this.waitForCampaign().subscribe(campaign => {
+      if (campaign && campaign.flights[id]) {
+        console.log('GOT a FLIGHT', campaign.flights[id]);
+      } else {
+        this.router.navigate(['/campaign', campaign.id]);
+      }
+    });
   }
 }

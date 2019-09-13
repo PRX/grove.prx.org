@@ -6,9 +6,9 @@ import { Flight } from '../../core';
   providedIn: 'root'
 })
 export class FlightFormService {
-  flightsRemote$ = new Observable<{ [id: string]: Flight }>({});
-  flightsLocal$ = new BehaviorSubject<{ [id: string]: { flight: Flight; valid: boolean; changed: boolean } }>({});
-  campaignId: number;
+  flightsRemote$ = new BehaviorSubject<Flight>(null);
+  flightsLocal$ = new BehaviorSubject<Flight>(null);
+  flightId: number;
 
   constructor() {}
 }

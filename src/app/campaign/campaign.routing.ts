@@ -10,7 +10,7 @@ import { FlightComponent } from './flight/flight.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
-  { path: 'flight/:id', component: FlightComponent }
+  { path: 'flight/:flightid', component: FlightComponent }
 ];
 
 export const campaignRoutes: Routes = [
