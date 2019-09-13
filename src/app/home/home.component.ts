@@ -16,8 +16,8 @@ export class HomeComponent {
       const podcast = params['podcast'] && +params['podcast'];
       const status = params['status'];
       const type = params['type'];
-      const geo = params['geo'];
-      const zone = params['zone'];
+      const geo = params['geo'] && params['geo'].split('|');
+      const zone = params['zone'] && params['zone'].split('|');
       const text = params['text'];
       const representative = params['representative'];
       const before = params['before'] && new Date(params['before']);

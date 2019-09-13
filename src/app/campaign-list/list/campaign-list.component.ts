@@ -76,34 +76,63 @@ export class CampaignListComponent implements OnChanges {
     return this.campaignListService.facets;
   }
 
-  removePer(params): CampaignParams {
-    // per is not a routable param
-    const { per, ...remainingNewParams } = params;
-    return remainingNewParams;
-  }
-
   routeToParams(params: CampaignParams) {
+    let { page, advertiser, podcast, status, type, text, representative } = params;
+    if (!params.hasOwnProperty('page') && this.params.page) {
+      page = this.params.page;
+    }
+    if (!params.hasOwnProperty('advertiser') && this.params.advertiser) {
+      advertiser = this.params.advertiser;
+    }
+    if (!params.hasOwnProperty('podcast') && this.params.podcast) {
+      podcast = this.params.podcast;
+    }
+    if (!params.hasOwnProperty('status') && this.params.status) {
+      status = this.params.status;
+    }
+    if (!params.hasOwnProperty('type') && this.params.type) {
+      type = this.params.type;
+    }
+    if (!params.hasOwnProperty('text') && this.params.text) {
+      text = this.params.text;
+    }
+    if (!params.hasOwnProperty('representative') && this.params.representative) {
+      representative = this.params.representative;
+    }
     let before: string;
     let after: string;
-    if (params.before === null) {
-      before = '';
-    } else if (params.before) {
+    if (params.before) {
       before = params.before.toISOString();
-    } else if (this.params.before) {
+    } else if (!params.hasOwnProperty('before') && this.params.before) {
       before = this.params.before.toISOString();
     }
-    if (params.after === null) {
-      after = '';
-    } else if (params.after) {
+    if (params.after) {
       after = params.after.toISOString();
-    } else if (this.params.after) {
+    } else if (!params.hasOwnProperty('after') && this.params.after) {
       after = this.params.after.toISOString();
     }
+    let geo;
+    if (params.geo) {
+      geo = params.geo.join('|');
+    } else if (this.params.geo) {
+      geo = this.params.geo.join('|');
+    }
+    let zone;
+    if (params.zone) {
+      zone = params.zone.join('|');
+    } else if (this.params.zone) {
+      zone = this.params.zone.join('|');
+    }
     this.router.navigate(['/'], {queryParams: {
-      ...this.removePer(this.params),
-      ...this.removePer(params),
-      ...((before || before === '') && {before}),
-      ...((after || after === '') && {after})
+      ...(page && {page}),
+      ...(advertiser && {advertiser}),
+      ...(podcast && {podcast}),
+      ...(status && {status}),
+      ...(type && {type}),
+      ...(before && {before}),
+      ...(after && {after}),
+      ...(geo && {geo}),
+      ...(zone && {zone})
     }});
   }
 

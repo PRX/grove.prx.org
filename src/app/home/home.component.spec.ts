@@ -20,7 +20,9 @@ describe('HomeComponent', () => {
   let el: HTMLElement;
   const mockHal = new MockHalService();
   const mockCampaignListService = new CampaignListServiceMock(mockHal);
-  const { per, ...routableParams } = params;
+  const { per, geo, zone, ...routableParams } = params;
+  const geoStr = geo && geo.join('|');
+  const zoneStr = zone && zone.join('|');
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

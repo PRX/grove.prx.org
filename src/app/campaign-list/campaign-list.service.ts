@@ -20,8 +20,8 @@ export interface CampaignParams {
   podcast?: number;
   status?: string;
   type?: string;
-  geo?: string;
-  zone?: string;
+  geo?: string[];
+  zone?: string[];
   text?: string;
   representative?: string;
   before?: Date;
@@ -98,7 +98,7 @@ export class CampaignListService {
     this._campaigns.next({});
 
     // newParams includes all params (from route) except per
-    this.params = {...newParams, per: this.params.per, page: newParams.page || this.params.page};
+    this.params = {...newParams, per: this.params.per, page: (newParams && newParams.page) || this.params.page};
     const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
     const filters = this.getFilters({advertiser, podcast, status, type, geo, zone, text, representative, before, after});
 

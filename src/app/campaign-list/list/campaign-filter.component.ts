@@ -18,12 +18,14 @@ import { CampaignParams, Facets, Facet } from '../campaign-list.service';
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Zone"
+        multiple="true"
         [options]="facets?.zone"
         [selectedOptions]="params?.zone"
         (selectedOptionsChange)="campaignListParams.emit({zone: $event})">
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Geo Target"
+        multiple="true"
         [options]="facets?.geo"
         [selectedOptions]="params?.geo"
         (selectedOptionsChange)="campaignListParams.emit({geo: $event})">

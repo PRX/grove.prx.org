@@ -5,8 +5,12 @@ import { Facet } from '../campaign-list.service';
   selector: 'grove-filter-facet',
   template: `
     <mat-form-field>
-      <mat-select formControlName="status" placeholder="Filter by {{facetName}}" [(value)]="selectedOptions">
-        <mat-option>None</mat-option>
+      <mat-select
+        formControlName="status"
+        placeholder="Filter by {{facetName}}"
+        [multiple]="multiple"
+        [(value)]="selectedOptions">
+        <mat-option *ngIf="!multiple">None</mat-option>
         <mat-option *ngFor="let option of options" [value]="option.id">{{ option.label }}</mat-option>
       </mat-select>
     </mat-form-field>
@@ -15,6 +19,7 @@ import { Facet } from '../campaign-list.service';
 })
 export class FilterFacetComponent {
   @Input() facetName: string;
+  @Input() multiple: boolean;
   @Input() options: Facet[];
   @Input()
   set selectedOptions(values: number | string | number[] | string[]) {
