@@ -6,11 +6,22 @@ import { AccountService } from './account/account.service';
 import { AdvertiserService } from './advertiser/advertiser.service';
 import { CampaignService } from './campaign/campaign.service';
 import { UserService } from './user/user.service';
+import { InventoryService } from './inventory/inventory.service';
 
 @NgModule({
   declarations: [],
   imports: [CommonModule],
   exports: [FooterModule, HeaderModule, ModalModule, ToastrModule],
-  providers: [AuguryService, AccountService, AdvertiserService, CampaignService, UserService, HalService, ModalService, ToastrService]
+  providers: [
+    AuguryService,
+    AccountService,
+    AdvertiserService,
+    InventoryService,
+    CampaignService,
+    UserService,
+    HalService,
+    ModalService,
+    ToastrService
+  ]
 })
 export class CoreModule {}

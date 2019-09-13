@@ -35,6 +35,8 @@ export interface Campaign {
 export interface Flight {
   id?: number;
   name: string;
+  startAt: string;
+  endAt: string;
 }
 
 @Injectable()

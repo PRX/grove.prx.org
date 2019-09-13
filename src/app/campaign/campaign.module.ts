@@ -9,9 +9,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
-import { FlightComponent } from './flight/flight.component';
-import { CampaignFormContainerComponent } from './form/campaign-form.container';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -23,6 +23,8 @@ import { CampaignFormContainerComponent } from './form/campaign-form.container';
     MatSelectModule,
     MatSidenavModule,
     MatListModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

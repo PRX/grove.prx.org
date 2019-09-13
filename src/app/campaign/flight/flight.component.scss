@@ -1,3 +1,7 @@
 mat-card {
   min-height: 300px;
 }
+
+.mat-card form > * {
+  width: 100%;
+}

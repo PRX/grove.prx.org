@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter } from '@angular/core';
-import { Flight } from 'src/app/core';
+import { Flight, Inventory } from 'src/app/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -9,10 +9,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 })
 export class FlightComponent implements OnInit, OnChanges {
   @Input() flight: Flight;
+  @Input() inventory: Inventory[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
 
   flightForm = this.fb.group({
-    name: ['', Validators.required]
+    name: ['', Validators.required],
+    startAt: ['', Validators.required],
+    endAt: ['', Validators.required],
+    set_inventory_uri: ['', Validators.required]
   });
 
   get name() {
@@ -41,8 +45,8 @@ export class FlightComponent implements OnInit, OnChanges {
     });
   }
 
-  updateFlightForm({ name }: Flight) {
-    this.flightForm.reset({ name });
+  updateFlightForm({ name, startAt, endAt }: Flight) {
+    this.flightForm.reset({ name, startAt: new Date(startAt), endAt: new Date(endAt) });
     this.formStatusChanged();
   }
 }
