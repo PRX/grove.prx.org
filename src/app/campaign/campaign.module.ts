@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { FlightComponent } from './flight/flight.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
@@ -21,6 +22,7 @@ import { CampaignFormContainerComponent } from './form/campaign-form.container';
     MatInputModule,
     MatSelectModule,
     MatSidenavModule,
+    MatListModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

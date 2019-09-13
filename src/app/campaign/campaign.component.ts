@@ -16,14 +16,24 @@ import { Observable } from 'rxjs';
       [isChanged]="formSvc.campaignChanged"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
-    <mat-drawer-container>
-      <mat-drawer mode="side" opened>
-        <a routerLink="">Campaign</a>
-        <a routerLink="flight/add">Test</a>
-        <a *ngFor="let flight of campaignFlights$ | async"> {{ flight.id }} </a>
-        <button (click)="createFlight()">+ Add a Flight</button>
+    <mat-drawer-container autosize>
+      <mat-drawer role="navigation" mode="side" opened disableClose>
+        <mat-nav-list>
+          <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./">Campaign</a>
+          <a
+            mat-list-item
+            *ngFor="let flight of campaignFlights$ | async"
+            [routerLink]="['flight', flight.id]"
+            routerLinkActive="active-link"
+          >
+            {{ flight.name }}
+          </a>
+          <mat-list-item>
+            <button mat-flat-button color="primary" (click)="createFlight()">Add a Flight</button>
+          </mat-list-item>
+        </mat-nav-list>
       </mat-drawer>
-      <mat-drawer-content>
+      <mat-drawer-content role="main">
         <router-outlet></router-outlet>
       </mat-drawer-content>
     </mat-drawer-container>
