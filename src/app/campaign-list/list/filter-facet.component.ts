@@ -19,9 +19,7 @@ export class FilterFacetComponent {
   @Input()
   set selectedOptions(values: number | string | number[] | string[]) {
     this._selectedOptions = values;
-    // emits empty string instead of undefined in order to update filter via routing
-    const options = values ? values : '';
-    this.selectedOptionsChange.emit(options);
+    this.selectedOptionsChange.emit(values);
   }
   get selectedOptions() {
     return this._selectedOptions;

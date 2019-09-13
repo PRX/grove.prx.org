@@ -89,27 +89,6 @@ export class CampaignListService {
     );
   }
 
-  takeNewParams(newParams: CampaignParams, params: CampaignParams): CampaignParams {
-    if (newParams) {
-      const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = newParams;
-      return {
-        ...params,
-        ...(page && {page}),
-        ...(per && {per}),
-        ...((advertiser || +advertiser === Number('')) && {advertiser}),
-        ...((podcast || +podcast === Number('')) && {podcast}),
-        ...((status || status === '') && {status}),
-        ...((type || type === '') && {type}),
-        ...((geo || geo === '') && {geo}),
-        ...((zone || zone === '') && {zone}),
-        ...((text || text === '' || text === '') && {text}),
-        ...((representative || representative === null || representative === '') && {representative}),
-        ...((before) && {before}),
-        ...((after) && {after})
-      };
-    }
-  }
-
   loadCampaignList(newParams?: CampaignParams) {
     this.count = 0;
     this.loading = true;
@@ -118,7 +97,8 @@ export class CampaignListService {
     // clear campaign list
     this._campaigns.next({});
 
-    this.params = this.takeNewParams(newParams, this.params) || this.params;
+    // newParams includes all params (from route) except per
+    this.params = {...newParams, per: this.params.per, page: newParams.page || this.params.page};
     const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
     const filters = this.getFilters({advertiser, podcast, status, type, geo, zone, text, representative, before, after});
 

@@ -83,12 +83,22 @@ export class CampaignListComponent implements OnChanges {
   }
 
   routeToParams(params: CampaignParams) {
-    const before = params.before === null ? '' :
-      (params.before && params.before.toISOString()) ||
-      (this.params.before && this.params.before.toISOString());
-    const after = params.after === null ? '' :
-      (params.after && params.after.toISOString()) ||
-      (this.params.after && this.params.after.toISOString());
+    let before: string;
+    let after: string;
+    if (params.before === null) {
+      before = '';
+    } else if (params.before) {
+      before = params.before.toISOString();
+    } else if (this.params.before) {
+      before = this.params.before.toISOString();
+    }
+    if (params.after === null) {
+      after = '';
+    } else if (params.after) {
+      after = params.after.toISOString();
+    } else if (this.params.after) {
+      after = this.params.after.toISOString();
+    }
     this.router.navigate(['/'], {queryParams: {
       ...this.removePer(this.params),
       ...this.removePer(params),
