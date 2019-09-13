@@ -7,13 +7,13 @@ import { map } from 'rxjs/operators';
 @Component({
   selector: 'grove-flight.container',
   template: `
-    <grove-flight [flight]="flightRemote$ | async" (flightUpdate)="flightUpdateFromForm($event)"></grove-flight>
+    <grove-flight [flight]="flightLocal$ | async" (flightUpdate)="flightUpdateFromForm($event)"></grove-flight>
   `
 })
 export class FlightContainerComponent implements OnInit {
   private currentFlightId: string;
   state$ = new ReplaySubject<FlightState>(1);
-  flightRemote$ = this.state$.pipe(map(state => state.remoteFlight));
+  flightLocal$ = this.state$.pipe(map(state => state.localFlight));
 
   constructor(private route: ActivatedRoute, private campaignService: CampaignService, private router: Router) {
     this.route.paramMap.subscribe(params => this.setFlightId(params.get('flightid')));

@@ -43,7 +43,7 @@ export class CampaignComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private campaignService: CampaignService,
+    protected campaignService: CampaignService,
     private router: Router,
     private toastr: ToastrService
   ) {
@@ -60,14 +60,16 @@ export class CampaignComponent {
   }
 
   campaignSubmit() {
-    let isNew = false;
-    this.campaignSaving = true;
-    this.campaignService.putCampaign().subscribe(newState => {
-      this.toastr.success('Campaign saved');
-      if (isNew) {
-        this.router.navigate(['/campaign', newState.remoteCampaign.id]);
-      }
-      this.campaignSaving = false;
+    this.campaignService.currentStateFirst$.subscribe(state => {
+      const isNew = !(state.remoteCampaign && state.remoteCampaign.id);
+      this.campaignSaving = true;
+      this.campaignService.putCampaign().subscribe(newState => {
+        this.toastr.success('Campaign saved');
+        if (isNew) {
+          this.router.navigate(['/campaign', newState.remoteCampaign.id]);
+        }
+        this.campaignSaving = false;
+      });
     });
   }
 

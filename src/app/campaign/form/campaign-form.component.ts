@@ -87,15 +87,17 @@ export class CampaignFormComponent implements OnChanges, OnInit {
   }
 
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    this.campaignForm.reset({
-      set_account_uri,
-      name,
-      type,
-      status,
-      repName,
-      notes,
-      set_advertiser_uri
-    });
-    this.formStatusChanged();
+    this.campaignForm.reset(
+      {
+        set_account_uri,
+        name,
+        type,
+        status,
+        repName,
+        notes,
+        set_advertiser_uri
+      },
+      { emitEvent: false }
+    );
   }
 }

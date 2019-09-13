@@ -42,15 +42,35 @@ export class CampaignService {
   currentState$ = new ReplaySubject<CampaignState>(1);
   currentStateFirst$ = this.currentState$.pipe(first());
   currentRemoteCampaign$ = this.currentState$.pipe(map(state => state.remoteCampaign));
+  currentLocalCampaign$ = this.currentState$.pipe(map(state => state.localCampaign));
 
   constructor(private augury: AuguryService) {}
 
   getCampaign(id: number | string): Observable<CampaignState> {
-    return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
-      switchMap(this.docToCampaign),
-      catchError(this.handleError),
-      map(state => this.setCurrentState(state))
-    );
+    if (!id) {
+      const newState: CampaignState = {
+        localCampaign: {
+          name: null,
+          type: null,
+          status: null,
+          repName: null,
+          notes: null,
+          set_account_uri: null,
+          set_advertiser_uri: null
+        },
+        flights: {},
+        changed: false,
+        valid: false
+      };
+      this.setCurrentState(newState);
+      return of(newState);
+    } else {
+      return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
+        switchMap(this.docToCampaign),
+        catchError(this.handleError),
+        map(state => this.setCurrentState(state))
+      );
+    }
   }
 
   putCampaign(): Observable<CampaignState> {
@@ -60,13 +80,13 @@ export class CampaignService {
           return this.augury.follow('prx:campaign', { id: state.remoteCampaign.id }).pipe(
             switchMap(doc => doc.update(state.localCampaign)),
             switchMap(this.docToCampaign),
-            map(state => this.setCurrentState(state))
+            map(nextState => this.setCurrentState(nextState))
           );
         } else {
           return this.augury.root.pipe(
             switchMap(rootDoc => rootDoc.create('prx:campaign', {}, state.localCampaign)),
             switchMap(this.docToCampaign),
-            map(state => this.setCurrentState(state))
+            map(nextState => this.setCurrentState(nextState))
           );
         }
       })

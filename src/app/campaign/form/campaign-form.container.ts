@@ -6,7 +6,7 @@ import { AccountService, AdvertiserService, Account, Advertiser, Campaign, Campa
   selector: 'grove-campaign-form.container',
   template: `
     <grove-campaign-form
-      [campaign]="campaignService.currentRemoteCampaign$ | async"
+      [campaign]="campaignService.currentLocalCampaign$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
       (campaignUpdate)="campaignUpdateFromForm($event)"
@@ -19,7 +19,7 @@ export class CampaignFormContainerComponent implements OnInit {
   accounts$: Observable<Account[]>;
 
   constructor(
-    private campaignService: CampaignService,
+    protected campaignService: CampaignService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {
