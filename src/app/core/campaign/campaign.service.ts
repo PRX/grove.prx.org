@@ -39,17 +39,11 @@ export interface Flight {
 
 @Injectable()
 export class CampaignService {
-  currentState$ = new ReplaySubject<CampaignState>();
+  currentState$ = new ReplaySubject<CampaignState>(1);
+  currentStateFirst$ = this.currentState$.pipe(first());
+  currentRemoteCampaign$ = this.currentState$.pipe(map(state => state.remoteCampaign));
 
   constructor(private augury: AuguryService) {}
-
-  get currentStateFirst$(): Observable<CampaignState> {
-    return this.currentState$.pipe(first());
-  }
-
-  get currentRemoteCampaign$(): Observable<Campaign> {
-    return this.currentState$.pipe(map(state => state.remoteCampaign));
-  }
 
   getCampaign(id: number | string): Observable<CampaignState> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(

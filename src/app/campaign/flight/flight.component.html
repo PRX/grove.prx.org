@@ -1,3 +1,7 @@
-<p>
-  flight works!
-</p>
+<mat-card>
+  <form [formGroup]="flightForm" (ngSubmit)="submitFlightForm()" ngNativeValidate>
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Name" formControlName="name" required />
+    </mat-form-field>
+  </form>
+</mat-card>

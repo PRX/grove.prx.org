@@ -14,7 +14,7 @@ import { FlightComponent } from './flight/flight.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
 
 @NgModule({
-  declarations: [...campaignComponents, FlightComponent, CampaignFormContainerComponent],
+  declarations: [...campaignComponents],
   imports: [
     MatCardModule,
     MatButtonModule,

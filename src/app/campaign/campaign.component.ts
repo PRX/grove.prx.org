@@ -75,8 +75,8 @@ export class CampaignComponent {
     this.campaignService.currentStateFirst$.subscribe(state => {
       const campaignId = state.remoteCampaign ? state.remoteCampaign.id : null;
       const flightId = Date.now();
-      const num = Object.keys(state.flights).length + 1;
-      state.flights[flightId] = { campaignId, localFlight: { name: `New Flight ${num}` }, changed: false, valid: true };
+      const flight = { name: 'New Flight ' + (Object.keys(state.flights).length + 1) };
+      state.flights[flightId] = { campaignId, localFlight: flight, remoteFlight: flight, changed: false, valid: true };
       this.campaignService.currentState$.next(state);
       this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
     });
