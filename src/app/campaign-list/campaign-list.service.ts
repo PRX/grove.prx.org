@@ -197,17 +197,17 @@ export class CampaignListService {
       }
       filters += `type=${params.type}`;
     }
-    if (params.geo) {
+    if (params.geo && params.geo.length) {
       if (filters) {
         filters += ',';
       }
-      filters += `geo=${params.geo}`;
+      filters += `geo=${params.geo.join(',')}`;
     }
-    if (params.zone) {
+    if (params.zone && params.zone.length) {
       if (filters) {
         filters += ',';
       }
-      filters += `zone=${params.zone}`;
+      filters += `zone=${params.zone.join(',')}`;
     }
     if (params.text) {
       if (filters) {

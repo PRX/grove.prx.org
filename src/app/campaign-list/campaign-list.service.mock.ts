@@ -30,7 +30,7 @@ export const flights: Flight[] = [
   }
 ];
 
-export const campaigns = [
+export const campaigns: Campaign[] = [
   {
     id: 1,
     accountId: 2,
@@ -40,7 +40,8 @@ export const campaigns = [
     type: 'paid_campaign',
     repName: 'John',
     notes: '',
-    flights
+    flights,
+    loading: false
   },
   {
     id: 2,
@@ -51,7 +52,8 @@ export const campaigns = [
     type: 'paid_campaign',
     repName: 'Jacob',
     notes: '',
-    flights
+    flights,
+    loading: false
   },
   {
     id: 3,
@@ -62,7 +64,8 @@ export const campaigns = [
     type: 'house',
     repName: 'Jingleheimer',
     notes: '',
-    flights
+    flights,
+    loading: false
   }
 ];
 
@@ -103,6 +106,6 @@ export class CampaignListServiceMock {
   }
 
   get loadedCampaigns(): Observable<Campaign[]> {
-    return of(campaigns);
+    return of(campaigns.filter(c => !c.loading));
   }
 }
