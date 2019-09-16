@@ -107,23 +107,22 @@ export class CampaignListService {
     this.count = 0;
 
     // newParams includes all params (from route) except per
-    this.params = {...newParams, per: this.params.per, page: (newParams && newParams.page) || this.params.page};
+    this.params = {...newParams, per: this.params.per, page: (newParams && newParams.page) || 1};
     const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
     const filters = this.getFilters({advertiser, podcast, status, type, geo, zone, text, representative, before, after});
 
-    this.augury.followItems(
-      'prx:campaigns', {
-        page,
-        per,
-        ...(filters && {filters})
-      }
-    ).pipe(
+    this.augury.follow('prx:campaigns', {
+      page,
+      per,
+      ...(filters && {filters})
+    }).pipe(
+      switchMap(result => {
+        this.count = +result['count'];
+        this.total = +result['total'];
+        this.facets = result['facets'];
+        return result.followList('prx:items');
+      }),
       switchMap((campaignDocs: HalDoc[]) => {
-        if (campaignDocs.length) {
-          this.count = campaignDocs[0]['_count'];
-          this.total = campaignDocs[0]['_total'];
-          this.facets = campaignDocs[0]['_facets'];
-        }
         this._campaigns.next(campaignDocs.reduce((acc, doc) => {
           acc[doc.id] = {loading: true};
           return acc;
@@ -139,7 +138,7 @@ export class CampaignListService {
         });
       }),
       concatAll(),
-      withLatestFrom(this._campaigns),
+      withLatestFrom(this._campaigns)
     ).subscribe(([[campaignDoc, advertiserDoc, flightDocs], campaigns]) => {
       const campaign: Campaign = {
         id: campaignDoc['id'],

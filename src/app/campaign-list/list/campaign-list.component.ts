@@ -126,7 +126,9 @@ export class CampaignListComponent implements OnChanges {
       ...(before && {before}),
       ...(after && {after}),
       ...(geo && {geo}),
-      ...(zone && {zone})
+      ...(zone && {zone}),
+      ...(text && {text}),
+      ...(representative && {representative})
     }});
   }
 
