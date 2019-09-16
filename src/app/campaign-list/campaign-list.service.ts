@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { concatMap, concatAll, withLatestFrom, map } from 'rxjs/operators';
+import { switchMap, concatAll, withLatestFrom, map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -67,6 +67,8 @@ export class CampaignListService {
   error: Error;
   // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{[id: number]: Campaign}>({});
+  // tslint:disable-next-line: variable-name
+  private _currentCampaignIds: number[]; // campaign ids for current request/filter params
 
   constructor(private augury: AuguryService) {}
 
@@ -80,9 +82,10 @@ export class CampaignListService {
     // this._campaigns is a subject of campaign entities (an object with campaignIds mapped to campaign,) convert to array for display
     return this._campaigns.asObservable().pipe(
       map((campaignEntities: {}) => {
-        if (Object.keys(campaignEntities).length) {
-          return Object.keys(campaignEntities)
-            // map to array
+        if (this._currentCampaignIds && this._currentCampaignIds.length) {
+          return this._currentCampaignIds
+            // map from array of Ids
+            .filter(campaignId => campaignEntities[campaignId])
             .map(campaignId => campaignEntities[campaignId])
             // sort by ?
             .sort((a, b ) => {
@@ -103,9 +106,6 @@ export class CampaignListService {
   loadCampaignList(newParams?: CampaignParams) {
     this.count = 0;
 
-    // clear campaign list
-    this._campaigns.next({});
-
     // newParams includes all params (from route) except per
     this.params = {...newParams, per: this.params.per, page: (newParams && newParams.page) || this.params.page};
     const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
@@ -118,16 +118,18 @@ export class CampaignListService {
         ...(filters && {filters})
       }
     ).pipe(
-      concatMap((campaignDocs: HalDoc[]) => {
+      switchMap((campaignDocs: HalDoc[]) => {
         if (campaignDocs.length) {
           this.count = campaignDocs[0]['_count'];
           this.total = campaignDocs[0]['_total'];
           this.facets = campaignDocs[0]['_facets'];
         }
         this._campaigns.next(campaignDocs.reduce((acc, doc) => {
-            acc[doc.id] = {loading: true};
-            return acc;
-          }, {}));
+          acc[doc.id] = {loading: true};
+          return acc;
+        }, {}));
+        // campaigns state is mapped from a list of ids from the current request/filter params
+        this._currentCampaignIds = campaignDocs.map(c => c['id']);
         return campaignDocs.map(doc => {
           return combineLatest(
             of(doc),
