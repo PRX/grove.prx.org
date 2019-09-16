@@ -70,50 +70,53 @@ export class CampaignListComponent implements OnChanges {
     return this.campaignListService.facets;
   }
 
-  routeToParams(params: CampaignParams) {
-    let { page, advertiser, podcast, status, type, text, representative } = params;
-    if (!params.hasOwnProperty('page') && this.params.page) {
+  routeToParams(partialParams: CampaignParams) {
+    let { page, advertiser, podcast, status, type, text, representative } = partialParams;
+
+    // this function takes partial parameters (what changed)
+    // mix in the existing this.params unless property was explicitly set in partialParams
+    if (!partialParams.hasOwnProperty('page') && this.params.page) {
       page = this.params.page;
     }
-    if (!params.hasOwnProperty('advertiser') && this.params.advertiser) {
+    if (!partialParams.hasOwnProperty('advertiser') && this.params.advertiser) {
       advertiser = this.params.advertiser;
     }
-    if (!params.hasOwnProperty('podcast') && this.params.podcast) {
+    if (!partialParams.hasOwnProperty('podcast') && this.params.podcast) {
       podcast = this.params.podcast;
     }
-    if (!params.hasOwnProperty('status') && this.params.status) {
+    if (!partialParams.hasOwnProperty('status') && this.params.status) {
       status = this.params.status;
     }
-    if (!params.hasOwnProperty('type') && this.params.type) {
+    if (!partialParams.hasOwnProperty('type') && this.params.type) {
       type = this.params.type;
     }
-    if (!params.hasOwnProperty('text') && this.params.text) {
+    if (!partialParams.hasOwnProperty('text') && this.params.text) {
       text = this.params.text;
     }
-    if (!params.hasOwnProperty('representative') && this.params.representative) {
+    if (!partialParams.hasOwnProperty('representative') && this.params.representative) {
       representative = this.params.representative;
     }
     let before: string;
     let after: string;
-    if (params.before) {
-      before = params.before.toISOString();
-    } else if (!params.hasOwnProperty('before') && this.params.before) {
+    if (partialParams.before) {
+      before = partialParams.before.toISOString();
+    } else if (!partialParams.hasOwnProperty('before') && this.params.before) {
       before = this.params.before.toISOString();
     }
-    if (params.after) {
-      after = params.after.toISOString();
-    } else if (!params.hasOwnProperty('after') && this.params.after) {
+    if (partialParams.after) {
+      after = partialParams.after.toISOString();
+    } else if (!partialParams.hasOwnProperty('after') && this.params.after) {
       after = this.params.after.toISOString();
     }
     let geo;
-    if (params.geo) {
-      geo = params.geo.join('|');
+    if (partialParams.geo) {
+      geo = partialParams.geo.join('|');
     } else if (this.params.geo) {
       geo = this.params.geo.join('|');
     }
     let zone;
-    if (params.zone) {
-      zone = params.zone.join('|');
+    if (partialParams.zone) {
+      zone = partialParams.zone.join('|');
     } else if (this.params.zone) {
       zone = this.params.zone.join('|');
     }
