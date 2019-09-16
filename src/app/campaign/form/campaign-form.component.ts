@@ -1,11 +1,12 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Account, Advertiser, Campaign } from '../../core';
+import { Campaign, Account, Advertiser } from 'src/app/core';
 
 @Component({
   selector: 'grove-campaign-form',
   templateUrl: './campaign-form.component.html',
-  styleUrls: ['./campaign-form.component.scss']
+  styleUrls: ['./campaign-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignFormComponent implements OnChanges, OnInit {
   @Input() accounts: Account[];

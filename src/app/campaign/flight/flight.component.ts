@@ -1,11 +1,12 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Flight, Inventory } from 'src/app/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'grove-flight',
   templateUrl: './flight.component.html',
-  styleUrls: ['./flight.component.scss']
+  styleUrls: ['./flight.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightComponent implements OnInit, OnChanges {
   @Input() flight: Flight;

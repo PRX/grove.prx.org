@@ -1,5 +1,5 @@
 import { CampaignComponent } from './campaign.component';
-import { AccountService, AdvertiserService, CampaignService, Campaign } from '../core';
+import { AccountService, AdvertiserService, CampaignService, Campaign } from 'src/app/core';
 import { of, ReplaySubject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-prx-styleguide';

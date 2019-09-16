@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReplaySubject, Observable } from 'rxjs';
-import { CampaignService, FlightState, Inventory } from '../../core';
+import { Inventory, CampaignStoreService, FlightState } from 'src/app/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { InventoryService } from 'src/app/core';
@@ -13,7 +13,8 @@ import { InventoryService } from 'src/app/core';
       [flight]="flightLocal$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit {
   private currentFlightId: string;
@@ -24,7 +25,7 @@ export class FlightContainerComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private inventoryService: InventoryService,
-    private campaignService: CampaignService,
+    private campaignStoreService: CampaignStoreService,
     private router: Router
   ) {
     this.route.paramMap.subscribe(params => this.setFlightId(params.get('flightid')));
@@ -34,23 +35,21 @@ export class FlightContainerComponent implements OnInit {
   ngOnInit() {}
 
   setFlightId(id: string) {
-    this.campaignService.currentStateFirst$.subscribe(state => {
-      if (state.flights[id]) {
-        this.currentFlightId = id;
-        this.state$.next(state.flights[id]);
-      } else {
-        const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
-        this.router.navigate(['/campaign', campaignId]);
-      }
-    });
+    const state = this.campaignStoreService.campaign;
+    if (state.flights[id]) {
+      this.currentFlightId = id;
+      this.state$.next(state.flights[id]);
+    } else {
+      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
+      this.router.navigate(['/campaign', campaignId]);
+    }
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
-    this.campaignService.currentStateFirst$.subscribe(state => {
-      const id = this.currentFlightId;
-      const localFlight = { ...state.flights[id].localFlight, ...flight };
-      state.flights[id] = { ...state.flights[id], localFlight, changed, valid };
-      this.campaignService.currentState$.next(state);
-    });
+    const state = this.campaignStoreService.campaign;
+    const id = this.currentFlightId;
+    const localFlight = { ...state.flights[id].localFlight, ...flight };
+    state.flights[id] = { ...state.flights[id], localFlight, changed, valid };
+    this.campaignStoreService.campaign = state;
   }
 }

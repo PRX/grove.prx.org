@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CampaignState } from '../../core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { CampaignState } from 'src/app/core';
 
 @Component({
   selector: 'grove-campaign-status',
@@ -13,7 +13,8 @@ import { CampaignState } from '../../core';
       <prx-button [working]="isSaving" [disabled]="!state?.valid || !state?.changed" (click)="onSave()">Save</prx-button>
     </prx-status-bar>
   `,
-  styleUrls: ['./campaign-status.component.scss']
+  styleUrls: ['./campaign-status.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignStatusComponent {
   @Input() state: CampaignState;

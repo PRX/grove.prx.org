@@ -1,17 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AccountService, AdvertiserService, Account, Advertiser, Campaign, CampaignService } from '../../core';
+import { AccountService, AdvertiserService, Account, Advertiser, CampaignStoreService, Campaign } from 'src/app/core';
 
 @Component({
   selector: 'grove-campaign-form.container',
   template: `
     <grove-campaign-form
-      [campaign]="campaignService.currentLocalCampaign$ | async"
+      [campaign]="campaignStoreService.localCampaign$ | async"
       [advertisers]="advertisers$ | async"
       [accounts]="accounts$ | async"
       (campaignUpdate)="campaignUpdateFromForm($event)"
     ></grove-campaign-form>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignFormContainerComponent implements OnInit {
   campaignRemote$: Observable<Campaign>;
@@ -19,7 +20,7 @@ export class CampaignFormContainerComponent implements OnInit {
   accounts$: Observable<Account[]>;
 
   constructor(
-    protected campaignService: CampaignService,
+    protected campaignStoreService: CampaignStoreService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {
@@ -30,8 +31,7 @@ export class CampaignFormContainerComponent implements OnInit {
   ngOnInit() {}
 
   campaignUpdateFromForm({ campaign, changed, valid }) {
-    this.campaignService.currentStateFirst$.subscribe(state => {
-      this.campaignService.currentState$.next({ ...state, localCampaign: campaign, changed, valid });
-    });
+    const state = this.campaignStoreService.campaign;
+    this.campaignStoreService.campaign = { ...state, localCampaign: campaign, changed, valid };
   }
 }

@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { switchMap, map } from 'rxjs/operators';
-import { CampaignService } from '../core';
+import { map } from 'rxjs/operators';
+import { CampaignService, CampaignStoreService } from 'src/app/core';
 import { ToastrService } from 'ngx-prx-styleguide';
 import { Observable } from 'rxjs';
 
@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
   selector: 'grove-campaign',
   template: `
     <grove-campaign-status
-      [state]="campaignService.currentState$ | async"
+      [state]="campaignStoreService.campaign$ | async"
       [isSaving]="campaignSaving"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
@@ -35,7 +35,8 @@ import { Observable } from 'rxjs';
       </mat-drawer-content>
     </mat-drawer-container>
   `,
-  styleUrls: ['./campaign.component.scss']
+  styleUrls: ['./campaign.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignComponent {
   campaignFlights$: Observable<{ id: string; name: string }[]>;
@@ -44,11 +45,13 @@ export class CampaignComponent {
   constructor(
     private route: ActivatedRoute,
     protected campaignService: CampaignService,
+    protected campaignStoreService: CampaignStoreService,
     private router: Router,
     private toastr: ToastrService
   ) {
-    this.route.paramMap.pipe(switchMap((params: ParamMap) => this.campaignService.getCampaign(params.get('id')))).subscribe();
-    this.campaignFlights$ = this.campaignService.currentState$.pipe(
+    this.route.paramMap.pipe(map((params: ParamMap) => this.campaignStoreService.createWithId(params.get('id')))).subscribe();
+    // TODO: move into store
+    this.campaignFlights$ = this.campaignStoreService.campaign$.pipe(
       map(state => {
         if (state && state.flights) {
           return Object.keys(state.flights).map(key => ({ id: key, name: state.flights[key].localFlight.name }));
@@ -59,28 +62,29 @@ export class CampaignComponent {
     );
   }
 
-  campaignSubmit() {
-    this.campaignService.currentStateFirst$.subscribe(state => {
-      const isNew = !(state.remoteCampaign && state.remoteCampaign.id);
-      this.campaignSaving = true;
-      this.campaignService.putCampaign().subscribe(newState => {
-        this.toastr.success('Campaign saved');
-        if (isNew) {
-          this.router.navigate(['/campaign', newState.remoteCampaign.id]);
-        }
-        this.campaignSaving = false;
-      });
-    });
+  async campaignSubmit() {
+    const state = this.campaignStoreService.campaign;
+    const isNew = !(state.remoteCampaign && state.remoteCampaign.id);
+    this.campaignSaving = true;
+    const newState = await this.campaignStoreService.storeCampaign();
+    this.toastr.success('Campaign saved');
+    if (isNew) {
+      this.router.navigate(['/campaign', newState.remoteCampaign.id]);
+    }
+    this.campaignSaving = false;
   }
 
   createFlight() {
-    this.campaignService.currentStateFirst$.subscribe(state => {
-      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : null;
-      const flightId = Date.now();
-      const flight = { name: 'New Flight ' + (Object.keys(state.flights).length + 1) };
-      state.flights[flightId] = { campaignId, localFlight: flight, remoteFlight: flight, changed: false, valid: true };
-      this.campaignService.currentState$.next(state);
-      this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
-    });
+    const state = this.campaignStoreService.campaign;
+    const campaignId = state.remoteCampaign ? state.remoteCampaign.id : null;
+    const flightId = Date.now();
+    const flight = {
+      name: 'New Flight ' + (Object.keys(state.flights).length + 1),
+      startAt: new Date().toISOString(),
+      endAt: new Date().toISOString()
+    };
+    state.flights[flightId] = { campaignId, localFlight: flight, remoteFlight: flight, changed: false, valid: true };
+    this.campaignStoreService.campaign = state;
+    this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
   }
 }
