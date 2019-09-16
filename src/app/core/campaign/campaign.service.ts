@@ -3,7 +3,7 @@ import { Observable, of, ReplaySubject } from 'rxjs';
 import { map, switchMap, catchError, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign } from './campaign-store.service';
+import { CampaignState, Campaign, Flight } from './campaign-store.service';
 
 @Injectable()
 export class CampaignService {
@@ -37,6 +37,7 @@ export class CampaignService {
     return doc.followItems('prx:flights').pipe(
       map(flightDocs => {
         const flights = flightDocs.reduce((prev, flight) => {
+          ((flight as any) as Flight).set_inventory_uri = flight.expand('prx:inventory');
           prev[flight.id.toString()] = {
             campaignId: campaign.id,
             remoteFlight: flight,

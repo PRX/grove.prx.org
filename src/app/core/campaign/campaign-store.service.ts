@@ -35,6 +35,8 @@ export interface Flight {
   name: string;
   startAt: string;
   endAt: string;
+  totalGoal: number;
+  set_inventory_uri: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -92,6 +94,7 @@ export class CampaignStoreService {
   }
 
   addFlight(flightState: FlightState, flightId) {
+    // TODO: don't manually handle immutability
     this.campaign = {
       ...this.campaign,
       flights: {

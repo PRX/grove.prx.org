@@ -4,6 +4,9 @@
       <input matInput placeholder="Name" formControlName="name" required />
     </mat-form-field>
     <mat-form-field>
+      <input matInput type="number" placeholder="Total Goal" formControlName="totalGoal" required />
+    </mat-form-field>
+    <mat-form-field>
       <input matInput [matDatepicker]="startPicker" placeholder="Start date" formControlName="startAt" />
       <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
       <mat-datepicker #startPicker></mat-datepicker>
@@ -16,7 +19,7 @@
     <mat-form-field>
       <mat-label>Series</mat-label>
       <mat-select formControlName="set_inventory_uri" required>
-        <mat-option *ngFor="let inv of inventory" [value]="inv.id">{{ inv.podcastTitle }}</mat-option>
+        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
       </mat-select>
     </mat-form-field>
   </form>

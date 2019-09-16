@@ -17,6 +17,7 @@ export class FlightComponent implements OnInit, OnChanges {
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
+    totalGoal: ['', Validators.required],
     set_inventory_uri: ['', Validators.required]
   });
 
@@ -46,7 +47,7 @@ export class FlightComponent implements OnInit, OnChanges {
     });
   }
 
-  updateFlightForm({ name, startAt, endAt }: Flight) {
-    this.flightForm.reset({ name, startAt: new Date(startAt), endAt: new Date(endAt) }, { emitEvent: false });
+  updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
+    this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
   }
 }
