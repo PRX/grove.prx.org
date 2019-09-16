@@ -47,7 +47,6 @@ export class FlightComponent implements OnInit, OnChanges {
   }
 
   updateFlightForm({ name, startAt, endAt }: Flight) {
-    this.flightForm.reset({ name, startAt: new Date(startAt), endAt: new Date(endAt) });
-    this.formStatusChanged();
+    this.flightForm.reset({ name, startAt: new Date(startAt), endAt: new Date(endAt) }, { emitEvent: false });
   }
 }

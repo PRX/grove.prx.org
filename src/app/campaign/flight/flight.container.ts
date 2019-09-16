@@ -46,10 +46,9 @@ export class FlightContainerComponent implements OnInit {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
-    const state = this.campaignStoreService.campaign;
-    const id = this.currentFlightId;
-    const localFlight = { ...state.flights[id].localFlight, ...flight };
-    state.flights[id] = { ...state.flights[id], localFlight, changed, valid };
-    this.campaignStoreService.campaign = state;
+    const { remoteCampaign } = this.campaignStoreService.campaign;
+    // TODO: handle unsaved campaign with flight
+    const campaignId = remoteCampaign ? remoteCampaign.id : 0;
+    this.campaignStoreService.addFlight({ localFlight: flight, changed, valid, campaignId }, this.currentFlightId);
   }
 }

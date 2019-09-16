@@ -75,7 +75,7 @@ export class CampaignComponent {
   }
 
   createFlight() {
-    const state = this.campaignStoreService.campaign;
+    const { campaign: state } = this.campaignStoreService;
     const campaignId = state.remoteCampaign ? state.remoteCampaign.id : null;
     const flightId = Date.now();
     const flight = {
@@ -83,8 +83,7 @@ export class CampaignComponent {
       startAt: new Date().toISOString(),
       endAt: new Date().toISOString()
     };
-    state.flights[flightId] = { campaignId, localFlight: flight, remoteFlight: flight, changed: false, valid: true };
-    this.campaignStoreService.campaign = state;
+    this.campaignStoreService.addFlight({ campaignId, localFlight: flight, changed: false, valid: true }, flightId);
     this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
   }
 }

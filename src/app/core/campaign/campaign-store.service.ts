@@ -90,4 +90,14 @@ export class CampaignStoreService {
       console.error(e);
     }
   }
+
+  addFlight(flightState: FlightState, flightId) {
+    this.campaign = {
+      ...this.campaign,
+      flights: {
+        ...this.campaign.flights,
+        [flightId]: flightState
+      }
+    };
+  }
 }
