@@ -58,14 +58,20 @@ describe('CampaignListService', () => {
 
   it('should build filters for API request', () => {
     expect(campaignListService.getFilters({
+      type: 'house',
+      geo: ['US', 'CA'],
       zone: ['mid_1', 'pre_1'],
       representative: 'Mich'
-    })).toEqual('zone=mid_1,pre_1,representative=Mich');
+    })).toEqual('type=house,geo=US,CA,zone=mid_1,pre_1,representative=Mich');
     const before = new Date();
+    const after = new Date();
     expect(campaignListService.getFilters({
+      advertiser: 3,
+      podcast: 2,
       status: 'approved',
-      before
-    })).toEqual(`status=approved,before=${before.toISOString()}`);
+      before,
+      after
+    })).toEqual(`advertiser=3,podcast=2,status=approved,before=${before.toISOString()},after=${after.toISOString()}`);
   });
 
   it('should handle errors on load', (done) => {
