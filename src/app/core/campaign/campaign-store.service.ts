@@ -12,7 +12,6 @@ export interface CampaignState {
 }
 
 export interface FlightState {
-  campaignId: number;
   localFlight: Flight;
   remoteFlight?: Flight;
   changed: boolean;
@@ -85,8 +84,17 @@ export class CampaignStoreService {
 
   async storeCampaign() {
     try {
-      const [flights, campaign] = await this.campaignService.putCampaign(this.campaign, this.changedFlightKeys()).toPromise();
-      this.campaign = campaign;
+      const campaign = await this.campaignService.putCampaign(this.campaign).toPromise();
+      campaign.flights = Object.assign({}, this.campaign.flights);
+      await Promise.all(
+        this.changedFlightKeys().map(async oldKey => {
+          const flight = await this.campaignService.putFlight(this.campaign.flights[oldKey]).toPromise();
+          delete campaign.flights[oldKey];
+          campaign.flights[flight.remoteFlight.id] = flight;
+        })
+      );
+
+      this.campaign = { ...campaign };
       return this.campaign;
     } catch (e) {
       // TODO: revert update

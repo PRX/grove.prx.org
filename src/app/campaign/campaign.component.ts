@@ -45,7 +45,7 @@ export class CampaignComponent {
   constructor(
     private route: ActivatedRoute,
     protected campaignService: CampaignService,
-    protected campaignStoreService: CampaignStoreService,
+    public campaignStoreService: CampaignStoreService,
     private router: Router,
     private toastr: ToastrService
   ) {
@@ -85,7 +85,7 @@ export class CampaignComponent {
       totalGoal: null,
       set_inventory_uri: null
     };
-    this.campaignStoreService.addFlight({ campaignId, localFlight: flight, changed: false, valid: true }, flightId);
+    this.campaignStoreService.addFlight({ localFlight: flight, changed: false, valid: true }, flightId);
     this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
   }
 }

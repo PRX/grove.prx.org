@@ -20,7 +20,7 @@ export class CampaignFormContainerComponent implements OnInit {
   accounts$: Observable<Account[]>;
 
   constructor(
-    protected campaignStoreService: CampaignStoreService,
+    public campaignStoreService: CampaignStoreService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {
