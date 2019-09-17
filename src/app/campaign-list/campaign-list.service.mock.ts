@@ -8,7 +8,7 @@ export const flights: Flight[] = [
     name: 'Flight 1',
     startAt: new Date('2019-09-01 0:0:0'),
     endAt: new Date('2019-09-10 0:0:0'),
-    zones: ['Preroll'],
+    zones: ['Preroll', 'Midroll'],
     targets: [
       {id: 1, label: 'LAN'},
       {id: 2, label: 'SAD'},
@@ -23,7 +23,7 @@ export const flights: Flight[] = [
     name: 'Flight 2',
     startAt: new Date('2019-09-02 0:0:0'),
     endAt: new Date('2019-09-13 0:0:0'),
-    zones: ['Midroll'],
+    zones: ['Midroll', 'Preroll'],
     targets: [
       {id: 1, label: 'Global'}
     ]
