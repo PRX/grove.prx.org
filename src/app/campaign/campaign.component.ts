@@ -81,7 +81,9 @@ export class CampaignComponent {
     const flight = {
       name: 'New Flight ' + (Object.keys(state.flights).length + 1),
       startAt: new Date().toISOString(),
-      endAt: new Date().toISOString()
+      endAt: new Date().toISOString(),
+      totalGoal: null,
+      set_inventory_uri: null
     };
     this.campaignStoreService.addFlight({ campaignId, localFlight: flight, changed: false, valid: true }, flightId);
     this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);

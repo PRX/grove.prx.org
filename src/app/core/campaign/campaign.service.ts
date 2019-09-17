@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject, forkJoin } from 'rxjs';
 import { map, switchMap, catchError, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
@@ -16,16 +16,41 @@ export class CampaignService {
     );
   }
 
-  putCampaign(state: CampaignState): Observable<CampaignState> {
+  putCampaign(state: CampaignState, changedFlightKeys: string[] = []): Observable<[Flight[], CampaignState]> {
     if (state.remoteCampaign) {
       return this.augury.follow('prx:campaign', { id: state.remoteCampaign.id }).pipe(
-        switchMap(doc => doc.update(state.localCampaign)),
-        switchMap(this.docToCampaign)
+        switchMap(doc => {
+          return forkJoin([
+            doc.followItems('prx:flights').pipe(
+              map(flights =>
+                flights.reduce((prev, flight) => {
+                  const flightId = flight.id.toString();
+                  if (changedFlightKeys.includes(flightId)) {
+                    prev.push(flight.update(state.flights[flightId].localFlight));
+                  }
+                  return prev;
+                }, [])
+              )
+            ),
+            doc.update(state.localCampaign)
+          ]);
+        }),
+        switchMap(([flights, doc]) => {
+          return forkJoin([
+            flights,
+            this.docToCampaign(doc)
+          ]);
+        })
       );
     } else {
       return this.augury.root.pipe(
         switchMap(rootDoc => rootDoc.create('prx:campaign', {}, state.localCampaign)),
-        switchMap(this.docToCampaign)
+        switchMap(doc => {
+          return forkJoin([
+            [],
+            this.docToCampaign(doc)
+          ]);
+        })
       );
     }
   }

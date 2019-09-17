@@ -85,12 +85,24 @@ export class CampaignStoreService {
 
   async storeCampaign() {
     try {
-      this.campaign = await this.campaignService.putCampaign(this.campaign).toPromise();
+      const [flights, campaign] = await this.campaignService.putCampaign(this.campaign, this.changedFlightKeys()).toPromise();
+      this.campaign = campaign;
       return this.campaign;
     } catch (e) {
       // TODO: revert update
       console.error(e);
     }
+  }
+
+  changedFlightKeys() {
+    const { flights } = this.campaign;
+    return Object.keys(flights).reduce((prev, key) => {
+      const { localFlight, remoteFlight } = flights[key];
+      if (JSON.stringify(localFlight) === JSON.stringify(remoteFlight)) {
+        prev.push(key);
+      }
+      return prev;
+    }, []);
   }
 
   addFlight(flightState: FlightState, flightId) {
