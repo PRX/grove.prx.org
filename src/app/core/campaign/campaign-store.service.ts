@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
-import { BehaviorSubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface CampaignState {
@@ -40,18 +40,19 @@ export interface Flight {
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
-  // tslint:disable-next-line:variable-name
-  private readonly _campaign = new BehaviorSubject<CampaignState>(null);
-  readonly campaign$ = this._campaign.asObservable();
+  private currentCampaign: CampaignState;
+  readonly campaign$ = new ReplaySubject<CampaignState>(1);
+  readonly flights$ = this.campaign$.pipe(map(c => c.flights));
   readonly remoteCampaign$ = this.campaign$.pipe(map(state => state && state.remoteCampaign));
   readonly localCampaign$ = this.campaign$.pipe(map(state => state && state.localCampaign));
 
   get campaign(): CampaignState {
-    return this._campaign.getValue();
+    return this.currentCampaign;
   }
 
   set campaign(val: CampaignState) {
-    this._campaign.next(val);
+    this.currentCampaign = val;
+    this.campaign$.next(val);
   }
 
   constructor(private campaignService: CampaignService) {}
@@ -78,23 +79,23 @@ export class CampaignStoreService {
     }
   }
 
-  async fetchCampaign(id) {
+  async fetchCampaign(id: number | string) {
     this.campaign = await this.campaignService.getCampaign(id).toPromise();
   }
 
   async storeCampaign() {
     try {
       const campaign = await this.campaignService.putCampaign(this.campaign).toPromise();
-      campaign.flights = Object.assign({}, this.campaign.flights);
+
+      const flights = {};
       await Promise.all(
-        this.changedFlightKeys().map(async oldKey => {
+        Object.keys(this.campaign.flights).map(async oldKey => {
           const flight = await this.campaignService.putFlight(this.campaign.flights[oldKey]).toPromise();
-          delete campaign.flights[oldKey];
-          campaign.flights[flight.remoteFlight.id] = flight;
+          flights[flight.remoteFlight.id] = flight;
         })
       );
 
-      this.campaign = { ...campaign };
+      this.campaign = { ...campaign, flights };
       return this.campaign;
     } catch (e) {
       // TODO: revert update
@@ -102,24 +103,12 @@ export class CampaignStoreService {
     }
   }
 
-  changedFlightKeys() {
-    const { flights } = this.campaign;
-    return Object.keys(flights).reduce((prev, key) => {
-      const { localFlight, remoteFlight } = flights[key];
-      if (JSON.stringify(localFlight) === JSON.stringify(remoteFlight)) {
-        prev.push(key);
-      }
-      return prev;
-    }, []);
-  }
-
-  addFlight(flightState: FlightState, flightId) {
-    // TODO: don't manually handle immutability
+  setFlight(flightState: FlightState, flightId: string) {
     this.campaign = {
       ...this.campaign,
       flights: {
         ...this.campaign.flights,
-        [flightId]: flightState
+        [flightId]: { ...this.campaign.flights[flightId], ...flightState }
       }
     };
   }
