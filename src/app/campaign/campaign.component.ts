@@ -50,14 +50,9 @@ export class CampaignComponent {
     private toastr: ToastrService
   ) {
     this.route.paramMap.pipe(map((params: ParamMap) => this.campaignStoreService.createWithId(params.get('id')))).subscribe();
-    // TODO: move into store
-    this.campaignFlights$ = this.campaignStoreService.campaign$.pipe(
-      map(state => {
-        if (state && state.flights) {
-          return Object.keys(state.flights).map(key => ({ id: key, name: state.flights[key].localFlight.name }));
-        } else {
-          return [];
-        }
+    this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
+      map(flightStates => {
+        return Object.keys(flightStates).map(key => ({ id: key, name: flightStates[key].localFlight.name }));
       })
     );
   }
