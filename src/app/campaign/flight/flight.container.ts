@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReplaySubject, Observable } from 'rxjs';
 import { Inventory, CampaignStoreService, FlightState } from 'src/app/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, first } from 'rxjs/operators';
 import { InventoryService } from 'src/app/core';
 
 @Component({
@@ -34,21 +34,19 @@ export class FlightContainerComponent implements OnInit {
 
   ngOnInit() {}
 
-  setFlightId(id: string) {
-    const state = this.campaignStoreService.campaign;
-    if (state.flights[id]) {
-      this.currentFlightId = id;
-      this.state$.next(state.flights[id]);
-    } else {
-      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
-      this.router.navigate(['/campaign', campaignId]);
-    }
+  async setFlightId(id: string) {
+    this.campaignStoreService.campaign$.pipe(first()).subscribe(state => {
+      if (state.flights[id]) {
+        this.currentFlightId = id;
+        this.state$.next(state.flights[id]);
+      } else {
+        const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
+        this.router.navigate(['/campaign', campaignId]);
+      }
+    });
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
-    const { remoteCampaign } = this.campaignStoreService.campaign;
-    // TODO: handle unsaved campaign with flight
-    const campaignId = remoteCampaign ? remoteCampaign.id : 0;
-    this.campaignStoreService.addFlight({ localFlight: flight, changed, valid, campaignId }, this.currentFlightId);
+    this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
   }
 }
