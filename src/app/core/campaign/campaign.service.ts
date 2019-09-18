@@ -58,7 +58,7 @@ export class CampaignService {
       return this._flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(map(doc => this.docToFlight(doc)));
     } else {
       console.log('putFlight new', state);
-      return this._campaignDoc.create('prx:flight', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+      return this._campaignDoc.create('prx:flights', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
     }
   }
 

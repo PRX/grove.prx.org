@@ -52,21 +52,26 @@ export class CampaignComponent {
     this.route.paramMap.pipe(map((params: ParamMap) => this.campaignStoreService.createWithId(params.get('id')))).subscribe();
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
       map(flightStates => {
-        return Object.keys(flightStates).map(key => ({ id: key, name: flightStates[key].localFlight.name }));
+        return Object.keys(flightStates).map(id => {
+          return { id, name: flightStates[id].localFlight.name || '(Flight)' };
+        });
       })
     );
   }
 
   async campaignSubmit() {
-    const state = this.campaignStoreService.campaign;
-    const isNew = !(state.remoteCampaign && state.remoteCampaign.id);
     this.campaignSaving = true;
-    const newState = await this.campaignStoreService.storeCampaign();
+    const changes = await this.campaignStoreService.storeCampaign();
     this.toastr.success('Campaign saved');
-    if (isNew) {
-      this.router.navigate(['/campaign', newState.remoteCampaign.id]);
-    }
     this.campaignSaving = false;
+
+    // TODO: a better way to do this. like, much better.
+    const flightId = this.router.url.split('/flight/').pop();
+    if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
+      this.router.navigate(['/campaign', changes.id, 'flight', changes.flights[flightId]]);
+    } else if (changes.prevId !== changes.id) {
+      this.router.navigate(['/campaign', changes.id]);
+    }
   }
 
   createFlight() {
@@ -80,7 +85,7 @@ export class CampaignComponent {
       totalGoal: null,
       set_inventory_uri: null
     };
-    this.campaignStoreService.addFlight({ localFlight: flight, changed: false, valid: true }, flightId);
+    this.campaignStoreService.setFlight({ localFlight: flight, changed: false, valid: true }, flightId);
     this.router.navigate(['/campaign', campaignId || 'new', 'flight', flightId]);
   }
 }

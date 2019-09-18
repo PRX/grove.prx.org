@@ -38,6 +38,12 @@ export interface Flight {
   set_inventory_uri: string;
 }
 
+export interface CampaignStateChanges {
+  id: number;
+  prevId?: number;
+  flights: { [prevId: number]: number };
+}
+
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
   private currentCampaign: CampaignState;
@@ -83,27 +89,30 @@ export class CampaignStoreService {
     this.campaign = await this.campaignService.getCampaign(id).toPromise();
   }
 
-  async storeCampaign() {
+  async storeCampaign(): Promise<CampaignStateChanges> {
     try {
+      const prevId = this.campaign.remoteCampaign ? this.campaign.remoteCampaign.id : null;
       const campaign = await this.campaignService.putCampaign(this.campaign).toPromise();
 
       const flights = {};
+      const flightIdChanges = {};
       await Promise.all(
         Object.keys(this.campaign.flights).map(async oldKey => {
           const flight = await this.campaignService.putFlight(this.campaign.flights[oldKey]).toPromise();
           flights[flight.remoteFlight.id] = flight;
+          flightIdChanges[oldKey] = flight.remoteFlight.id;
         })
       );
 
       this.campaign = { ...campaign, flights };
-      return this.campaign;
+      return { id: campaign.remoteCampaign.id, prevId, flights: flightIdChanges };
     } catch (e) {
       // TODO: revert update
       console.error(e);
     }
   }
 
-  setFlight(flightState: FlightState, flightId: string) {
+  setFlight(flightState: FlightState, flightId: string | number) {
     this.campaign = {
       ...this.campaign,
       flights: {
