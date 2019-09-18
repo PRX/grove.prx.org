@@ -7,10 +7,8 @@ import { CampaignState, Campaign, Flight, FlightState } from './campaign-store.s
 
 @Injectable()
 export class CampaignService {
-  // tslint:disable-next-line:variable-name
-  private _campaignDoc: HalDoc;
-  // tslint:disable-next-line:variable-name
-  private _flightDocs: { [id: number]: HalDoc };
+  private campaignDoc: HalDoc;
+  private flightDocs: { [id: number]: HalDoc };
 
   constructor(private augury: AuguryService) {}
 
@@ -18,8 +16,8 @@ export class CampaignService {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
       switchMap(doc => doc.followItems('prx:flights').pipe(map(flightDocs => ({ doc, flightDocs })))),
       map(({ doc, flightDocs }) => {
-        this._campaignDoc = doc;
-        this._flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});
+        this.campaignDoc = doc;
+        this.flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});
         const campaign = this.docToCampaign(doc);
         const flights = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: this.docToFlight(flight) }), {});
         return { ...campaign, flights };
@@ -32,9 +30,9 @@ export class CampaignService {
     if (!state.changed) {
       return of(state);
     } else if (state.remoteCampaign) {
-      return this._campaignDoc.update(state.localCampaign).pipe(
+      return this.campaignDoc.update(state.localCampaign).pipe(
         map(doc => {
-          this._campaignDoc = doc;
+          this.campaignDoc = doc;
           return this.docToCampaign(doc);
         })
       );
@@ -42,7 +40,7 @@ export class CampaignService {
       return this.augury.root.pipe(
         switchMap(rootDoc => rootDoc.create('prx:campaign', {}, state.localCampaign)),
         map(doc => {
-          this._campaignDoc = doc;
+          this.campaignDoc = doc;
           return this.docToCampaign(doc);
         })
       );
@@ -51,14 +49,11 @@ export class CampaignService {
 
   putFlight(state: FlightState): Observable<FlightState> {
     if (!state.changed) {
-      console.log('putFlight unchanged', state.localFlight.name);
       return of(state);
     } else if (state.remoteFlight) {
-      console.log('putFlight exists', state.localFlight.name);
-      return this._flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+      return this.flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(map(doc => this.docToFlight(doc)));
     } else {
-      console.log('putFlight new', state);
-      return this._campaignDoc.create('prx:flights', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+      return this.campaignDoc.create('prx:flights', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
     }
   }
 
