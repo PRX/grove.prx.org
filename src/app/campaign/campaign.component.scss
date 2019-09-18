@@ -2,6 +2,15 @@ mat-drawer-content {
   min-height: 150px;
 }
 
+mat-drawer {
+  min-width: 250px;
+}
+
 mat-nav-list .active-link {
   background: rgba(0, 0, 0, 0.2);
+}
+
+.add-flight {
+  text-align: center;
+  padding: 12px 0;
 }

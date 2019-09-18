@@ -25,10 +25,10 @@ import { Observable } from 'rxjs';
           >
             {{ flight.name }}
           </a>
-          <mat-list-item>
-            <button mat-flat-button color="primary" (click)="createFlight()">Add a Flight</button>
-          </mat-list-item>
         </mat-nav-list>
+        <div class="add-flight">
+          <a [routerLink]="" (click)="createFlight()">+ Add a Flight</a>
+        </div>
       </mat-drawer>
       <mat-drawer-content role="main">
         <router-outlet></router-outlet>

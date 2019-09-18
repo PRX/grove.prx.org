@@ -1,8 +1,10 @@
-.mat-card {
+mat-card {
   display: flex;
   flex-direction: column;
+  border-radius: 0;
 }
 
-.mat-card form > * {
+mat-card form > * {
+  max-width: 600px;
   width: 100%;
 }
