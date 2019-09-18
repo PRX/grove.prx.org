@@ -29,7 +29,9 @@ export class CampaignService {
   }
 
   putCampaign(state: CampaignState): Observable<CampaignState> {
-    if (state.remoteCampaign) {
+    if (!state.changed) {
+      return of(state);
+    } else if (state.remoteCampaign) {
       return this._campaignDoc.update(state.localCampaign).pipe(
         map(doc => {
           this._campaignDoc = doc;
@@ -47,14 +49,21 @@ export class CampaignService {
     }
   }
 
-  putFlight(flightState: FlightState): Observable<FlightState> {
-    const flight = flightState.remoteFlight ? this._flightDocs[flightState.remoteFlight.id] : null;
-    const flightDoc = flight ? flight.update(flightState.localFlight) : this._campaignDoc.create('prx:flight', {}, flightState.localFlight);
-    return flightDoc.pipe(map(doc => this.docToFlight(doc)));
+  putFlight(state: FlightState): Observable<FlightState> {
+    if (!state.changed) {
+      console.log('putFlight unchanged', state.localFlight.name);
+      return of(state);
+    } else if (state.remoteFlight) {
+      console.log('putFlight exists', state.localFlight.name);
+      return this._flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+    } else {
+      console.log('putFlight new', state);
+      return this._campaignDoc.create('prx:flight', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+    }
   }
 
   docToCampaign(doc: HalDoc): CampaignState {
-    const campaign = doc.asJSON() as Campaign;
+    const campaign = this.filter(doc) as Campaign;
     campaign.set_advertiser_uri = doc.expand('prx:advertiser');
     campaign.set_account_uri = doc.expand('prx:account');
     return {
@@ -67,7 +76,7 @@ export class CampaignService {
   }
 
   docToFlight(doc: HalDoc): FlightState {
-    const flight = doc.asJSON() as Flight;
+    const flight = this.filter(doc) as Flight;
     flight.set_inventory_uri = doc.expand('prx:inventory');
     return {
       remoteFlight: flight,
@@ -75,6 +84,12 @@ export class CampaignService {
       changed: false,
       valid: true
     };
+  }
+
+  filter(doc: HalDoc): {} {
+    return Object.keys(doc.asJSON())
+      .filter(key => !key.startsWith('_'))
+      .reduce((obj, key) => ({ ...obj, [key]: doc[key] }), {});
   }
 
   handleError(err: any) {
