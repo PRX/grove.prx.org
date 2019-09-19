@@ -1,80 +1,113 @@
 import { CampaignComponent } from './campaign.component';
-import { AccountService, AdvertiserService, CampaignService, Campaign } from '../core';
-import { of, ReplaySubject } from 'rxjs';
+import { CampaignStoreService, CampaignState, FlightState } from '../core';
+import { ReplaySubject, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-prx-styleguide';
 import { map } from 'rxjs/operators';
 
 describe('CampaignComponent', () => {
-  let accountService: AccountService;
-  let advertiserService: AdvertiserService;
-  let campaignService: CampaignService;
   let routeId: ReplaySubject<string>;
   let route: ActivatedRoute;
   let router: Router;
   let toastrService: ToastrService;
+  let campaignStoreService: CampaignStoreService;
+  let campaignState: ReplaySubject<CampaignState>;
   let component: CampaignComponent;
 
-  function campaignFactory(attrs = {}): Campaign {
+  function campaignFactory(attrs = {}): CampaignState {
     return {
-      id: 1,
-      name: 'my campaign name',
-      type: 'paid_campaign',
-      status: 'draft',
-      repName: 'my rep name',
-      notes: 'my notes',
-      set_account_uri: '/some/account',
-      set_advertiser_uri: '/some/advertiser',
-      ...attrs
+      localCampaign: {
+        name: 'my campaign',
+        type: '',
+        status: '',
+        repName: '',
+        notes: '',
+        set_account_uri: '',
+        set_advertiser_uri: '',
+        ...attrs
+      },
+      changed: false,
+      valid: false,
+      flights: {}
+    };
+  }
+  function flightFactory(attrs = {}): FlightState {
+    return {
+      localFlight: { id: 123, name: 'my flight', startAt: '', endAt: '', totalGoal: 1, set_inventory_uri: '', ...attrs },
+      changed: false,
+      valid: false
     };
   }
 
   beforeEach(() => {
-    accountService = <any>{ listAccounts: jest.fn(() => of([])) };
-    advertiserService = <any>{ listAdvertisers: jest.fn(() => of([])) };
-    campaignService = <any>{
-      getCampaign: jest.fn(() => of(campaignFactory())),
-      putCampaign: jest.fn(() => of(campaignFactory()))
-    };
     routeId = new ReplaySubject(1);
-    route = <any>{
-      paramMap: routeId.pipe(
-        map(id => {
-          return { get: jest.fn(() => id) };
-        })
-      )
-    };
-    router = <any>{ navigate: jest.fn() };
+    route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
+    router = <any>{ navigate: jest.fn(), url: '/campaign/new/flight/9999' };
     toastrService = <any>{ success: jest.fn() };
-    component = new CampaignComponent(accountService, advertiserService, campaignService, route, router, toastrService);
+    campaignState = new ReplaySubject(1);
+    campaignStoreService = {
+      campaign: campaignState,
+      flights$: campaignState.pipe(map(s => s.flights)),
+      load: jest.fn(() => campaignState),
+      storeCampaign: jest.fn(() => campaignState),
+      setFlight: jest.fn()
+    } as any;
+    component = new CampaignComponent(route, router, toastrService, campaignStoreService);
   });
 
-  it('loads the campaign from the route', () => {
-    expect(component.campaign$.value).toBeNull();
+  it('loads the campaign state from the route', () => {
     routeId.next('123');
-    expect(campaignService.getCampaign).toHaveBeenCalledWith('123');
-    expect(component.campaign$.value).toEqual(campaignFactory());
+    expect(campaignStoreService.load).toHaveBeenCalledWith('123');
   });
 
-  it('updates the campaign subject', () => {
-    component.campaignUpdate(campaignFactory({ id: 456, name: 'other' }));
-    expect(component.campaign$.value).toMatchObject({ id: 456, name: 'other' });
+  it('loads flights options from the campaign state', done => {
+    const campaign = campaignFactory();
+    const flight1 = flightFactory({ name: 'Name 1' });
+    const flight2 = flightFactory({ name: 'Name 2' });
+    campaignState.next({ ...campaign, flights: { flight1, flight2 } });
+    component.campaignFlights$.subscribe(options => {
+      expect(options).toEqual([{ id: 'flight1', name: 'Name 1' }, { id: 'flight2', name: 'Name 2' }]);
+      done();
+    });
   });
 
-  it('updates an existing campaign', () => {
-    const campaign = campaignFactory({ id: 999, name: 'Existing' });
-    component.campaign$.next(campaign);
+  it('submits the campaign forms', () => {
+    const campaign = campaignFactory();
+    campaignState.next(campaign);
     component.campaignSubmit();
-    expect(campaignService.putCampaign).toHaveBeenCalledWith(campaign);
+    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
     expect(toastrService.success).toHaveBeenCalledWith('Campaign saved');
   });
 
-  it('creates a new campaign', () => {
-    const campaign = campaignFactory({ id: null, name: 'Brand New' });
-    component.campaign$.next(campaign);
+  it('redirects to a new campaign', () => {
+    const changes = { id: '1234', prevId: null, flights: { 9999: '9999' } };
+    campaignStoreService.storeCampaign = jest.fn(() => of(changes)) as any;
     component.campaignSubmit();
-    expect(campaignService.putCampaign).toHaveBeenCalledWith(campaign);
-    expect(toastrService.success).toHaveBeenCalledWith('Campaign saved');
-    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1]);
+    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/campaign', '1234']);
+  });
+
+  it('redirects to a new flight', () => {
+    const changes = { id: '1234', prevId: null, flights: { 9999: '8888' } };
+    campaignStoreService.storeCampaign = jest.fn(() => of(changes)) as any;
+    component.campaignSubmit();
+    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/campaign', '1234', 'flight', '8888']);
+  });
+
+  it('adds a new flight to the state', () => {
+    const spy = jest.spyOn(campaignStoreService, 'setFlight');
+    const campaign = campaignFactory();
+    campaignState.next(campaign);
+    component.createFlight();
+    expect(spy).toHaveBeenCalled();
+    const flight = spy.mock.calls[0][0];
+    const id = spy.mock.calls[0][1];
+    expect(flight).toMatchObject({
+      localFlight: { name: 'New Flight 1' },
+      changed: false,
+      valid: true
+    });
+    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 'new', 'flight', id]);
   });
 });

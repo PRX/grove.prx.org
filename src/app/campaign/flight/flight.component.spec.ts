@@ -11,7 +11,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
 import { Flight } from '../../core';
-import { domRendererFactory3 } from '@angular/core/src/render3/interfaces/renderer';
 
 describe('FlightComponent', () => {
   let component: FlightComponent;

@@ -44,9 +44,9 @@ export class CampaignComponent {
 
   constructor(
     private route: ActivatedRoute,
-    public campaignStoreService: CampaignStoreService,
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public campaignStoreService: CampaignStoreService
   ) {
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.campaignStoreService.load(params.get('id'));
