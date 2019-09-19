@@ -1,26 +1,41 @@
 <mat-card>
   <form [formGroup]="flightForm" ngNativeValidate>
-    <mat-form-field>
-      <input matInput placeholder="Name" formControlName="name" required />
+    <mat-form-field appearance="outline">
+      <mat-label>Flight Name</mat-label>
+      <input matInput placeholder="Flight Name" formControlName="name" required />
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Total Goal</mat-label>
       <input matInput type="number" placeholder="Total Goal" formControlName="totalGoal" required />
     </mat-form-field>
-    <mat-form-field>
-      <input matInput [matDatepicker]="startPicker" placeholder="Start date" formControlName="startAt" />
+    <mat-form-field appearance="outline">
+      <mat-label>Actual Start Date</mat-label>
+      <input matInput [matDatepicker]="startPicker" placeholder="Actual Start date" formControlName="startAt" />
       <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
       <mat-datepicker #startPicker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field>
-      <input matInput [matDatepicker]="endPicker" placeholder="End date" formControlName="endAt" />
+    <mat-form-field appearance="outline">
+      <mat-label>Actual End Date</mat-label>
+      <input matInput [matDatepicker]="endPicker" placeholder="Actual End date" formControlName="endAt" />
       <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
       <mat-datepicker #endPicker></mat-datepicker>
     </mat-form-field>
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-label>Series</mat-label>
-      <mat-select formControlName="set_inventory_uri" required>
-        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
-      </mat-select>
+      <input
+        type="text"
+        required
+        placeholder="Series"
+        aria-label="Series"
+        matInput
+        formControlName="set_inventory_uri"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete required #auto="matAutocomplete">
+        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">
+          {{ inv.podcastTitle }}
+        </mat-option>
+      </mat-autocomplete>
     </mat-form-field>
   </form>
 </mat-card>

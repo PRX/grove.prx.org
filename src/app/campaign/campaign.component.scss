@@ -4,10 +4,25 @@ mat-drawer-content {
 
 mat-drawer {
   min-width: 250px;
+  background: #f0f0f0;
+  border-right: none;
 }
 
-mat-nav-list .active-link {
-  background: rgba(0, 0, 0, 0.2);
+.mat-list-base {
+  padding-top: 0;
+}
+
+.mat-list-base .mat-list-item {
+  background: #ddd;
+  color: #0089bd;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.mat-list-base .mat-list-item.active-link {
+  background: #fff;
+  color: #0089bd;
+  font-style: italic;
 }
 
 .add-flight {
