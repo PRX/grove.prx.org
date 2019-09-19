@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { CampaignStoreService } from 'src/app/core';
+import { CampaignStoreService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 import { Observable } from 'rxjs';
 

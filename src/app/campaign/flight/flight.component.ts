@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Flight, Inventory } from 'src/app/core';
+import { Flight, Inventory } from '../../core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({

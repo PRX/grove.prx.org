@@ -1,9 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReplaySubject, Observable } from 'rxjs';
-import { Inventory, CampaignStoreService, FlightState } from 'src/app/core';
+import { Inventory, InventoryService, CampaignStoreService, FlightState } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, first } from 'rxjs/operators';
-import { InventoryService } from 'src/app/core';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',

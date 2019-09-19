@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AccountService, AdvertiserService, Account, Advertiser, CampaignStoreService, Campaign } from 'src/app/core';
+import { AccountService, AdvertiserService, Account, Advertiser, CampaignStoreService, Campaign } from '../../core';
 
 @Component({
   selector: 'grove-campaign-form.container',

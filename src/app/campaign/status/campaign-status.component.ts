@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CampaignState } from 'src/app/core';
+import { CampaignState } from '../../core';
 
 @Component({
   selector: 'grove-campaign-status',
