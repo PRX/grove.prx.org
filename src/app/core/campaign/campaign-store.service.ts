@@ -1,69 +1,23 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
-import { ReplaySubject } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-export interface CampaignState {
-  localCampaign: Campaign;
-  remoteCampaign?: Campaign;
-  flights: { [id: string]: FlightState };
-  changed: boolean;
-  valid: boolean;
-}
-
-export interface FlightState {
-  localFlight: Flight;
-  remoteFlight?: Flight;
-  changed: boolean;
-  valid: boolean;
-}
-
-export interface Campaign {
-  id?: number;
-  name: string;
-  type: string;
-  status: string;
-  repName: string;
-  notes: string;
-  set_account_uri: string;
-  set_advertiser_uri: string;
-}
-
-export interface Flight {
-  id?: number;
-  name: string;
-  startAt: string;
-  endAt: string;
-  totalGoal: number;
-  set_inventory_uri: string;
-}
-
-export interface CampaignStateChanges {
-  id: number;
-  prevId?: number;
-  flights: { [prevId: number]: number };
-}
+import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
+import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
+import { map, first, switchMap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
-  private currentCampaign: CampaignState;
   readonly campaign$ = new ReplaySubject<CampaignState>(1);
   readonly flights$ = this.campaign$.pipe(map(c => c.flights));
   readonly remoteCampaign$ = this.campaign$.pipe(map(state => state && state.remoteCampaign));
   readonly localCampaign$ = this.campaign$.pipe(map(state => state && state.localCampaign));
 
-  get campaign(): CampaignState {
-    return this.currentCampaign;
-  }
-
-  set campaign(val: CampaignState) {
-    this.currentCampaign = val;
-    this.campaign$.next(val);
+  get campaign(): Observable<CampaignState> {
+    return this.campaign$.pipe(first());
   }
 
   constructor(private campaignService: CampaignService) {}
 
-  createWithId(id: number | string = null) {
+  load(id: number | string = null): Observable<CampaignState> {
     if (!id) {
       const newState: CampaignState = {
         localCampaign: {
@@ -79,46 +33,104 @@ export class CampaignStoreService {
         changed: false,
         valid: false
       };
-      this.campaign = newState;
+      this.campaign$.next(newState);
+      return of(newState);
     } else {
-      this.fetchCampaign(id);
+      const lazyState = new ReplaySubject<CampaignState>(1);
+
+      // non-lazy load
+      this.campaignService
+        .getCampaign(id)
+        .pipe(first())
+        .subscribe(state => {
+          this.campaign$.next(state);
+          lazyState.next(state);
+        });
+
+      return lazyState;
     }
   }
 
-  async fetchCampaign(id: number | string) {
-    this.campaign = await this.campaignService.getCampaign(id).toPromise();
-  }
+  storeCampaign(): Observable<CampaignStateChanges> {
+    const changes = new ReplaySubject<CampaignStateChanges>(1);
 
-  async storeCampaign(): Promise<CampaignStateChanges> {
-    try {
-      const prevId = this.campaign.remoteCampaign ? this.campaign.remoteCampaign.id : null;
-      const campaign = await this.campaignService.putCampaign(this.campaign).toPromise();
-
-      const flights = {};
-      const flightIdChanges = {};
-      await Promise.all(
-        Object.keys(this.campaign.flights).map(async oldKey => {
-          const flight = await this.campaignService.putFlight(this.campaign.flights[oldKey]).toPromise();
-          flights[flight.remoteFlight.id] = flight;
-          flightIdChanges[oldKey] = flight.remoteFlight.id;
+    // non-lazy save
+    this.putCampaign()
+      .pipe(
+        switchMap(campaignChanges => {
+          return this.putFlights().pipe(
+            map(flightChanges => {
+              this.campaign$.next({
+                ...campaignChanges.state,
+                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+              });
+              return {
+                id: campaignChanges.state.remoteCampaign.id,
+                prevId: campaignChanges.prevId,
+                flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
+              };
+            })
+          );
         })
-      );
+      )
+      .subscribe(val => changes.next(val));
 
-      this.campaign = { ...campaign, flights };
-      return { id: campaign.remoteCampaign.id, prevId, flights: flightIdChanges };
-    } catch (e) {
-      // TODO: revert update
-      console.error(e);
-    }
+    return changes;
   }
 
-  setFlight(flightState: FlightState, flightId: string | number) {
-    this.campaign = {
-      ...this.campaign,
-      flights: {
-        ...this.campaign.flights,
-        [flightId]: { ...this.campaign.flights[flightId], ...flightState }
-      }
-    };
+  setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {
+    const lazyState = new ReplaySubject<CampaignState>(1);
+    const { localCampaign, changed, valid } = newState;
+
+    // non-lazy update
+    this.campaign.subscribe(state => {
+      const updatedState = { ...state, localCampaign, changed, valid };
+      this.campaign$.next(updatedState);
+      lazyState.next(updatedState);
+    });
+
+    return lazyState;
+  }
+
+  setFlight(flightState: FlightState, flightId: string | number): Observable<CampaignState> {
+    const lazyState = new ReplaySubject<CampaignState>(1);
+
+    // non-lazy update
+    this.campaign.subscribe(state => {
+      const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
+      const updatedState = { ...state, flights: updatedFlights };
+      this.campaign$.next(updatedState);
+      lazyState.next(updatedState);
+    });
+
+    return lazyState;
+  }
+
+  private putCampaign(): Observable<{ prevId: number; state: CampaignState }> {
+    return this.campaign.pipe(
+      switchMap(state => {
+        return this.campaignService.putCampaign(state).pipe(
+          map(newState => {
+            return { prevId: state.remoteCampaign ? state.remoteCampaign.id : null, state: newState };
+          })
+        );
+      })
+    );
+  }
+
+  private putFlights(): Observable<{ prevId: string; state: FlightState }[]> {
+    return this.campaign.pipe(
+      switchMap(state => {
+        return forkJoin(
+          Object.keys(state.flights).map(key => {
+            return this.campaignService.putFlight(state.flights[key]).pipe(
+              map(newState => {
+                return { prevId: key, state: newState };
+              })
+            );
+          })
+        );
+      })
+    );
   }
 }

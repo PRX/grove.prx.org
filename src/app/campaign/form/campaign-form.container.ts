@@ -30,8 +30,8 @@ export class CampaignFormContainerComponent implements OnInit {
 
   ngOnInit() {}
 
-  campaignUpdateFromForm({ campaign, changed, valid }) {
-    const state = this.campaignStoreService.campaign;
-    this.campaignStoreService.campaign = { ...state, localCampaign: campaign, changed, valid };
+  campaignUpdateFromForm(newState: { campaign: Campaign; changed: boolean; valid: boolean }) {
+    const { campaign, changed, valid } = newState;
+    this.campaignStoreService.setCampaign({ localCampaign: campaign, changed, valid });
   }
 }

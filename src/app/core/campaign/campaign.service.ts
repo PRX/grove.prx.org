@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, ReplaySubject, forkJoin } from 'rxjs';
-import { map, switchMap, catchError, first } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign, Flight, FlightState } from './campaign-store.service';
+import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
 
 @Injectable()
 export class CampaignService {

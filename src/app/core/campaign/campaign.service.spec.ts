@@ -1,5 +1,5 @@
 import { CampaignService } from './campaign.service';
-import { Campaign, CampaignState, Flight, FlightState } from './campaign-store.service';
+import { Campaign, CampaignState, Flight, FlightState } from './campaign.models';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 
