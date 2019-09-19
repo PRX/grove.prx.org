@@ -22,20 +22,9 @@
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Series</mat-label>
-      <input
-        type="text"
-        required
-        placeholder="Series"
-        aria-label="Series"
-        matInput
-        formControlName="set_inventory_uri"
-        [matAutocomplete]="auto"
-      />
-      <mat-autocomplete required #auto="matAutocomplete">
-        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">
-          {{ inv.podcastTitle }}
-        </mat-option>
-      </mat-autocomplete>
+      <mat-select formControlName="set_inventory_uri" required>
+        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
+      </mat-select>
     </mat-form-field>
   </form>
 </mat-card>
