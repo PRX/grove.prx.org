@@ -1,43 +1,49 @@
 <mat-card>
   <form [formGroup]="campaignForm" ngNativeValidate>
-    <mat-form-field>
-      <mat-label>Owner</mat-label>
-      <mat-select formControlName="set_account_uri" required>
-        <mat-option *ngFor="let acct of accounts" [value]="acct.self_uri">{{ acct.name }}</mat-option>
-      </mat-select>
+    <mat-form-field appearance="outline">
+      <mat-label>Campaign Name</mat-label>
+      <input matInput placeholder="Campaign Name" formControlName="name" required />
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Name" formControlName="name" required />
+    <mat-form-field appearance="outline">
+      <mat-label>Advertiser</mat-label>
+      <input
+        type="text"
+        placeholder="Advertiser"
+        aria-label="Advertiser"
+        matInput
+        formControlName="set_advertiser_uri"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete required #auto="matAutocomplete">
+        <mat-option *ngFor="let adv of advertisers" [value]="adv.self_uri">
+          {{ adv.name }}
+        </mat-option>
+      </mat-autocomplete>
     </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Type</mat-label>
+    <mat-form-field appearance="outline">
+      <mat-label>Campaign Type</mat-label>
       <mat-select formControlName="type" required>
         <mat-option *ngFor="let type of typeOptions" [value]="type.value">{{ type.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Status</mat-label>
+    <mat-form-field appearance="outline">
+      <mat-label>Campaign Status</mat-label>
       <mat-select formControlName="status" required>
         <mat-option *ngFor="let status of statusOptions" [value]="status.value">{{ status.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="Rep name" formControlName="repName" required />
+    <mat-form-field appearance="outline">
+      <mat-label>Campaign Rep</mat-label>
+      <input matInput placeholder="Campaign Rep" formControlName="repName" required />
     </mat-form-field>
 
-    <mat-form-field>
-      <textarea matInput formControlName="notes" placeholder="Notes"></textarea>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-label>Advertiser</mat-label>
-      <mat-select formControlName="set_advertiser_uri" required>
-        <mat-option *ngFor="let adv of advertisers" [value]="adv.self_uri">{{ adv.name }}</mat-option>
-      </mat-select>
+    <mat-form-field appearance="outline">
+      <mat-label>Notes</mat-label>
+      <textarea matInput formControlName="notes" placeholder="Enter notes"></textarea>
     </mat-form-field>
   </form>
 </mat-card>

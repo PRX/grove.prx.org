@@ -8,3 +8,13 @@ mat-card form > * {
   max-width: 600px;
   width: 100%;
 }
+
+.mat-select-value-text,
+.mat-input-element {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 1.1em;
+}
