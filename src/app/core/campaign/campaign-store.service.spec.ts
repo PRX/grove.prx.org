@@ -84,12 +84,32 @@ describe('CampaignStoreService', () => {
     store.load(1);
   });
 
+  it('updates campaigns', done => {
+    const updateCampaign = { localCampaign: { ...campaignFixture, name: 'foo' }, changed: true, valid: false };
+    store.load(1);
+    store.setCampaign(updateCampaign);
+    store.campaign$.subscribe(camp => {
+      expect(camp).toMatchObject({ ...campaignStateFixture, ...updateCampaign });
+      done();
+    });
+  });
+
   it('adds new flights', done => {
     const newFlight: FlightState = { localFlight: flightFixture, changed: true, valid: false };
     store.load(1);
     store.setFlight(newFlight, 9999);
     store.campaign$.subscribe(camp => {
       expect(camp.flights['9999']).toEqual(newFlight);
+      done();
+    });
+  });
+
+  it('updates existing flights', done => {
+    const existingFlight: FlightState = { localFlight: { ...flightFixture, name: 'foo' }, changed: true, valid: false };
+    store.load(1);
+    store.setFlight(existingFlight, 9);
+    store.campaign$.subscribe(camp => {
+      expect(camp.flights['9']).toMatchObject({ ...flightStateFixture, ...existingFlight });
       done();
     });
   });

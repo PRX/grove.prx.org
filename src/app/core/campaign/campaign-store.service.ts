@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
-import { CampaignState, FlightState, CampaignStateChanges } from './campaign.models';
+import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap } from 'rxjs/operators';
 
@@ -60,6 +60,10 @@ export class CampaignStoreService {
         switchMap(campaignChanges => {
           return this.putFlights().pipe(
             map(flightChanges => {
+              this.campaign$.next({
+                ...campaignChanges.state,
+                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+              });
               return {
                 id: campaignChanges.state.remoteCampaign.id,
                 prevId: campaignChanges.prevId,
@@ -72,6 +76,20 @@ export class CampaignStoreService {
       .subscribe(val => changes.next(val));
 
     return changes;
+  }
+
+  setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {
+    const lazyState = new ReplaySubject<CampaignState>(1);
+    const { localCampaign, changed, valid } = newState;
+
+    // non-lazy update
+    this.campaign.subscribe(state => {
+      const updatedState = { ...state, localCampaign, changed, valid };
+      this.campaign$.next(updatedState);
+      lazyState.next(updatedState);
+    });
+
+    return lazyState;
   }
 
   setFlight(flightState: FlightState, flightId: string | number): Observable<CampaignState> {
