@@ -86,7 +86,7 @@ export class CampaignListService {
           return this._currentCampaignIds
             // map from array of Ids
             .filter(campaignId => campaignEntities[campaignId])
-            .map(campaignId => campaignEntities[campaignId])
+            .map(campaignId => campaignEntities[campaignId]);
         }
       })
     );
@@ -109,6 +109,7 @@ export class CampaignListService {
     this.augury.follow('prx:campaigns', {
       page,
       per,
+      zoom: 'prx:flights,prx:advertiser',
       ...(filters && {filters})
     }).pipe(
       switchMap(result => {
