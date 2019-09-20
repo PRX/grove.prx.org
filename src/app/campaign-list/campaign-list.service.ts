@@ -87,11 +87,6 @@ export class CampaignListService {
             // map from array of Ids
             .filter(campaignId => campaignEntities[campaignId])
             .map(campaignId => campaignEntities[campaignId])
-            // sort by ?
-            .sort((a, b ) => {
-              // TODO: name seems to be the default sort on the API, but what makes sense for the dashboard?
-              return a.name - b.name;
-            });
         }
       })
     );
