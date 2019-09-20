@@ -1,5 +1,5 @@
 <mat-card>
-  <form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate>
+  <form [formGroup]="campaignForm" (ngSubmit)="campaignFormSubmit()" ngNativeValidate *ngIf="campaignForm">
     <mat-form-field>
       <mat-label>Owner</mat-label>
       <mat-select formControlName="set_account_id" required>
@@ -34,10 +34,9 @@
     </mat-form-field>
 
     <grove-campaign-form-advertiser
-      *ngIf="campaignForm && advertiserOptions$ | async as advertisers"
+      *ngIf="advertiserOptions$ | async as advertisers"
       [formGroup]="campaignForm"
-      [formControl]="campaignForm.get('set_advertiser_uri')"
-      formControlName="set_advertiser_uri"
+      controlName="set_advertiser_uri"
       label="Advertiser"
       [options]="advertisers"
       (addOption)="onAddAdvertiser($event)">

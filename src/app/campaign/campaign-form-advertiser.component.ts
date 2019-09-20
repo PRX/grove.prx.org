@@ -1,14 +1,21 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { Component, Input, Output, EventEmitter, forwardRef, OnInit } from '@angular/core';
+import { FormGroup, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 @Component({
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => CampaignFormAdvertiserComponent),  // replace name as appropriate
+      multi: true
+    }
+  ],
   selector: 'grove-campaign-form-advertiser',
   template: `
     <mat-form-field [formGroup]="formGroup">
       <mat-label>{{ label }}</mat-label>
-      <input type="text" matInput #input formControlName="set_advertiser_uri"
+      <input type="text" matInput #input [formControlName]="controlName" ngDefaultControl
         [matAutocomplete]="auto" (keydown.enter)="enterPressed($event)">
       <button type="button" mat-button matSuffix mat-stroked-button
         *ngIf="input.value && !findExistingOtion(input.value)"
@@ -24,15 +31,14 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class CampaignFormAdvertiserComponent implements OnInit {
   @Input() formGroup: FormGroup;
-  @Input() formControl: FormControl;
-  @Input() formControlName: string;
+  @Input() controlName: string;
   @Input() label: string;
   @Input() options: {name: string, value: string}[];
   @Output() addOption = new EventEmitter<string>();
   filteredOptions: Observable<{name: string, value: string}[]>;
 
   ngOnInit() {
-    this.filteredOptions = this.formControl.valueChanges.pipe(
+    this.filteredOptions = this.formGroup.get(this.controlName).valueChanges.pipe(
       startWith(''),
       map(value => this.options && this.options.filter(adv => adv.name.toLowerCase().indexOf(value.toLowerCase()) === 0))
     );
