@@ -1,18 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HalService, MockHalService, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
+import { HalService, MockHalService, ToastrService } from 'ngx-prx-styleguide';
 import { MatFormFieldModule, MatInputModule, MatSelectModule,
-         MatCardModule, MatButtonModule } from '@angular/material';
+         MatCardModule, MatButtonModule, MatAutocompleteModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { AuguryService } from '../core/augury.service';
 import { CampaignFormComponent } from './campaign-form.component';
+import { CampaignFormAdvertiserComponent } from './campaign-form-advertiser.component';
+import { AdvertiserService } from './advertiser.service';
+import { AdvertiserServiceMock } from './advertiser.service.mock';
 import { UserServiceMock } from '../core/user/user.service.mock';
 import { UserService } from '../core/user/user.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { of } from 'rxjs';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 describe('CampaignFormComponent', () => {
@@ -21,16 +23,22 @@ describe('CampaignFormComponent', () => {
   let de: DebugElement;
   let augury;
   let user;
+  let advertiserMock;
 
   beforeEach(async(() => {
     augury = new MockHalService();
     user = new UserServiceMock();
+    advertiserMock = new AdvertiserServiceMock(augury);
     TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, RouterTestingModule.withRoutes([]),
                 MatFormFieldModule, MatInputModule, MatSelectModule,
-                MatCardModule, MatButtonModule, NoopAnimationsModule],
-      declarations: [CampaignFormComponent],
+                MatCardModule, MatButtonModule, MatAutocompleteModule, NoopAnimationsModule],
+      declarations: [CampaignFormComponent, CampaignFormAdvertiserComponent],
       providers: [
+        {
+          provide: AdvertiserService,
+          useValue: advertiserMock
+        },
         {
           provide: ToastrService,
           useValue: { success: jest.fn() }

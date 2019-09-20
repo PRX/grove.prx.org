@@ -33,12 +33,15 @@
       <textarea matInput formControlName="notes" placeholder="Notes"></textarea>
     </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Advertiser</mat-label>
-      <mat-select formControlName="set_advertiser_uri" required>
-        <mat-option *ngFor="let adv of advertiserOptions$ | async" [value]="adv.value">{{ adv.name }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <grove-campaign-form-advertiser
+      *ngIf="campaignForm && advertiserOptions$ | async as advertisers"
+      [formGroup]="campaignForm"
+      [formControl]="campaignForm.get('set_advertiser_uri')"
+      formControlName="set_advertiser_uri"
+      label="Advertiser"
+      [options]="advertisers"
+      (addOption)="onAddAdvertiser($event)">
+    </grove-campaign-form-advertiser>
 
     <button mat-flat-button color="primary" type="submit">Submit</button>
   </form>

@@ -3,10 +3,11 @@ import { Observable, of } from 'rxjs';
 import { FormBuilder, Validators } from '@angular/forms';
 import { UserService } from '../core/user/user.service';
 import { AuguryService } from '../core/augury.service';
-import { withLatestFrom, map, switchMap } from 'rxjs/operators';
+import { withLatestFrom, map, switchMap, mergeMap, share } from 'rxjs/operators';
 import { Router, ParamMap, ActivatedRoute } from '@angular/router';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { ToastrService } from 'ngx-prx-styleguide';
+import { AdvertiserService } from './advertiser.service';
 
 interface CampaignData {
   accountUri: string;
@@ -86,11 +87,12 @@ export class CampaignFormComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private auguryService: AuguryService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private advertiserStore: AdvertiserService
   ) {}
 
   ngOnInit() {
-    this.advertiserOptions$ = this.fetchAdvertisers();
+    this.advertiserOptions$ = this.advertiserStore.advertisers;
 
     this.campaignDoc$ = this.route.paramMap.pipe(switchMap((params: ParamMap) => this.fetchCampaign(params.get('id'))));
 
@@ -174,5 +176,16 @@ export class CampaignFormComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  onAddAdvertiser(name: string) {
+    const post = this.advertiserStore.addAdvertiser(name);
+
+    post.subscribe(result => {
+      this.toastr.success('Advertiser added');
+      // TODO: this is not setting the value accordingly
+      // is setting value (present on submit) but not displaying it
+      this.campaignForm.get('set_advertiser_uri').setValue(result.set_advertiser_uri);
+    });
   }
 }
