@@ -30,6 +30,7 @@ export interface Flight {
   startAt: string;
   endAt: string;
   totalGoal: number;
+  zones: string[];
   set_inventory_uri: string;
 }
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Flight, Inventory } from '../../core';
+import { Flight, Inventory, InventoryZone } from '../../core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 export class FlightComponent implements OnInit, OnChanges {
   @Input() flight: Flight;
   @Input() inventory: Inventory[];
+  @Input() zoneOptions: InventoryZone[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
 
   flightForm = this.fb.group({
@@ -18,11 +19,16 @@ export class FlightComponent implements OnInit, OnChanges {
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
     totalGoal: ['', Validators.required],
+    zones: ['', Validators.required],
     set_inventory_uri: ['', Validators.required]
   });
 
   get name() {
     return this.flightForm.get('name');
+  }
+
+  get zones() {
+    return this.flightForm.get('zones');
   }
 
   constructor(private fb: FormBuilder) {}
@@ -36,6 +42,16 @@ export class FlightComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.flight && changes.flight.currentValue) {
       this.updateFlightForm(this.flight);
+    }
+    if (changes.zoneOptions && changes.zoneOptions.currentValue) {
+      const filteredValues = this.zones.value.filter((id: string) => {
+        return this.zoneOptions.find(z => z.id === id);
+      });
+      if (filteredValues.length !== this.zones.value.length) {
+        this.zones.setValue(filteredValues);
+        this.zones.markAsDirty();
+        this.formStatusChanged(this.flightForm.value);
+      }
     }
   }
 

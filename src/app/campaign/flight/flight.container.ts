@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ReplaySubject, Observable } from 'rxjs';
-import { Inventory, InventoryService, CampaignStoreService, FlightState } from '../../core';
+import { ReplaySubject, Observable, combineLatest } from 'rxjs';
+import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
   template: `
     <grove-flight
       [inventory]="inventoryOptions$ | async"
+      [zoneOptions]="zoneOptions$ | async"
       [flight]="flightLocal$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
@@ -19,7 +20,9 @@ export class FlightContainerComponent implements OnInit {
   private currentFlightId: string;
   state$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.state$.pipe(map(state => state.localFlight));
+  currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
+  zoneOptions$: Observable<InventoryZone[]>;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +32,12 @@ export class FlightContainerComponent implements OnInit {
   ) {
     this.route.paramMap.subscribe(params => this.setFlightId(params.get('flightid')));
     this.inventoryOptions$ = this.inventoryService.listInventory();
+    this.zoneOptions$ = combineLatest(this.inventoryOptions$, this.currentInventoryUri$).pipe(
+      map(([options, uri]) => {
+        const inventory = options.find(i => i.self_uri === uri);
+        return inventory ? inventory.zones : [];
+      })
+    );
   }
 
   ngOnInit() {}
@@ -38,6 +47,7 @@ export class FlightContainerComponent implements OnInit {
       if (state.flights[id]) {
         this.currentFlightId = id;
         this.state$.next(state.flights[id]);
+        this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
       } else {
         const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
         this.router.navigate(['/campaign', campaignId]);
@@ -47,5 +57,6 @@ export class FlightContainerComponent implements OnInit {
 
   flightUpdateFromForm({ flight, changed, valid }) {
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
+    this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 }

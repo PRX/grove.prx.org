@@ -7,7 +7,13 @@ import { AuguryService } from '../augury.service';
 export interface Inventory {
   id: number;
   podcastTitle: string;
+  zones: InventoryZone[];
   self_uri: string;
+}
+
+export interface InventoryZone {
+  id: string;
+  label: string;
 }
 
 @Injectable()
@@ -26,6 +32,7 @@ export class InventoryService {
     return {
       id: doc.id,
       podcastTitle: doc['podcastTitle'],
+      zones: doc['zones'],
       self_uri: doc.expand('self')
     };
   }

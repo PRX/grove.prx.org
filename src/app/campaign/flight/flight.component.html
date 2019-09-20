@@ -8,22 +8,30 @@
       <mat-label>Total Goal</mat-label>
       <input matInput type="number" placeholder="Total Goal" formControlName="totalGoal" required />
     </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Actual Start Date</mat-label>
-      <input matInput [matDatepicker]="startPicker" placeholder="Actual Start date" formControlName="startAt" />
-      <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-      <mat-datepicker #startPicker></mat-datepicker>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Actual End Date</mat-label>
-      <input matInput [matDatepicker]="endPicker" placeholder="Actual End date" formControlName="endAt" />
-      <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-      <mat-datepicker #endPicker></mat-datepicker>
-    </mat-form-field>
+    <div class="flight-dates">
+      <mat-form-field appearance="outline">
+        <mat-label>Actual Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" placeholder="Actual Start date" formControlName="startAt" />
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Actual End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" placeholder="Actual End date" formControlName="endAt" />
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
     <mat-form-field appearance="outline">
       <mat-label>Series</mat-label>
       <mat-select formControlName="set_inventory_uri" required>
         <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Zones</mat-label>
+      <mat-select formControlName="zones" multiple required>
+        <mat-option *ngFor="let zone of zoneOptions" [value]="zone.id">{{ zone.label }}</mat-option>
       </mat-select>
     </mat-form-field>
   </form>

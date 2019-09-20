@@ -84,6 +84,7 @@ export class CampaignComponent {
         startAt: new Date().toISOString(),
         endAt: new Date().toISOString(),
         totalGoal: null,
+        zones: [],
         set_inventory_uri: null
       };
       this.campaignStoreService.setFlight({ localFlight: flight, changed: false, valid: true }, flightId);
