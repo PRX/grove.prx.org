@@ -120,8 +120,7 @@ export class CampaignListService {
       }),
       switchMap((campaignDocs: HalDoc[]) => {
         this._campaigns.next(campaignDocs.reduce((acc, doc) => {
-          acc[doc.id] = {loading: true};
-          return acc;
+          return {...acc, [doc.id]: {loading: true}};
         }, {}));
         // campaigns state is mapped from a list of ids from the current request/filter params
         this._currentCampaignIds = campaignDocs.map(c => c['id']);
