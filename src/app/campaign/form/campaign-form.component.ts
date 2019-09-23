@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Campaign, Account, Advertiser } from '../../core';
 
@@ -8,11 +8,24 @@ import { Campaign, Account, Advertiser } from '../../core';
   styleUrls: ['./campaign-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignFormComponent implements OnChanges, OnInit {
+export class CampaignFormComponent implements OnInit {
   @Input() accounts: Account[];
   @Input() advertisers: Advertiser[];
-  @Input() campaign: Campaign;
   @Output() campaignUpdate = new EventEmitter<{ campaign: Campaign; changed: boolean; valid: boolean }>(true);
+
+  // tslint:disable-next-line
+  private _campaign: Campaign;
+  get campaign(): Campaign {
+    return this._campaign;
+  }
+
+  @Input()
+  set campaign(campaign: Campaign) {
+    if (campaign) {
+      this._campaign = campaign;
+      this.updateCampaignForm(this._campaign);
+    }
+  }
 
   readonly typeOptions = [
     { name: 'Paid Campaign', value: 'paid_campaign' },
@@ -71,12 +84,6 @@ export class CampaignFormComponent implements OnChanges, OnInit {
     this.campaignForm.valueChanges.subscribe(cmp => {
       this.formStatusChanged(cmp);
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.campaign && changes.campaign.currentValue) {
-      this.updateCampaignForm(this.campaign);
-    }
   }
 
   formStatusChanged(campaign?: Campaign) {

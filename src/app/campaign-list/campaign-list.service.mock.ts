@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { Campaign, Flight } from './campaign-list.service';
+import { Campaign, Flight, Facets, CampaignParams } from './campaign-list.service';
 
 export const flights: Flight[] = [
   {
     name: 'Flight 1',
     startAt: new Date('2019-09-01 0:0:0'),
     endAt: new Date('2019-09-10 0:0:0'),
-    zones: ['Preroll'],
+    zones: ['Preroll', 'Midroll'],
     targets: [
       {id: 1, label: 'LAN'},
       {id: 2, label: 'SAD'},
@@ -23,14 +23,14 @@ export const flights: Flight[] = [
     name: 'Flight 2',
     startAt: new Date('2019-09-02 0:0:0'),
     endAt: new Date('2019-09-13 0:0:0'),
-    zones: ['Midroll'],
+    zones: ['Midroll', 'Preroll'],
     targets: [
       {id: 1, label: 'Global'}
     ]
   }
 ];
 
-export const campaigns = [
+export const campaigns: Campaign[] = [
   {
     id: 1,
     accountId: 2,
@@ -40,7 +40,8 @@ export const campaigns = [
     type: 'paid_campaign',
     repName: 'John',
     notes: '',
-    flights
+    flights,
+    loading: false
   },
   {
     id: 2,
@@ -51,7 +52,8 @@ export const campaigns = [
     type: 'paid_campaign',
     repName: 'Jacob',
     notes: '',
-    flights
+    flights,
+    loading: false
   },
   {
     id: 3,
@@ -62,9 +64,34 @@ export const campaigns = [
     type: 'house',
     repName: 'Jingleheimer',
     notes: '',
-    flights
+    flights,
+    loading: false
   }
 ];
+
+export const facets: Facets = {
+  advertiser: [{id: 3, label: 'Toyota'}, {id: 2, label: 'Griddy'}, {id: 1, label: 'Adidas'}],
+  podcast: [{id: 3, label: 'Podcast 3'}, {id: 2, label: 'Podcast 2'}, {id: 1, label: 'Podcast 1'}],
+  status: [{id: 'canceled', label: 'Canceled'}, {id: 'approved', label: 'Approved'}, {id: 'sold', label: 'Sold'}],
+  type: [{id: 'house', label: 'House'}, {id: 'paid_campaign', label: 'Paid Campaign'}],
+  geo: [{id: 'US', label: 'United States'}, {id: 'CA', label: 'Canada'}],
+  zone: [{id: 'mid_1', label: 'Midroll'}, {id: 'pre_1', label: 'Preroll'}]
+};
+
+export const params: CampaignParams = {
+  page: 1,
+  per: 2,
+  advertiser: 2,
+  podcast: 2,
+  status: 'approved',
+  type: 'paid_campaign',
+  geo: ['US', 'CA'],
+  zone: ['mid_1', 'pre_1'],
+  text: 'anything',
+  representative: 'Schmidt',
+  before: new Date('2019-09-30'),
+  after: new Date('2019-09-01')
+};
 
 @Injectable()
 export class CampaignListServiceMock {
@@ -76,5 +103,9 @@ export class CampaignListServiceMock {
 
   get campaigns(): Observable<Campaign[]> {
     return of(campaigns);
+  }
+
+  get loadedCampaigns(): Observable<Campaign[]> {
+    return of(campaigns.filter(c => !c.loading));
   }
 }

@@ -48,9 +48,6 @@ describe('FlightComponent', () => {
 
   it('updates the flight form', () => {
     component.flight = flightFixture;
-    component.ngOnChanges({
-      flight: { previousValue: null, currentValue: flightFixture, firstChange: true, isFirstChange: () => true }
-    });
     expect(component.flightForm.value).toMatchObject({
       ...flightFixture,
       startAt: new Date(flightFixture.startAt),
@@ -60,10 +57,6 @@ describe('FlightComponent', () => {
 
   it('emits form changes', done => {
     component.flight = flightFixture;
-    component.ngOnChanges({
-      flight: { previousValue: null, currentValue: flightFixture, firstChange: true, isFirstChange: () => true }
-    });
-
     component.flightUpdate.subscribe(updates => {
       expect(updates).toMatchObject({ flight: { name: 'brand new name' } });
       done();

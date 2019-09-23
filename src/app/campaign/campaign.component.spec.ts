@@ -42,11 +42,11 @@ describe('CampaignComponent', () => {
   beforeEach(() => {
     routeId = new ReplaySubject(1);
     route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
-    router = <any>{ navigate: jest.fn(), url: '/campaign/new/flight/9999' };
-    toastrService = <any>{ success: jest.fn() };
+    router = { navigate: jest.fn(), url: '/campaign/new/flight/9999' } as any;
+    toastrService = { success: jest.fn() } as any;
     campaignState = new ReplaySubject(1);
     campaignStoreService = {
-      campaign: campaignState,
+      campaignFirst$: campaignState,
       flights$: campaignState.pipe(map(s => s.flights)),
       load: jest.fn(() => campaignState),
       storeCampaign: jest.fn(() => campaignState),

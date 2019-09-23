@@ -2,17 +2,27 @@ import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap } from 'rxjs/operators';
+import { map, first, switchMap, share } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
-  readonly campaign$ = new ReplaySubject<CampaignState>(1);
-  readonly flights$ = this.campaign$.pipe(map(c => c.flights));
-  readonly remoteCampaign$ = this.campaign$.pipe(map(state => state && state.remoteCampaign));
-  readonly localCampaign$ = this.campaign$.pipe(map(state => state && state.localCampaign));
+  // tslint:disable-next-line
+  private _campaign$ = new ReplaySubject<CampaignState>(1);
 
-  get campaign(): Observable<CampaignState> {
+  get campaign$(): Observable<CampaignState> {
+    return this._campaign$.asObservable();
+  }
+
+  get campaignFirst$(): Observable<CampaignState> {
     return this.campaign$.pipe(first());
+  }
+
+  get localCampaign$(): Observable<Campaign> {
+    return this.campaign$.pipe(map(state => state && state.localCampaign));
+  }
+
+  get flights$(): Observable<{ [id: string]: FlightState }> {
+    return this.campaign$.pipe(map(c => c.flights));
   }
 
   constructor(private campaignService: CampaignService) {}
@@ -33,81 +43,69 @@ export class CampaignStoreService {
         changed: false,
         valid: false
       };
-      this.campaign$.next(newState);
+      this._campaign$.next(newState);
       return of(newState);
     } else {
-      const lazyState = new ReplaySubject<CampaignState>(1);
-
-      // non-lazy load
-      this.campaignService
-        .getCampaign(id)
-        .pipe(first())
-        .subscribe(state => {
-          this.campaign$.next(state);
-          lazyState.next(state);
-        });
-
-      return lazyState;
+      const loading = this.campaignService.getCampaign(id).pipe(
+        first(),
+        share()
+      );
+      loading.subscribe(state => this._campaign$.next(state));
+      return loading;
     }
   }
 
   storeCampaign(): Observable<CampaignStateChanges> {
-    const changes = new ReplaySubject<CampaignStateChanges>(1);
-
-    // non-lazy save
-    this.putCampaign()
-      .pipe(
-        switchMap(campaignChanges => {
-          return this.putFlights().pipe(
-            map(flightChanges => {
-              this.campaign$.next({
-                ...campaignChanges.state,
-                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
-              });
-              return {
-                id: campaignChanges.state.remoteCampaign.id,
-                prevId: campaignChanges.prevId,
-                flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
-              };
-            })
-          );
-        })
-      )
-      .subscribe(val => changes.next(val));
-
-    return changes;
+    const saving = this.putCampaign().pipe(
+      switchMap(campaignChanges => {
+        return this.putFlights().pipe(
+          map(flightChanges => {
+            this._campaign$.next({
+              ...campaignChanges.state,
+              flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+            });
+            return {
+              id: campaignChanges.state.remoteCampaign.id,
+              prevId: campaignChanges.prevId,
+              flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
+            };
+          })
+        );
+      }),
+      share()
+    );
+    saving.subscribe();
+    return saving;
   }
 
   setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {
-    const lazyState = new ReplaySubject<CampaignState>(1);
     const { localCampaign, changed, valid } = newState;
-
-    // non-lazy update
-    this.campaign.subscribe(state => {
-      const updatedState = { ...state, localCampaign, changed, valid };
-      this.campaign$.next(updatedState);
-      lazyState.next(updatedState);
-    });
-
-    return lazyState;
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const updatedState = { ...state, localCampaign, changed, valid };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
   }
 
   setFlight(flightState: FlightState, flightId: string | number): Observable<CampaignState> {
-    const lazyState = new ReplaySubject<CampaignState>(1);
-
-    // non-lazy update
-    this.campaign.subscribe(state => {
-      const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
-      const updatedState = { ...state, flights: updatedFlights };
-      this.campaign$.next(updatedState);
-      lazyState.next(updatedState);
-    });
-
-    return lazyState;
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
+        const updatedState = { ...state, flights: updatedFlights };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
   }
 
   private putCampaign(): Observable<{ prevId: number; state: CampaignState }> {
-    return this.campaign.pipe(
+    return this.campaignFirst$.pipe(
       switchMap(state => {
         return this.campaignService.putCampaign(state).pipe(
           map(newState => {
@@ -119,7 +117,7 @@ export class CampaignStoreService {
   }
 
   private putFlights(): Observable<{ prevId: string; state: FlightState }[]> {
-    return this.campaign.pipe(
+    return this.campaignFirst$.pipe(
       switchMap(state => {
         return forkJoin(
           Object.keys(state.flights).map(key => {

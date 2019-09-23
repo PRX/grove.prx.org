@@ -77,7 +77,7 @@ export class CampaignComponent {
   }
 
   createFlight() {
-    this.campaignStoreService.campaign.subscribe(state => {
+    this.campaignStoreService.campaignFirst$.subscribe(state => {
       const flightId = Date.now();
       const flight = {
         name: 'New Flight ' + (Object.keys(state.flights).length + 1),

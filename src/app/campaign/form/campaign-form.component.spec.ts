@@ -34,18 +34,11 @@ describe('CampaignFormComponent', () => {
 
   it('updates the campaign form', () => {
     component.campaign = campaignFixture;
-    component.ngOnChanges({
-      campaign: { previousValue: null, currentValue: campaignFixture, firstChange: true, isFirstChange: () => true }
-    });
     expect(component.campaignForm.value).toMatchObject(campaignFixture);
   });
 
   it('emits form changes', done => {
     component.campaign = campaignFixture;
-    component.ngOnChanges({
-      flight: { previousValue: null, currentValue: campaignFixture, firstChange: true, isFirstChange: () => true }
-    });
-
     component.campaignUpdate.subscribe(updates => {
       expect(updates).toMatchObject({ campaign: { name: 'brand new name' } });
       done();
