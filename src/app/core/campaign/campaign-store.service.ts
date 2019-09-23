@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap } from 'rxjs/operators';
+import { map, first, switchMap, share } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -46,74 +46,62 @@ export class CampaignStoreService {
       this._campaign$.next(newState);
       return of(newState);
     } else {
-      const lazyState = new ReplaySubject<CampaignState>(1);
-
-      // non-lazy load
-      this.campaignService
-        .getCampaign(id)
-        .pipe(first())
-        .subscribe(state => {
-          this._campaign$.next(state);
-          lazyState.next(state);
-        });
-
-      return lazyState;
+      const loading = this.campaignService.getCampaign(id).pipe(
+        first(),
+        share()
+      );
+      loading.subscribe(state => this._campaign$.next(state));
+      return loading;
     }
   }
 
   storeCampaign(): Observable<CampaignStateChanges> {
-    const changes = new ReplaySubject<CampaignStateChanges>(1);
-
-    // non-lazy save
-    this.putCampaign()
-      .pipe(
-        switchMap(campaignChanges => {
-          return this.putFlights().pipe(
-            map(flightChanges => {
-              this._campaign$.next({
-                ...campaignChanges.state,
-                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
-              });
-              return {
-                id: campaignChanges.state.remoteCampaign.id,
-                prevId: campaignChanges.prevId,
-                flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
-              };
-            })
-          );
-        })
-      )
-      .subscribe(val => changes.next(val));
-
-    return changes;
+    const saving = this.putCampaign().pipe(
+      switchMap(campaignChanges => {
+        return this.putFlights().pipe(
+          map(flightChanges => {
+            this._campaign$.next({
+              ...campaignChanges.state,
+              flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+            });
+            return {
+              id: campaignChanges.state.remoteCampaign.id,
+              prevId: campaignChanges.prevId,
+              flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
+            };
+          })
+        );
+      }),
+      share()
+    );
+    saving.subscribe();
+    return saving;
   }
 
   setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {
-    const lazyState = new ReplaySubject<CampaignState>(1);
     const { localCampaign, changed, valid } = newState;
-
-    // non-lazy update
-    this.campaignFirst$.subscribe(state => {
-      const updatedState = { ...state, localCampaign, changed, valid };
-      this._campaign$.next(updatedState);
-      lazyState.next(updatedState);
-    });
-
-    return lazyState;
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const updatedState = { ...state, localCampaign, changed, valid };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
   }
 
   setFlight(flightState: FlightState, flightId: string | number): Observable<CampaignState> {
-    const lazyState = new ReplaySubject<CampaignState>(1);
-
-    // non-lazy update
-    this.campaignFirst$.subscribe(state => {
-      const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
-      const updatedState = { ...state, flights: updatedFlights };
-      this._campaign$.next(updatedState);
-      lazyState.next(updatedState);
-    });
-
-    return lazyState;
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
+        const updatedState = { ...state, flights: updatedFlights };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
   }
 
   private putCampaign(): Observable<{ prevId: number; state: CampaignState }> {
