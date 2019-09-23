@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, SimpleChanges, OnChanges, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Flight, Inventory } from '../../core';
 import { FormBuilder, Validators } from '@angular/forms';
 
@@ -8,10 +8,22 @@ import { FormBuilder, Validators } from '@angular/forms';
   styleUrls: ['./flight.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FlightComponent implements OnInit, OnChanges {
-  @Input() flight: Flight;
+export class FlightComponent implements OnInit {
   @Input() inventory: Inventory[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
+
+  // tslint:disable-next-line
+  private _flight: Flight;
+  get flight(): Flight {
+    return this._flight;
+  }
+  @Input()
+  set flight(flight: Flight) {
+    if (flight) {
+      this._flight = flight;
+      this.updateFlightForm(this._flight);
+    }
+  }
 
   flightForm = this.fb.group({
     name: ['', Validators.required],
@@ -31,12 +43,6 @@ export class FlightComponent implements OnInit, OnChanges {
     this.flightForm.valueChanges.subscribe(cmp => {
       this.formStatusChanged(cmp);
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.flight && changes.flight.currentValue) {
-      this.updateFlightForm(this.flight);
-    }
   }
 
   formStatusChanged(flight?: Flight) {
