@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { withLatestFrom, map, mergeMap, share } from 'rxjs/operators';
-import { AuguryService } from '../core/augury.service';
+import { AuguryService } from '../augury.service';
 import { HalDoc } from 'ngx-prx-styleguide';
+
+export interface Advertiser {
+  id: number;
+  name: string;
+  self_uri: string;
+}
 
 @Injectable()
 export class AdvertiserService {
@@ -28,11 +34,13 @@ export class AdvertiserService {
     this.auguryService.followItems(`prx:advertisers`, {per: 999}).pipe(
       map((docs: HalDoc[]) => {
         return docs.reduce((acc, doc: HalDoc) => {
-          acc[doc.id] = {
-            name: doc['name'],
-            value: doc.expand('self')
+          return {
+            ...acc,
+            [doc.id]: {
+              name: doc['name'],
+              value: doc.expand('self')
+            }
           };
-          return acc;
         }, {});
       })
     ).subscribe(advertisers => {

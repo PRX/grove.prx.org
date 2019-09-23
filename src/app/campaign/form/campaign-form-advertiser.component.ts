@@ -1,16 +1,9 @@
-import { Component, Input, Output, EventEmitter, forwardRef, OnInit } from '@angular/core';
-import { FormGroup, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 @Component({
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CampaignFormAdvertiserComponent),  // replace name as appropriate
-      multi: true
-    }
-  ],
   selector: 'grove-campaign-form-advertiser',
   template: `
     <mat-form-field [formGroup]="formGroup">

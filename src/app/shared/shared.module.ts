@@ -1,7 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthGuard, DeactivateGuard, UnauthGuard,
-  IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
+  DatepickerModule, IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
+import {
+  MatFormFieldModule,
+  MatInputModule,
+  MatSelectModule,
+  MatDatepickerModule,
+  MatNativeDateModule } from '@angular/material';
 
 @NgModule({
   declarations: [],
@@ -12,7 +18,12 @@ import { AuthGuard, DeactivateGuard, UnauthGuard,
     IconModule,
     ImageModule,
     SpinnerModule,
-    ToastrModule
+    ToastrModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   providers: [
     AuthGuard,

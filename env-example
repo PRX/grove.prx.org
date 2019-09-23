@@ -11,6 +11,8 @@ AUGURY_TTL=
 AUTH_HOST=id.staging.prx.tech
 # for https://grove.prx.docker
 AUTH_CLIENT_ID=
+AUTH_CLIENT_SECRET=
+AUTH_ACCOUNT_ID=
 
 # monitoring
 NEW_RELIC_APP_NAME=
