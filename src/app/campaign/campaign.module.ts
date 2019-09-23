@@ -7,6 +7,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -16,8 +22,15 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatSidenavModule,
+    MatListModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatAutocompleteModule,
     CommonModule,
     ReactiveFormsModule,
+    StatusBarModule,
+    FancyFormModule,
     campaignRouting
   ]
 })
