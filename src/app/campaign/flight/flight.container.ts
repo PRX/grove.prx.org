@@ -34,7 +34,7 @@ export class FlightContainerComponent implements OnInit {
   ngOnInit() {}
 
   setFlightId(id: string) {
-    this.campaignStoreService.campaign.subscribe(state => {
+    this.campaignStoreService.campaignFirst$.subscribe(state => {
       if (state.flights[id]) {
         this.currentFlightId = id;
         this.state$.next(state.flights[id]);

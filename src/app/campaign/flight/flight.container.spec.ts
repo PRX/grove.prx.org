@@ -15,11 +15,11 @@ describe('FlightContainerComponent', () => {
 
   beforeEach(() => {
     campaign = new ReplaySubject(1);
-    campaignStoreService = { campaign, setFlight: jest.fn(() => of({})) } as any;
+    campaignStoreService = { campaignFirst$: campaign, setFlight: jest.fn(() => of({})) } as any;
     inventoryService = { listInventory: jest.fn(() => of([])) } as any;
     routeId = new ReplaySubject(1);
     route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
-    router = <any>{ navigate: jest.fn() };
+    router = { navigate: jest.fn() } as any;
     component = new FlightContainerComponent(route, inventoryService, campaignStoreService, router);
   });
 

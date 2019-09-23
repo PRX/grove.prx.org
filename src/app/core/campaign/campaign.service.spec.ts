@@ -21,7 +21,7 @@ describe('CampaignService', () => {
 
   beforeEach(() => {
     augury = new MockHalService();
-    campaign = new CampaignService(new AuguryService(<any>augury));
+    campaign = new CampaignService(new AuguryService(augury as any));
     campaignFixture = {
       id: 1,
       name: 'my campaign name',
