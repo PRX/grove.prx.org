@@ -7,7 +7,7 @@ describe('AccountService', () => {
 
   beforeEach(() => {
     user = new UserServiceMock();
-    account = new AccountService(<any>user);
+    account = new AccountService(user as any);
   });
 
   it('lists accounts', done => {

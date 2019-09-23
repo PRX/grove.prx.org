@@ -8,7 +8,7 @@ describe('AdvertiserService', () => {
 
   beforeEach(() => {
     augury = new MockHalService();
-    advertiser = new AdvertiserService(new AuguryService(<any>augury));
+    advertiser = new AdvertiserService(new AuguryService(augury as any));
   });
 
   it('lists advertisers', done => {
