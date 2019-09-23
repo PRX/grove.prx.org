@@ -33,7 +33,7 @@ describe('CampaignComponent', () => {
   }
   function flightFactory(attrs = {}): FlightState {
     return {
-      localFlight: { id: 123, name: 'my flight', startAt: '', endAt: '', totalGoal: 1, set_inventory_uri: '', ...attrs },
+      localFlight: { id: 123, name: 'my flight', startAt: '', endAt: '', totalGoal: 1, set_inventory_uri: '', zones: [], ...attrs },
       changed: false,
       valid: false
     };

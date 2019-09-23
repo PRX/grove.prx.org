@@ -39,6 +39,7 @@ describe('FlightComponent', () => {
       startAt: new Date().toISOString(),
       endAt: new Date().toISOString(),
       totalGoal: 123,
+      zones: [],
       set_inventory_uri: '/some/inventory'
     };
     fixture = TestBed.createComponent(FlightComponent);
