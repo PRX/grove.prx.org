@@ -12,8 +12,14 @@ import {
   CampaignFlightZonesPipe,
   CampaignTypePipe } from './card/';
 
-import { CampaignListComponent } from './campaign-list.component';
-import { CampaignListTotalPagesPipe } from './campaign-list-total-pages.pipe';
+import {
+  CampaignListComponent,
+  CampaignListTotalPagesPipe,
+  CampaignFilterComponent,
+  FilterFacetComponent,
+  FilterTextComponent,
+  FilterDateComponent } from './list';
+
 import { CampaignListService } from './campaign-list.service';
 
 @NgModule({
@@ -23,6 +29,10 @@ import { CampaignListService } from './campaign-list.service';
     CampaignFlightTargetsPipe,
     CampaignFlightZonesPipe,
     CampaignTypePipe,
+    CampaignFilterComponent,
+    FilterFacetComponent,
+    FilterTextComponent,
+    FilterDateComponent,
     CampaignListComponent,
     CampaignListTotalPagesPipe
   ],

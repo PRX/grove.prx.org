@@ -7,9 +7,10 @@ import { Flight } from '../campaign-list.service';
 export class CampaignFlightZonesPipe implements PipeTransform {
   transform(flights: Flight[]): string {
     if (flights && flights.some(flight => flight.zones && flight.zones.length > 0)) {
-      return flights.reduce((acc, flight) => {
-        return acc += flight.zones && (acc && ', ') + flight.zones.join(', ');
-      }, '');
+      const zones = flights.reduce((fAcc, flight) => {
+        return {...fAcc, ...flight.zones.reduce((zAcc, zone) => ({...zAcc, [zone]: zone}), {})};
+      }, {});
+      return Object.keys(zones).join(', ');
     } else {
       return '';
     }
