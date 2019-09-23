@@ -64,4 +64,13 @@ describe('FlightComponent', () => {
     });
     component.name.setValue('brand new name');
   });
+
+  it('filters zones to reflect available options', () => {
+    component.flight = { ...flightFixture, zones: ['pre_1', 'mid_1'] };
+    expect(component.zones.value).toEqual(['pre_1', 'mid_1']);
+    component.zoneOptions = [{ id: 'pre_1', label: 'Preroll 1' }, { id: 'post_1', label: 'Postroll 1' }];
+    expect(component.zones.value).toEqual(['pre_1']);
+    component.zoneOptions = [];
+    expect(component.zones.value).toEqual([]);
+  });
 });

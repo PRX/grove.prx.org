@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 describe('FlightContainerComponent', () => {
   let campaign: ReplaySubject<any>;
   let campaignStoreService: CampaignStoreService;
+  let inventory: ReplaySubject<any>;
   let inventoryService: InventoryService;
   let routeId: ReplaySubject<string>;
   let route: ActivatedRoute;
@@ -16,7 +17,8 @@ describe('FlightContainerComponent', () => {
   beforeEach(() => {
     campaign = new ReplaySubject(1);
     campaignStoreService = { campaignFirst$: campaign, setFlight: jest.fn(() => of({})) } as any;
-    inventoryService = { listInventory: jest.fn(() => of([])) } as any;
+    inventory = new ReplaySubject(1);
+    inventoryService = { listInventory: jest.fn(() => inventory) } as any;
     routeId = new ReplaySubject(1);
     route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
     router = { navigate: jest.fn() } as any;
@@ -58,5 +60,21 @@ describe('FlightContainerComponent', () => {
 
     component.flightUpdateFromForm({ flight, changed, valid });
     expect(campaignStoreService.setFlight).toHaveBeenCalledWith({ localFlight: flight, changed, valid }, '123');
+  });
+
+  it('generates zone options from inventory', done => {
+    component.zoneOptions$.subscribe(opts => {
+      expect(opts).toEqual(['z2', 'z22']);
+      done();
+    });
+
+    const flight = { set_inventory_uri: '/inv/2' };
+    campaign.next({ flights: { 123: { localFlight: flight } } });
+    component.setFlightId('123');
+    inventory.next([
+      { self_uri: '/inv/1', zones: ['z1'] },
+      { self_uri: '/inv/2', zones: ['z2', 'z22'] },
+      { self_uri: '/inv/3', zones: ['z3'] }
+    ]);
   });
 });
