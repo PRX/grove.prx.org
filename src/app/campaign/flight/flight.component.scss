@@ -17,3 +17,13 @@ mat-card form > * {
 .mat-form-field-wrapper {
   padding-bottom: 1.1em;
 }
+
+.flight-dates {
+  display: flex;
+}
+.flight-dates > mat-form-field {
+  flex: 1;
+  &:first-child {
+    margin-right: 20px;
+  }
+}

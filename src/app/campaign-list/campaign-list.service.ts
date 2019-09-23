@@ -152,7 +152,7 @@ export class CampaignListService {
           endAt: doc['endAt'] && new Date(doc['endAt']),
           // map zonesId from facets
           zones: doc['zones'].map(zoneId => {
-            const zoneFacet = this.facets && this.facets.zone && this.facets.zone.find(facet => facet.id === zoneId)
+            const zoneFacet = this.facets && this.facets.zone && this.facets.zone.find(facet => facet.id === zoneId);
             return zoneFacet && zoneFacet.label || zoneId;
           })
           // TODO: no targets yet?

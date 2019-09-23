@@ -34,6 +34,7 @@ describe('CampaignStoreService', () => {
       startAt: '2019-09-01',
       endAt: '2019-10-01',
       totalGoal: 999,
+      zones: [],
       set_inventory_uri: '/some/inventory'
     };
     flightStateFixture = { localFlight: flightFixture, remoteFlight: flightFixture, changed: false, valid: true };

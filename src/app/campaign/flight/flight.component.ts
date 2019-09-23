@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Flight, Inventory } from '../../core';
+import { Flight, Inventory, InventoryZone } from '../../core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -25,16 +25,41 @@ export class FlightComponent implements OnInit {
     }
   }
 
+  // tslint:disable-next-line
+  private _zoneOptions: InventoryZone[];
+  get zoneOptions(): InventoryZone[] {
+    return this._zoneOptions;
+  }
+  @Input()
+  set zoneOptions(opts: InventoryZone[]) {
+    this._zoneOptions = opts || [];
+    if (this.zones.value) {
+      const filteredValues = this.zones.value.filter((id: string) => {
+        return this.zoneOptions.find(z => z.id === id);
+      });
+      if (filteredValues.length !== this.zones.value.length) {
+        this.zones.setValue(filteredValues);
+        this.zones.markAsDirty();
+        this.formStatusChanged(this.flightForm.value);
+      }
+    }
+  }
+
   flightForm = this.fb.group({
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
     totalGoal: ['', Validators.required],
+    zones: ['', Validators.required],
     set_inventory_uri: ['', Validators.required]
   });
 
   get name() {
     return this.flightForm.get('name');
+  }
+
+  get zones() {
+    return this.flightForm.get('zones');
   }
 
   constructor(private fb: FormBuilder) {}
