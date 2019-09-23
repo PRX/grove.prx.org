@@ -24,7 +24,7 @@ export class AccountService {
   }
 
   docToAccount(doc: HalDoc): Account {
-    const account = <Account>doc.asJSON();
+    const account = doc.asJSON() as Account;
     account.self_uri = doc.expand('self');
     return account;
   }
