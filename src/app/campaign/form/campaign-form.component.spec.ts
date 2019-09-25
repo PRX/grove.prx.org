@@ -13,7 +13,15 @@ describe('CampaignFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, ReactiveFormsModule, NoopAnimationsModule, MatCardModule],
+      imports: [
+        SharedModule,
+        ReactiveFormsModule,
+        NoopAnimationsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule
+      ],
       declarations: [CampaignFormComponent]
     }).compileComponents();
   }));

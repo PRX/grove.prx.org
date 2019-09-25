@@ -6,8 +6,6 @@ import {
   MatInputModule,
   MatSelectModule } from '@angular/material';
 
-import { SharedModule } from '../../shared/shared.module';
-
 import { facets } from '../campaign-list.service.mock';
 import { FilterFacetComponent } from '.';
 
@@ -20,11 +18,10 @@ describe('FilterFacetComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule,
-        NoopAnimationsModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSelectModule
+        MatSelectModule,
+        NoopAnimationsModule
       ],
       declarations: [
         FilterFacetComponent
