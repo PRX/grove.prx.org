@@ -1,8 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Campaign, Account, Advertiser } from '../../core';
-import { AdvertiserService } from '../../core/advertiser/advertiser.service';
 
 @Component({
   selector: 'grove-campaign-form',
@@ -12,9 +10,9 @@ import { AdvertiserService } from '../../core/advertiser/advertiser.service';
 })
 export class CampaignFormComponent implements OnInit {
   @Input() accounts: Account[];
+  @Input() advertisers: Advertiser[];
   @Output() campaignUpdate = new EventEmitter<{ campaign: Campaign; changed: boolean; valid: boolean }>(true);
   @Output() addAdvertiser = new EventEmitter<string>();
-  advertiserOptions$: Observable<{ name: string; value: string }[]> = this.advertiserService.advertisers;
 
   // tslint:disable-next-line
   private _campaign: Campaign;
@@ -81,8 +79,7 @@ export class CampaignFormComponent implements OnInit {
     return this.campaignForm.get('set_advertiser_uri');
   }
 
-  constructor(private fb: FormBuilder,
-              private advertiserService: AdvertiserService) {}
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.campaignForm.valueChanges.subscribe(cmp => {
@@ -99,28 +96,21 @@ export class CampaignFormComponent implements OnInit {
   }
 
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    this.campaignForm.reset(
-      {
-        set_account_uri,
-        name,
-        type,
-        status,
-        repName,
-        notes,
-        set_advertiser_uri
-      },
-      { emitEvent: false }
-    );
+    // when user types an advertiser name match into the advertiser autoselect, set advertiser by value (URI)
+    const findAdvertiserByNameOrURI = set_advertiser_uri && this.advertisers &&
+      this.advertisers.find(adv => adv.name === set_advertiser_uri || adv.set_advertiser_uri === set_advertiser_uri);
+    this.campaignForm.patchValue({
+      ...(name && {name}),
+      ...(type && {type}),
+      ...(status && {status}),
+      ...(repName && {repName}),
+      ...(notes && {notes}),
+      ...(set_account_uri && {set_account_uri}),
+      ...(findAdvertiserByNameOrURI && {set_advertiser_uri: findAdvertiserByNameOrURI.set_advertiser_uri})
+    }, {emitEvent: false, onlySelf: true});
   }
 
   onAddAdvertiser(name: string) {
-    const post = this.advertiserService.addAdvertiser(name);
-
-    post.subscribe(result => {
-      // this.toastr.success('Advertiser added');
-      // TODO: this is not setting the value accordingly
-      // is setting value (present on submit) but not displaying it
-      this.campaignForm.get('set_advertiser_uri').setValue(result.set_advertiser_uri);
-    });
+    this.addAdvertiser.emit(name);
   }
 }

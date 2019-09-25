@@ -4,6 +4,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CampaignFormComponent } from './campaign-form.component';
 import { Campaign } from '../../core';
+import { SharedModule } from '../../shared/shared.module';
 
 describe('CampaignFormComponent', () => {
   let component: CampaignFormComponent;
@@ -12,7 +13,7 @@ describe('CampaignFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, NoopAnimationsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+      imports: [SharedModule, ReactiveFormsModule, NoopAnimationsModule, MatCardModule],
       declarations: [CampaignFormComponent]
     }).compileComponents();
   }));
@@ -25,7 +26,7 @@ describe('CampaignFormComponent', () => {
       repName: 'my rep name',
       notes: 'my notes',
       set_account_uri: '/some/account',
-      set_advertiser_uri: '/some/advertiser'
+      set_advertiser_uri: '/some/advertiser/1'
     };
     fixture = TestBed.createComponent(CampaignFormComponent);
     component = fixture.componentInstance;
@@ -33,6 +34,7 @@ describe('CampaignFormComponent', () => {
   });
 
   it('updates the campaign form', () => {
+    component.advertisers = [{id: 1, name: 'some ads', set_advertiser_uri: '/some/advertiser/1'}];
     component.campaign = campaignFixture;
     expect(component.campaignForm.value).toMatchObject(campaignFixture);
   });

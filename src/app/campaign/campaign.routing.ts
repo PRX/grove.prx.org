@@ -4,7 +4,6 @@ import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { CampaignComponent } from './campaign.component';
 import { CampaignFormComponent } from './form/campaign-form.component';
-import { CampaignFormAdvertiserComponent } from './form/campaign-form-advertiser.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
 import { FlightContainerComponent } from './flight/flight.container';
@@ -36,7 +35,6 @@ export const campaignComponents: any[] = [
   CampaignComponent,
   CampaignFormContainerComponent,
   CampaignFormComponent,
-  CampaignFormAdvertiserComponent,
   CampaignStatusComponent,
   FlightContainerComponent,
   FlightComponent

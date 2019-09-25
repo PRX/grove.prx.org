@@ -7,24 +7,23 @@ import { HalDoc } from 'ngx-prx-styleguide';
 export interface Advertiser {
   id: number;
   name: string;
-  self_uri: string;
+  set_advertiser_uri: string;
 }
 
 @Injectable()
 export class AdvertiserService {
   // tslint:disable-next-line: variable-name
-  private _advertisers = new BehaviorSubject({});
+  private _advertisers = new BehaviorSubject<{[id: number]: Advertiser}>({});
 
   constructor(private auguryService: AuguryService) {
     this.loadAdvertisers();
   }
 
-  get advertisers(): Observable<{name: string, value: string}[]> {
+  get advertisers(): Observable<Advertiser[]> {
     return this._advertisers.pipe(
       map(advertisers => {
         return Object.keys(advertisers)
           .map(id => advertisers[id])
-          // hmm, sort?
           .sort((a, b) => a.name.localeCompare(b.name));
       })
     );
@@ -33,19 +32,26 @@ export class AdvertiserService {
   loadAdvertisers() {
     this.auguryService.followItems(`prx:advertisers`, {per: 999}).pipe(
       map((docs: HalDoc[]) => {
-        return docs.reduce((acc, doc: HalDoc) => {
+        return docs.reduce((acc, doc: HalDoc): {[id: number]: Advertiser} => {
           return {
             ...acc,
             [doc.id]: {
+              id: doc.id,
               name: doc['name'],
-              value: doc.expand('self')
+              set_advertiser_uri: doc.expand('self')
             }
           };
         }, {});
       })
-    ).subscribe(advertisers => {
+    ).subscribe((advertisers: {[id: number]: Advertiser}) => {
       this._advertisers.next(advertisers);
     });
+  }
+
+  findAdvertiserByUri(uri: string): Observable<Advertiser> | undefined {
+    return this.advertisers.pipe(
+      map((advertisers: Advertiser[]) => advertisers.find(advertiser => advertiser.set_advertiser_uri === uri))
+    );
   }
 
   addAdvertiser(name: string): Observable<{id: number, name: string, set_advertiser_uri: string}> {
@@ -70,7 +76,7 @@ export class AdvertiserService {
       const { id, set_advertiser_uri } = newAdvertiser;
       this._advertisers.next({
         ...advertisers,
-        [id]: {name,  set_advertiser_uri}
+        [id]: {id, name, set_advertiser_uri}
       });
     });
 

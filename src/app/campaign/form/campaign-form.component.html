@@ -5,14 +5,14 @@
       <input matInput placeholder="Campaign Name" formControlName="name" required />
     </mat-form-field>
 
-    <grove-campaign-form-advertiser
-      *ngIf="advertiserOptions$ | async as advertisers"
+    <grove-autocomplete
+      *ngIf="advertisers"
       [formGroup]="campaignForm"
       controlName="set_advertiser_uri"
       label="Advertiser"
-      [options]="advertisers"
+      [options]="{options: advertisers, name: 'name', value: 'set_advertiser_uri'} | optionsTransform"
       (addOption)="onAddAdvertiser($event)">
-    </grove-campaign-form-advertiser>
+    </grove-autocomplete>
 
     <mat-form-field appearance="outline">
       <mat-label>Campaign Type</mat-label>
