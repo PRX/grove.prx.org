@@ -1,7 +1,6 @@
 import { AdvertiserService } from './advertiser.service';
 import { MockHalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { withLatestFrom } from 'rxjs/operators';
 
 describe('AdvertiserService', () => {
   let augury: MockHalService;
