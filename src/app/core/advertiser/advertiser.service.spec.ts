@@ -1,6 +1,7 @@
 import { AdvertiserService } from './advertiser.service';
 import { MockHalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
+import { withLatestFrom } from 'rxjs/operators';
 
 describe('AdvertiserService', () => {
   let augury: MockHalService;
@@ -43,9 +44,17 @@ describe('AdvertiserService', () => {
   });
 
   it('adds an advertiser', done => {
-    advertiserService.addAdvertiser('Hi Friend!').subscribe(newAdvertiser => {
-      expect(newAdvertiser.name).toEqual('Hi Friend!');
-      done();
-    });
+    advertiserService.addAdvertiser('Hi Friend!').subscribe(
+       (newAdvertiser) => {
+         expect(newAdvertiser.name).toEqual('Hi Friend!');
+       },
+      () => {},
+      () => {
+        advertiserService.advertisers.subscribe(advertisers => {
+          expect(advertisers.find(a => a.name === 'Hi Friend!')).toBeDefined();
+          done();
+        });
+      }
+    );
   });
 });
