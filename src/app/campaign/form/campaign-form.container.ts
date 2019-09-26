@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AccountService, Account, Advertiser, AdvertiserService, CampaignStoreService, Campaign } from '../../core';
 import { withLatestFrom } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { withLatestFrom } from 'rxjs/operators';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignFormContainerComponent implements OnInit {
+export class CampaignFormContainerComponent {
   campaign$: Observable<Campaign> = this.campaignStoreService.localCampaign$;
   accounts$: Observable<Account[]>;
   advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
@@ -28,8 +28,6 @@ export class CampaignFormContainerComponent implements OnInit {
   ) {
     this.accounts$ = this.accountService.listAccounts();
   }
-
-  ngOnInit() {}
 
   campaignUpdateFromForm(newState: { campaign: Campaign; changed: boolean; valid: boolean }) {
     const { campaign, changed, valid } = newState;
