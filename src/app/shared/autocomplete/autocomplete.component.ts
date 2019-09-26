@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -21,7 +21,8 @@ import { map, startWith } from 'rxjs/operators';
       <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option.value">{{ option.name }}</mat-option>
     </mat-autocomplete>
   `,
-  styleUrls: ['./autocomplete.component.scss']
+  styleUrls: ['./autocomplete.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AutocompleteComponent implements OnInit {
   @Input() formGroup: FormGroup;
