@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { withLatestFrom, map, mergeMap, share } from 'rxjs/operators';
+import { withLatestFrom, map, mergeMap, publish, refCount } from 'rxjs/operators';
 import { AuguryService } from '../augury.service';
 import { HalDoc } from 'ngx-prx-styleguide';
 
@@ -57,9 +57,12 @@ export class AdvertiserService {
   addAdvertiser(name: string): Observable<{id: number, name: string, set_advertiser_uri: string}> {
     const post = this.auguryService.root.pipe(
       mergeMap(root => {
-        return root.create('prx:advertiser', {}, {name}).pipe(share());
+        return root.create('prx:advertiser', {}, {name});
       }),
-      share(), // HAS TO double up on share or it's duplicating the post for some reason?
+      // publish + refCount multicasts the Observable (makes it hot/shareable) and gives a complete notification to any late subscribers
+      // unlike share which uses a subject factory so late subscribers cause a retry (duplicating the HTTP POST)
+      publish(),
+      refCount(),
       map((doc: HalDoc): {id: number, name: string, set_advertiser_uri: string} => {
         const { id } = doc;
         // tslint:disable-next-line: variable-name
