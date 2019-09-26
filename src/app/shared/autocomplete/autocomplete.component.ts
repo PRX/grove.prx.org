@@ -9,7 +9,7 @@ import { map, startWith } from 'rxjs/operators';
     <mat-form-field [formGroup]="formGroup" appearance="outline">
       <mat-label>{{ label }}</mat-label>
       <input type="text" matInput #input [formControlName]="controlName"
-        [matAutocomplete]="auto">
+        [matAutocomplete]="auto" (keydown.enter)="enterPressed($event)">
       <button type="button" mat-button matSuffix mat-stroked-button
         *ngIf="input.value && !findExistingOtion(input.value)"
         (click)="addNewOption(input.value)">
@@ -57,14 +57,13 @@ export class AutocompleteComponent implements OnInit {
     }
   }
 
-  // on input: (keydown.enter)="enterPressed($event)"
   enterPressed(event: Event) {
-    // getting an error on keydown.enter, possibly from browser extensions?
-    // Cannot read property 'type' of undefined at setFieldValue (onloadwff.js:71) at HTMLFormElement.formKeydownListener (onloadwff.js:71)
-    // https://github.com/KillerCodeMonkey/ngx-quill/issues/351
-    // This prevents the error, however it also prevents the form from submitting hitting enter on the autocomplete input field
     event.preventDefault();
     event.stopPropagation();
+    const value = this.formGroup.get(this.controlName).value;
+    if (value && !this.findExistingOtion(value)) {
+      this.addNewOption(value);
+    }
   }
 
   findExistingOtion(name: string) {

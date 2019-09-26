@@ -62,17 +62,24 @@ describe('AutocompleteComponent', () => {
     input.dispatchEvent(new Event('input'));
   });
 
-  xit('displays with option name', () => {
+  it('displays with option name', () => {
     expect(comp.optionName('/url/toyoda')).toEqual('Toyoda');
   });
 
-  xit('finds existing options by name', () => {
+  it('finds existing options by name', () => {
     expect(comp.findExistingOtion('Toyoda')).toBeDefined();
   });
 
-  xit('emits for new options', () => {
+  it('emits for new options', () => {
     jest.spyOn(comp.addOption, 'emit');
     comp.addNewOption('Squarespace');
     expect(comp.addOption.emit).toHaveBeenCalled();
+  });
+
+  it('submits on enter', () => {
+    jest.spyOn(comp, 'addNewOption');
+    comp.formGroup.get(comp.controlName).setValue('Toy Land');
+    comp.enterPressed(new Event('keydown.enter'));
+    expect(comp.addNewOption).toHaveBeenCalled();
   });
 });
