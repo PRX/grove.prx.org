@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
+import { Advertiser } from './advertiser.service';
 
 export const advertisers = [
   {
@@ -22,15 +23,20 @@ export const advertisers = [
 
 @Injectable()
 export class AdvertiserServiceMock {
+  // tslint:disable-next-line: variable-name
+  _advertisers = new BehaviorSubject(advertisers);
+
   constructor(private augury: MockHalService) {}
 
   loadAdvertisers() {}
 
-  get advertisers(): Observable<{id: number, name: string, set_advertiser_uri: string}[]> {
-    return of(advertisers);
+  get advertisers(): Observable<Advertiser[]> {
+    return this._advertisers.asObservable();
   }
 
-  addAdvertiser(name): Observable<{id: number, name: string, set_advertiser_uri: string}> {
-    return of({name, set_advertiser_uri: '4', id: 4});
+  addAdvertiser(name): Observable<Advertiser> {
+    const advertiser = {name, set_advertiser_uri: '4', id: 4};
+    this._advertisers.next([...this._advertisers.getValue(), advertiser]);
+    return of(advertiser);
   }
 }

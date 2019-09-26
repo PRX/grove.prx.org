@@ -14,21 +14,37 @@ describe('AdvertiserService', () => {
 
   beforeEach(() => {
     augury = new MockHalService();
-    augury
-      .mock('prx:advertisers', [{id, name, href}])
+    augury.mockItems('prx:advertisers', [{ id, name, _links: { self: { href } } }]);
     advertiserService = new AdvertiserService(new AuguryService(augury as any));
   });
 
   it('lists advertisers', done => {
-    augury.mockItems('prx:advertisers', [{ id, name, _links: { self: { href } } }]);
     advertiserService.loadAdvertisers();
-    advertiserService.advertisers.subscribe(ads => {
-      expect(ads.length).toEqual(1);
-      expect(ads[0]).toMatchObject({
+    advertiserService.advertisers.subscribe(advertisers => {
+      expect(advertisers.length).toEqual(1);
+      expect(advertisers[0]).toMatchObject({
         id,
         name,
         set_advertiser_uri: href
       });
+      done();
+    });
+  });
+
+  it('finds advertisers by URI', done => {
+    advertiserService.findAdvertiserByUri('/all/by/my/self').subscribe(advertiser => {
+      expect(advertiser).toMatchObject({
+        id,
+        name,
+        set_advertiser_uri: href
+      });
+      done();
+    });
+  });
+
+  it('adds an advertiser', done => {
+    advertiserService.addAdvertiser('Hi Friend!').subscribe(newAdvertiser => {
+      expect(newAdvertiser.name).toEqual('Hi Friend!');
       done();
     });
   });

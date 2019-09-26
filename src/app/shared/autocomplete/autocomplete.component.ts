@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-autocomplete',
@@ -18,7 +18,7 @@ import { map, startWith, tap } from 'rxjs/operators';
     </mat-form-field>
     <mat-autocomplete autoActiveFirstOption required
       #auto="matAutocomplete" [displayWith]="optionName.bind(this)">
-      <mat-option *ngFor="let option of filteredOptions | async" [value]="option.value">{{ option.name }}</mat-option>
+      <mat-option *ngFor="let option of filteredOptions$ | async" [value]="option.value">{{ option.name }}</mat-option>
     </mat-autocomplete>
   `,
   styleUrls: ['./autocomplete.component.scss']
@@ -29,12 +29,11 @@ export class AutocompleteComponent implements OnInit {
   @Input() label: string;
   @Input() options: {name: string, value: string}[];
   @Output() addOption = new EventEmitter<string>();
-  filteredOptions: Observable<{name: string, value: string}[]>;
+  filteredOptions$: Observable<{name: string, value: string}[]>;
 
   ngOnInit() {
-    this.filteredOptions = this.formGroup.get(this.controlName).valueChanges.pipe(
+    this.filteredOptions$ = this.formGroup.get(this.controlName).valueChanges.pipe(
       startWith(''),
-      tap(console.log),
       map(value => {
         if (this.options) {
           // if no value or valueChange matches one of the existing options, list is unfiltered

@@ -59,7 +59,7 @@ export class AdvertiserService {
       mergeMap(root => {
         return root.create('prx:advertiser', {}, {name}).pipe(share());
       }),
-      share(), // double up on share or it's duplicating the post for some reason?
+      share(), // HAS TO double up on share or it's duplicating the post for some reason?
       map((doc: HalDoc): {id: number, name: string, set_advertiser_uri: string} => {
         const { id } = doc;
         // tslint:disable-next-line: variable-name
@@ -67,8 +67,6 @@ export class AdvertiserService {
         return {id, name,  set_advertiser_uri};
       })
     );
-
-    // TODO: seems like still duplicating the post
 
     post.pipe(
       withLatestFrom(this._advertisers)
