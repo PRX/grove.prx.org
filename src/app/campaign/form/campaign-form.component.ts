@@ -88,6 +88,13 @@ export class CampaignFormComponent implements OnInit {
   }
 
   formStatusChanged(campaign?: Campaign) {
+    // when user types an advertiser name match into the advertiser autoselect, set advertiser by value (URI)
+    if (campaign.set_advertiser_uri) {
+      const findAdvertiserByName = this.advertisers && this.advertisers.find(adv => adv.name === campaign.set_advertiser_uri);
+      if (findAdvertiserByName) {
+        campaign = {...campaign, set_advertiser_uri: findAdvertiserByName.set_advertiser_uri};
+      }
+    }
     this.campaignUpdate.emit({
       campaign,
       changed: this.campaignForm.dirty,
@@ -96,9 +103,8 @@ export class CampaignFormComponent implements OnInit {
   }
 
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    // when user types an advertiser name match into the advertiser autoselect, set advertiser by value (URI)
-    const findAdvertiserByNameOrURI = set_advertiser_uri && this.advertisers &&
-      this.advertisers.find(adv => adv.name === set_advertiser_uri || adv.set_advertiser_uri === set_advertiser_uri);
+    const findAdvertiserByURI = set_advertiser_uri && this.advertisers &&
+      this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
     this.campaignForm.patchValue({
       ...(name && {name}),
       ...(type && {type}),
@@ -106,7 +112,7 @@ export class CampaignFormComponent implements OnInit {
       ...(repName && {repName}),
       ...(notes && {notes}),
       ...(set_account_uri && {set_account_uri}),
-      ...(findAdvertiserByNameOrURI && {set_advertiser_uri: findAdvertiserByNameOrURI.set_advertiser_uri})
+      ...(findAdvertiserByURI && {set_advertiser_uri: findAdvertiserByURI.set_advertiser_uri})
     }, {emitEvent: false, onlySelf: true});
   }
 
