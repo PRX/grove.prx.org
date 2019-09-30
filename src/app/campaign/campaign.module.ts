@@ -12,6 +12,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatIconModule } from '@angular/material/icon';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 
 @NgModule({
@@ -20,6 +21,7 @@ import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatSelectModule,
     MatSidenavModule,

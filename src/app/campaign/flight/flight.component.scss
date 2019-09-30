@@ -27,3 +27,12 @@ mat-card form > * {
     margin-right: 20px;
   }
 }
+
+.flight-controls-container {
+  display: flex;
+  justify-content: flex-end;
+  .mat-fab {
+    flex: none;
+    margin-left: 1em;
+  }
+}
