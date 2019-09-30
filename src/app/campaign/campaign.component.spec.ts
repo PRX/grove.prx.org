@@ -56,6 +56,11 @@ describe('CampaignComponent', () => {
     } as any;
     advertiserService = new AdvertiserServiceMock(new MockHalService()) as any;
     component = new CampaignComponent(route, router, toastrService, campaignStoreService, advertiserService);
+    component.ngOnInit();
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('loads the campaign state from the route', () => {

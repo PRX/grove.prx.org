@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { CampaignStoreService, AdvertiserService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
@@ -38,9 +38,10 @@ import { ToastrService } from 'ngx-prx-styleguide';
   styleUrls: ['./campaign.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignComponent {
+export class CampaignComponent implements OnInit, OnDestroy {
   campaignFlights$: Observable<{ id: string; name: string }[]>;
   campaignSaving: boolean;
+  routeSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,8 +49,10 @@ export class CampaignComponent {
     private toastr: ToastrService,
     public campaignStoreService: CampaignStoreService,
     private advertiserService: AdvertiserService
-  ) {
-    this.route.paramMap.pipe(
+  ) {}
+
+  ngOnInit() {
+    this.routeSub = this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         return this.advertiserService.loadAdvertisers().pipe(
           map(advertisers => ({params, advertisers}))
@@ -65,6 +68,12 @@ export class CampaignComponent {
         });
       })
     );
+  }
+
+  ngOnDestroy() {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
   }
 
   campaignSubmit() {
