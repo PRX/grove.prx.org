@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { withLatestFrom, map, mergeMap, publish, refCount } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { filter, withLatestFrom, map, mergeMap, share, publish, refCount } from 'rxjs/operators';
 import { AuguryService } from '../augury.service';
 import { HalDoc } from 'ngx-prx-styleguide';
 
@@ -15,9 +15,7 @@ export class AdvertiserService {
   // tslint:disable-next-line: variable-name
   private _advertisers = new BehaviorSubject<{[id: number]: Advertiser}>({});
 
-  constructor(private auguryService: AuguryService) {
-    this.loadAdvertisers();
-  }
+  constructor(private auguryService: AuguryService) {}
 
   get advertisers(): Observable<Advertiser[]> {
     return this._advertisers.pipe(
@@ -29,8 +27,8 @@ export class AdvertiserService {
     );
   }
 
-  loadAdvertisers() {
-    this.auguryService.followItems(`prx:advertisers`, {per: 999}).pipe(
+  loadAdvertisers(): Observable<null> {
+    const result = this.auguryService.followItems(`prx:advertisers`, {per: 999}).pipe(
       map((docs: HalDoc[]) => {
         return docs.reduce((acc, doc: HalDoc): {[id: number]: Advertiser} => {
           return {
@@ -42,10 +40,15 @@ export class AdvertiserService {
             }
           };
         }, {});
-      })
-    ).subscribe((advertisers: {[id: number]: Advertiser}) => {
+      }),
+      share()
+    );
+
+    result.subscribe((advertisers: {[id: number]: Advertiser}) => {
       this._advertisers.next(advertisers);
     });
+
+    return result.pipe(map(() => null));
   }
 
   findAdvertiserByUri(uri: string): Observable<Advertiser> | undefined {

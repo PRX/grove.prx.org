@@ -1,14 +1,16 @@
 import { CampaignComponent } from './campaign.component';
-import { CampaignStoreService, CampaignState, FlightState } from '../core';
+import { CampaignStoreService, CampaignState, FlightState, AdvertiserService } from '../core';
+import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
 import { ReplaySubject, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-prx-styleguide';
+import { ToastrService, MockHalService } from 'ngx-prx-styleguide';
 import { map } from 'rxjs/operators';
 
 describe('CampaignComponent', () => {
   let routeId: ReplaySubject<string>;
   let route: ActivatedRoute;
   let router: Router;
+  let advertiserService: AdvertiserService;
   let toastrService: ToastrService;
   let campaignStoreService: CampaignStoreService;
   let campaignState: ReplaySubject<CampaignState>;
@@ -52,7 +54,8 @@ describe('CampaignComponent', () => {
       storeCampaign: jest.fn(() => campaignState),
       setFlight: jest.fn()
     } as any;
-    component = new CampaignComponent(route, router, toastrService, campaignStoreService);
+    advertiserService = new AdvertiserServiceMock(new MockHalService()) as any;
+    component = new CampaignComponent(route, router, toastrService, campaignStoreService, advertiserService);
   });
 
   it('loads the campaign state from the route', () => {

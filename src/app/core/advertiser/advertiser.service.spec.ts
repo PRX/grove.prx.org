@@ -16,10 +16,10 @@ describe('AdvertiserService', () => {
     augury = new MockHalService();
     augury.mockItems('prx:advertisers', [{ id, name, _links: { self: { href } } }]);
     advertiserService = new AdvertiserService(new AuguryService(augury as any));
+    advertiserService.loadAdvertisers();
   });
 
   it('lists advertisers', done => {
-    advertiserService.loadAdvertisers();
     advertiserService.advertisers.subscribe(advertisers => {
       expect(advertisers.length).toEqual(1);
       expect(advertisers[0]).toMatchObject({

@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { CampaignStoreService } from '../core';
-import { ToastrService } from 'ngx-prx-styleguide';
 import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { CampaignStoreService, AdvertiserService } from '../core';
+import { ToastrService } from 'ngx-prx-styleguide';
 
 @Component({
   selector: 'grove-campaign',
@@ -46,9 +46,16 @@ export class CampaignComponent {
     private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
-    public campaignStoreService: CampaignStoreService
+    public campaignStoreService: CampaignStoreService,
+    private advertiserService: AdvertiserService
   ) {
-    this.route.paramMap.subscribe((params: ParamMap) => {
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        return this.advertiserService.loadAdvertisers().pipe(
+          map(advertisers => ({params, advertisers}))
+        );
+      })
+    ).subscribe(({params, advertisers}) => {
       this.campaignStoreService.load(params.get('id'));
     });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(

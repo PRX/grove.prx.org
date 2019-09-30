@@ -28,7 +28,9 @@ export class AdvertiserServiceMock {
 
   constructor(private augury: MockHalService) {}
 
-  loadAdvertisers() {}
+  loadAdvertisers(): Observable<null> {
+    return of(null);
+  }
 
   get advertisers(): Observable<Advertiser[]> {
     return this._advertisers.asObservable();
