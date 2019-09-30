@@ -16,19 +16,25 @@ describe('FlightContainerComponent', () => {
 
   beforeEach(() => {
     campaign = new ReplaySubject(1);
-    campaignStoreService = { campaignFirst$: campaign, setFlight: jest.fn(() => of({})) } as any;
+    campaignStoreService = { campaign$: campaign, setFlight: jest.fn(() => of({})) } as any;
     inventory = new ReplaySubject(1);
     inventoryService = { listInventory: jest.fn(() => inventory) } as any;
     routeId = new ReplaySubject(1);
     route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
     router = { navigate: jest.fn() } as any;
     component = new FlightContainerComponent(route, inventoryService, campaignStoreService, router);
+    component.ngOnInit();
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
   });
 
   it('sets the flight id from the route', () => {
     const spy = jest.spyOn(component, 'setFlightId');
+    campaign.next({});
     routeId.next('123');
-    expect(spy).toHaveBeenCalledWith('123');
+    expect(spy).toHaveBeenCalledWith('123', {});
   });
 
   it('loads an existing flight', done => {
@@ -37,12 +43,12 @@ describe('FlightContainerComponent', () => {
       done();
     });
     campaign.next({ flights: { 123: { name: 'my-flight' } } });
-    component.setFlightId('123');
+    routeId.next('123');
   });
 
   it('redirects to campaign if the flight does not exist', () => {
     campaign.next({ flights: { 123: { name: 'my-flight' } } });
-    component.setFlightId('456');
+    routeId.next('456');
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', 'new']);
   });
 
@@ -70,7 +76,7 @@ describe('FlightContainerComponent', () => {
 
     const flight = { set_inventory_uri: '/inv/2' };
     campaign.next({ flights: { 123: { localFlight: flight } } });
-    component.setFlightId('123');
+    routeId.next('123');
     inventory.next([
       { self_uri: '/inv/1', zones: ['z1'] },
       { self_uri: '/inv/2', zones: ['z2', 'z22'] },

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share } from 'rxjs/operators';
+import { map, first, switchMap, share, mergeMap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -97,6 +97,17 @@ export class CampaignStoreService {
         const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
         const updatedState = { ...state, flights: updatedFlights };
         return updatedState;
+      }),
+      mergeMap(state => {
+        if (state.flights[flightId] &&
+          state.flights[flightId].localFlight.startAt &&
+          state.flights[flightId].localFlight.endAt &&
+          state.flights[flightId].localFlight.set_inventory_uri &&
+          state.flights[flightId].localFlight.zones && state.flights[flightId].localFlight.zones.length) {
+          // lookup inventory
+        }
+        // can't lookup inventory
+        return of(state);
       }),
       share()
     );
