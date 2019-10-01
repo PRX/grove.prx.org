@@ -12,6 +12,7 @@ export class CampaignFormComponent implements OnInit {
   @Input() accounts: Account[];
   @Input() advertisers: Advertiser[];
   @Output() campaignUpdate = new EventEmitter<{ campaign: Campaign; changed: boolean; valid: boolean }>(true);
+  @Output() addAdvertiser = new EventEmitter<string>();
 
   // tslint:disable-next-line
   private _campaign: Campaign;
@@ -87,6 +88,13 @@ export class CampaignFormComponent implements OnInit {
   }
 
   formStatusChanged(campaign?: Campaign) {
+    // when user types an advertiser name match into the advertiser autoselect, set advertiser by value (URI)
+    if (campaign.set_advertiser_uri) {
+      const findAdvertiserByName = this.advertisers && this.advertisers.find(adv => adv.name === campaign.set_advertiser_uri);
+      if (findAdvertiserByName) {
+        campaign = {...campaign, set_advertiser_uri: findAdvertiserByName.set_advertiser_uri};
+      }
+    }
     this.campaignUpdate.emit({
       campaign,
       changed: this.campaignForm.dirty,
@@ -95,17 +103,20 @@ export class CampaignFormComponent implements OnInit {
   }
 
   updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    this.campaignForm.reset(
-      {
-        set_account_uri,
-        name,
-        type,
-        status,
-        repName,
-        notes,
-        set_advertiser_uri
-      },
-      { emitEvent: false }
-    );
+    const findAdvertiserByURI = set_advertiser_uri && this.advertisers &&
+      this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
+    this.campaignForm.patchValue({
+      ...(name && {name}),
+      ...(type && {type}),
+      ...(status && {status}),
+      ...(repName && {repName}),
+      ...(notes && {notes}),
+      ...(set_account_uri && {set_account_uri}),
+      ...(findAdvertiserByURI && {set_advertiser_uri: findAdvertiserByURI.set_advertiser_uri})
+    }, {emitEvent: false, onlySelf: true});
+  }
+
+  onAddAdvertiser(name: string) {
+    this.addAdvertiser.emit(name);
   }
 }

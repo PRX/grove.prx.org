@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,12 +12,12 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [...campaignComponents],
   imports: [
+    SharedModule,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -26,7 +27,6 @@ import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
     MatListModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatAutocompleteModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

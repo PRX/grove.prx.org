@@ -2,11 +2,11 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
+  MatDatepickerModule,
   MatFormFieldModule,
   MatInputModule,
-  MatSelectModule,
-  MatDatepickerModule,
-  MatNativeDateModule } from '@angular/material';
+  MatNativeDateModule,
+  MatSelectModule } from '@angular/material';
 
 import { SharedModule } from '../../shared/shared.module';
 
@@ -28,12 +28,12 @@ describe('CampaignFilterComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule,
-        NoopAnimationsModule,
+        MatDatepickerModule,
         MatFormFieldModule,
         MatInputModule,
+        MatNativeDateModule,
         MatSelectModule,
-        MatDatepickerModule,
-        MatNativeDateModule
+        NoopAnimationsModule
       ],
       declarations: [
         CampaignFilterComponent,

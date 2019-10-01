@@ -3,7 +3,12 @@ import { DebugElement } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-
+import {
+  MatDatepickerModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatNativeDateModule,
+  MatSelectModule } from '@angular/material';
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -36,6 +41,11 @@ describe('CampaignListComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatNativeDateModule,
+        MatSelectModule,
         NoopAnimationsModule,
         PagingModule,
         SharedModule
