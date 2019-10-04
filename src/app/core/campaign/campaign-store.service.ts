@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
-import { CampaignState, FlightState, CampaignStateChanges, Campaign } from './campaign.models';
+import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share, mergeMap } from 'rxjs/operators';
+import { map, first, switchMap, share, withLatestFrom, publish, refCount } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -55,6 +55,36 @@ export class CampaignStoreService {
     }
   }
 
+  loadAvailability(flight: Flight): Observable<Availability[]> {
+    if (flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0) {
+      const inventoryId = flight.set_inventory_uri.split('/').pop();
+      const loading = forkJoin(flight.zones.map((zoneName) => {
+        return this.campaignService.getInventoryAvailability({
+          id: inventoryId,
+          startDate: new Date(flight.startAt),
+          endDate: new Date(flight.endAt),
+          zoneName,
+          flightId: flight.id
+        }).pipe(map(availabilityDoc => this.campaignService.docToAvailability(zoneName, availabilityDoc)));
+      })).pipe(
+        publish(),
+        refCount()
+      );
+      loading.pipe(first(), withLatestFrom(this._campaign$)).subscribe(([availabilities, state]) => {
+        const updatedState = {
+          ...state,
+          availability: {
+            ...state.availability,
+            ...availabilities.reduce((acc, availability) => ({...acc, [`${flight.id}-${availability.zone}`]: availability}), {})
+          }
+        };
+        console.log(updatedState);
+        this._campaign$.next(updatedState);
+      });
+      return loading;
+    }
+  }
+
   storeCampaign(): Observable<CampaignStateChanges> {
     const saving = this.putCampaign().pipe(
       switchMap(campaignChanges => {
@@ -97,17 +127,6 @@ export class CampaignStoreService {
         const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
         const updatedState = { ...state, flights: updatedFlights };
         return updatedState;
-      }),
-      mergeMap(state => {
-        if (state.flights[flightId] &&
-          state.flights[flightId].localFlight.startAt &&
-          state.flights[flightId].localFlight.endAt &&
-          state.flights[flightId].localFlight.set_inventory_uri &&
-          state.flights[flightId].localFlight.zones && state.flights[flightId].localFlight.zones.length) {
-          // lookup inventory
-        }
-        // can't lookup inventory
-        return of(state);
       }),
       share()
     );

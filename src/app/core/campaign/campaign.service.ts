@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
+import { CampaignState, Campaign, Flight, FlightState, Availability } from './campaign.models';
 
 @Injectable()
 export class CampaignService {
@@ -57,6 +57,19 @@ export class CampaignService {
     }
   }
 
+  getInventoryAvailability({id, startDate, endDate, zoneName, flightId}): Observable<HalDoc> {
+    return this.augury.follow('prx:inventory', {id}).pipe(
+      switchMap(inventory => {
+        return inventory.follow('prx:availability', {
+          startDate: startDate.toISOString().slice(0, 10),
+          endDate: endDate.toISOString().slice(0, 10),
+          zoneName,
+          flightId
+        });
+      })
+    );
+  }
+
   docToCampaign(doc: HalDoc): CampaignState {
     const campaign = this.filter(doc) as Campaign;
     campaign.set_advertiser_uri = doc.expand('prx:advertiser');
@@ -79,6 +92,10 @@ export class CampaignService {
       changed: false,
       valid: true
     };
+  }
+
+  docToAvailability(zone: string, doc: HalDoc): Availability {
+    return {...this.filter(doc) as Availability, zone};
   }
 
   filter(doc: HalDoc): {} {
