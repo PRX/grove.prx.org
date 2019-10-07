@@ -1,7 +1,6 @@
 export interface CampaignState {
   localCampaign: Campaign;
   remoteCampaign?: Campaign;
-  currentFlightId?: string;
   flights: { [id: string]: FlightState };
   availability?: { [flightZone: string]: Availability};
   changed: boolean;

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
-import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState } from '../../core';
+import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState, Availability } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, withLatestFrom } from 'rxjs/operators';
 
@@ -14,6 +14,7 @@ import { map, withLatestFrom } from 'rxjs/operators';
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
     <grove-availability
+      *ngIf="flightAvailability$ && flightAvailabilityTotals$"
       [flight]="flightLocal$ | async"
       [zones]="zoneOptions$ | async"
       [availabilityZones]="flightAvailability$ | async"
@@ -27,8 +28,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
-  flightAvailability$ = this.campaignStoreService.currentFlightAvailabilityRollup$;
-  flightAvailabilityTotals$ = this.campaignStoreService.currentFlightAvailabilityTotals$;
+  flightAvailability$: Observable<Availability[]>;
+  flightAvailabilityTotals$: Observable<{allocated: number, availability: number}[]>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -53,7 +54,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         return inventory ? inventory.zones : [];
       })
     );
-    // this.flightAvailability$.subscribe(avail => console.log('avail', avail));
   }
 
   ngOnDestroy() {
@@ -62,9 +62,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   setFlightId(id: string, state: CampaignState) {
     if (state.flights[id]) {
-      if (state.currentFlightId !== id) {
-        this.campaignStoreService.setCurrentFlightId(id);
+      if (this.currentFlightId !== id) {
         this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
+        this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
+        this.flightAvailabilityTotals$ = this.campaignStoreService.getFlightAvailabilityTotals$(id);
       }
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);

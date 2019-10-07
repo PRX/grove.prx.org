@@ -21,7 +21,9 @@ describe('FlightContainerComponent', () => {
       campaign$: campaign,
       setFlight: jest.fn(() => of({})),
       setCurrentFlightId: jest.fn((id) => {}),
-      loadAvailability: jest.fn((f) => of({}))
+      loadAvailability: jest.fn((f) => of({})),
+      getFlightAvailabilityTotals$: jest.fn((id) => of([])),
+      getFlightAvailabilityRollup$: jest.fn((id) => of([]))
     } as any;
     inventory = new ReplaySubject(1);
     inventoryService = { listInventory: jest.fn(() => inventory) } as any;

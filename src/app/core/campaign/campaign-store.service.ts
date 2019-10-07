@@ -55,22 +55,16 @@ export class CampaignStoreService {
     }
   }
 
-  setCurrentFlightId(flightId: string) {
-    this.campaign$.pipe(
-      first()
-    ).subscribe(state => this._campaign$.next({...state, currentFlightId: flightId}));
-  }
-
-  get currentFlightAvailabilityTotals$(): Observable<{allocated: number, availability: number}[]> {
+  getFlightAvailabilityTotals$(flightId: string): Observable<{allocated: number, availability: number}[]> {
     return this.campaign$.pipe(
       map(state => {
-        const availabilityZones = state.flights[state.currentFlightId] &&
-          state.flights[state.currentFlightId].localFlight &&
-          state.flights[state.currentFlightId].localFlight.zones &&
+        const availabilityZones = state.flights[flightId] &&
+          state.flights[flightId].localFlight &&
+          state.flights[flightId].localFlight.zones &&
           state.availability &&
-          state.flights[state.currentFlightId].localFlight.zones
-            .filter(zone => state.availability[`${state.currentFlightId}-${zone}`])
-            .map(zone => state.availability[`${state.currentFlightId}-${zone}`]);
+          state.flights[flightId].localFlight.zones
+            .filter(zone => state.availability[`${flightId}-${zone}`])
+            .map(zone => state.availability[`${flightId}-${zone}`]);
         return availabilityZones && availabilityZones.map(days => days.availabilityAllocationDays.reduce((acc, day) => {
           acc.allocated += day.allocated;
           acc.availability += day.availability;
@@ -80,17 +74,17 @@ export class CampaignStoreService {
     );
   }
 
-  get currentFlightAvailabilityRollup$(): Observable<Availability[]> {
+  getFlightAvailabilityRollup$(flightId: string): Observable<Availability[]> {
     return this.campaign$.pipe(
       map(state => {
         // availability of current flights
-        const availabilityZones = state.flights[state.currentFlightId] &&
-          state.flights[state.currentFlightId].localFlight &&
-          state.flights[state.currentFlightId].localFlight.zones &&
+        const availabilityZones = state.flights[flightId] &&
+          state.flights[flightId].localFlight &&
+          state.flights[flightId].localFlight.zones &&
           state.availability &&
-          state.flights[state.currentFlightId].localFlight.zones
-            .filter(zone => state.availability[`${state.currentFlightId}-${zone}`])
-            .map(zone => state.availability[`${state.currentFlightId}-${zone}`]);
+          state.flights[flightId].localFlight.zones
+            .filter(zone => state.availability[`${flightId}-${zone}`])
+            .map(zone => state.availability[`${flightId}-${zone}`]);
         // each zone
         const zoneWeeks = availabilityZones && availabilityZones.map((availability: Availability) => {
           let weekBeginString: string;
