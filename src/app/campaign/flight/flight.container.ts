@@ -15,7 +15,7 @@ import { map, withLatestFrom } from 'rxjs/operators';
     ></grove-flight>
     <grove-availability
       [flight]="flightLocal$ | async"
-      [availability]="flightAvailability$ | async">
+      [availabilityZones]="flightAvailability$ | async">
     </grove-availability>
   `,
   styleUrls: ['flight.container.scss'],
@@ -25,12 +25,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
-  rootState$ = new ReplaySubject<CampaignState>(1);
-  availability$ = this.rootState$.pipe(
-    withLatestFrom(this.flightLocal$),
-    map(([state, flight]) => flight && flight.zones && state.availability &&
-      flight.zones.filter(zone => state.availability[`${flight.id}-${zone}`]).map(zone => state.availability[`${flight.id}-${zone}`]))
-  );
   flightAvailability$ = this.campaignStoreService.currentFlightAvailability$;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
@@ -71,7 +65,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       }
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);
-      this.rootState$.next(state);
       this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
     } else {
       const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
