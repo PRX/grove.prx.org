@@ -1,6 +1,7 @@
 export interface CampaignState {
   localCampaign: Campaign;
   remoteCampaign?: Campaign;
+  currentFlightId?: string;
   flights: { [id: string]: FlightState };
   availability?: { [flightZone: string]: Availability};
   changed: boolean;
@@ -33,6 +34,11 @@ export interface Availability {
     allocated: number;
     availability: number;
     date: string;
+    days?: {
+      allocated: number;
+      availability: number;
+      date: string;
+    }
   }[];
 }
 
