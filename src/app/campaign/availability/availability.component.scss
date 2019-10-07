@@ -32,7 +32,10 @@ section {
   justify-content: space-between;
 }
 .row.expand > * > span:first-child {
-  flex-basis: 50%;
+  flex-basis: calc(100% / 3);
+}
+.row.totals > * {
+  font-weight: 700;
 }
 .date {
   flex-basis: 20%;

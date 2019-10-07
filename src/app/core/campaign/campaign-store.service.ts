@@ -61,7 +61,26 @@ export class CampaignStoreService {
     ).subscribe(state => this._campaign$.next({...state, currentFlightId: flightId}));
   }
 
-  get currentFlightAvailability$(): Observable<Availability[]> {
+  get currentFlightAvailabilityTotals$(): Observable<{allocated: number, availability: number}[]> {
+    return this.campaign$.pipe(
+      map(state => {
+        const availabilityZones = state.flights[state.currentFlightId] &&
+          state.flights[state.currentFlightId].localFlight &&
+          state.flights[state.currentFlightId].localFlight.zones &&
+          state.availability &&
+          state.flights[state.currentFlightId].localFlight.zones
+            .filter(zone => state.availability[`${state.currentFlightId}-${zone}`])
+            .map(zone => state.availability[`${state.currentFlightId}-${zone}`]);
+        return availabilityZones && availabilityZones.map(days => days.availabilityAllocationDays.reduce((acc, day) => {
+          acc.allocated += day.allocated;
+          acc.availability += day.availability;
+          return acc;
+        }), {allocated: 0, availability: 0});
+      })
+    );
+  }
+
+  get currentFlightAvailabilityRollup$(): Observable<Availability[]> {
     return this.campaign$.pipe(
       map(state => {
         // availability of current flights

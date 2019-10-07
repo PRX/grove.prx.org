@@ -15,7 +15,8 @@ import { map, withLatestFrom } from 'rxjs/operators';
     ></grove-flight>
     <grove-availability
       [flight]="flightLocal$ | async"
-      [availabilityZones]="flightAvailability$ | async">
+      [availabilityZones]="flightAvailability$ | async"
+      [totals]="flightAvailabilityTotals$ | async">
     </grove-availability>
   `,
   styleUrls: ['flight.container.scss'],
@@ -25,7 +26,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
-  flightAvailability$ = this.campaignStoreService.currentFlightAvailability$;
+  flightAvailability$ = this.campaignStoreService.currentFlightAvailabilityRollup$;
+  flightAvailabilityTotals$ = this.campaignStoreService.currentFlightAvailabilityTotals$;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
