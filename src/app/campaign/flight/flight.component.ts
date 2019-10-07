@@ -11,6 +11,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 export class FlightComponent implements OnInit {
   @Input() inventory: Inventory[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
+  @Output() flightDuplicate = new EventEmitter<Flight>(true);
 
   // tslint:disable-next-line
   private _flight: Flight;
@@ -80,5 +81,9 @@ export class FlightComponent implements OnInit {
 
   updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
     this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
+  }
+
+  duplicateFlight() {
+    this.flightDuplicate.emit(this.flight);
   }
 }

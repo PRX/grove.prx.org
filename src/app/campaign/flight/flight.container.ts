@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReplaySubject, Observable, combineLatest } from 'rxjs';
-import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone } from '../../core';
+import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, Flight } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
       [zoneOptions]="zoneOptions$ | async"
       [flight]="flightLocal$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
+      (flightDuplicate)="flightDuplicate($event)"
     ></grove-flight>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -58,5 +59,16 @@ export class FlightContainerComponent implements OnInit {
   flightUpdateFromForm({ flight, changed, valid }) {
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
+  }
+
+  flightDuplicate(flight: Flight) {
+    const localFlight: Flight = { ...flight, name: `${flight.name} (Copy)` };
+    this.campaignStoreService.campaignFirst$.subscribe(state => {
+      const flightId = Date.now();
+      this.campaignStoreService.setFlight({ localFlight, changed: true, valid: true }, flightId);
+
+      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
+      this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+    });
   }
 }
