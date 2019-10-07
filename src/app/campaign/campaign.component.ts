@@ -1,9 +1,9 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { CampaignStoreService } from '../core';
+import { Observable, Subscription } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { CampaignStoreService, AdvertiserService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'grove-campaign',
@@ -38,17 +38,27 @@ import { Observable } from 'rxjs';
   styleUrls: ['./campaign.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignComponent {
+export class CampaignComponent implements OnInit, OnDestroy {
   campaignFlights$: Observable<{ id: string; name: string }[]>;
   campaignSaving: boolean;
+  routeSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService,
-    public campaignStoreService: CampaignStoreService
-  ) {
-    this.route.paramMap.subscribe((params: ParamMap) => {
+    public campaignStoreService: CampaignStoreService,
+    private advertiserService: AdvertiserService
+  ) {}
+
+  ngOnInit() {
+    this.routeSub = this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        return this.advertiserService.loadAdvertisers().pipe(
+          map(advertisers => ({params, advertisers}))
+        );
+      })
+    ).subscribe(({params, advertisers}) => {
       this.campaignStoreService.load(params.get('id'));
     });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
@@ -58,6 +68,12 @@ export class CampaignComponent {
         });
       })
     );
+  }
+
+  ngOnDestroy() {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
   }
 
   campaignSubmit() {

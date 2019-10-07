@@ -1,17 +1,21 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { DebugElement } from '@angular/core';
+import { DebugElement, Component, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-
-import { SharedModule } from '../shared/shared.module';
 
 import { MockHalService } from 'ngx-prx-styleguide';
-import { CampaignListService } from '../campaign-list/campaign-list.service';
-import { CampaignListModule } from '../campaign-list/campaign-list.module';
+import { CampaignListService, CampaignParams } from '../campaign-list/campaign-list.service';
 import { CampaignListServiceMock, params } from '../campaign-list/campaign-list.service.mock';
 import { HomeComponent } from './home.component';
+
+@Component({
+  selector: 'grove-campaign-list',
+  template: ``
+})
+class MockGroveCampaignList {
+  @Input() routedParams: CampaignParams;
+}
 
 describe('HomeComponent', () => {
   let comp: HomeComponent;
@@ -20,26 +24,26 @@ describe('HomeComponent', () => {
   let el: HTMLElement;
   const mockHal = new MockHalService();
   const mockCampaignListService = new CampaignListServiceMock(mockHal);
-  const { per, geo, zone, ...routableParams } = params;
-  const geoStr = geo && geo.join('|');
-  const zoneStr = zone && zone.join('|');
+  const { per, ...routableParams } = params;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        SharedModule,
-        NoopAnimationsModule,
-        CampaignListModule
-      ],
+      imports: [RouterTestingModule],
       declarations: [
-        HomeComponent
+        HomeComponent,
+        MockGroveCampaignList
       ],
       providers: [
         {
           provide: ActivatedRoute,
           useValue: {
-            queryParams: of({...routableParams, before: params.before.toISOString(), after: params.after.toISOString()})
+            queryParams: of({
+              ...routableParams,
+              before: params.before.toISOString(),
+              after: params.after.toISOString(),
+              geo: params.geo.join('|'),
+              zone: params.zone.join('|')
+            })
           }
         },
         {

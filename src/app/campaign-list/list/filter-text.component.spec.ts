@@ -3,8 +3,6 @@ import { DebugElement } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule, MatInputModule } from '@angular/material';
 
-import { SharedModule } from '../../shared/shared.module';
-
 import { FilterTextComponent } from '.';
 
 describe('FilterTextComponent', () => {
@@ -16,10 +14,9 @@ describe('FilterTextComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedModule,
-        NoopAnimationsModule,
         MatFormFieldModule,
-        MatInputModule
+        MatInputModule,
+        NoopAnimationsModule
       ],
       declarations: [
         FilterTextComponent
