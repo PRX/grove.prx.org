@@ -56,13 +56,16 @@ export class CampaignStoreService {
   }
 
   loadAvailability(flight: Flight): Observable<Availability[]> {
+    // Flight dates are typed string but are actually sometimes Date
+    const startDate = new Date(flight.startAt.valueOf()).toISOString().slice(0, 10);
+    const endDate = new Date(flight.endAt.valueOf()).toISOString().slice(0, 10);
     if (flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0) {
       const inventoryId = flight.set_inventory_uri.split('/').pop();
       const loading = forkJoin(flight.zones.map((zoneName) => {
         return this.campaignService.getInventoryAvailability({
           id: inventoryId,
-          startDate: new Date(flight.startAt),
-          endDate: new Date(flight.endAt),
+          startDate,
+          endDate,
           zoneName,
           flightId: flight.id
         }).pipe(map(availabilityDoc => this.campaignService.docToAvailability(zoneName, availabilityDoc)));

@@ -27,12 +27,12 @@ export interface Campaign {
 
 export interface Availability {
   zone: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   availabilityAllocationDays: {
     allocated: number;
     availability: number;
-    date: Date;
+    date: string;
   }[];
 }
 

@@ -61,8 +61,8 @@ export class CampaignService {
     return this.augury.follow('prx:inventory', {id}).pipe(
       switchMap(inventory => {
         return inventory.follow('prx:availability', {
-          startDate: startDate.toISOString().slice(0, 10),
-          endDate: endDate.toISOString().slice(0, 10),
+          startDate,
+          endDate,
           zoneName,
           flightId
         });
