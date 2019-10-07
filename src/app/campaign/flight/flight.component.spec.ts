@@ -10,7 +10,6 @@ import {
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
-import { InventoryComponent } from '../inventory/inventory.component';
 import { Flight } from '../../core';
 
 describe('FlightComponent', () => {
@@ -30,7 +29,7 @@ describe('FlightComponent', () => {
         MatDatepickerModule,
         MatNativeDateModule
       ],
-      declarations: [FlightComponent, InventoryComponent]
+      declarations: [FlightComponent]
     }).compileComponents();
   }));
 

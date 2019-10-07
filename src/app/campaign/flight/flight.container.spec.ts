@@ -1,8 +1,9 @@
 import { of, ReplaySubject } from 'rxjs';
 import { CampaignStoreService, InventoryService } from '../../core';
-import { FlightContainerComponent } from './flight.container';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
+
+import { FlightContainerComponent } from './flight.container';
 
 describe('FlightContainerComponent', () => {
   let campaign: ReplaySubject<any>;
@@ -16,7 +17,12 @@ describe('FlightContainerComponent', () => {
 
   beforeEach(() => {
     campaign = new ReplaySubject(1);
-    campaignStoreService = { campaign$: campaign, setFlight: jest.fn(() => of({})) } as any;
+    campaignStoreService = {
+      campaign$: campaign,
+      setFlight: jest.fn(() => of({})),
+      setCurrentFlightId: jest.fn((id) => {}),
+      loadAvailability: jest.fn((f) => of({}))
+    } as any;
     inventory = new ReplaySubject(1);
     inventoryService = { listInventory: jest.fn(() => inventory) } as any;
     routeId = new ReplaySubject(1);
@@ -38,7 +44,7 @@ describe('FlightContainerComponent', () => {
   });
 
   it('loads an existing flight', done => {
-    component.state$.subscribe(state => {
+    component.flightState$.subscribe(state => {
       expect(state).toEqual({ name: 'my-flight' });
       done();
     });

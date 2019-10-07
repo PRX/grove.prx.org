@@ -1,0 +1,36 @@
+:host {
+  margin: 20px 10px;
+}
+.row {
+  display: flex;
+}
+.row {
+  border-bottom: 1px solid #ddd;
+}
+.row.head {
+  border-top: 1px solid #ddd;
+}
+.row.head > * {
+  text-align: center;
+  font-weight: bold;
+}
+.row > * {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.row.expand > * {
+  margin-left: 2%;
+  margin-right: 2%;
+}
+.date {
+  flex-basis: 20%;
+  text-align: right;
+}
+.avail, .goal {
+  flex-basis: 30%;
+  text-align: right;
+}
+.edit {
+  flex-basis: 20%;
+  text-align: center;
+}

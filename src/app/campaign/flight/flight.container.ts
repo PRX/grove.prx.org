@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, tap } from 'rxjs/operators';
+import { map, withLatestFrom } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',
@@ -13,13 +13,25 @@ import { map, tap } from 'rxjs/operators';
       [flight]="flightLocal$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
+    <grove-availability
+      [flight]="flightLocal$ | async"
+      [availability]="flightAvailability$ | async">
+    </grove-availability>
   `,
+  styleUrls: ['flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
-  state$ = new ReplaySubject<FlightState>(1);
-  flightLocal$ = this.state$.pipe(tap(s => console.log('flightLocal$', s)), map(state => state.localFlight));
+  flightState$ = new ReplaySubject<FlightState>(1);
+  flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
+  rootState$ = new ReplaySubject<CampaignState>(1);
+  availability$ = this.rootState$.pipe(
+    withLatestFrom(this.flightLocal$),
+    map(([state, flight]) => flight && flight.zones && state.availability &&
+      flight.zones.filter(zone => state.availability[`${flight.id}-${zone}`]).map(zone => state.availability[`${flight.id}-${zone}`]))
+  );
+  flightAvailability$ = this.campaignStoreService.currentFlightAvailability$;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -44,6 +56,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         return inventory ? inventory.zones : [];
       })
     );
+    // this.flightAvailability$.subscribe(avail => console.log('avail', avail));
   }
 
   ngOnDestroy() {
@@ -52,8 +65,13 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   setFlightId(id: string, state: CampaignState) {
     if (state.flights[id]) {
+      if (state.currentFlightId !== id) {
+        this.campaignStoreService.setCurrentFlightId(id);
+        this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
+      }
       this.currentFlightId = id;
-      this.state$.next(state.flights[id]);
+      this.flightState$.next(state.flights[id]);
+      this.rootState$.next(state);
       this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
     } else {
       const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
@@ -63,6 +81,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   flightUpdateFromForm({ flight, changed, valid }) {
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
+    this.campaignStoreService.loadAvailability(flight);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 }
