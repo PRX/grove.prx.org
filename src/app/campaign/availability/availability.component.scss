@@ -19,8 +19,14 @@
   margin-right: 5%;
 }
 .row.expand > * {
-  margin-left: 2%;
   margin-right: 2%;
+}
+.row.expand > * {
+  display: flex;
+  justify-content: space-between;
+}
+.row.expand > * > span:first-child {
+  flex-basis: 50%;
 }
 .date {
   flex-basis: 20%;

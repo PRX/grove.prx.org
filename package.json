@@ -6,6 +6,7 @@
     "start": "prx-ng-serve dev",
     "build": "ng build --prod --aot",
     "test": "jest --watch",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "prx-ng-serve dist",

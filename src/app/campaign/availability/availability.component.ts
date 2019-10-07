@@ -21,14 +21,14 @@ import { Flight, Availability } from '../../core';
             <div class="date">
               <button class="btn-link" (click)="toggleZoneWeekExpanded(avail.zone, week.date)">{{ week.date | date:'M/dd' }}</button>
             </div>
-            <div class="avail">{{ week.allocated + week.availability }}</div>
+            <div class="avail">{{ (week.allocated + week.availability) | largeNumber }}</div>
             <div class="goal"></div>
             <div class="edit"></div>
           </div>
           <ng-container *ngIf="zoneWeekExpanded[avail.zone + '-' + week.date]">
             <div class="row expand" *ngFor="let day of week.days">
-              <div class="date">{{ day.date | date:'M/dd' }}</div>
-              <div class="avail">{{ day.allocated + day.availability }}</div>
+              <div class="date"><span>&mdash;</span><span>{{ day.date | date:'M/dd' }}</span></div>
+              <div class="avail"><span>&mdash;</span><span>{{ (day.allocated + day.availability) | largeNumber }}</span></div>
               <div class="goal"></div>
               <div class="edit"></div>
             </div>

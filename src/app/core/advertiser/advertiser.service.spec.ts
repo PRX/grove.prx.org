@@ -4,28 +4,56 @@ import { AuguryService } from '../augury.service';
 
 describe('AdvertiserService', () => {
   let augury: MockHalService;
-  let advertiser: AdvertiserService;
+  let advertiserService: AdvertiserService;
+
+  const { id, name, href } = {
+    id: 123,
+    name: 'my name',
+    href: '/all/by/my/self'
+  };
 
   beforeEach(() => {
     augury = new MockHalService();
-    advertiser = new AdvertiserService(new AuguryService(augury as any));
+    augury.mockItems('prx:advertisers', [{ id, name, _links: { self: { href } } }]);
+    advertiserService = new AdvertiserService(new AuguryService(augury as any));
+    advertiserService.loadAdvertisers();
   });
 
   it('lists advertisers', done => {
-    const { id, name, href } = {
-      id: 123,
-      name: 'my name',
-      href: '/all/by/my/self'
-    };
-    augury.mockItems('prx:advertisers', [{ id, name, _links: { self: { href } } }]);
-    advertiser.listAdvertisers().subscribe(ads => {
-      expect(ads.length).toEqual(1);
-      expect(ads[0]).toMatchObject({
+    advertiserService.advertisers.subscribe(advertisers => {
+      expect(advertisers.length).toEqual(1);
+      expect(advertisers[0]).toMatchObject({
         id,
         name,
-        self_uri: href
+        set_advertiser_uri: href
       });
       done();
     });
+  });
+
+  it('finds advertisers by URI', done => {
+    advertiserService.findAdvertiserByUri('/all/by/my/self').subscribe(advertiser => {
+      expect(advertiser).toMatchObject({
+        id,
+        name,
+        set_advertiser_uri: href
+      });
+      done();
+    });
+  });
+
+  it('adds an advertiser', done => {
+    advertiserService.addAdvertiser('Hi Friend!').subscribe(
+       (newAdvertiser) => {
+         expect(newAdvertiser.name).toEqual('Hi Friend!');
+       },
+      () => {},
+      () => {
+        advertiserService.advertisers.subscribe(advertisers => {
+          expect(advertisers.find(a => a.name === 'Hi Friend!')).toBeDefined();
+          done();
+        });
+      }
+    );
   });
 });

@@ -1,29 +1,36 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import * as autocomplete from './autocomplete';
 import { AuthGuard, DeactivateGuard, UnauthGuard,
-  DatepickerModule, IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
-import {
-  MatFormFieldModule,
-  MatInputModule,
-  MatSelectModule,
-  MatDatepickerModule,
-  MatNativeDateModule } from '@angular/material';
-
+  IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
+import { LargeNumberPipe } from './pipes/large-number.pipe';
 @NgModule({
-  declarations: [],
+  declarations: [
+    autocomplete.OptionsPipe,
+    autocomplete.AutocompleteComponent,
+    LargeNumberPipe
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ReactiveFormsModule
   ],
   exports: [
+    LargeNumberPipe,
     IconModule,
     ImageModule,
     SpinnerModule,
     ToastrModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule
+    autocomplete.OptionsPipe,
+    autocomplete.AutocompleteComponent
   ],
   providers: [
     AuthGuard,
