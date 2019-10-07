@@ -15,6 +15,7 @@ import { map, withLatestFrom } from 'rxjs/operators';
     ></grove-flight>
     <grove-availability
       [flight]="flightLocal$ | async"
+      [zones]="zoneOptions$ | async"
       [availabilityZones]="flightAvailability$ | async"
       [totals]="flightAvailabilityTotals$ | async">
     </grove-availability>

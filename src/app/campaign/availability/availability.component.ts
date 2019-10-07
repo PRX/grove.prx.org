@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import { Flight, Availability } from '../../core';
+import { Flight, Availability, InventoryZone } from '../../core';
 
 @Component({
   selector: 'grove-availability',
@@ -9,7 +9,7 @@ import { Flight, Availability } from '../../core';
       Please select Start and End Dates, Series, and Zones to view inventory.
     </p>
     <section *ngFor="let zone of availabilityZones; index as i">
-      <h3>{{zone.zone}}</h3>
+      <h3>{{ getZoneName(zone.zone) }}</h3>
       <div class="row head">
         <div class="date">Week</div>
         <div class="avail">Available</div>
@@ -46,11 +46,17 @@ import { Flight, Availability } from '../../core';
 })
 export class AvailabilityComponent {
   @Input() flight: Flight;
+  @Input() zones: InventoryZone[];
   @Input() availabilityZones: Availability[];
   @Input() totals: {allocated: number, availability: number}[];
   zoneWeekExpanded = {};
 
   toggleZoneWeekExpanded(zone: string, date: string) {
     this.zoneWeekExpanded[`${zone}-${date}`] = !this.zoneWeekExpanded[`${zone}-${date}`];
+  }
+
+  getZoneName(zoneId: string): string {
+    const zone = this.zones && this.zones.find(z => z.id === zoneId);
+    return zone && zone.label;
   }
 }
