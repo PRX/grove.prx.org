@@ -1,15 +1,6 @@
 import { InventoryService, Inventory } from './inventory.service';
-import { Availability } from '../campaign/campaign.models';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-
-// TODO: styleguide doesn't export HalHttpError class
-class Mock404Error extends Error {
-  status = 404;
-  constructor() {
-    super();
-  }
-}
 
 describe('InventoryService', () => {
   const augury = new MockHalService();
