@@ -57,7 +57,7 @@ export class CampaignService {
     }
   }
 
-  getInventoryAvailability({id, startDate, endDate, zoneName, flightId}): Observable<HalDoc> {
+  getInventoryAvailability({id, startDate, endDate, zoneName, flightId}): Observable<Availability> {
     return this.augury.follow('prx:inventory', {id}).pipe(
       switchMap(inventory => {
         return inventory.follow('prx:availability', {
@@ -66,7 +66,8 @@ export class CampaignService {
           zoneName,
           flightId
         });
-      })
+      }),
+      map(doc => this.docToAvailability(zoneName, doc))
     );
   }
 
@@ -95,7 +96,18 @@ export class CampaignService {
   }
 
   docToAvailability(zone: string, doc: HalDoc): Availability {
-    return {...this.filter(doc) as Availability, zone};
+    return {
+      totals: {
+        startDate: doc['startDate'],
+        endDate: doc['endDate'],
+        groups: doc['availabilityAllocationDays'].map(allocation => ({
+          allocated: allocation.allocated,
+          availability: allocation.availability,
+          startDate: allocation.date,
+          endDate: allocation.date
+        }))
+      }, zone
+    };
   }
 
   filter(doc: HalDoc): {} {

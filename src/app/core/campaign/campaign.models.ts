@@ -2,7 +2,7 @@ export interface CampaignState {
   localCampaign: Campaign;
   remoteCampaign?: Campaign;
   flights: { [id: string]: FlightState };
-  availability?: { [flightZone: string]: Availability};
+  availability?: { [flightZone: string]: Availability };
   changed: boolean;
   valid: boolean;
 }
@@ -25,20 +25,17 @@ export interface Campaign {
   set_advertiser_uri: string;
 }
 
-export interface Availability {
-  zone: string;
+export interface Allocation {
+  allocated?: number;
+  availability?: number;
   startDate: string;
   endDate: string;
-  availabilityAllocationDays: {
-    allocated: number;
-    availability: number;
-    date: string;
-    days?: {
-      allocated: number;
-      availability: number;
-      date: string;
-    }
-  }[];
+  groups?: Allocation[];
+}
+
+export interface Availability {
+  zone: string;
+  totals: Allocation;
 }
 
 export interface Flight {

@@ -2,8 +2,8 @@
   display: flex;
 }
 grove-flight {
-  flex-basis: calc(200%/3);
+  flex-basis: 600px;
 }
 grove-availability {
-  flex-basis: calc(100%/3);
+  flex-basis: calc(100% - 600px);
 }

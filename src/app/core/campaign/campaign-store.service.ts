@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share, withLatestFrom, publish, refCount } from 'rxjs/operators';
+import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -22,7 +22,7 @@ export class CampaignStoreService {
   }
 
   get flights$(): Observable<{ [id: string]: FlightState }> {
-    return this.campaign$.pipe(map(c => c.flights));
+    return this.campaign$.pipe(map(c => c && c.flights));
   }
 
   constructor(private campaignService: CampaignService) {}
@@ -55,25 +55,6 @@ export class CampaignStoreService {
     }
   }
 
-  getFlightAvailabilityTotals$(flightId: string): Observable<{allocated: number, availability: number}[]> {
-    return this.campaign$.pipe(
-      map(state => {
-        const availabilityZones = state.flights[flightId] &&
-          state.flights[flightId].localFlight &&
-          state.flights[flightId].localFlight.zones &&
-          state.availability &&
-          state.flights[flightId].localFlight.zones
-            .filter(zone => state.availability[`${flightId}-${zone}`])
-            .map(zone => state.availability[`${flightId}-${zone}`]);
-        return availabilityZones && availabilityZones.map(days => days.availabilityAllocationDays.reduce((acc, day) => {
-          acc.allocated += day.allocated;
-          acc.availability += day.availability;
-          return acc;
-        }), {allocated: 0, availability: 0});
-      })
-    );
-  }
-
   getFlightAvailabilityRollup$(flightId: string): Observable<Availability[]> {
     return this.campaign$.pipe(
       map(state => {
@@ -90,31 +71,47 @@ export class CampaignStoreService {
           let weekBeginString: string;
           let weekEnd: Date;
           // acc weeks
-          return availability.availabilityAllocationDays.reduce((acc, day) => {
-            const dayDate = new Date(day.date);
+          return availability.totals.groups.reduce((acc, day) => {
+            const dayDate = new Date(day.startDate + ' 0:0:0');
             if (!weekEnd || weekEnd.valueOf() <= dayDate.valueOf()) {
-              weekBeginString = day.date;
-              weekEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 0, 0, 0);
-              weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
+              weekBeginString = day.startDate;
+              weekEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59);
+              weekEnd.setDate(weekEnd.getDate() + (6 - weekEnd.getDay()));
             }
-            const week = acc.weeks[weekBeginString];
-            acc.weeks[weekBeginString] = {
+            const week = acc.totals.groups[weekBeginString];
+            acc.totals.groups[weekBeginString] = {
               allocated: week && week.allocated ? week.allocated + day.allocated : day.allocated || 0,
               availability: week && week.availability ? week.availability + day.availability : day.availability || 0,
-              date: weekBeginString,
-              days: week && week.days ? week.days.concat([day]) : [day]
+              startDate: weekBeginString,
+              endDate: weekEnd.toISOString().slice(0, 10),
+              groups: week && week.groups ? week.groups.concat([day]) : [day]
             };
+            acc.totals.allocated += week && week.allocated || 0;
+            acc.totals.availability += week && week.availability || 0;
             return acc;
-          }, {zone: availability.zone, startDate: availability.startDate, endDate: availability.endDate, weeks: {}});
+          }, {
+            zone: availability.zone,
+            totals: {
+              startDate: availability.totals.startDate,
+              endDate: availability.totals.endDate,
+              allocated: 0,
+              availability: 0,
+              groups: {}
+            }
+          });
         });
         // map week acc keys to array
         return zoneWeeks && zoneWeeks.map(zw => {
-          const { zone, endDate, startDate } = zw;
+          const { zone } = zw;
+          const { endDate, startDate, allocated, availability } = zw.totals;
           return {
-            zone, endDate, startDate,
-            availabilityAllocationDays: Object.keys(zw.weeks)
-              .map(w => zw.weeks[w])
-              .sort((a, b) => new Date(a.startAt).valueOf() - new Date(b.startAt).valueOf())
+            zone,
+            totals: {
+              endDate, startDate, allocated, availability,
+              groups: Object.keys(zw.totals.groups)
+                .map(w => zw.totals.groups[w])
+                .sort((a, b) => new Date(a.startAt).valueOf() - new Date(b.startAt).valueOf())
+            }
           };
         });
       })
@@ -122,10 +119,10 @@ export class CampaignStoreService {
   }
 
   loadAvailability(flight: Flight): Observable<Availability[]> {
-    // Flight dates are typed string but are actually sometimes Date
-    const startDate = new Date(flight.startAt.valueOf()).toISOString().slice(0, 10);
-    const endDate = new Date(flight.endAt.valueOf()).toISOString().slice(0, 10);
     if (flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0) {
+      // Flight dates are typed string but are actually sometimes Date
+      const startDate = new Date(flight.startAt.valueOf()).toISOString().slice(0, 10);
+      const endDate = new Date(flight.endAt.valueOf()).toISOString().slice(0, 10);
       const inventoryId = flight.set_inventory_uri.split('/').pop();
       const loading = forkJoin(flight.zones.map((zoneName) => {
         return this.campaignService.getInventoryAvailability({
@@ -134,10 +131,9 @@ export class CampaignStoreService {
           endDate,
           zoneName,
           flightId: flight.id
-        }).pipe(map(availabilityDoc => this.campaignService.docToAvailability(zoneName, availabilityDoc)));
+        });
       })).pipe(
-        publish(),
-        refCount()
+        share()
       );
       loading.pipe(first(), withLatestFrom(this._campaign$)).subscribe(([availabilities, state]) => {
         const updatedState = {

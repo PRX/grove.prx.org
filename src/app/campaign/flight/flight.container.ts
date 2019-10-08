@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState, Availability } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',
@@ -14,11 +14,10 @@ import { map, withLatestFrom } from 'rxjs/operators';
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
     <grove-availability
-      *ngIf="flightAvailability$ && flightAvailabilityTotals$"
+      *ngIf="flightAvailability$"
       [flight]="flightLocal$ | async"
       [zones]="zoneOptions$ | async"
-      [availabilityZones]="flightAvailability$ | async"
-      [totals]="flightAvailabilityTotals$ | async">
+      [availabilityZones]="flightAvailability$ | async">
     </grove-availability>
   `,
   styleUrls: ['flight.container.scss'],
@@ -29,7 +28,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
   flightAvailability$: Observable<Availability[]>;
-  flightAvailabilityTotals$: Observable<{allocated: number, availability: number}[]>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -65,7 +63,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       if (this.currentFlightId !== id) {
         this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
         this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
-        this.flightAvailabilityTotals$ = this.campaignStoreService.getFlightAvailabilityTotals$(id);
       }
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);
