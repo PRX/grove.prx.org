@@ -9,8 +9,6 @@ section {
 }
 .row {
   display: flex;
-}
-.row {
   border-bottom: 1px solid #ddd;
 }
 .row.head {
@@ -26,8 +24,6 @@ section {
 }
 .row.expand > * {
   margin-right: 2%;
-}
-.row.expand > * {
   display: flex;
   justify-content: space-between;
 }
