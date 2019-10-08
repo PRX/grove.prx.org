@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
+import { InventoryService } from '../inventory/inventory.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
@@ -25,7 +26,8 @@ export class CampaignStoreService {
     return this.campaign$.pipe(map(c => c && c.flights));
   }
 
-  constructor(private campaignService: CampaignService) {}
+  constructor(private campaignService: CampaignService,
+              private inventoryService: InventoryService) {}
 
   load(id: number | string = null): Observable<CampaignState> {
     if (!id) {
@@ -125,7 +127,7 @@ export class CampaignStoreService {
       const endDate = new Date(flight.endAt.valueOf()).toISOString().slice(0, 10);
       const inventoryId = flight.set_inventory_uri.split('/').pop();
       const loading = forkJoin(flight.zones.map((zoneName) => {
-        return this.campaignService.getInventoryAvailability({
+        return this.inventoryService.getInventoryAvailability({
           id: inventoryId,
           startDate,
           endDate,

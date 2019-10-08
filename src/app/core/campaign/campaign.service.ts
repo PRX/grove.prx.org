@@ -57,20 +57,6 @@ export class CampaignService {
     }
   }
 
-  getInventoryAvailability({id, startDate, endDate, zoneName, flightId}): Observable<Availability> {
-    return this.augury.follow('prx:inventory', {id}).pipe(
-      switchMap(inventory => {
-        return inventory.follow('prx:availability', {
-          startDate,
-          endDate,
-          zoneName,
-          flightId
-        });
-      }),
-      map(doc => this.docToAvailability(zoneName, doc))
-    );
-  }
-
   docToCampaign(doc: HalDoc): CampaignState {
     const campaign = this.filter(doc) as Campaign;
     campaign.set_advertiser_uri = doc.expand('prx:advertiser');
@@ -92,21 +78,6 @@ export class CampaignService {
       localFlight: flight,
       changed: false,
       valid: true
-    };
-  }
-
-  docToAvailability(zone: string, doc: HalDoc): Availability {
-    return {
-      totals: {
-        startDate: doc['startDate'],
-        endDate: doc['endDate'],
-        groups: doc['availabilityAllocationDays'].map(allocation => ({
-          allocated: allocation.allocated,
-          availability: allocation.availability,
-          startDate: allocation.date,
-          endDate: allocation.date
-        }))
-      }, zone
     };
   }
 

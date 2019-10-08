@@ -1,11 +1,13 @@
 import { CampaignStoreService } from './campaign-store.service';
 import { Campaign, CampaignState, Flight, FlightState, Availability } from './campaign.models';
 import { CampaignService } from './campaign.service';
+import { InventoryService } from '../inventory/inventory.service';
 import { of } from 'rxjs';
 
 describe('CampaignStoreService', () => {
   let store: CampaignStoreService;
   let campaignService: CampaignService;
+  let inventoryService: InventoryService;
   let campaignFixture: Campaign;
   let flightFixture: Flight;
   let campaignStateFixture: CampaignState;
@@ -16,10 +18,13 @@ describe('CampaignStoreService', () => {
     campaignService = {
       getCampaign: jest.fn(id => of(campaignStateFixture)),
       putCampaign: jest.fn(state => of({ ...campaignStateFixture, flights: {} })),
-      putFlight: jest.fn(state => of(flightStateFixture)),
+      putFlight: jest.fn(state => of(flightStateFixture))
+    } as any;
+    inventoryService = {
       getInventoryAvailability: jest.fn(flight => of(availabilityFixture))
     } as any;
-    store = new CampaignStoreService(campaignService);
+
+    store = new CampaignStoreService(campaignService, inventoryService);
     campaignFixture = {
       id: 1,
       name: 'my campaign name',
