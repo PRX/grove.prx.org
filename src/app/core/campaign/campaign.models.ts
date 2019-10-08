@@ -11,6 +11,7 @@ export interface FlightState {
   remoteFlight?: Flight;
   changed: boolean;
   valid: boolean;
+  softDeleted?: boolean;
 }
 
 export interface Campaign {

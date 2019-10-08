@@ -11,7 +11,9 @@ import { map } from 'rxjs/operators';
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
       [flight]="flightLocal$ | async"
+      [softDeleted]="softDeleted$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
+      (flightDeleteToggle)="flightDeleteToggle($event)"
       (flightDuplicate)="flightDuplicate($event)"
     ></grove-flight>
   `,
@@ -21,6 +23,7 @@ export class FlightContainerComponent implements OnInit {
   private currentFlightId: string;
   state$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.state$.pipe(map(state => state.localFlight));
+  softDeleted$ = this.state$.pipe(map(state => state.softDeleted));
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -69,6 +72,15 @@ export class FlightContainerComponent implements OnInit {
 
       const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+    });
+  }
+
+  flightDeleteToggle() {
+    this.campaignStoreService.campaignFirst$.subscribe(state => {
+      const currentState = state.flights[this.currentFlightId];
+      const newState = { ...currentState, softDeleted: !!!currentState.softDeleted };
+      this.campaignStoreService.setFlight(newState, this.currentFlightId);
+      this.state$.next(newState);
     });
   }
 }

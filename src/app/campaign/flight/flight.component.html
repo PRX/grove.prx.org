@@ -36,8 +36,8 @@
     </mat-form-field>
   </form>
   <div class="flight-controls-container">
-    <button mat-fab color="primary" aria-label="Delete flight">
-      <mat-icon>delete</mat-icon>
+    <button (click)="toggleDeleteFlight()" mat-fab color="primary" attr.aria-label="{{ softDeleted ? 'Restore flight' : 'Delete flight' }}">
+      <mat-icon>{{ softDeleted ? 'restore_from_trash' : 'delete' }}</mat-icon>
     </button>
     <button (click)="duplicateFlight()" mat-fab color="primary" aria-label="Copy flight">
       <mat-icon>file_copy</mat-icon>

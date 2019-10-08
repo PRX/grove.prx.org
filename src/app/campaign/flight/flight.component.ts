@@ -12,6 +12,20 @@ export class FlightComponent implements OnInit {
   @Input() inventory: Inventory[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
+  @Output() flightDeleteToggle = new EventEmitter(true);
+
+  // tslint:disable-next-line
+  private _softDeleted: boolean;
+  get softDeleted() {
+    return this._softDeleted;
+  }
+  @Input()
+  set softDeleted(deleted: boolean) {
+    this._softDeleted = deleted;
+    Object.keys(this.flightForm.controls).forEach(key => {
+      deleted ? this.flightForm.controls[key].disable() : this.flightForm.controls[key].enable();
+    });
+  }
 
   // tslint:disable-next-line
   private _flight: Flight;
@@ -85,5 +99,9 @@ export class FlightComponent implements OnInit {
 
   duplicateFlight() {
     this.flightDuplicate.emit(this.flight);
+  }
+
+  toggleDeleteFlight() {
+    this.flightDeleteToggle.emit();
   }
 }
