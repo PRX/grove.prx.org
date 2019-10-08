@@ -54,6 +54,17 @@ describe('FlightContainerComponent', () => {
     routeId.next('123');
   });
 
+  it('loads inventory availability', done => {
+    routeId.next('321');
+    campaign.next({ flights: { 123: { name: 'my-flight'} , 321: { name: 'my-other-flight' } }, availability: {} });
+    component.flightAvailability$.subscribe(availability => {
+      expect(availability).toBeDefined();
+      expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
+      done();
+    });
+    routeId.next('123');
+  });
+
   it('redirects to campaign if the flight does not exist', () => {
     campaign.next({ flights: { 123: { name: 'my-flight' } } });
     routeId.next('456');
