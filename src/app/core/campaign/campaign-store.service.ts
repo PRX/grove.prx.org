@@ -61,11 +61,12 @@ export class CampaignStoreService {
     return this.campaign$.pipe(
       map(state => {
         // availability of current flights
-        const availabilityZones = state.flights[flightId] &&
-          state.flights[flightId].localFlight &&
-          state.flights[flightId].localFlight.zones &&
+        // `${flightId}` because flightId is sometimes a number, sometimes a string but is a string in the store ids
+        const availabilityZones = state.flights[`${flightId}`] &&
+          state.flights[`${flightId}`].localFlight &&
+          state.flights[`${flightId}`].localFlight.zones &&
           state.availability &&
-          state.flights[flightId].localFlight.zones
+          state.flights[`${flightId}`].localFlight.zones
             .filter(zone => state.availability[`${flightId}-${zone}`])
             .map(zone => state.availability[`${flightId}-${zone}`]);
         // each zone
@@ -75,21 +76,33 @@ export class CampaignStoreService {
           // acc weeks
           return availability.totals.groups.reduce((acc, day) => {
             const dayDate = new Date(day.startDate + ' 0:0:0');
+            // if dayDate has passed into the next week (past prior weekEnd)
             if (!weekEnd || weekEnd.valueOf() <= dayDate.valueOf()) {
               weekBeginString = day.startDate;
               weekEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59);
               weekEnd.setDate(weekEnd.getDate() + (6 - weekEnd.getDay()));
+
+              // initialize week entry with day 0 values
+              acc.totals.groups[weekBeginString] = {
+                allocated: day.allocated || 0,
+                availability: day.availability || 0,
+                startDate: weekBeginString,
+                endDate: weekEnd.toISOString().slice(0, 10),
+                groups: [day]
+              };
+            } else {
+              // accumulate values onto week
+              acc.totals.groups[weekBeginString] = {
+                allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
+                availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
+                startDate: weekBeginString,
+                endDate: weekEnd.toISOString().slice(0, 10),
+                groups: acc.totals.groups[weekBeginString].groups.concat([day])
+              };
             }
-            const week = acc.totals.groups[weekBeginString];
-            acc.totals.groups[weekBeginString] = {
-              allocated: week && week.allocated ? week.allocated + day.allocated : day.allocated || 0,
-              availability: week && week.availability ? week.availability + day.availability : day.availability || 0,
-              startDate: weekBeginString,
-              endDate: weekEnd.toISOString().slice(0, 10),
-              groups: week && week.groups ? week.groups.concat([day]) : [day]
-            };
-            acc.totals.allocated += week && week.allocated || 0;
-            acc.totals.availability += week && week.availability || 0;
+            // accumulate days onto totals
+            acc.totals.allocated += day.allocated;
+            acc.totals.availability += day.availability;
             return acc;
           }, {
             zone: availability.zone,
