@@ -8,11 +8,12 @@ import { MatButtonModule } from '@angular/material/button';
 import * as autocomplete from './autocomplete';
 import { AuthGuard, DeactivateGuard, UnauthGuard,
   IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
-
+import { LargeNumberPipe } from './pipes/large-number.pipe';
 @NgModule({
   declarations: [
     autocomplete.OptionsPipe,
-    autocomplete.AutocompleteComponent
+    autocomplete.AutocompleteComponent,
+    LargeNumberPipe
   ],
   imports: [
     CommonModule,
@@ -23,6 +24,7 @@ import { AuthGuard, DeactivateGuard, UnauthGuard,
     ReactiveFormsModule
   ],
   exports: [
+    LargeNumberPipe,
     IconModule,
     ImageModule,
     SpinnerModule,

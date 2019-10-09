@@ -81,7 +81,7 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged(cmp);
+      this.formStatusChanged({...cmp, id: this.flight.id});
     });
   }
 
