@@ -2,7 +2,11 @@ mat-card {
   min-height: 400px;
   border-radius: 0;
 }
-
+mat-card form {
+  display: flex;
+  flex-direction: column;
+  flex-flow: column;
+}
 mat-card form > * {
   max-width: 600px;
   width: 100%;

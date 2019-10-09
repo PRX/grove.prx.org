@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+}
+grove-flight {
+  flex-basis: 600px;
+}
+grove-availability {
+  flex-basis: calc(100% - 600px);
+}

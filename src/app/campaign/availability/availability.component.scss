@@ -1,0 +1,47 @@
+:host {
+  margin: 20px 10px 20px 20px;
+}
+h2, h3 {
+  font-size: 1rem;
+}
+section {
+  margin: 20px 0;
+}
+.row {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+.row.head {
+  border-top: 1px solid #ddd;
+}
+.row.head > * {
+  text-align: center;
+  font-weight: bold;
+}
+.row > * {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.row.expand > * {
+  margin-right: 2%;
+  display: flex;
+  justify-content: space-between;
+}
+.row.expand > * > span:first-child {
+  flex-basis: calc(100% / 3);
+}
+.row.totals > * {
+  font-weight: 700;
+}
+.date {
+  flex-basis: 20%;
+  text-align: right;
+}
+.avail, .goal {
+  flex-basis: 30%;
+  text-align: right;
+}
+.edit {
+  flex-basis: 20%;
+  text-align: center;
+}

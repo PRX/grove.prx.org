@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ReplaySubject, Observable, combineLatest } from 'rxjs';
-import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone } from '../../core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
+import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState, Availability } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
@@ -13,24 +13,38 @@ import { map } from 'rxjs/operators';
       [flight]="flightLocal$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
     ></grove-flight>
+    <grove-availability
+      *ngIf="flightAvailability$"
+      [flight]="flightLocal$ | async"
+      [zones]="zoneOptions$ | async"
+      [availabilityZones]="flightAvailability$ | async">
+    </grove-availability>
   `,
+  styleUrls: ['flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FlightContainerComponent implements OnInit {
+export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
-  state$ = new ReplaySubject<FlightState>(1);
-  flightLocal$ = this.state$.pipe(map(state => state.localFlight));
+  flightState$ = new ReplaySubject<FlightState>(1);
+  flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
+  flightAvailability$: Observable<Availability[]>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
+  flightSub: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private inventoryService: InventoryService,
     private campaignStoreService: CampaignStoreService,
     private router: Router
-  ) {
-    this.route.paramMap.subscribe(params => this.setFlightId(params.get('flightid')));
+  ) {}
+
+  ngOnInit() {
+    this.flightSub = combineLatest(this.route.paramMap, this.campaignStoreService.campaign$).subscribe(([params, campaignState]) => {
+      this.setFlightId(params.get('flightid'), campaignState);
+    });
+
     this.inventoryOptions$ = this.inventoryService.listInventory();
     this.zoneOptions$ = combineLatest(this.inventoryOptions$, this.currentInventoryUri$).pipe(
       map(([options, uri]) => {
@@ -40,23 +54,28 @@ export class FlightContainerComponent implements OnInit {
     );
   }
 
-  ngOnInit() {}
+  ngOnDestroy() {
+    if (this.flightSub) { this.flightSub.unsubscribe(); }
+  }
 
-  setFlightId(id: string) {
-    this.campaignStoreService.campaignFirst$.subscribe(state => {
-      if (state.flights[id]) {
-        this.currentFlightId = id;
-        this.state$.next(state.flights[id]);
-        this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
-      } else {
-        const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
-        this.router.navigate(['/campaign', campaignId]);
+  setFlightId(id: string, state: CampaignState) {
+    if (state.flights[id]) {
+      if (this.currentFlightId !== id) {
+        this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
+        this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
       }
-    });
+      this.currentFlightId = id;
+      this.flightState$.next(state.flights[id]);
+      this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
+    } else {
+      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
+      this.router.navigate(['/campaign', campaignId]);
+    }
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
+    this.campaignStoreService.loadAvailability(flight);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 }
