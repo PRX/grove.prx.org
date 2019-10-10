@@ -1,5 +1,6 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -33,6 +34,7 @@ describe('CampaignListComponent', () => {
   let fix: ComponentFixture<CampaignListComponent>;
   let de: DebugElement;
   let el: HTMLElement;
+  let router: Router;
   const mockHal = new MockHalService();
   const mockCampaignListService = new CampaignListServiceMock(mockHal);
   let campaignListService: CampaignListService;
@@ -75,6 +77,7 @@ describe('CampaignListComponent', () => {
       de = fix.debugElement;
       el = de.nativeElement;
       campaignListService = TestBed.get(CampaignListService);
+      router = TestBed.get(Router);
       fix.detectChanges();
     });
   }));
@@ -103,5 +106,20 @@ describe('CampaignListComponent', () => {
     fix.detectChanges();
     comp.ngOnChanges();
     expect(campaignListService.loadCampaignList).toHaveBeenCalledWith(params);
+  });
+
+  it('should route to campaigns asc or desc', () => {
+    jest.spyOn(comp, 'routeToParams');
+    comp.routedParams = params;
+    const toggle = de.query(By.css('input.updown-toggle'));
+    toggle.nativeElement.click();
+    expect(toggle.nativeElement.checked).toBeTruthy();
+    expect(comp.routeToParams).toHaveBeenCalledWith({desc: true});
+
+    jest.spyOn(router, 'navigate');
+    comp.routedParams.desc = true;
+    toggle.nativeElement.click();
+    expect(toggle.nativeElement.checked).toBeFalsy();
+    expect(router.navigate).toHaveBeenCalledWith(['/'], {queryParams: {desc: false, page: params.page}});
   });
 });

@@ -42,7 +42,8 @@ describe('HomeComponent', () => {
               before: params.before.toISOString(),
               after: params.after.toISOString(),
               geo: params.geo.join('|'),
-              zone: params.zone.join('|')
+              zone: params.zone.join('|'),
+              desc: 'false'
             })
           }
         },
