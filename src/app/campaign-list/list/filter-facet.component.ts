@@ -4,7 +4,7 @@ import { Facet } from '../campaign-list.service';
 @Component({
   selector: 'grove-filter-facet',
   template: `
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <mat-select
         formControlName="status"
         placeholder="Filter by {{facetName}}"
