@@ -7,18 +7,24 @@ import { map } from 'rxjs/operators';
 @Component({
   selector: 'grove-flight.container',
   template: `
-    <grove-flight
-      [inventory]="inventoryOptions$ | async"
-      [zoneOptions]="zoneOptions$ | async"
-      [flight]="flightLocal$ | async"
-      (flightUpdate)="flightUpdateFromForm($event)"
-    ></grove-flight>
-    <grove-availability
-      *ngIf="flightAvailability$"
-      [flight]="flightLocal$ | async"
-      [zones]="zoneOptions$ | async"
-      [availabilityZones]="flightAvailability$ | async">
-    </grove-availability>
+    <ng-container *ngIf="zoneOptions$ | async as zoneOpts; else loadingForm">
+      <grove-flight
+        [inventory]="inventoryOptions$ | async"
+        [zoneOptions]="zoneOpts"
+        [flight]="flightLocal$ | async"
+        (flightUpdate)="flightUpdateFromForm($event)"
+      ></grove-flight>
+      <grove-availability
+        *ngIf="flightAvailability$"
+        [flight]="flightLocal$ | async"
+        [zones]="zoneOpts"
+        [availabilityZones]="flightAvailability$ | async"
+      >
+      </grove-availability>
+    </ng-container>
+    <ng-template #loadingForm>
+      <div class="loading-form"><mat-spinner></mat-spinner></div>
+    </ng-template>
   `,
   styleUrls: ['flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -41,10 +47,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.flightSub = combineLatest(this.route.paramMap, this.campaignStoreService.campaign$).subscribe(([params, campaignState]) => {
-      this.setFlightId(params.get('flightid'), campaignState);
-    });
-
     this.inventoryOptions$ = this.inventoryService.listInventory();
     this.zoneOptions$ = combineLatest(this.inventoryOptions$, this.currentInventoryUri$).pipe(
       map(([options, uri]) => {
@@ -52,10 +54,15 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         return inventory ? inventory.zones : [];
       })
     );
+    this.flightSub = combineLatest(this.route.paramMap, this.campaignStoreService.campaign$).subscribe(([params, campaignState]) => {
+      this.setFlightId(params.get('flightid'), campaignState);
+    });
   }
 
   ngOnDestroy() {
-    if (this.flightSub) { this.flightSub.unsubscribe(); }
+    if (this.flightSub) {
+      this.flightSub.unsubscribe();
+    }
   }
 
   setFlightId(id: string, state: CampaignState) {
