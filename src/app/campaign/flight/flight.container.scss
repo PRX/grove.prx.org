@@ -7,3 +7,10 @@ grove-flight {
 grove-availability {
   flex-basis: calc(100% - 600px);
 }
+
+.loading-form {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 5em 0;
+}

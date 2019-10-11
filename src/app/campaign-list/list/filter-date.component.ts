@@ -3,14 +3,14 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from 
 @Component({
   selector: 'grove-filter-date',
   template: `
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <input matInput [matDatepicker]="afterDate" [max]="before"
         [value]="after" (dateChange)="dateChange.emit({after: $event.value})">
       <mat-datepicker-toggle matSuffix [for]="afterDate"></mat-datepicker-toggle>
       <mat-datepicker #afterDate></mat-datepicker>
     </mat-form-field>
 
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <input matInput [matDatepicker]="beforeDate" [min]="after"
         [value]="before" (dateChange)="dateChange.emit({before: $event.value})">
       <mat-datepicker-toggle matSuffix [for]="beforeDate"></mat-datepicker-toggle>

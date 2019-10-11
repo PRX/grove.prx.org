@@ -13,6 +13,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 
 @NgModule({
@@ -29,6 +30,7 @@ import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
     MatListModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatProgressSpinnerModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,
