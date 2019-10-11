@@ -153,6 +153,27 @@ describe('CampaignStoreService', () => {
     });
   });
 
+  it('removes flights', done => {
+    const [retainId, deleteId] = [1, 2];
+    const retainFlight: FlightState = { localFlight: { ...flightFixture, id: retainId }, changed: true, valid: false };
+    const deleteFlight: FlightState = { localFlight: { ...flightFixture, id: deleteId }, changed: true, valid: false };
+    store.load(1);
+
+    store.setFlight(retainFlight, retainId);
+    store.setFlight(deleteFlight, deleteId);
+    store.campaign$
+      .subscribe(camp => {
+        expect(Object.keys(camp.flights).length).toEqual(3);
+      })
+      .unsubscribe();
+    store.removeFlight(deleteId);
+    store.campaign$.subscribe(camp => {
+      expect(Object.keys(camp.flights).length).toEqual(2);
+      expect(camp.flights[retainId].localFlight.id).toEqual(retainId);
+      done();
+    });
+  });
+
   it('updates existing flights', done => {
     const existingFlight: FlightState = { localFlight: { ...flightFixture, name: 'foo' }, changed: true, valid: false };
     store.load(1);

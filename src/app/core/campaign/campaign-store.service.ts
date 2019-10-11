@@ -229,6 +229,19 @@ export class CampaignStoreService {
     return updating;
   }
 
+  removeFlight(flightId: string | number): Observable<CampaignState> {
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const { [flightId]: deletedFlight, ...updatedFlights } = { ...state.flights };
+        const updatedState = { ...state, flights: updatedFlights };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
+  }
+
   private putCampaign(): Observable<{ prevId: number; state: CampaignState }> {
     return this.campaignFirst$.pipe(
       switchMap(state => {
