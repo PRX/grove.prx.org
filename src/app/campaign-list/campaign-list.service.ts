@@ -26,6 +26,7 @@ export interface CampaignParams {
   representative?: string;
   before?: Date;
   after?: Date;
+  desc?: boolean;
 }
 
 export interface Facets {
@@ -103,14 +104,15 @@ export class CampaignListService {
 
     // newParams includes all params (from route) except per
     this.params = {...newParams, per: this.params.per, page: (newParams && newParams.page) || 1};
-    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after } = this.params;
+    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc } = this.params;
     const filters = this.getFilters({advertiser, podcast, status, type, geo, zone, text, representative, before, after});
 
     this.augury.follow('prx:campaigns', {
       page,
       per,
       zoom: 'prx:flights,prx:advertiser',
-      ...(filters && {filters})
+      ...(filters && {filters}),
+      sorts: 'flight_start_at:' + (desc ? 'desc' : 'asc')
     }).pipe(
       switchMap(result => {
         this.count = +result['count'];

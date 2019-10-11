@@ -9,7 +9,15 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
     <grove-campaign-filter
       [params]="params" [facets]="facets" (campaignListParams)="routeToParams($event)">
     </grove-campaign-filter>
-    <h2>Campaigns</h2>
+    <div class="campaigns-head">
+      <h2>Campaigns</h2>
+      <div>
+        <input type="checkbox" class="updown-toggle" id="desc"
+          [checked]="routedParams?.desc"
+          (click)="routeToParams({desc: !routedParams.desc})">
+        <label for="desc"></label>
+      </div>
+    </div>
     <ul>
       <li *ngFor="let campaign of campaigns$ | async">
         <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
@@ -71,7 +79,7 @@ export class CampaignListComponent implements OnChanges {
   }
 
   routeToParams(partialParams: CampaignParams) {
-    let { page, advertiser, podcast, status, type, text, representative } = partialParams;
+    let { page, advertiser, podcast, status, type, text, representative, desc } = partialParams;
 
     // this function takes partial parameters (what changed)
     // mix in the existing this.params unless property was explicitly set in partialParams
@@ -95,6 +103,9 @@ export class CampaignListComponent implements OnChanges {
     }
     if (!partialParams.hasOwnProperty('representative') && this.params.representative) {
       representative = this.params.representative;
+    }
+    if (!partialParams.hasOwnProperty('desc') && this.params.hasOwnProperty('desc')) {
+      desc = this.params.desc;
     }
     let before: string;
     let after: string;
@@ -131,7 +142,8 @@ export class CampaignListComponent implements OnChanges {
       ...(geo && {geo}),
       ...(zone && {zone}),
       ...(text && {text}),
-      ...(representative && {representative})
+      ...(representative && {representative}),
+      ...(desc !== undefined && {desc})
     }});
   }
 

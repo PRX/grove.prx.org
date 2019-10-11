@@ -90,7 +90,8 @@ export const params: CampaignParams = {
   text: 'anything',
   representative: 'Schmidt',
   before: new Date('2019-09-30'),
-  after: new Date('2019-09-01')
+  after: new Date('2019-09-01'),
+  desc: false
 };
 
 @Injectable()

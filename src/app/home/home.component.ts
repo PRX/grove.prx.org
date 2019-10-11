@@ -22,7 +22,8 @@ export class HomeComponent {
       const representative = params['representative'];
       const before = params['before'] && new Date(params['before']);
       const after = params['after'] && new Date(params['after']);
-      return {page, advertiser, podcast, status, type, geo, zone, text, representative, before, after};
+      const desc = params['desc'] && params['desc'].toLowerCase() !== 'false';
+      return {page, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc};
     })
   );
 

@@ -5,7 +5,7 @@ import { debounceTime, distinctUntilChanged, filter, tap } from 'rxjs/operators'
 @Component({
   selector: 'grove-filter-text',
   template: `
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       <input matInput type="text" placeholder="Search by {{textName}}"
         [value]="inputValue" (keyup)="onChange($event.target.value)">
     </mat-form-field>

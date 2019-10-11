@@ -20,14 +20,23 @@ h3 {
   margin-bottom: 0.5em;
 }
 .status {
-  color: white;
   padding: 2px 4px;
+  color: #000;
 }
-.draft, .hold, .paused, .canceled {
-  background-color: #ff9600;
+.draft {
+  background-color: #b3d9ef;
 }
 .approved {
-  background-color: #61A85D;
+  background-color: #23c763;
+}
+.paused {
+  background-color: #ffc400;
+}
+.canceled {
+  background-color: #e04524;
+}
+.hold {
+  background-color: #ff9600;
 }
 .sold {
   background-color: #17C9D3;
