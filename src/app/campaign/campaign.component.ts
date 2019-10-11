@@ -22,6 +22,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
             *ngFor="let flight of campaignFlights$ | async"
             [routerLink]="['flight', flight.id]"
             routerLinkActive="active-link"
+            [class.deleted-flight]="flight.softDeleted"
           >
             {{ flight.name }}
           </a>
@@ -39,7 +40,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignComponent implements OnInit, OnDestroy {
-  campaignFlights$: Observable<{ id: string; name: string }[]>;
+  campaignFlights$: Observable<{ id: string; name: string; softDeleted: boolean }[]>;
   campaignSaving: boolean;
   routeSub: Subscription;
 
@@ -52,19 +53,19 @@ export class CampaignComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.routeSub = this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        return this.advertiserService.loadAdvertisers().pipe(
-          map(advertisers => ({params, advertisers}))
-        );
-      })
-    ).subscribe(({params, advertisers}) => {
-      this.campaignStoreService.load(params.get('id'));
-    });
+    this.routeSub = this.route.paramMap
+      .pipe(
+        switchMap((params: ParamMap) => {
+          return this.advertiserService.loadAdvertisers().pipe(map(advertisers => ({ params, advertisers })));
+        })
+      )
+      .subscribe(({ params, advertisers }) => {
+        this.campaignStoreService.load(params.get('id'));
+      });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
       map(flightStates => {
         return Object.keys(flightStates).map(id => {
-          return { id, name: flightStates[id].localFlight.name || '(Flight)' };
+          return { id, name: flightStates[id].localFlight.name || '(Flight)', softDeleted: !!flightStates[id].softDeleted };
         });
       })
     );
