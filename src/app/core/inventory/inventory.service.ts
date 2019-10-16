@@ -38,14 +38,13 @@ export class InventoryService {
     };
   }
 
-  getInventoryAvailability({id, startDate, endDate, zoneName, flightId}): Observable<Availability> {
+  getInventoryAvailability({id, startDate, endDate, zoneName}): Observable<Availability> {
     return this.augury.follow('prx:inventory', {id}).pipe(
       switchMap(inventory => {
         return inventory.follow('prx:availability', {
           startDate,
           endDate,
-          zoneName,
-          flightId
+          zoneName
         });
       }),
       map(doc => this.docToAvailability(zoneName, doc))

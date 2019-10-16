@@ -144,8 +144,7 @@ export class CampaignStoreService {
           id: inventoryId,
           startDate,
           endDate,
-          zoneName,
-          flightId: flight.id
+          zoneName
         });
       })).pipe(
         share()
