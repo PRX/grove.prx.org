@@ -21,6 +21,7 @@ import { map } from 'rxjs/operators';
         [inventory]="inventoryOptions$ | async"
         [zoneOptions]="zoneOpts"
         [flight]="flightLocal$ | async"
+        [softDeleted]="softDeleted$ | async"
         (flightUpdate)="flightUpdateFromForm($event)"
         (flightDeleteToggle)="flightDeleteToggle($event)"
         (flightDuplicate)="flightDuplicate($event)"

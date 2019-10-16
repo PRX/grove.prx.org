@@ -23,7 +23,7 @@ export class FlightComponent implements OnInit {
   set softDeleted(deleted: boolean) {
     this._softDeleted = deleted;
     Object.keys(this.flightForm.controls).forEach(key => {
-      deleted ? this.flightForm.controls[key].disable() : this.flightForm.controls[key].enable();
+      deleted ? this.flightForm.controls[key].disable({ emitEvent: false }) : this.flightForm.controls[key].enable({ emitEvent: false });
     });
   }
 
@@ -81,7 +81,9 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged({...cmp, id: this.flight.id});
+      // if (this.flight) {
+      this.formStatusChanged({ ...cmp, id: this.flight.id });
+      // }
     });
   }
 
