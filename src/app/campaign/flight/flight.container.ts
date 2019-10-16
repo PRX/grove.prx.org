@@ -113,7 +113,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightDeleteToggle() {
     this.campaignStoreService.campaignFirst$.subscribe(state => {
       const currentState = state.flights[this.currentFlightId];
-      const newState = { ...currentState, softDeleted: !!!currentState.softDeleted };
+      const newState = { ...currentState, changed: true, softDeleted: !!!currentState.softDeleted };
       this.campaignStoreService.setFlight(newState, this.currentFlightId);
       this.flightState$.next(newState);
     });

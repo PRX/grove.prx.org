@@ -183,6 +183,14 @@ export class CampaignStoreService {
   storeCampaign(): Observable<CampaignStateChanges> {
     const saving = this.putCampaign().pipe(
       switchMap(campaignChanges => {
+        const { flights } = campaignChanges.state;
+        const deletedFlightIds = Object.keys(flights).filter(fId => flights[fId].softDeleted);
+        deletedFlightIds.forEach(fId => {
+          if (flights[fId].remoteFlight) {
+            this.campaignService.deleteFlight(fId).subscribe();
+          }
+          this.removeFlight(fId);
+        });
         return this.putFlights().pipe(
           map(flightChanges => {
             this._campaign$.next({
