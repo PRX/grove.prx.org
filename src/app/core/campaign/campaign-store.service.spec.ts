@@ -18,7 +18,8 @@ describe('CampaignStoreService', () => {
     campaignService = {
       getCampaign: jest.fn(id => of(campaignStateFixture)),
       putCampaign: jest.fn(state => of({ ...campaignStateFixture, flights: {} })),
-      putFlight: jest.fn(state => of(flightStateFixture))
+      putFlight: jest.fn(state => of(flightStateFixture)),
+      deleteFlight: jest.fn(state => of({ id: 1337 }))
     } as any;
     inventoryService = {
       getInventoryAvailability: jest.fn(flight => of(availabilityFixture))
@@ -128,6 +129,23 @@ describe('CampaignStoreService', () => {
     campaignService.getCampaign = jest.fn(id => of(newState)) as any;
     store.storeCampaign().subscribe(changes => {
       expect(changes).toEqual({ id: 1, prevId: null, flights: { 'unsaved-id': 9 } });
+      done();
+    });
+    store.load(1);
+  });
+
+  it('removes and deletes flights marked for deletion when storing a campaign', done => {
+    const softDeletedId = 'deletion-id';
+    const newState = {
+      ...campaignStateFixture,
+      remoteCampaign: { ...campaignFixture },
+      flights: { [softDeletedId]: { ...flightStateFixture, softDeleted: true } }
+    };
+    const removeFlightSpy = jest.spyOn(store, 'removeFlight');
+    campaignService.putCampaign = jest.fn(id => of(newState));
+    store.storeCampaign().subscribe(changes => {
+      expect(removeFlightSpy).toHaveBeenCalledWith(softDeletedId);
+      expect(campaignService.deleteFlight).toHaveBeenCalledWith(softDeletedId);
       done();
     });
     store.load(1);
