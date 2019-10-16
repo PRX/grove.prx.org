@@ -61,8 +61,7 @@ describe('InventoryService', () => {
       id: 1,
       startDate: '2019-10-01',
       endDate: '2019-11;01',
-      zoneName: 'pre_1',
-      flightId: 1})
+      zoneName: 'pre_1'})
     .subscribe(avail => {
       expect(avail.totals.startDate).toEqual(availabilityFixture.startDate);
       expect(avail.totals.endDate).toEqual(availabilityFixture.endDate);
