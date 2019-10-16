@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, FlightState, InventoryZone, CampaignState, Availability } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, filter, first } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',
@@ -81,8 +81,20 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
+    this.flightState$.pipe(
+      filter((flightState: FlightState) => {
+        const { localFlight } = flightState;
+        return flight.startAt && flight.endAt &&
+          flight.set_inventory_uri &&
+          flight.zones && flight.zones.length > 0 &&
+          (new Date(flight.startAt).valueOf() !== new Date(localFlight.startAt).valueOf() ||
+            new Date(flight.endAt).valueOf() !== new Date(localFlight.endAt).valueOf() ||
+            flight.set_inventory_uri !== localFlight.set_inventory_uri ||
+            !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
+      }),
+      first()
+    ).subscribe(() => this.campaignStoreService.loadAvailability({...flight, id: this.currentFlightId}));
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
-    this.campaignStoreService.loadAvailability(flight);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 }
