@@ -74,7 +74,7 @@ describe('CampaignComponent', () => {
     const flight2 = flightFactory({ name: 'Name 2' });
     campaignState.next({ ...campaign, flights: { flight1, flight2 } });
     component.campaignFlights$.subscribe(options => {
-      expect(options).toEqual([{ id: 'flight1', name: 'Name 1' }, { id: 'flight2', name: 'Name 2' }]);
+      expect(options).toMatchObject([{ id: 'flight1', name: 'Name 1' }, { id: 'flight2', name: 'Name 2' }]);
       done();
     });
   });

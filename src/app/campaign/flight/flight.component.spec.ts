@@ -5,7 +5,9 @@ import {
   MatInputModule,
   MatSelectModule,
   MatDatepickerModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  MatButtonModule,
+  MatIconModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -27,7 +29,9 @@ describe('FlightComponent', () => {
         MatInputModule,
         MatSelectModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatButtonModule,
+        MatIconModule
       ],
       declarations: [FlightComponent]
     }).compileComponents();
