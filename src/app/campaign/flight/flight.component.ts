@@ -97,11 +97,11 @@ export class FlightComponent implements OnInit {
     this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
   }
 
-  duplicateFlight() {
+  onFlightDuplicate() {
     this.flightDuplicate.emit(this.flight);
   }
 
-  toggleDeleteFlight() {
+  onFlightDeleteToggle() {
     this.flightDeleteToggle.emit();
   }
 }
