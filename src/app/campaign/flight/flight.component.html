@@ -35,4 +35,17 @@
       </mat-select>
     </mat-form-field>
   </form>
+  <div class="flight-controls-container">
+    <button
+      (click)="onFlightDeleteToggle()"
+      mat-fab
+      [color]="softDeleted ? 'primary' : 'warn'"
+      [attr.aria-label]="softDeleted ? 'Restore flight' : 'Delete flight'"
+    >
+      <mat-icon>{{ softDeleted ? 'restore_from_trash' : 'delete' }}</mat-icon>
+    </button>
+    <button (click)="onFlightDuplicate()" mat-fab color="primary" aria-label="Copy flight">
+      <mat-icon>file_copy</mat-icon>
+    </button>
+  </div>
 </mat-card>

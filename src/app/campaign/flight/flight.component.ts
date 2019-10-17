@@ -11,6 +11,21 @@ import { FormBuilder, Validators } from '@angular/forms';
 export class FlightComponent implements OnInit {
   @Input() inventory: Inventory[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
+  @Output() flightDuplicate = new EventEmitter<Flight>(true);
+  @Output() flightDeleteToggle = new EventEmitter(true);
+
+  // tslint:disable-next-line
+  private _softDeleted: boolean;
+  get softDeleted() {
+    return this._softDeleted;
+  }
+  @Input()
+  set softDeleted(deleted: boolean) {
+    this._softDeleted = deleted;
+    Object.keys(this.flightForm.controls).forEach(key => {
+      deleted ? this.flightForm.controls[key].disable({ emitEvent: false }) : this.flightForm.controls[key].enable({ emitEvent: false });
+    });
+  }
 
   // tslint:disable-next-line
   private _flight: Flight;
@@ -66,7 +81,7 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged({...cmp, id: this.flight.id});
+      this.formStatusChanged({ ...cmp, id: this.flight.id });
     });
   }
 
@@ -80,5 +95,13 @@ export class FlightComponent implements OnInit {
 
   updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
     this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
+  }
+
+  onFlightDuplicate() {
+    this.flightDuplicate.emit(this.flight);
+  }
+
+  onFlightDeleteToggle() {
+    this.flightDeleteToggle.emit();
   }
 }
