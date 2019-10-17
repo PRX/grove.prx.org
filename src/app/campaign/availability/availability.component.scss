@@ -9,10 +9,14 @@ section {
 }
 .row {
   display: flex;
+  align-items: center;
   border-bottom: 1px solid #ddd;
 }
 .row.head {
   border-top: 1px solid #ddd;
+}
+.row:not(.expand), .row.head {
+  line-height: 28px;
 }
 .row.head > * {
   text-align: center;
@@ -32,10 +36,17 @@ section {
 }
 .row.totals > * {
   font-weight: 700;
+  font-style: italic;
 }
 .date {
   flex-basis: 20%;
   text-align: right;
+}
+.date button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 .avail, .goal {
   flex-basis: 30%;
@@ -44,4 +55,7 @@ section {
 .edit {
   flex-basis: 20%;
   text-align: center;
+}
+prx-icon.hide {
+  visibility: hidden;
 }

@@ -14,15 +14,29 @@ import { Flight, Availability, InventoryZone } from '../../core';
         <div class="date">Week</div>
         <div class="avail">Available</div>
         <div class="goal">Goal</div>
+        <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
       </div>
       <ng-container *ngFor="let week of zone.totals.groups">
         <div class="row">
           <div class="date">
-            <button class="btn-link" (click)="toggleZoneWeekExpanded(zone.zone, week.startDate)">{{ week.startDate | date:'M/dd' }}</button>
+            <button class="btn-link"
+              (click)="toggleZoneWeekExpanded(zone.zone, week.startDate)"
+              (mouseover)="toggleZoneWeekHover(zone.zone, week.startDate)"
+              (mouseleave)="toggleZoneWeekHover(zone.zone, week.startDate)">
+              <prx-icon
+                [class.hide]="!(zoneWeekHover[zone.zone + '-' + week.startDate] || zoneWeekExpanded[zone.zone + '-' + week.startDate])"
+                name="arrows-alt-v" size="6px" color="primary">
+              </prx-icon>
+              {{ week.startDate | date:'M/dd' }}
+            </button>
           </div>
           <div class="avail">{{ (week.allocated + week.availability) | largeNumber }}</div>
           <div class="goal"></div>
-          <div class="edit"></div>
+          <div class="edit">
+            <button class="btn-link" aria-label="Edit">
+              <prx-icon name="pencil" size="14px" color="primary"></prx-icon>
+            </button>
+          </div>
         </div>
         <ng-container *ngIf="zoneWeekExpanded[zone.zone + '-' + week.startDate]">
           <div class="row expand" *ngFor="let day of week.groups">
@@ -49,9 +63,14 @@ export class AvailabilityComponent {
   @Input() zones: InventoryZone[];
   @Input() availabilityZones: Availability[];
   zoneWeekExpanded = {};
+  zoneWeekHover = {};
 
   toggleZoneWeekExpanded(zone: string, date: string) {
     this.zoneWeekExpanded[`${zone}-${date}`] = !this.zoneWeekExpanded[`${zone}-${date}`];
+  }
+
+  toggleZoneWeekHover(zone: string, date: string) {
+    this.zoneWeekHover[`${zone}-${date}`] = !this.zoneWeekHover[`${zone}-${date}`];
   }
 
   getZoneName(zoneId: string): string {
