@@ -118,7 +118,7 @@ describe('CampaignStoreService', () => {
 
   it('stores a campaign', done => {
     store.storeCampaign().subscribe(changes => {
-      expect(changes).toEqual({ id: 1, prevId: 1, flights: { 9: 9 } });
+      expect(changes).toEqual([{ id: 1, prevId: 1, flights: { 9: 9 } }, []]);
       done();
     });
     store.load(1);
