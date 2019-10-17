@@ -89,7 +89,7 @@ describe('CampaignComponent', () => {
 
   it('redirects to a new campaign', () => {
     const changes = { id: '1234', prevId: null, flights: { 9999: '9999' } };
-    campaignStoreService.storeCampaign = jest.fn(() => of(changes)) as any;
+    campaignStoreService.storeCampaign = jest.fn(() => of([changes, []])) as any;
     component.campaignSubmit();
     expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', '1234']);
@@ -97,7 +97,7 @@ describe('CampaignComponent', () => {
 
   it('redirects to a new flight', () => {
     const changes = { id: '1234', prevId: null, flights: { 9999: '8888' } };
-    campaignStoreService.storeCampaign = jest.fn(() => of(changes)) as any;
+    campaignStoreService.storeCampaign = jest.fn(() => of([changes, []])) as any;
     component.campaignSubmit();
     expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', '1234', 'flight', '8888']);

@@ -19,7 +19,7 @@ describe('CampaignStoreService', () => {
       getCampaign: jest.fn(id => of(campaignStateFixture)),
       putCampaign: jest.fn(state => of({ ...campaignStateFixture, flights: {} })),
       putFlight: jest.fn(state => of(flightStateFixture)),
-      deleteFlight: jest.fn(state => of({ id: 1337 }))
+      deleteFlight: jest.fn(id => of({ id }))
     } as any;
     inventoryService = {
       getInventoryAvailability: jest.fn(flight => of(availabilityFixture))
@@ -125,10 +125,32 @@ describe('CampaignStoreService', () => {
   });
 
   it('returns changes for new campaigns and flights', done => {
+    const unsavedId = 'unsaved-id';
     const newState = { ...campaignStateFixture, remoteCampaign: null, flights: { 'unsaved-id': { ...flightFixture, remoteFlight: null } } };
     campaignService.getCampaign = jest.fn(id => of(newState)) as any;
-    store.storeCampaign().subscribe(changes => {
+    store.storeCampaign().subscribe(([changes, deletedDocs]) => {
       expect(changes).toEqual({ id: 1, prevId: null, flights: { 'unsaved-id': 9 } });
+      done();
+    });
+    store.load(1);
+  });
+
+  it('returns deletion docs for deleted flights', done => {
+    const deletedId = 'deleted-id';
+    const newState = {
+      ...campaignStateFixture,
+      remoteCampaign: { ...campaignFixture },
+      flights: {
+        [deletedId]: {
+          ...flightStateFixture,
+          ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: deletedId }, softDeleted: true }
+        }
+      }
+    };
+    campaignService.putCampaign = jest.fn(id => of(newState)) as any;
+    store.storeCampaign().subscribe(([changes, deletedDocs]) => {
+      expect(campaignService.deleteFlight).toHaveBeenCalledWith(deletedId);
+      expect(deletedDocs).toMatchObject([{ id: deletedId }]);
       done();
     });
     store.load(1);

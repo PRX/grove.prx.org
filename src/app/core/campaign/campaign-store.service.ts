@@ -4,6 +4,7 @@ import { InventoryService } from '../inventory/inventory.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
+import { HalDoc } from 'ngx-prx-styleguide';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -180,35 +181,48 @@ export class CampaignStoreService {
     }
   }
 
-  storeCampaign(): Observable<CampaignStateChanges> {
+  storeCampaign(): Observable<[CampaignStateChanges, HalDoc[]]> {
     const saving = this.putCampaign().pipe(
       switchMap(campaignChanges => {
         const { flights } = campaignChanges.state;
-        const deletedFlightIds = Object.keys(flights).filter(fId => flights[fId].softDeleted);
-        deletedFlightIds.forEach(fId => {
-          if (flights[fId].remoteFlight) {
-            this.campaignService.deleteFlight(fId).subscribe();
-          }
-          this.removeFlight(fId);
-        });
-        return this.putFlights().pipe(
-          map(flightChanges => {
-            this._campaign$.next({
-              ...campaignChanges.state,
-              flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
-            });
-            return {
-              id: campaignChanges.state.remoteCampaign.id,
-              prevId: campaignChanges.prevId,
-              flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
-            };
-          })
+        return forkJoin(
+          this.putFlights().pipe(
+            map(flightChanges => {
+              this._campaign$.next({
+                ...campaignChanges.state,
+                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+              });
+              return {
+                id: campaignChanges.state.remoteCampaign.id,
+                prevId: campaignChanges.prevId,
+                flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
+              };
+            })
+          ),
+          this.deleteFlights(
+            Object.keys(flights)
+              .filter(fId => flights[fId].softDeleted)
+              .map(fId => ({ id: fId, persisted: !!flights[fId].remoteFlight }))
+          )
         );
       }),
       share()
     );
     saving.subscribe();
     return saving;
+  }
+
+  deleteFlights(deletedFlights: { id: string; persisted: boolean }[]): Observable<HalDoc[]> {
+    deletedFlights.forEach(({ id }) => this.removeFlight(id));
+    const persistedFlights = deletedFlights.filter(({ persisted }) => persisted);
+    if (!persistedFlights.length) {
+      return of([]);
+    }
+    return forkJoin(
+      persistedFlights.map(({ id }) => {
+        return this.campaignService.deleteFlight(id);
+      })
+    );
   }
 
   setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {

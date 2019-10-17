@@ -79,7 +79,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
 
   campaignSubmit() {
     this.campaignSaving = true;
-    this.campaignStoreService.storeCampaign().subscribe(changes => {
+    this.campaignStoreService.storeCampaign().subscribe(([changes, deletedDocs]) => {
       this.toastr.success('Campaign saved');
       this.campaignSaving = false;
 
