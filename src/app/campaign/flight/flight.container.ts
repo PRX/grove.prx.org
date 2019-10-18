@@ -114,8 +114,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         first()
       )
       .subscribe(() => {
-        // TODO: can get flight id from this.currentFlightId, but dont want to use that for request
         this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
+        this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
       });
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
     this.currentInventoryUri$.next(flight.set_inventory_uri);

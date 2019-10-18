@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { AllocationPreviewService } from '../allocation/allocation-preview.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
@@ -27,7 +28,11 @@ export class CampaignStoreService {
     return this.campaign$.pipe(map(c => c && c.flights));
   }
 
-  constructor(private campaignService: CampaignService, private inventoryService: InventoryService) {}
+  constructor(
+    private campaignService: CampaignService,
+    private inventoryService: InventoryService,
+    private allocationPreviewService: AllocationPreviewService
+  ) {}
 
   load(id: number | string = null): Observable<CampaignState> {
     if (!id) {
@@ -184,6 +189,49 @@ export class CampaignStoreService {
         });
       return loading;
     }
+  }
+
+  // the flightId parameter here will be the temp id in the case the flight has not yet been created
+  loadAllocationPreview(
+    { id, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones },
+    flightId?: string
+  ): Observable<any> {
+    // dates come back as Date but typed string, use YYYY-MM-DD formatted string
+    startAt = new Date(startAt.valueOf()).toISOString().slice(0, 10);
+    endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
+    const loading = this.allocationPreviewService
+      .getAllocationPreview({
+        set_inventory_uri,
+        name,
+        startAt,
+        endAt,
+        totalGoal,
+        dailyMinimum,
+        zones
+      })
+      .pipe(share());
+    loading
+      .pipe(
+        first(),
+        withLatestFrom(this._campaign$)
+      )
+      .subscribe(([result, state]) => {
+        const updatedState = {
+          ...state,
+          allocationPreview: {
+            ...state.allocationPreview,
+            ...result.zones.reduce(
+              (acc, zone) => ({
+                ...acc,
+                [`${flightId || id}-${zone}`]: { ...result, allocations: result.allocations.filter(a => a.zoneName === zone) }
+              }),
+              {}
+            )
+          }
+        };
+        this._campaign$.next(updatedState);
+      });
+    return loading;
   }
 
   storeCampaign(): Observable<[CampaignStateChanges, HalDoc[]]> {
