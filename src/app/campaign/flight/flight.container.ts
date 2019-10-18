@@ -94,19 +94,29 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
-    this.flightState$.pipe(
-      filter((flightState: FlightState) => {
-        const { localFlight } = flightState;
-        return flight.startAt && flight.endAt &&
-          flight.set_inventory_uri &&
-          flight.zones && flight.zones.length > 0 &&
-          (new Date(flight.startAt).valueOf() !== new Date(localFlight.startAt).valueOf() ||
-            new Date(flight.endAt).valueOf() !== new Date(localFlight.endAt).valueOf() ||
-            flight.set_inventory_uri !== localFlight.set_inventory_uri ||
-            !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
-      }),
-      first()
-    ).subscribe(() => this.campaignStoreService.loadAvailability({...flight, id: this.currentFlightId}));
+    this.flightState$
+      .pipe(
+        filter((flightState: FlightState) => {
+          const { localFlight } = flightState;
+          return (
+            flight.startAt &&
+            flight.endAt &&
+            flight.set_inventory_uri &&
+            flight.zones &&
+            flight.zones.length > 0 &&
+            // dates come back as Date but typed string, make sure working with Date types and compare the valuea
+            (new Date(flight.startAt.valueOf()).valueOf() !== new Date(localFlight.startAt).valueOf() ||
+              new Date(flight.endAt.valueOf()).valueOf() !== new Date(localFlight.endAt).valueOf() ||
+              flight.set_inventory_uri !== localFlight.set_inventory_uri ||
+              !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1))
+          );
+        }),
+        first()
+      )
+      .subscribe(() => {
+        // TODO: can get flight id from this.currentFlightId, but dont want to use that for request
+        this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
+      });
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
   }

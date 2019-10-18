@@ -145,7 +145,8 @@ export class CampaignStoreService {
     );
   }
 
-  loadAvailability(flight: Flight): Observable<Availability[]> {
+  // the flightId parameter here will be the temp id in the case the flight has not yet been created
+  loadAvailability(flight: Flight, flightId?: string): Observable<Availability[]> {
     if (flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0) {
       // Flight dates are typed string but are actually sometimes Date
       const startDate = new Date(flight.startAt.valueOf()).toISOString().slice(0, 10);
@@ -157,7 +158,9 @@ export class CampaignStoreService {
             id: inventoryId,
             startDate,
             endDate,
-            zoneName
+            zoneName,
+            // flight.id will be undefined if flight is not yet created, which is when flightId is provided as the temp id
+            flightId: flight.id
           });
         })
       ).pipe(share());
@@ -171,7 +174,10 @@ export class CampaignStoreService {
             ...state,
             availability: {
               ...state.availability,
-              ...availabilities.reduce((acc, availability) => ({ ...acc, [`${flight.id}-${availability.zone}`]: availability }), {})
+              ...availabilities.reduce(
+                (acc, availability) => ({ ...acc, [`${flightId || flight.id}-${availability.zone}`]: availability }),
+                {}
+              )
             }
           };
           this._campaign$.next(updatedState);
