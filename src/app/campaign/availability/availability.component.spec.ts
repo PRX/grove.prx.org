@@ -1,6 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatFormFieldModule, MatInputModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
+import { GoalFormComponent } from './goal-form.component';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
@@ -8,41 +12,41 @@ describe('AvailabilityComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        SharedModule
-      ],
-      declarations: [
-        AvailabilityComponent
-      ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(AvailabilityComponent);
-      comp = fix.componentInstance;
-      comp.flight = {
-        id: 9,
-        name: 'my flight name',
-        startAt: '2019-10-01',
-        endAt: '2019-11-01',
-        totalGoal: 999,
-        zones: ['pre_1'],
-        set_inventory_uri: '/some/inventory'
-      };
-      comp.zones = [{id: 'pre_1', label: 'Preroll 1'}];
-      comp.availabilityZones = [{
-        zone: 'pre_1',
-        totals: {
-          startDate: '2019-10-01',
-          endDate: '2019-11-01',
-          groups: [
-            {allocated: 0, availability: 1, startDate: '2019-10-01', endDate: '2019-10-05'},
-            {allocated: 0, availability: 1339, startDate: '2019-10-06', endDate: '2019-10-12'},
-            {allocated: 0, availability: 8, startDate: '2019-10-13', endDate: '2019-10-19'},
-            {allocated: 0, availability: 1393, startDate: '2019-10-20', endDate: '2019-10-26'},
-            {allocated: 0, availability: 722, startDate: '2019-10-27', endDate: '2019-10-31'}
-          ]
-        }
-      }];
-      fix.detectChanges();
-    });
+      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+      declarations: [AvailabilityComponent, GoalFormComponent]
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(AvailabilityComponent);
+        comp = fix.componentInstance;
+        comp.flight = {
+          id: 9,
+          name: 'my flight name',
+          startAt: '2019-10-01',
+          endAt: '2019-11-01',
+          totalGoal: 999,
+          zones: ['pre_1'],
+          set_inventory_uri: '/some/inventory'
+        };
+        comp.zones = [{ id: 'pre_1', label: 'Preroll 1' }];
+        comp.availabilityZones = [
+          {
+            zone: 'pre_1',
+            totals: {
+              startDate: '2019-10-01',
+              endDate: '2019-11-01',
+              groups: [
+                { allocated: 0, availability: 1, startDate: '2019-10-01', endDate: '2019-10-05' },
+                { allocated: 0, availability: 1339, startDate: '2019-10-06', endDate: '2019-10-12' },
+                { allocated: 0, availability: 8, startDate: '2019-10-13', endDate: '2019-10-19' },
+                { allocated: 0, availability: 1393, startDate: '2019-10-20', endDate: '2019-10-26' },
+                { allocated: 0, availability: 722, startDate: '2019-10-27', endDate: '2019-10-31' }
+              ]
+            }
+          }
+        ];
+        fix.detectChanges();
+      });
   }));
 
   it('gets zone name', () => {

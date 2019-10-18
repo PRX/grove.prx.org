@@ -193,7 +193,8 @@ export class CampaignStoreService {
 
   // the flightId parameter here will be the temp id in the case the flight has not yet been created
   loadAllocationPreview(
-    { id, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones },
+    { id, set_inventory_uri, name, startAt, endAt, totalGoal, zones },
+    dailyMinimum,
     flightId?: string
   ): Observable<any> {
     // dates come back as Date but typed string, use YYYY-MM-DD formatted string

@@ -31,6 +31,7 @@ import { map, filter, first } from 'rxjs/operators';
         [flight]="flightLocal$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
+        (goalChange)="loadAllocationPreview($event.flight, $event.dailyMinimum)"
       >
       </grove-availability>
     </ng-container>
@@ -126,7 +127,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadAllocationPreview(flight) {
+  loadAllocationPreview(flight, dailyMinimum?: number) {
     this.flightState$
       .pipe(
         filter((flightState: FlightState) => {
@@ -150,7 +151,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         first()
       )
       .subscribe(() => {
-        this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
+        this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum, this.currentFlightId);
       });
   }
 
