@@ -94,9 +94,17 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
+    this.loadAvailability(flight);
+    this.loadAllocationPreview(flight);
+    this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
+    this.currentInventoryUri$.next(flight.set_inventory_uri);
+  }
+
+  loadAvailability(flight) {
     this.flightState$
       .pipe(
         filter((flightState: FlightState) => {
+          // determine if the availability fields are present and have changed since the last update from form
           const { localFlight } = flightState;
           return (
             flight.startAt &&
@@ -104,7 +112,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
             flight.set_inventory_uri &&
             flight.zones &&
             flight.zones.length > 0 &&
-            // dates come back as Date but typed string, make sure working with Date types and compare the valuea
+            // dates come back as Date but typed string, make sure working with Date types and compare the values
             (new Date(flight.startAt.valueOf()).valueOf() !== new Date(localFlight.startAt).valueOf() ||
               new Date(flight.endAt.valueOf()).valueOf() !== new Date(localFlight.endAt).valueOf() ||
               flight.set_inventory_uri !== localFlight.set_inventory_uri ||
@@ -115,10 +123,35 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
+      });
+  }
+
+  loadAllocationPreview(flight) {
+    this.flightState$
+      .pipe(
+        filter((flightState: FlightState) => {
+          const { localFlight } = flightState;
+          // load allocation preview for flights not yet created if fields have changes since last update from form
+          return (
+            !flight.id &&
+            flight.totalGoal &&
+            (flight.startAt &&
+              flight.endAt &&
+              flight.set_inventory_uri &&
+              flight.zones &&
+              flight.zones.length > 0 &&
+              (flight.totalGoal !== localFlight.totalGoal ||
+                new Date(flight.startAt.valueOf()).valueOf() !== new Date(localFlight.startAt).valueOf() ||
+                new Date(flight.endAt.valueOf()).valueOf() !== new Date(localFlight.endAt).valueOf() ||
+                flight.set_inventory_uri !== localFlight.set_inventory_uri ||
+                !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1)))
+          );
+        }),
+        first()
+      )
+      .subscribe(() => {
         this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
       });
-    this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
-    this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 
   flightDuplicate(flight: Flight) {
