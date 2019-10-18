@@ -51,10 +51,24 @@ export class CampaignService {
     if (!state.changed) {
       return of(state);
     } else if (state.remoteFlight) {
-      return this.flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+      return this.flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(
+        map(doc => {
+          this.flightDocs[doc.id] = doc;
+          return this.docToFlight(doc);
+        })
+      );
     } else {
-      return this.campaignDoc.create('prx:flights', {}, state.localFlight).pipe(map(doc => this.docToFlight(doc)));
+      return this.campaignDoc.create('prx:flights', {}, state.localFlight).pipe(
+        map(doc => {
+          this.flightDocs[doc.id] = doc;
+          return this.docToFlight(doc);
+        })
+      );
     }
+  }
+
+  deleteFlight(flightId): Observable<HalDoc> {
+    return this.flightDocs[flightId].destroy();
   }
 
   docToCampaign(doc: HalDoc): CampaignState {

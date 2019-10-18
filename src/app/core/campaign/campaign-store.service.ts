@@ -4,6 +4,7 @@ import { InventoryService } from '../inventory/inventory.service';
 import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
+import { HalDoc } from 'ngx-prx-styleguide';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -26,8 +27,7 @@ export class CampaignStoreService {
     return this.campaign$.pipe(map(c => c && c.flights));
   }
 
-  constructor(private campaignService: CampaignService,
-              private inventoryService: InventoryService) {}
+  constructor(private campaignService: CampaignService, private inventoryService: InventoryService) {}
 
   load(id: number | string = null): Observable<CampaignState> {
     if (!id) {
@@ -62,7 +62,8 @@ export class CampaignStoreService {
       map(state => {
         // availability of current flights
         // `${flightId}` because flightId is sometimes a number, sometimes a string but is a string in the store ids
-        const availabilityZones = state.flights[`${flightId}`] &&
+        const availabilityZones =
+          state.flights[`${flightId}`] &&
           state.flights[`${flightId}`].localFlight &&
           state.flights[`${flightId}`].localFlight.zones &&
           state.availability &&
@@ -70,65 +71,76 @@ export class CampaignStoreService {
             .filter(zone => state.availability[`${flightId}-${zone}`])
             .map(zone => state.availability[`${flightId}-${zone}`]);
         // each zone
-        const zoneWeeks = availabilityZones && availabilityZones.map((availability: Availability) => {
-          let weekBeginString: string;
-          let weekEnd: Date;
-          // acc weeks
-          return availability.totals.groups.reduce((acc, day) => {
-            const dayDate = new Date(day.startDate + ' 0:0:0');
-            // if dayDate has passed into the next week (past prior weekEnd)
-            if (!weekEnd || weekEnd.valueOf() <= dayDate.valueOf()) {
-              weekBeginString = day.startDate;
-              weekEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59);
-              weekEnd.setDate(weekEnd.getDate() + (6 - weekEnd.getDay()));
+        const zoneWeeks =
+          availabilityZones &&
+          availabilityZones.map((availability: Availability) => {
+            let weekBeginString: string;
+            let weekEnd: Date;
+            // acc weeks
+            return availability.totals.groups.reduce(
+              (acc, day) => {
+                const dayDate = new Date(day.startDate + ' 0:0:0');
+                // if dayDate has passed into the next week (past prior weekEnd)
+                if (!weekEnd || weekEnd.valueOf() <= dayDate.valueOf()) {
+                  weekBeginString = day.startDate;
+                  weekEnd = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), 23, 59, 59);
+                  weekEnd.setDate(weekEnd.getDate() + (6 - weekEnd.getDay()));
 
-              // initialize week entry with day 0 values
-              acc.totals.groups[weekBeginString] = {
-                allocated: day.allocated || 0,
-                availability: day.availability || 0,
-                startDate: weekBeginString,
-                endDate: weekEnd.toISOString().slice(0, 10),
-                groups: [day]
-              };
-            } else {
-              // accumulate values onto week
-              acc.totals.groups[weekBeginString] = {
-                allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
-                availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
-                startDate: weekBeginString,
-                endDate: weekEnd.toISOString().slice(0, 10),
-                groups: acc.totals.groups[weekBeginString].groups.concat([day])
-              };
-            }
-            // accumulate days onto totals
-            acc.totals.allocated += day.allocated;
-            acc.totals.availability += day.availability;
-            return acc;
-          }, {
-            zone: availability.zone,
-            totals: {
-              startDate: availability.totals.startDate,
-              endDate: availability.totals.endDate,
-              allocated: 0,
-              availability: 0,
-              groups: {}
-            }
+                  // initialize week entry with day 0 values
+                  acc.totals.groups[weekBeginString] = {
+                    allocated: day.allocated || 0,
+                    availability: day.availability || 0,
+                    startDate: weekBeginString,
+                    endDate: weekEnd.toISOString().slice(0, 10),
+                    groups: [day]
+                  };
+                } else {
+                  // accumulate values onto week
+                  acc.totals.groups[weekBeginString] = {
+                    allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
+                    availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
+                    startDate: weekBeginString,
+                    endDate: weekEnd.toISOString().slice(0, 10),
+                    groups: acc.totals.groups[weekBeginString].groups.concat([day])
+                  };
+                }
+                // accumulate days onto totals
+                acc.totals.allocated += day.allocated;
+                acc.totals.availability += day.availability;
+                return acc;
+              },
+              {
+                zone: availability.zone,
+                totals: {
+                  startDate: availability.totals.startDate,
+                  endDate: availability.totals.endDate,
+                  allocated: 0,
+                  availability: 0,
+                  groups: {}
+                }
+              }
+            );
           });
-        });
         // map week acc keys to array
-        return zoneWeeks && zoneWeeks.map(zw => {
-          const { zone } = zw;
-          const { endDate, startDate, allocated, availability } = zw.totals;
-          return {
-            zone,
-            totals: {
-              endDate, startDate, allocated, availability,
-              groups: Object.keys(zw.totals.groups)
-                .map(w => zw.totals.groups[w])
-                .sort((a, b) => new Date(a.startAt).valueOf() - new Date(b.startAt).valueOf())
-            }
-          };
-        });
+        return (
+          zoneWeeks &&
+          zoneWeeks.map(zw => {
+            const { zone } = zw;
+            const { endDate, startDate, allocated, availability } = zw.totals;
+            return {
+              zone,
+              totals: {
+                endDate,
+                startDate,
+                allocated,
+                availability,
+                groups: Object.keys(zw.totals.groups)
+                  .map(w => zw.totals.groups[w])
+                  .sort((a, b) => new Date(a.startAt).valueOf() - new Date(b.startAt).valueOf())
+              }
+            };
+          })
+        );
       })
     );
   }
@@ -139,51 +151,77 @@ export class CampaignStoreService {
       const startDate = new Date(flight.startAt.valueOf()).toISOString().slice(0, 10);
       const endDate = new Date(flight.endAt.valueOf()).toISOString().slice(0, 10);
       const inventoryId = flight.set_inventory_uri.split('/').pop();
-      const loading = forkJoin(flight.zones.map((zoneName) => {
-        return this.inventoryService.getInventoryAvailability({
-          id: inventoryId,
-          startDate,
-          endDate,
-          zoneName
+      const loading = forkJoin(
+        flight.zones.map(zoneName => {
+          return this.inventoryService.getInventoryAvailability({
+            id: inventoryId,
+            startDate,
+            endDate,
+            zoneName
+          });
+        })
+      ).pipe(share());
+      loading
+        .pipe(
+          first(),
+          withLatestFrom(this._campaign$)
+        )
+        .subscribe(([availabilities, state]) => {
+          const updatedState = {
+            ...state,
+            availability: {
+              ...state.availability,
+              ...availabilities.reduce((acc, availability) => ({ ...acc, [`${flight.id}-${availability.zone}`]: availability }), {})
+            }
+          };
+          this._campaign$.next(updatedState);
         });
-      })).pipe(
-        share()
-      );
-      loading.pipe(first(), withLatestFrom(this._campaign$)).subscribe(([availabilities, state]) => {
-        const updatedState = {
-          ...state,
-          availability: {
-            ...state.availability,
-            ...availabilities.reduce((acc, availability) => ({...acc, [`${flight.id}-${availability.zone}`]: availability}), {})
-          }
-        };
-        this._campaign$.next(updatedState);
-      });
       return loading;
     }
   }
 
-  storeCampaign(): Observable<CampaignStateChanges> {
+  storeCampaign(): Observable<[CampaignStateChanges, HalDoc[]]> {
     const saving = this.putCampaign().pipe(
       switchMap(campaignChanges => {
-        return this.putFlights().pipe(
-          map(flightChanges => {
-            this._campaign$.next({
-              ...campaignChanges.state,
-              flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
-            });
-            return {
-              id: campaignChanges.state.remoteCampaign.id,
-              prevId: campaignChanges.prevId,
-              flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
-            };
-          })
+        const { flights } = campaignChanges.state;
+        return forkJoin(
+          this.putFlights().pipe(
+            map(flightChanges => {
+              this._campaign$.next({
+                ...campaignChanges.state,
+                flights: flightChanges.reduce((obj, { state }) => ({ ...obj, [state.remoteFlight.id]: state }), {})
+              });
+              return {
+                id: campaignChanges.state.remoteCampaign.id,
+                prevId: campaignChanges.prevId,
+                flights: flightChanges.reduce((obj, { prevId, state }) => ({ ...obj, [prevId]: state.remoteFlight.id }), {})
+              };
+            })
+          ),
+          this.deleteFlights(
+            Object.keys(flights)
+              .filter(fId => flights[fId].softDeleted)
+              .map(fId => ({ id: fId, persisted: !!flights[fId].remoteFlight }))
+          )
         );
       }),
       share()
     );
     saving.subscribe();
     return saving;
+  }
+
+  deleteFlights(deletedFlights: { id: string; persisted: boolean }[]): Observable<HalDoc[]> {
+    deletedFlights.forEach(({ id }) => this.removeFlight(id));
+    const persistedFlights = deletedFlights.filter(({ persisted }) => persisted);
+    if (!persistedFlights.length) {
+      return of([]);
+    }
+    return forkJoin(
+      persistedFlights.map(({ id }) => {
+        return this.campaignService.deleteFlight(id);
+      })
+    );
   }
 
   setCampaign(newState: { localCampaign: Campaign; changed: boolean; valid: boolean }): Observable<CampaignState> {
@@ -203,6 +241,19 @@ export class CampaignStoreService {
     const updating = this.campaignFirst$.pipe(
       map(state => {
         const updatedFlights = { ...state.flights, [flightId]: { ...state.flights[flightId], ...flightState } };
+        const updatedState = { ...state, flights: updatedFlights };
+        return updatedState;
+      }),
+      share()
+    );
+    updating.subscribe(state => this._campaign$.next(state));
+    return updating;
+  }
+
+  removeFlight(flightId: string | number): Observable<CampaignState> {
+    const updating = this.campaignFirst$.pipe(
+      map(state => {
+        const { [flightId]: deletedFlight, ...updatedFlights } = { ...state.flights };
         const updatedState = { ...state, flights: updatedFlights };
         return updatedState;
       }),
