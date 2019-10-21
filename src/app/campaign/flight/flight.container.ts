@@ -107,7 +107,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         filter((flightState: FlightState) => {
           // determine if the availability fields are present and have changed since the last update from form
           const { localFlight } = flightState;
-          // dates come back as Date but typed string, make sure working with Date types and compare the values
+          // dates come back as Date but typed string on Flight
           const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
           const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
           return (

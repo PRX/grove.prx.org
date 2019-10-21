@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Flight } from '../../core';
 
 @Component({
@@ -42,9 +43,16 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
-    this.goalFormSub = this.goalForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged(cmp);
-    });
+    this.goalFormSub = this.goalForm.valueChanges
+      .pipe(
+        debounceTime(200),
+        distinctUntilChanged((a, b) => {
+          return a.totalGoal === b.totalGoal && a.dailyMinimum === b.dailyMinimum;
+        })
+      )
+      .subscribe(cmp => {
+        this.formStatusChanged(cmp);
+      });
   }
 
   ngOnDestroy() {
@@ -53,10 +61,13 @@ export class GoalFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  formStatusChanged({ totalGoal, dailyMinimum }) {
+  formStatusChanged(formFields) {
+    // allow totalGoal to be null but set dailyMinimum to 0 if not set
+    const totalGoal = formFields.totalGoal && +formFields.totalGoal;
+    const dailyMinimum = formFields.dailyMinimum ? +formFields.dailyMinimum : 0;
     this.goalChange.emit({
-      flight: { ...this.flight, totalGoal: +totalGoal },
-      dailyMinimum: +dailyMinimum || 0
+      flight: { ...this.flight, totalGoal },
+      dailyMinimum
     });
   }
 
