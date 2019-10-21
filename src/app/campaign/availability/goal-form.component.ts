@@ -9,11 +9,11 @@ import { Flight } from '../../core';
     <form [formGroup]="goalForm" ngNativeValidate>
       <mat-form-field appearance="outline">
         <mat-label>Total Goal</mat-label>
-        <input matInput placeholder="Total Goal" formControlName="totalGoal" required />
+        <input type="number" matInput placeholder="Total Goal" formControlName="totalGoal" required />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Daily Minimum</mat-label>
-        <input matInput type="number" placeholder="Total Goal" formControlName="dailyMinimum" />
+        <input type="number" matInput placeholder="Daily Minimum" formControlName="dailyMinimum" />
       </mat-form-field>
     </form>
   `,
@@ -55,8 +55,8 @@ export class GoalFormComponent implements OnInit, OnDestroy {
 
   formStatusChanged({ totalGoal, dailyMinimum }) {
     this.goalChange.emit({
-      flight: { ...this.flight, totalGoal },
-      dailyMinimum: dailyMinimum || 0
+      flight: { ...this.flight, totalGoal: +totalGoal },
+      dailyMinimum: +dailyMinimum || 0
     });
   }
 

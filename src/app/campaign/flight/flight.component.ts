@@ -64,7 +64,6 @@ export class FlightComponent implements OnInit {
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
-    totalGoal: ['', Validators.required],
     zones: ['', Validators.required],
     set_inventory_uri: ['', Validators.required]
   });
@@ -87,7 +86,7 @@ export class FlightComponent implements OnInit {
 
   formStatusChanged(flight?: Flight) {
     this.flightUpdate.emit({
-      flight,
+      flight: { ...flight, totalGoal: this.flight.totalGoal },
       changed: this.flightForm.dirty,
       valid: this.flightForm.valid
     });

@@ -31,7 +31,7 @@ import { map, filter, first } from 'rxjs/operators';
         [flight]="flightLocal$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
-        (goalChange)="loadAllocationPreview($event.flight, $event.dailyMinimum)"
+        (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
       >
       </grove-availability>
     </ng-container>
@@ -44,6 +44,7 @@ import { map, filter, first } from 'rxjs/operators';
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
+  private dailyMinimum: number;
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
   softDeleted$ = this.flightState$.pipe(map(state => state.softDeleted));
@@ -95,27 +96,29 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
-    this.loadAvailability(flight);
-    this.loadAllocationPreview(flight);
+    this.loadAvailabilityAllocationIfChanged(flight);
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
   }
 
-  loadAvailability(flight) {
+  loadAvailabilityAllocationIfChanged(flight: Flight) {
     this.flightState$
       .pipe(
         filter((flightState: FlightState) => {
           // determine if the availability fields are present and have changed since the last update from form
           const { localFlight } = flightState;
+          // dates come back as Date but typed string, make sure working with Date types and compare the values
+          const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
+          const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
           return (
             flight.startAt &&
             flight.endAt &&
+            flightStartAtDate.valueOf() !== flightEndAtDate.valueOf() &&
             flight.set_inventory_uri &&
             flight.zones &&
             flight.zones.length > 0 &&
-            // dates come back as Date but typed string, make sure working with Date types and compare the values
-            (new Date(flight.startAt.valueOf()).valueOf() !== new Date(localFlight.startAt).valueOf() ||
-              new Date(flight.endAt.valueOf()).valueOf() !== new Date(localFlight.endAt).valueOf() ||
+            (flightStartAtDate.valueOf() !== new Date(localFlight.startAt).valueOf() ||
+              flightEndAtDate.valueOf() !== new Date(localFlight.endAt).valueOf() ||
               flight.set_inventory_uri !== localFlight.set_inventory_uri ||
               !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1))
           );
@@ -124,35 +127,20 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
+        if (flight.totalGoal) {
+          this.campaignStoreService.loadAllocationPreview(flight, this.dailyMinimum, this.currentFlightId);
+        }
       });
   }
 
-  loadAllocationPreview(flight, dailyMinimum?: number) {
-    this.flightState$
-      .pipe(
-        filter((flightState: FlightState) => {
-          const { localFlight } = flightState;
-          // load allocation preview for flights not yet created if fields have changes since last update from form
-          return (
-            !flight.id &&
-            flight.totalGoal &&
-            (flight.startAt &&
-              flight.endAt &&
-              flight.set_inventory_uri &&
-              flight.zones &&
-              flight.zones.length > 0 &&
-              (flight.totalGoal !== localFlight.totalGoal ||
-                new Date(flight.startAt.valueOf()).valueOf() !== new Date(localFlight.startAt).valueOf() ||
-                new Date(flight.endAt.valueOf()).valueOf() !== new Date(localFlight.endAt).valueOf() ||
-                flight.set_inventory_uri !== localFlight.set_inventory_uri ||
-                !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1)))
-          );
-        }),
-        first()
-      )
-      .subscribe(() => {
-        this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum, this.currentFlightId);
-      });
+  onGoalChange(flight: Flight, dailyMinimum: number) {
+    this.dailyMinimum = dailyMinimum || 0;
+    // TODO: changed if totalGoal has changed
+    const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
+    this.campaignStoreService.setFlight({ localFlight: flight, changed: true, valid }, this.currentFlightId);
+    if (valid) {
+      this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum, this.currentFlightId);
+    }
   }
 
   flightDuplicate(flight: Flight) {
