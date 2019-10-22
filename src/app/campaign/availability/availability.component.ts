@@ -10,6 +10,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
     </p>
     <ng-template #inventory>
       <grove-goal-form [flight]="flight" (goalChange)="goalChange.emit($event)"></grove-goal-form>
+      <p class="error" *ngIf="allocationPreviewError">Got error #{{ allocationPreviewError.status }} from allocation preview</p>
       <section *ngFor="let zone of availabilityZones">
         <h3>{{ getZoneName(zone.zone) }}</h3>
         <div class="row head">
@@ -95,6 +96,7 @@ export class AvailabilityComponent {
   @Input() flight: Flight;
   @Input() zones: InventoryZone[];
   @Input() availabilityZones: Availability[];
+  @Input() allocationPreviewError: any;
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
   zoneWeekHover = {};

@@ -1,7 +1,8 @@
 :host {
   margin: 20px 10px 20px 20px;
 }
-h2, h3 {
+h2,
+h3 {
   font-size: 1rem;
 }
 section {
@@ -15,7 +16,8 @@ section {
 .row.head {
   border-top: 1px solid #ddd;
 }
-.row:not(.expand), .row.head {
+.row:not(.expand),
+.row.head {
   line-height: 28px;
 }
 .row.head > * {
@@ -48,7 +50,8 @@ section {
   justify-content: space-between;
   align-items: baseline;
 }
-.avail, .goal {
+.avail,
+.goal {
   flex-basis: 30%;
   text-align: right;
 }
@@ -58,4 +61,8 @@ section {
 }
 prx-icon.hide {
   visibility: hidden;
+}
+.error {
+  color: #ee4d3e;
+  font-style: italic;
 }

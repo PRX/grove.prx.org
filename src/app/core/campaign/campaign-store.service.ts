@@ -9,10 +9,11 @@ import {
   Campaign,
   Flight,
   Availability,
-  Allocation
+  Allocation,
+  AllocationPreview
 } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
+import { map, first, switchMap, share, withLatestFrom, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 @Injectable({ providedIn: 'root' })
@@ -213,12 +214,16 @@ export class CampaignStoreService {
     }
   }
 
+  get allocationPreviewError() {
+    return this.allocationPreviewService.error;
+  }
+
   // the flightId parameter here will be the temp id in the case the flight has not yet been created
   loadAllocationPreview(
     { id, set_inventory_uri, name, startAt, endAt, totalGoal, zones }: Flight,
     dailyMinimum,
     flightId?: string
-  ): Observable<any> {
+  ): Observable<AllocationPreview> {
     // dates come back as Date but typed string, use YYYY-MM-DD formatted string
     startAt = new Date(startAt.valueOf()).toISOString().slice(0, 10);
     endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
@@ -239,25 +244,37 @@ export class CampaignStoreService {
         withLatestFrom(this._campaign$)
       )
       .subscribe(([result, state]) => {
-        const updatedState: CampaignState = {
-          ...state,
-          allocationPreview: {
-            ...state.allocationPreview,
-            [`${flightId || id}`]: result.zones.reduce(
-              (previewByZone, zone) => ({
-                ...previewByZone,
-                [`${zone}`]: {
-                  ...result,
-                  allocations: (result.allocations as Allocation[])
-                    .filter(a => a.zoneName === zone)
-                    .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
-                  zones: [zone]
-                }
-              }),
-              {}
-            )
-          }
-        };
+        let updatedState: CampaignState;
+        if (result) {
+          updatedState = {
+            ...state,
+            allocationPreview: {
+              ...state.allocationPreview,
+              [`${flightId || id}`]: result.zones.reduce(
+                (previewByZone, zone) => ({
+                  ...previewByZone,
+                  [`${zone}`]: {
+                    ...result,
+                    allocations: (result.allocations as Allocation[])
+                      .filter(a => a.zoneName === zone)
+                      .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
+                    zones: [zone]
+                  }
+                }),
+                {}
+              )
+            }
+          };
+        } else {
+          // if no result clear allocationPreview for flight
+          updatedState = {
+            ...state,
+            allocationPreview: {
+              ...state.allocationPreview,
+              [`${flightId || id}`]: null
+            }
+          };
+        }
         this._campaign$.next(updatedState);
       });
     return loading;

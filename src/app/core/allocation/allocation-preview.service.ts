@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 import { AllocationPreview } from '../campaign/campaign.models';
 
 @Injectable()
 export class AllocationPreviewService {
+  error: any;
+
   constructor(private augury: AuguryService) {}
 
   getAllocationPreview({ set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones }): Observable<AllocationPreview> {
@@ -20,7 +22,12 @@ export class AllocationPreviewService {
         dailyMinimum,
         zones
       })
-      .pipe(map(docs => this.docToAllocationPreview(docs)));
+      .pipe(
+        // clear error on new request
+        tap(() => (this.error = null)),
+        map(docs => this.docToAllocationPreview(docs)),
+        catchError(err => this.handleError(err))
+      );
   }
 
   docToAllocationPreview(doc: HalDoc): AllocationPreview {
@@ -38,5 +45,17 @@ export class AllocationPreviewService {
         zoneName: allocation.zoneName
       }))
     };
+  }
+
+  handleError(err: any) {
+    // augury throws these errors when overallocating or deadlocked
+    // augury puts reason in error message but
+    // HalRemote sticks a different message in the HalHttpError
+    this.error = err;
+    if (err.status === 422 || err.status === 500) {
+      return of(null);
+    } else {
+      throw err;
+    }
   }
 }

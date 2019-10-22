@@ -31,6 +31,7 @@ import { map, filter, first } from 'rxjs/operators';
         [flight]="flightLocal$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
+        [allocationPreviewError]="allocationPreviewError"
         (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
       >
       </grove-availability>
@@ -140,6 +141,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     if (valid) {
       this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum, this.currentFlightId);
     }
+  }
+
+  get allocationPreviewError() {
+    return this.campaignStoreService.allocationPreviewError;
   }
 
   flightDuplicate(flight: Flight) {
