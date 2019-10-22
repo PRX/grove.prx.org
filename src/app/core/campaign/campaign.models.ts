@@ -3,7 +3,7 @@ export interface CampaignState {
   remoteCampaign?: Campaign;
   flights: { [id: string]: FlightState };
   availability?: { [flightZone: string]: Availability };
-  allocationPreview?: { [flightZone: string]: AllocationPreview };
+  allocationPreview?: { [flightId: string]: { [zone: string]: AllocationPreview } };
   changed: boolean;
   valid: boolean;
 }
@@ -30,6 +30,7 @@ export interface Campaign {
 export interface AvailabilityAllocation {
   allocated?: number;
   availability?: number;
+  allocationPreview?: number;
   startDate: string;
   endDate: string;
   groups?: AvailabilityAllocation[];
@@ -54,7 +55,7 @@ export interface AllocationPreview {
   name: string;
   totalGoal: number;
   zones: string[];
-  allocations: Allocation[];
+  allocations: Allocation[] | { [date: string]: Allocation };
 }
 
 export interface Flight {

@@ -2,7 +2,15 @@ import { Injectable } from '@angular/core';
 import { CampaignService } from './campaign.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { AllocationPreviewService } from '../allocation/allocation-preview.service';
-import { CampaignState, FlightState, CampaignStateChanges, Campaign, Flight, Availability } from './campaign.models';
+import {
+  CampaignState,
+  FlightState,
+  CampaignStateChanges,
+  Campaign,
+  Flight,
+  Availability,
+  Allocation
+} from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { map, first, switchMap, share, withLatestFrom } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
@@ -84,6 +92,15 @@ export class CampaignStoreService {
             // acc weeks
             return availability.totals.groups.reduce(
               (acc, day) => {
+                // get the day's allocationPreview from the allocationPreview state
+                day.allocationPreview =
+                  state.allocationPreview &&
+                  state.allocationPreview[`${flightId}`] &&
+                  state.allocationPreview[`${flightId}`][availability.zone] &&
+                  state.allocationPreview[`${flightId}`][availability.zone].allocations &&
+                  state.allocationPreview[`${flightId}`][availability.zone].allocations[day.startDate] &&
+                  state.allocationPreview[`${flightId}`][availability.zone].allocations[day.startDate].goalCount;
+
                 const dayDate = new Date(day.startDate + ' 0:0:0');
                 // if dayDate has passed into the next week (past prior weekEnd)
                 if (!weekEnd || weekEnd.valueOf() <= dayDate.valueOf()) {
@@ -95,6 +112,7 @@ export class CampaignStoreService {
                   acc.totals.groups[weekBeginString] = {
                     allocated: day.allocated || 0,
                     availability: day.availability || 0,
+                    allocationPreview: day.allocationPreview || 0,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
                     groups: [day]
@@ -104,6 +122,7 @@ export class CampaignStoreService {
                   acc.totals.groups[weekBeginString] = {
                     allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
                     availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
+                    allocationPreview: acc.totals.groups[weekBeginString].allocationPreview + (day.allocationPreview || 0),
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
                     groups: acc.totals.groups[weekBeginString].groups.concat([day])
@@ -112,6 +131,7 @@ export class CampaignStoreService {
                 // accumulate days onto totals
                 acc.totals.allocated += day.allocated;
                 acc.totals.availability += day.availability;
+                acc.totals.allocationPreview += day.allocationPreview;
                 return acc;
               },
               {
@@ -121,6 +141,7 @@ export class CampaignStoreService {
                   endDate: availability.totals.endDate,
                   allocated: 0,
                   availability: 0,
+                  allocationPreview: 0,
                   groups: {}
                 }
               }
@@ -131,7 +152,7 @@ export class CampaignStoreService {
           zoneWeeks &&
           zoneWeeks.map(zw => {
             const { zone } = zw;
-            const { endDate, startDate, allocated, availability } = zw.totals;
+            const { endDate, startDate, allocated, availability, allocationPreview } = zw.totals;
             return {
               zone,
               totals: {
@@ -139,6 +160,7 @@ export class CampaignStoreService {
                 startDate,
                 allocated,
                 availability,
+                allocationPreview,
                 groups: Object.keys(zw.totals.groups)
                   .map(w => zw.totals.groups[w])
                   .sort((a, b) => new Date(a.startAt).valueOf() - new Date(b.startAt).valueOf())
@@ -217,14 +239,20 @@ export class CampaignStoreService {
         withLatestFrom(this._campaign$)
       )
       .subscribe(([result, state]) => {
-        const updatedState = {
+        const updatedState: CampaignState = {
           ...state,
           allocationPreview: {
             ...state.allocationPreview,
-            ...result.zones.reduce(
-              (acc, zone) => ({
-                ...acc,
-                [`${flightId || id}-${zone}`]: { ...result, allocations: result.allocations.filter(a => a.zoneName === zone) }
+            [`${flightId || id}`]: result.zones.reduce(
+              (previewByZone, zone) => ({
+                ...previewByZone,
+                [`${zone}`]: {
+                  ...result,
+                  allocations: (result.allocations as Allocation[])
+                    .filter(a => a.zoneName === zone)
+                    .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
+                  zones: [zone]
+                }
               }),
               {}
             )

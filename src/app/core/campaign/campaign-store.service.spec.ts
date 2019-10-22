@@ -2,12 +2,14 @@ import { CampaignStoreService } from './campaign-store.service';
 import { Campaign, CampaignState, Flight, FlightState, Availability } from './campaign.models';
 import { CampaignService } from './campaign.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { AllocationPreviewService } from '../allocation/allocation-preview.service';
 import { of } from 'rxjs';
 
 describe('CampaignStoreService', () => {
   let store: CampaignStoreService;
   let campaignService: CampaignService;
   let inventoryService: InventoryService;
+  let allocationPreviewService: AllocationPreviewService;
   let campaignFixture: Campaign;
   let flightFixture: Flight;
   let campaignStateFixture: CampaignState;
@@ -24,8 +26,11 @@ describe('CampaignStoreService', () => {
     inventoryService = {
       getInventoryAvailability: jest.fn(flight => of(availabilityFixture))
     } as any;
+    allocationPreviewService = {
+      getAllocationPreview: jest.fn(flight => of())
+    } as any;
 
-    store = new CampaignStoreService(campaignService, inventoryService);
+    store = new CampaignStoreService(campaignService, inventoryService, allocationPreviewService);
     campaignFixture = {
       id: 1,
       name: 'my campaign name',

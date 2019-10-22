@@ -38,7 +38,13 @@ import { Flight, Availability, InventoryZone } from '../../core';
               </button>
             </div>
             <div class="avail">{{ week.allocated + week.availability | largeNumber }}</div>
-            <div class="goal"></div>
+            <div class="goal">
+              {{
+                week.allocationPreview || week.allocationPreview === 0
+                  ? (week.allocationPreview | largeNumber)
+                  : (week.allocated | largeNumber)
+              }}
+            </div>
             <div class="edit">
               <button class="btn-link" aria-label="Edit">
                 <prx-icon name="pencil" size="14px" color="primary"></prx-icon>
@@ -53,7 +59,16 @@ import { Flight, Availability, InventoryZone } from '../../core';
               <div class="avail">
                 <span>&mdash;</span><span>{{ day.allocated + day.availability | largeNumber }}</span>
               </div>
-              <div class="goal"></div>
+              <div class="goal">
+                <span>&mdash;</span>
+                <span>
+                  {{
+                    day.allocationPreview || day.allocationPreview === 0
+                      ? (day.allocationPreview | largeNumber)
+                      : (day.allocated | largeNumber)
+                  }}
+                </span>
+              </div>
               <div class="edit"></div>
             </div>
           </ng-container>
@@ -61,7 +76,13 @@ import { Flight, Availability, InventoryZone } from '../../core';
         <div class="row totals">
           <div class="date">TOTALS</div>
           <div class="avail">{{ zone.totals.allocated + zone.totals.availability | largeNumber }}</div>
-          <div class="goal"></div>
+          <div class="goal">
+            {{
+              zone.totals.allocationPreview || zone.totals.allocationPreview == 0
+                ? (zone.totals.allocationPreview | largeNumber)
+                : (zone.totals.allocated | largeNumber)
+            }}
+          </div>
           <div class="edit"></div>
         </div>
       </section>
