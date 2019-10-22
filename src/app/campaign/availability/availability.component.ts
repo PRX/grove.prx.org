@@ -20,7 +20,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
           <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
         </div>
         <ng-container *ngFor="let week of zone.totals.groups">
-          <div class="row">
+          <div class="row" [class.error]="week.allocated + week.availability < week.allocationPreview">
             <div class="date">
               <button
                 class="btn-link"
@@ -53,7 +53,11 @@ import { Flight, Availability, InventoryZone } from '../../core';
             </div>
           </div>
           <ng-container *ngIf="zoneWeekExpanded[zone.zone + '-' + week.startDate]">
-            <div class="row expand" *ngFor="let day of week.groups">
+            <div
+              class="row expand"
+              [class.row-highlight]="day.allocated + day.availability < day.allocationPreview"
+              *ngFor="let day of week.groups"
+            >
               <div class="date">
                 <span>&mdash;</span><span>{{ day.startDate | date: 'M/dd' }}</span>
               </div>
@@ -74,7 +78,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
             </div>
           </ng-container>
         </ng-container>
-        <div class="row totals">
+        <div class="row totals" [class.row-highlight]="zone.totals.allocated + zone.totals.availability < zone.totals.allocationPreview">
           <div class="date">TOTALS</div>
           <div class="avail">{{ zone.totals.allocated + zone.totals.availability | largeNumber }}</div>
           <div class="goal">

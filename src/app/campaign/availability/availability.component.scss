@@ -62,7 +62,10 @@ section {
 prx-icon.hide {
   visibility: hidden;
 }
+.row-highlight,
 .error {
   color: #ee4d3e;
+}
+.error {
   font-style: italic;
 }
