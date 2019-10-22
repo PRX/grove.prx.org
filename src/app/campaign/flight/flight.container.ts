@@ -135,7 +135,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
     this.dailyMinimum = dailyMinimum || 0;
-    // TODO: changed if totalGoal has changed
     const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
     this.campaignStoreService.setFlight({ localFlight: flight, changed: true, valid }, this.currentFlightId);
     if (valid) {
