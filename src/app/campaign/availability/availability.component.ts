@@ -20,7 +20,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
           <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
         </div>
         <ng-container *ngFor="let week of zone.totals.groups">
-          <div class="row" [class.error]="week.allocated + week.availability < week.allocationPreview">
+          <div class="row" [class.row-highlight]="week.allocated + week.availability < week.allocationPreview">
             <div class="date">
               <button
                 class="btn-link"

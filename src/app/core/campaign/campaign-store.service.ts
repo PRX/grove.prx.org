@@ -71,7 +71,7 @@ export class CampaignStoreService {
     }
   }
 
-  getFlightAvailabilityRollup$(flightId: string): Observable<Availability[]> {
+  getFlightAvailabilityRollup$(flightId: string | number): Observable<Availability[]> {
     return this.campaign$.pipe(
       map(state => {
         // availability of current flights
@@ -245,7 +245,7 @@ export class CampaignStoreService {
       )
       .subscribe(([result, state]) => {
         let updatedState: CampaignState;
-        if (result) {
+        if (result && result.zones) {
           updatedState = {
             ...state,
             allocationPreview: {

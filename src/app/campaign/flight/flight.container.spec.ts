@@ -23,6 +23,7 @@ describe('FlightContainerComponent', () => {
       setFlight: jest.fn(() => of({})),
       setCurrentFlightId: jest.fn(id => {}),
       loadAvailability: jest.fn(f => of({})),
+      loadAllocationPreview: jest.fn(f => of()),
       getFlightAvailabilityRollup$: jest.fn(id => of([]))
     } as any;
     inventory = new ReplaySubject(1);
@@ -63,6 +64,33 @@ describe('FlightContainerComponent', () => {
       done();
     });
     routeId.next('123');
+  });
+
+  it('loads availability and allocation preview when flight changes', done => {
+    const flight = {
+      name: 'my-flight',
+      totalGoal: 999,
+      startAt: '2019-10-01',
+      endAt: '2019-11-01',
+      set_inventory_uri: '/some/url',
+      zones: ['pre_1']
+    };
+    campaign.next({
+      flights: {
+        123: {
+          localFlight: flight
+        }
+      },
+      availability: {}
+    });
+    routeId.next('123');
+    component.flightUpdateFromForm({ flight: { ...flight, startAt: '2019-10-15' }, changed: true, valid: true });
+    component.flightAvailability$.subscribe(availability => {
+      expect(availability).toBeDefined();
+      expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
+      expect(campaignStoreService.loadAllocationPreview).toHaveBeenCalled();
+      done();
+    });
   });
 
   it('redirects to campaign if the flight does not exist', () => {

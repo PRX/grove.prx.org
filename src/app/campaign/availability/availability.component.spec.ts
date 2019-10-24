@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule, MatInputModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
@@ -9,6 +11,7 @@ import { GoalFormComponent } from './goal-form.component';
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
   let fix: ComponentFixture<AvailabilityComponent>;
+  let de: DebugElement;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -19,6 +22,7 @@ describe('AvailabilityComponent', () => {
       .then(() => {
         fix = TestBed.createComponent(AvailabilityComponent);
         comp = fix.componentInstance;
+        de = fix.debugElement;
         comp.flight = {
           id: 9,
           name: 'my flight name',
@@ -36,11 +40,11 @@ describe('AvailabilityComponent', () => {
               startDate: '2019-10-01',
               endDate: '2019-11-01',
               groups: [
-                { allocated: 0, availability: 1, startDate: '2019-10-01', endDate: '2019-10-05' },
-                { allocated: 0, availability: 1339, startDate: '2019-10-06', endDate: '2019-10-12' },
-                { allocated: 0, availability: 8, startDate: '2019-10-13', endDate: '2019-10-19' },
-                { allocated: 0, availability: 1393, startDate: '2019-10-20', endDate: '2019-10-26' },
-                { allocated: 0, availability: 722, startDate: '2019-10-27', endDate: '2019-10-31' }
+                { allocated: 1, availability: 1, allocationPreview: 3, startDate: '2019-10-01', endDate: '2019-10-05' },
+                { allocated: 9, availability: 1339, allocationPreview: 9, startDate: '2019-10-06', endDate: '2019-10-12' },
+                { allocated: 8, availability: 8, allocationPreview: 8, startDate: '2019-10-13', endDate: '2019-10-19' },
+                { allocated: 7, availability: 1393, allocationPreview: 7, startDate: '2019-10-20', endDate: '2019-10-26' },
+                { allocated: 6, availability: 722, allocationPreview: 6, startDate: '2019-10-27', endDate: '2019-10-31' }
               ]
             }
           }
@@ -56,5 +60,16 @@ describe('AvailabilityComponent', () => {
   it('toggles week expanded', () => {
     comp.toggleZoneWeekExpanded('pre_1', '2019-10-06');
     expect(comp.zoneWeekExpanded['pre_1-2019-10-06']).toBeTruthy();
+  });
+
+  it('toggle week hover', () => {
+    comp.toggleZoneWeekHover('pre_1', '2019-10-13');
+    expect(comp.zoneWeekHover['pre_1-2019-10-13']).toBeTruthy();
+  });
+
+  it('highlights rows were more allocated than available', () => {
+    const row = de.query(By.css('.row-highlight'));
+    expect(row).toBeDefined();
+    expect(row.nativeElement.textContent).toContain('10/01');
   });
 });
