@@ -62,12 +62,12 @@ describe('AvailabilityComponent', () => {
     expect(comp.zoneWeekExpanded['pre_1-2019-10-06']).toBeTruthy();
   });
 
-  it('toggle week hover', () => {
+  it('toggles week on hover', () => {
     comp.toggleZoneWeekHover('pre_1', '2019-10-13');
     expect(comp.zoneWeekHover['pre_1-2019-10-13']).toBeTruthy();
   });
 
-  it('highlights rows were more allocated than available', () => {
+  it('highlights rows where more allocated than available', () => {
     const row = de.query(By.css('.row-highlight'));
     expect(row).toBeDefined();
     expect(row.nativeElement.textContent).toContain('10/01');
