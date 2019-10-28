@@ -111,18 +111,16 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
           // dates come back as Date but typed string on Flight
           const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
           const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
-          return (
-            flight.startAt &&
-            flight.endAt &&
-            flightStartAtDate.valueOf() !== flightEndAtDate.valueOf() &&
-            flight.set_inventory_uri &&
-            flight.zones &&
-            flight.zones.length > 0 &&
+          const dateRangeValid = flightStartAtDate && flightEndAtDate && flightStartAtDate.valueOf() < flightEndAtDate.valueOf();
+          const hasAvailabilityParams =
+            flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0;
+          const availabilityParamsChanged =
+            hasAvailabilityParams &&
             (flightStartAtDate.valueOf() !== new Date(localFlight.startAt).valueOf() ||
               flightEndAtDate.valueOf() !== new Date(localFlight.endAt).valueOf() ||
               flight.set_inventory_uri !== localFlight.set_inventory_uri ||
-              !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1))
-          );
+              !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
+          return dateRangeValid && availabilityParamsChanged;
         }),
         first()
       )
