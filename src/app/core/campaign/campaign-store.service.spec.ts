@@ -285,7 +285,7 @@ describe('CampaignStoreService', () => {
   it('loads allocation preview and transforms it into state entities keyed by flight id', done => {
     store.load(1);
     store
-      .loadAllocationPreview(flightFixture, 90)
+      .loadAllocationPreview(flightFixture, flightFixture.id, 90)
       .pipe(withLatestFrom(store.campaign$))
       .subscribe(([allocationPreview, state]) => {
         expect(allocationPreview.dailyMinimum).toEqual(90);
@@ -304,7 +304,7 @@ describe('CampaignStoreService', () => {
     store
       .loadAvailability(flightFixture)
       .pipe(
-        withLatestFrom(store.loadAllocationPreview(flightFixture, 90)),
+        withLatestFrom(store.loadAllocationPreview(flightFixture, flightFixture.id, 90)),
         withLatestFrom(store.getFlightAvailabilityRollup$(flightFixture.id))
       )
       .subscribe(([_, rollup]) => {

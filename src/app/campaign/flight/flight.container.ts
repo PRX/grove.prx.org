@@ -32,6 +32,7 @@ import { map, filter, first } from 'rxjs/operators';
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
         [allocationPreviewError]="allocationPreviewError"
+        [dailyMinimum]="flightDailyMin$ | async"
         (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
       >
       </grove-availability>
@@ -45,11 +46,11 @@ import { map, filter, first } from 'rxjs/operators';
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
   private currentFlightId: string;
-  private dailyMinimum: number;
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
   softDeleted$ = this.flightState$.pipe(map(state => state.softDeleted));
   flightAvailability$: Observable<Availability[]>;
+  flightDailyMin$: Observable<number>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -86,6 +87,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       if (this.currentFlightId !== id) {
         this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
         this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
+        this.flightDailyMin$ = this.campaignStoreService.getFlightDailyMin$(id);
       }
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);
@@ -127,17 +129,16 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
         if (flight.totalGoal) {
-          this.campaignStoreService.loadAllocationPreview(flight, this.dailyMinimum, this.currentFlightId);
+          this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
         }
       });
   }
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
-    this.dailyMinimum = dailyMinimum || 0;
     const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
     this.campaignStoreService.setFlight({ localFlight: flight, changed: true, valid }, this.currentFlightId);
     if (valid) {
-      this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum, this.currentFlightId);
+      this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId, dailyMinimum);
     }
   }
 

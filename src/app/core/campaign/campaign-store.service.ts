@@ -13,7 +13,7 @@ import {
   AllocationPreview
 } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share, withLatestFrom, catchError } from 'rxjs/operators';
+import { map, first, switchMap, share, withLatestFrom, mergeMap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 @Injectable({ providedIn: 'root' })
@@ -69,6 +69,10 @@ export class CampaignStoreService {
       loading.subscribe(state => this._campaign$.next(state));
       return loading;
     }
+  }
+
+  getFlightDailyMin$(flightId: string | number): Observable<number> {
+    return this.campaign$.pipe(map(s => s.dailyMinimum && s.dailyMinimum[`${flightId}`]));
   }
 
   getFlightAvailabilityRollup$(flightId: string | number): Observable<Availability[]> {
@@ -221,23 +225,38 @@ export class CampaignStoreService {
   // the flightId parameter here will be the temp id in the case the flight has not yet been created
   loadAllocationPreview(
     { id, set_inventory_uri, name, startAt, endAt, totalGoal, zones }: Flight,
-    dailyMinimum,
-    flightId?: string
+    flightId?: string | number,
+    dailyMinimum?: number
   ): Observable<AllocationPreview> {
     // dates come back as Date but typed string, use YYYY-MM-DD formatted string
     startAt = new Date(startAt.valueOf()).toISOString().slice(0, 10);
     endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
-    const loading = this.allocationPreviewService
-      .getAllocationPreview({
-        set_inventory_uri,
-        name,
-        startAt,
-        endAt,
-        totalGoal,
-        dailyMinimum,
-        zones
-      })
-      .pipe(share());
+    // const loading = this.allocationPreviewService
+    //   .getAllocationPreview({
+    //     set_inventory_uri,
+    //     name,
+    //     startAt,
+    //     endAt,
+    //     totalGoal,
+    //     dailyMinimum,
+    //     zones
+    //   })
+    //   .pipe(share());
+    const loading = this._campaign$.pipe(
+      mergeMap(state => {
+        dailyMinimum = dailyMinimum || state.dailyMinimum[`${flightId || id}`] || 0;
+        return this.allocationPreviewService.getAllocationPreview({
+          set_inventory_uri,
+          name,
+          startAt,
+          endAt,
+          totalGoal,
+          dailyMinimum,
+          zones
+        });
+      }),
+      share()
+    );
     loading
       .pipe(
         first(),
@@ -275,6 +294,7 @@ export class CampaignStoreService {
             }
           };
         }
+        updatedState.dailyMinimum = { ...updatedState.dailyMinimum, [`${flightId || id}`]: dailyMinimum };
         this._campaign$.next(updatedState);
       });
     return loading;

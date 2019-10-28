@@ -4,6 +4,7 @@ export interface CampaignState {
   flights: { [id: string]: FlightState };
   availability?: { [flightZone: string]: Availability };
   allocationPreview?: { [flightId: string]: { [zone: string]: AllocationPreview } };
+  dailyMinimum?: { [flightId: string]: number };
   changed: boolean;
   valid: boolean;
 }

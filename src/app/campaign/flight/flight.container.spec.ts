@@ -24,7 +24,8 @@ describe('FlightContainerComponent', () => {
       setCurrentFlightId: jest.fn(id => {}),
       loadAvailability: jest.fn(f => of({})),
       loadAllocationPreview: jest.fn(f => of()),
-      getFlightAvailabilityRollup$: jest.fn(id => of([]))
+      getFlightAvailabilityRollup$: jest.fn(id => of([])),
+      getFlightDailyMin$: jest.fn(id => of(0))
     } as any;
     inventory = new ReplaySubject(1);
     inventoryService = { listInventory: jest.fn(() => inventory) } as any;

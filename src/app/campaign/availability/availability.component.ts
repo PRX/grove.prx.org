@@ -9,7 +9,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
       Please select Start and End Dates, Series, and Zones to view inventory.
     </p>
     <ng-template #inventory>
-      <grove-goal-form [flight]="flight" (goalChange)="goalChange.emit($event)"></grove-goal-form>
+      <grove-goal-form [flight]="flight" [dailyMinimum]="dailyMinimum" (goalChange)="goalChange.emit($event)"></grove-goal-form>
       <p class="error" *ngIf="allocationPreviewError">Got error #{{ allocationPreviewError.status }} from allocation preview</p>
       <section *ngFor="let zone of availabilityZones">
         <h3>{{ getZoneName(zone.zone) }}</h3>
@@ -101,6 +101,7 @@ export class AvailabilityComponent {
   @Input() zones: InventoryZone[];
   @Input() availabilityZones: Availability[];
   @Input() allocationPreviewError: any;
+  @Input() dailyMinimum: number;
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
   zoneWeekHover = {};
