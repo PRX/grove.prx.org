@@ -68,7 +68,9 @@ export interface Campaign {
   loading?: boolean;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class CampaignListService {
   params: CampaignParams = { page: 1, per: 12 };
   facets: Facets;
