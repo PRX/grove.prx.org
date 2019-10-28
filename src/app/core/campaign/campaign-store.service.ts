@@ -231,17 +231,6 @@ export class CampaignStoreService {
     // dates come back as Date but typed string, use YYYY-MM-DD formatted string
     startAt = new Date(startAt.valueOf()).toISOString().slice(0, 10);
     endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
-    // const loading = this.allocationPreviewService
-    //   .getAllocationPreview({
-    //     set_inventory_uri,
-    //     name,
-    //     startAt,
-    //     endAt,
-    //     totalGoal,
-    //     dailyMinimum,
-    //     zones
-    //   })
-    //   .pipe(share());
     const loading = this._campaign$.pipe(
       mergeMap(state => {
         dailyMinimum = dailyMinimum || state.dailyMinimum[`${flightId || id}`] || 0;
