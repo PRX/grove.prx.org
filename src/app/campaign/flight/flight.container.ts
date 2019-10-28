@@ -11,7 +11,7 @@ import {
   Availability
 } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, filter, first } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',
@@ -31,6 +31,9 @@ import { map } from 'rxjs/operators';
         [flight]="flightLocal$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
+        [allocationPreviewError]="allocationPreviewError"
+        [dailyMinimum]="flightDailyMin$ | async"
+        (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
       >
       </grove-availability>
     </ng-container>
@@ -47,6 +50,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
   softDeleted$ = this.flightState$.pipe(map(state => state.softDeleted));
   flightAvailability$: Observable<Availability[]>;
+  flightDailyMin$: Observable<number>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
@@ -83,6 +87,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       if (this.currentFlightId !== id) {
         this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
         this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
+        this.flightDailyMin$ = this.campaignStoreService.getFlightDailyMin$(id);
       }
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);
@@ -94,9 +99,51 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
+    this.loadAvailabilityAllocationIfChanged(flight);
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
-    this.campaignStoreService.loadAvailability(flight);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
+  }
+
+  loadAvailabilityAllocationIfChanged(flight: Flight) {
+    this.flightState$
+      .pipe(
+        filter((flightState: FlightState) => {
+          // determine if the availability fields are present and have changed since the last update from form
+          const { localFlight } = flightState;
+          // dates come back as Date but typed string on Flight
+          const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
+          const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
+          const dateRangeValid = flightStartAtDate && flightEndAtDate && flightStartAtDate.valueOf() < flightEndAtDate.valueOf();
+          const hasAvailabilityParams =
+            flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0;
+          const availabilityParamsChanged =
+            hasAvailabilityParams &&
+            (flightStartAtDate.valueOf() !== new Date(localFlight.startAt).valueOf() ||
+              flightEndAtDate.valueOf() !== new Date(localFlight.endAt).valueOf() ||
+              flight.set_inventory_uri !== localFlight.set_inventory_uri ||
+              !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
+          return dateRangeValid && availabilityParamsChanged;
+        }),
+        first()
+      )
+      .subscribe(() => {
+        this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
+        if (flight.totalGoal) {
+          this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
+        }
+      });
+  }
+
+  onGoalChange(flight: Flight, dailyMinimum: number) {
+    const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
+    this.campaignStoreService.setFlight({ localFlight: flight, changed: true, valid }, this.currentFlightId);
+    if (valid) {
+      this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId, dailyMinimum);
+    }
+  }
+
+  get allocationPreviewError() {
+    return this.campaignStoreService.allocationPreviewError;
   }
 
   flightDuplicate(flight: Flight) {

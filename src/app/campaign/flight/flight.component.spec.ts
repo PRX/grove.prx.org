@@ -52,9 +52,10 @@ describe('FlightComponent', () => {
   });
 
   it('updates the flight form', () => {
+    const { totalGoal, ...flightFields } = flightFixture;
     component.flight = flightFixture;
     expect(component.flightForm.value).toMatchObject({
-      ...flightFixture,
+      ...flightFields,
       startAt: new Date(flightFixture.startAt),
       endAt: new Date(flightFixture.endAt)
     });
@@ -67,6 +68,15 @@ describe('FlightComponent', () => {
       done();
     });
     component.name.setValue('brand new name');
+  });
+
+  it('preserves totalGoal when emitting form changes', done => {
+    component.flight = flightFixture;
+    component.flightUpdate.subscribe(flightUpdate => {
+      expect(flightUpdate).toMatchObject({ flight: { totalGoal: flightFixture.totalGoal } });
+      done();
+    });
+    component.flightForm.patchValue({ endAt: new Date() });
   });
 
   it('filters zones to reflect available options', () => {

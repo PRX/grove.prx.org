@@ -9,6 +9,7 @@ import { CampaignFormContainerComponent } from './form/campaign-form.container';
 import { FlightContainerComponent } from './flight/flight.container';
 import { FlightComponent } from './flight/flight.component';
 import { AvailabilityComponent } from './availability/availability.component';
+import { GoalFormComponent } from './availability/goal-form.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
@@ -39,7 +40,8 @@ export const campaignComponents: any[] = [
   CampaignStatusComponent,
   FlightContainerComponent,
   FlightComponent,
-  AvailabilityComponent
+  AvailabilityComponent,
+  GoalFormComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);
