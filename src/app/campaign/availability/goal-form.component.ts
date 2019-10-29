@@ -41,7 +41,7 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   @Input()
   set dailyMinimum(dailyMinimum: number) {
     this._dailyMinimum = dailyMinimum;
-    this.updateGoalForm({ dailyMinimum: dailyMinimum || 0 });
+    this.updateGoalForm({ dailyMinimum });
   }
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   goalForm = this.fb.group({
@@ -72,9 +72,8 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   }
 
   formStatusChanged(formFields) {
-    // allow totalGoal to be null but set dailyMinimum to 0 if not set
     const totalGoal = formFields.totalGoal && +formFields.totalGoal;
-    const dailyMinimum = formFields.dailyMinimum ? +formFields.dailyMinimum : 0;
+    const dailyMinimum = formFields.dailyMinimum && +formFields.dailyMinimum;
     this.goalChange.emit({
       flight: { ...this.flight, totalGoal },
       dailyMinimum
