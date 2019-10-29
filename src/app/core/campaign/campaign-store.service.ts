@@ -233,14 +233,16 @@ export class CampaignStoreService {
     endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
     const loading = this._campaign$.pipe(
       mergeMap(state => {
-        dailyMinimum = dailyMinimum || state.dailyMinimum[`${flightId || id}`] || 0;
+        if (!dailyMinimum && dailyMinimum !== 0 && state.dailyMinimum) {
+          dailyMinimum = state.dailyMinimum[`${flightId || id}`];
+        }
         return this.allocationPreviewService.getAllocationPreview({
           set_inventory_uri,
           name,
           startAt,
           endAt,
           totalGoal,
-          dailyMinimum,
+          dailyMinimum: dailyMinimum || 0,
           zones
         });
       }),

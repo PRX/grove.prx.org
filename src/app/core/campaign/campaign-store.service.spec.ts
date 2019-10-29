@@ -299,6 +299,18 @@ describe('CampaignStoreService', () => {
       });
   });
 
+  it('saves dailyMinimum in state', done => {
+    store.load(1);
+    store
+      .loadAllocationPreview(flightFixture, flightFixture.id, 90)
+      .pipe(withLatestFrom(store.campaign$))
+      .subscribe(([allocationPreview, state]) => {
+        expect(allocationPreview.dailyMinimum).toEqual(90);
+        expect(state.dailyMinimum[flightFixture.id]).toEqual(90);
+        done();
+      });
+  });
+
   it('rolls up into weekly availability and includes allocation preview', done => {
     store.load(1);
     store
