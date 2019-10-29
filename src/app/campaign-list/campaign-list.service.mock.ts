@@ -98,7 +98,9 @@ export class CampaignListServiceMock {
 
   constructor(private augury: MockHalService) {}
 
-  loadCampaignList() {}
+  loadCampaignList(newParams: CampaignParams) {
+    this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
+  }
 
   get campaigns(): Observable<Campaign[]> {
     return of(campaigns);
@@ -109,7 +111,10 @@ export class CampaignListServiceMock {
   }
 
   getRouteQueryParams(partialParams: CampaignParams): CampaignRouteParams {
-    const { per, ...routeParams } = params;
-    return { ...routeParams, ...partialParams, geo: 'US|CA', zone: 'mid_1|pre_1', before: '2019-09-30', after: '2019-09-01' };
+    const omitPer = allParams => {
+      const { per, ...theRest } = allParams;
+      return theRest;
+    };
+    return { ...omitPer(params), ...omitPer(partialParams), geo: 'US|CA', zone: 'mid_1|pre_1', before: '2019-09-30', after: '2019-09-01' };
   }
 }

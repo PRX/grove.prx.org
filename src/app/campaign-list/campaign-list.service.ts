@@ -300,6 +300,19 @@ export class CampaignListService {
     } else if (this.params.zone) {
       zone = this.params.zone.join('|');
     }
-    return { page, advertiser, podcast, status, type, text, representative, desc };
+    return {
+      ...(page && { page }),
+      ...(advertiser && { advertiser }),
+      ...(podcast && { podcast }),
+      ...(status && { status }),
+      ...(type && { type }),
+      ...(geo && { geo }),
+      ...(zone && { zone }),
+      ...(text && { text }),
+      ...(representative && { representative }),
+      ...(before && { before }),
+      ...(after && { after }),
+      ...((desc || desc === false) && { desc })
+    };
   }
 }
