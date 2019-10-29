@@ -4,12 +4,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import {
-  MatDatepickerModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatNativeDateModule,
-  MatSelectModule } from '@angular/material';
+import { MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatSelectModule } from '@angular/material';
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -21,13 +16,15 @@ import {
   CampaignFilterComponent,
   FilterFacetComponent,
   FilterTextComponent,
-  FilterDateComponent } from './';
+  FilterDateComponent
+} from './';
 import {
   CampaignCardComponent,
   CampaignFlightDatesPipe,
   CampaignFlightTargetsPipe,
   CampaignFlightZonesPipe,
-  CampaignTypePipe } from '../card/';
+  CampaignTypePipe
+} from '../card/';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
@@ -71,15 +68,17 @@ describe('CampaignListComponent', () => {
           useValue: mockCampaignListService
         }
       ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(CampaignListComponent);
-      comp = fix.componentInstance;
-      de = fix.debugElement;
-      el = de.nativeElement;
-      campaignListService = TestBed.get(CampaignListService);
-      router = TestBed.get(Router);
-      fix.detectChanges();
-    });
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(CampaignListComponent);
+        comp = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        campaignListService = TestBed.get(CampaignListService);
+        router = TestBed.get(Router);
+        fix.detectChanges();
+      });
   }));
 
   it('should show page 1 of campaigns', () => {
@@ -97,7 +96,7 @@ describe('CampaignListComponent', () => {
         break;
       }
     }
-    expect(comp.routeToParams).toHaveBeenCalledWith({page: 2});
+    expect(comp.routeToParams).toHaveBeenCalledWith({ page: 2 });
   });
 
   it('should load campaign list on params change', () => {
@@ -114,12 +113,14 @@ describe('CampaignListComponent', () => {
     const toggle = de.query(By.css('input.updown-toggle'));
     toggle.nativeElement.click();
     expect(toggle.nativeElement.checked).toBeTruthy();
-    expect(comp.routeToParams).toHaveBeenCalledWith({desc: true});
+    expect(comp.routeToParams).toHaveBeenCalledWith({ desc: true });
 
     jest.spyOn(router, 'navigate');
     comp.routedParams.desc = true;
     toggle.nativeElement.click();
     expect(toggle.nativeElement.checked).toBeFalsy();
-    expect(router.navigate).toHaveBeenCalledWith(['/'], {queryParams: {desc: false, page: params.page}});
+    expect(router.navigate).toHaveBeenCalledWith(['/'], {
+      queryParams: campaignListService.getRouteQueryParams({ desc: false, page: params.page })
+    });
   });
 });

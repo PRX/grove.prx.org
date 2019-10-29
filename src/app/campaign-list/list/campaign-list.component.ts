@@ -6,15 +6,17 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
 @Component({
   selector: 'grove-campaign-list',
   template: `
-    <grove-campaign-filter
-      [params]="params" [facets]="facets" (campaignListParams)="routeToParams($event)">
-    </grove-campaign-filter>
+    <grove-campaign-filter [params]="params" [facets]="facets" (campaignListParams)="routeToParams($event)"> </grove-campaign-filter>
     <div class="campaigns-head">
       <h2>Campaigns</h2>
       <div>
-        <input type="checkbox" class="updown-toggle" id="desc"
+        <input
+          type="checkbox"
+          class="updown-toggle"
+          id="desc"
           [checked]="routedParams?.desc"
-          (click)="routeToParams({desc: !routedParams.desc})">
+          (click)="routeToParams({ desc: !routedParams.desc })"
+        />
         <label for="desc"></label>
       </div>
     </div>
@@ -28,13 +30,10 @@ import { Campaign, CampaignListService, Facets, CampaignParams } from '../campai
         </li>
       </ng-container>
     </ul>
-    <hr>
-    <prx-paging
-      [currentPage]="currentPage"
-      [totalPages]="totalPer | campaignListTotalPages"
-      (showPage)="routeToParams({page: $event})">
+    <hr />
+    <prx-paging [currentPage]="currentPage" [totalPages]="totalPer | campaignListTotalPages" (showPage)="routeToParams({ page: $event })">
     </prx-paging>
-    <div class="count-of-total">Showing {{count}} of {{total}}</div>
+    <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
   `,
   styleUrls: ['campaign-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -43,8 +42,7 @@ export class CampaignListComponent implements OnChanges {
   @Input() routedParams: CampaignParams;
   campaigns$: Observable<Campaign[]> = this.campaignListService.loadedCampaigns;
 
-  constructor(private campaignListService: CampaignListService,
-              private router: Router) {}
+  constructor(private campaignListService: CampaignListService, private router: Router) {}
 
   ngOnChanges() {
     this.campaignListService.loadCampaignList(this.routedParams);
@@ -66,8 +64,8 @@ export class CampaignListComponent implements OnChanges {
     return this.campaignListService.total;
   }
 
-  get totalPer(): {total: number, per: number} {
-    return {total: this.campaignListService.total, per: this.campaignListService.params.per};
+  get totalPer(): { total: number; per: number } {
+    return { total: this.campaignListService.total, per: this.campaignListService.params.per };
   }
 
   get params(): CampaignParams {
@@ -79,72 +77,35 @@ export class CampaignListComponent implements OnChanges {
   }
 
   routeToParams(partialParams: CampaignParams) {
-    let { page, advertiser, podcast, status, type, text, representative, desc } = partialParams;
-
-    // this function takes partial parameters (what changed)
-    // mix in the existing this.params unless property was explicitly set in partialParams
-    if (!partialParams.hasOwnProperty('page') && this.params.page) {
-      page = this.params.page;
-    }
-    if (!partialParams.hasOwnProperty('advertiser') && this.params.advertiser) {
-      advertiser = this.params.advertiser;
-    }
-    if (!partialParams.hasOwnProperty('podcast') && this.params.podcast) {
-      podcast = this.params.podcast;
-    }
-    if (!partialParams.hasOwnProperty('status') && this.params.status) {
-      status = this.params.status;
-    }
-    if (!partialParams.hasOwnProperty('type') && this.params.type) {
-      type = this.params.type;
-    }
-    if (!partialParams.hasOwnProperty('text') && this.params.text) {
-      text = this.params.text;
-    }
-    if (!partialParams.hasOwnProperty('representative') && this.params.representative) {
-      representative = this.params.representative;
-    }
-    if (!partialParams.hasOwnProperty('desc') && this.params.hasOwnProperty('desc')) {
-      desc = this.params.desc;
-    }
-    let before: string;
-    let after: string;
-    if (partialParams.before) {
-      before = partialParams.before.toISOString();
-    } else if (!partialParams.hasOwnProperty('before') && this.params.before) {
-      before = this.params.before.toISOString();
-    }
-    if (partialParams.after) {
-      after = partialParams.after.toISOString();
-    } else if (!partialParams.hasOwnProperty('after') && this.params.after) {
-      after = this.params.after.toISOString();
-    }
-    let geo;
-    if (partialParams.geo) {
-      geo = partialParams.geo.join('|');
-    } else if (this.params.geo) {
-      geo = this.params.geo.join('|');
-    }
-    let zone;
-    if (partialParams.zone) {
-      zone = partialParams.zone.join('|');
-    } else if (this.params.zone) {
-      zone = this.params.zone.join('|');
-    }
-    this.router.navigate(['/'], {queryParams: {
-      ...(page && {page}),
-      ...(advertiser && {advertiser}),
-      ...(podcast && {podcast}),
-      ...(status && {status}),
-      ...(type && {type}),
-      ...(before && {before}),
-      ...(after && {after}),
-      ...(geo && {geo}),
-      ...(zone && {zone}),
-      ...(text && {text}),
-      ...(representative && {representative}),
-      ...(desc !== undefined && {desc})
-    }});
+    const {
+      page,
+      advertiser,
+      podcast,
+      status,
+      type,
+      before,
+      after,
+      geo,
+      zone,
+      text,
+      representative,
+      desc
+    } = this.campaignListService.getRouteQueryParams(partialParams);
+    this.router.navigate(['/'], {
+      queryParams: {
+        ...(page && { page }),
+        ...(advertiser && { advertiser }),
+        ...(podcast && { podcast }),
+        ...(status && { status }),
+        ...(type && { type }),
+        ...(before && { before }),
+        ...(after && { after }),
+        ...(geo && { geo }),
+        ...(zone && { zone }),
+        ...(text && { text }),
+        ...(representative && { representative }),
+        ...(desc !== undefined && { desc })
+      }
+    });
   }
-
 }

@@ -1,11 +1,12 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CampaignState } from '../../core';
+import { CampaignListService, CampaignRouteParams } from '../../campaign-list/campaign-list.service';
 
 @Component({
   selector: 'grove-campaign-status',
   template: `
     <prx-status-bar>
-      <a prx-status-bar-link routerLink="/">
+      <a prx-status-bar-link routerLink="/" [queryParams]="queryParams">
         <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
       </a>
       <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
@@ -21,6 +22,8 @@ export class CampaignStatusComponent {
   @Input() isSaving: boolean;
   @Output() save = new EventEmitter();
 
+  constructor(private campaignListService: CampaignListService) {}
+
   get anyInvalid(): boolean {
     if (this.state) {
       return !this.state.valid || Object.values(this.state.flights).some(f => !f.valid);
@@ -35,6 +38,10 @@ export class CampaignStatusComponent {
     } else {
       return false;
     }
+  }
+
+  get queryParams(): CampaignRouteParams {
+    return this.campaignListService.getRouteQueryParams({});
   }
 
   onSave() {

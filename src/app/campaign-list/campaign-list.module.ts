@@ -53,9 +53,6 @@ import { CampaignListService } from './campaign-list.service';
   ],
   exports: [
     CampaignListComponent
-  ],
-  providers: [
-    CampaignListService
   ]
 })
 
