@@ -169,17 +169,6 @@ $prx-accent: mat-palette($prx-orange, 500, 200, 800);
 
 $prx-warn: mat-palette($prx-red);
 
-$prx: mat-light-theme(
-  $prx-primary,
-  $prx-neutral,
-  $prx-accent,
-  $prx-warn,
-  $prx-blue,
-  $prx-gray,
-  $prx-red,
-  $prx-yellow,
-  $prx-green,
-  $prx-aqua
-);
+$prx: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
 
 @include angular-material-theme($prx);
