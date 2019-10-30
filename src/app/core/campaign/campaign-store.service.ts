@@ -386,9 +386,12 @@ export class CampaignStoreService {
     );
   }
 
-  private putFlights(): Observable<{ prevId: string; state: FlightState }[]> {
+  putFlights(): Observable<{ prevId: string; state: FlightState }[]> {
     return this.campaignFirst$.pipe(
       switchMap(state => {
+        if (!Object.keys(state.flights).length) {
+          return of([]);
+        }
         return forkJoin(
           Object.keys(state.flights).map(key => {
             return this.campaignService.putFlight(state.flights[key]).pipe(
