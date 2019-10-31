@@ -1,6 +1,5 @@
-@import '~@angular/material/theming';
-
-@include mat-core();
+$dark-primary-text: rgba(black, 0.87);
+$light-primary-text: white;
 
 $prx-blue: (
   100: #e6f4f9,
@@ -162,13 +161,3 @@ $prx-aqua: (
     900: $light-primary-text
   )
 );
-
-$prx-primary: mat-palette($prx-blue, 500, 200, 800);
-$prx-neutral: mat-palette($prx-gray, 500, 200, 800);
-$prx-accent: mat-palette($prx-orange, 500, 200, 800);
-
-$prx-warn: mat-palette($prx-red);
-
-$prx: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
-
-@include angular-material-theme($prx);

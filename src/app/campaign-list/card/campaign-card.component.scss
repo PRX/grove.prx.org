@@ -1,10 +1,12 @@
+@import '~src/sass/variables';
+
 :host {
   display: block;
   background-color: white;
 }
 .header {
   height: 3px;
-  background-color: #a3a3a3;
+  background-color: map-get($prx-gray, 500);
 }
 section {
   padding: 10px;
@@ -12,7 +14,7 @@ section {
 }
 section.loading {
   position: relative;
-  background-color: #ddd;
+  background-color: map-get($prx-gray, 300);
 }
 h3 {
   font-weight: 700;
@@ -21,23 +23,23 @@ h3 {
 }
 .status {
   padding: 2px 4px;
-  color: #000;
+  color: map-get($prx-gray, 900);
 }
 .draft {
-  background-color: #b3d9ef;
+  background-color: map-get($prx-blue, 200);
 }
 .approved {
-  background-color: #23c763;
+  background-color: map-get($prx-green, 500);
 }
 .paused {
-  background-color: #ffc400;
+  background-color: map-get($prx-yellow, 500);
 }
 .canceled {
-  background-color: #e04524;
+  background-color: map-get($prx-red, 500);
 }
 .hold {
-  background-color: #ff9600;
+  background-color: map-get($prx-orange, 500);
 }
 .sold {
-  background-color: #17c9d3;
+  background-color: map-get($prx-aqua, 500);
 }
