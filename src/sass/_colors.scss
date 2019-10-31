@@ -1,5 +1,4 @@
-$dark-primary-text: rgba(black, 0.87);
-$light-primary-text: white;
+@import '~@angular/material/theming';
 
 $prx-blue: (
   100: #e6f4f9,
@@ -116,6 +115,7 @@ $prx-red: (
   )
 );
 
+
 $prx-green: (
   100: #dafbe7,
   200: #bcf5d2,
@@ -161,3 +161,11 @@ $prx-aqua: (
     900: $light-primary-text
   )
 );
+
+$prx-aqua-palette: mat-palette($prx-aqua, 500, 200, 800);
+$prx-blue-palette: mat-palette($prx-blue, 500, 200, 800);
+$prx-gray-palette: mat-palette($prx-gray, 500, 200, 800);
+$prx-green-palette: mat-palette($prx-green, 500, 200, 800);
+$prx-orange-palette: mat-palette($prx-orange, 500, 200, 800);
+$prx-red-palette: mat-palette($prx-red, 500, 200, 800);
+$prx-yellow-palette: mat-palette($prx-yellow, 500, 200, 800);
