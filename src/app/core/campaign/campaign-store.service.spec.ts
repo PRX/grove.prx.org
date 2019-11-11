@@ -272,6 +272,15 @@ describe('CampaignStoreService', () => {
     });
   });
 
+  it('handles putting flights correctly when no flights exist', done => {
+    campaignService.getCampaign = jest.fn(() => of({...campaignStateFixture, flights: {}}));
+    store.load(1);
+    store.putFlights().subscribe(res => {
+      expect(res).toMatchObject([]);
+      done();
+    });
+  });
+
   it('loads availability', done => {
     store.load(1);
     store.loadAvailability(flightFixture).subscribe(availabilty => {
