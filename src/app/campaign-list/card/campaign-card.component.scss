@@ -1,10 +1,13 @@
+@import '~src/sass/colors';
+@import '~@angular/material/theming';
+
 :host {
   display: block;
-  background-color: white;
+  background-color: mat-color($prx-gray, 100);
 }
 .header {
   height: 3px;
-  background-color: #a3a3a3;
+  background-color: mat-color($prx-gray, 500);
 }
 section {
   padding: 10px;
@@ -12,7 +15,7 @@ section {
 }
 section.loading {
   position: relative;
-  background-color: #ddd;
+  background-color: mat-color($prx-gray, 300);
 }
 h3 {
   font-weight: 700;
@@ -21,23 +24,28 @@ h3 {
 }
 .status {
   padding: 2px 4px;
-  color: #000;
 }
 .draft {
-  background-color: #b3d9ef;
+  color: mat-color($prx-blue-palette, lighter-contrast);
+  background-color: mat-color($prx-blue-palette, lighter);
 }
 .approved {
-  background-color: #23c763;
+  color: mat-color($prx-green-palette, default-contrast);
+  background-color: mat-color($prx-green-palette, default);
 }
 .paused {
-  background-color: #ffc400;
+  color: mat-color($prx-yellow-palette, default-contrast);
+  background-color: mat-color($prx-yellow-palette, default);
 }
 .canceled {
-  background-color: #e04524;
+  color: mat-color($prx-red-palette, default-contrast);
+  background-color: mat-color($prx-red-palette, default);
 }
 .hold {
-  background-color: #ff9600;
+  color: mat-color($prx-orange-palette, default-contrast);
+  background-color: mat-color($prx-orange-palette, default);
 }
 .sold {
-  background-color: #17C9D3;
+  color: mat-color($prx-aqua-palette, default-contrast);
+  background-color: mat-color($prx-aqua-palette, default);
 }

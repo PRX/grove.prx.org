@@ -1,0 +1,171 @@
+@import '~@angular/material/theming';
+
+$prx-blue: (
+  100: #e6f4f9,
+  200: #b3d9ef,
+  300: #75bbe1,
+  400: #3f94c6,
+  500: #0089bd,
+  600: #0072a3,
+  700: #004e75,
+  800: #003a57,
+  900: #002533,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-gray: (
+  100: #f9f9fb,
+  200: #e9e9ec,
+  300: #dddde0,
+  400: #bebec2,
+  500: #98989c,
+  600: #727276,
+  700: #535355,
+  800: #323233,
+  900: #1a1a1a,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $dark-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-orange: (
+  100: #faefe1,
+  200: #f8deba,
+  300: #fccc88,
+  400: #fab452,
+  500: #ff9600,
+  600: #d17a00,
+  700: #8a570f,
+  800: #5b3c10,
+  900: #2b1b08,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-yellow: (
+  100: #fdf6dd,
+  200: #fdecb5,
+  300: #fde187,
+  400: #ffd447,
+  500: #ffc400,
+  600: #e0b500,
+  700: #a58809,
+  800: #665605,
+  900: #4b3e02,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $dark-primary-text,
+    600: $dark-primary-text,
+    700: $dark-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-red: (
+  100: #f8ddd8,
+  200: #f5c6bc,
+  300: #f0a798,
+  400: #ec775f,
+  500: #e04524,
+  600: #bf3c22,
+  700: #932e1a,
+  800: #5a1b11,
+  900: #3b100c,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+
+$prx-green: (
+  100: #dafbe7,
+  200: #bcf5d2,
+  300: #98f0ba,
+  400: #67e497,
+  500: #23c763,
+  600: #1ca04f,
+  700: #178240,
+  800: #0f4d27,
+  900: #042f15,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $dark-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-aqua: (
+  100: #e7fdfe,
+  200: #cbf4f6,
+  300: #97e8ed,
+  400: #60dbe2,
+  500: #17c9d3,
+  600: #11a4ac,
+  700: #0a7176,
+  800: #034b4e,
+  900: #003033,
+  contrast: (
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $dark-primary-text,
+    400: $dark-primary-text,
+    500: $dark-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text
+  )
+);
+
+$prx-aqua-palette: mat-palette($prx-aqua, 500, 200, 800);
+$prx-blue-palette: mat-palette($prx-blue, 500, 200, 800);
+$prx-gray-palette: mat-palette($prx-gray, 500, 200, 800);
+$prx-green-palette: mat-palette($prx-green, 500, 200, 800);
+$prx-orange-palette: mat-palette($prx-orange, 500, 200, 800);
+$prx-red-palette: mat-palette($prx-red, 500, 200, 800);
+$prx-yellow-palette: mat-palette($prx-yellow, 500, 200, 800);
