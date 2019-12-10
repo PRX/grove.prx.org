@@ -71,7 +71,7 @@ export interface Campaign {
 @Injectable({
   providedIn: 'root'
 })
-export class CampaignListService {
+export class DashboardService {
   params: CampaignParams = { page: 1, per: 12 };
   facets: Facets;
   total: number;
@@ -109,28 +109,8 @@ export class CampaignListService {
   }
 
   loadCampaignList(newParams?: CampaignParams) {
-    this.count = 0;
-
-    // newParams includes all params (from route) except per
-    this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
-    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc } = this.params;
-    const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
-
-    this.augury
-      .follow('prx:campaigns', {
-        page,
-        per,
-        zoom: 'prx:flights,prx:advertiser',
-        ...(filters && { filters }),
-        sorts: 'flight_start_at:' + (desc ? 'desc' : 'asc')
-      })
+    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', newParams)
       .pipe(
-        switchMap(result => {
-          this.count = +result['count'];
-          this.total = +result['total'];
-          this.facets = result['facets'];
-          return result.followList('prx:items');
-        }),
         switchMap((campaignDocs: HalDoc[]) => {
           this._campaigns.next(
             campaignDocs.reduce((acc, doc) => {
@@ -182,6 +162,32 @@ export class CampaignListService {
           });
         },
         err => (this.error = err)
+      );
+  }
+
+  loadList(list: string, zoom: string, newParams?: CampaignParams): Observable<HalDoc[]> {
+    this.count = 0;
+
+    // newParams includes all params (from route) except per
+    this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
+    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc } = this.params;
+    const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
+
+    return this.augury
+      .follow(list, {
+        page,
+        per,
+        zoom,
+        ...(filters && { filters }),
+        sorts: 'flight_start_at:' + (desc ? 'desc' : 'asc')
+      })
+      .pipe(
+        switchMap(result => {
+          this.count = +result['count'];
+          this.total = +result['total'];
+          this.facets = result['facets'];
+          return result.followList('prx:items');
+        })
       );
   }
 

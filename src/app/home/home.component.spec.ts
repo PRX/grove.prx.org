@@ -5,15 +5,15 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
 import { MockHalService } from 'ngx-prx-styleguide';
-import { CampaignListService, CampaignParams } from '../campaign-list/campaign-list.service';
-import { CampaignListServiceMock, params } from '../campaign-list/campaign-list.service.mock';
+import { DashboardService, CampaignParams } from '../dashboard/dashboard.service';
+import { DashboardServiceMock, params } from '../dashboard/dashboard.service.mock';
 import { HomeComponent } from './home.component';
 
 @Component({
   selector: 'grove-campaign-list',
   template: ``
 })
-class MockGroveCampaignList {
+class MockGroveCampaignListComponent {
   @Input() routedParams: CampaignParams;
 }
 
@@ -23,16 +23,13 @@ describe('HomeComponent', () => {
   let de: DebugElement;
   let el: HTMLElement;
   const mockHal = new MockHalService();
-  const mockCampaignListService = new CampaignListServiceMock(mockHal);
+  const mockDashboardService = new DashboardServiceMock(mockHal);
   const { per, ...routableParams } = params;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [
-        HomeComponent,
-        MockGroveCampaignList
-      ],
+      declarations: [HomeComponent, MockGroveCampaignListComponent],
       providers: [
         {
           provide: ActivatedRoute,
@@ -48,20 +45,22 @@ describe('HomeComponent', () => {
           }
         },
         {
-          provide: CampaignListService,
-          useValue: mockCampaignListService
+          provide: DashboardService,
+          useValue: mockDashboardService
         }
       ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(HomeComponent);
-      comp = fix.componentInstance;
-      de = fix.debugElement;
-      el = de.nativeElement;
-      fix.detectChanges();
-    });
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(HomeComponent);
+        comp = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        fix.detectChanges();
+      });
   }));
 
-  it('map route params to campaign params', (done) => {
+  it('map route params to campaign params', done => {
     comp.params$.subscribe(campaignParams => {
       expect(campaignParams).toEqual(routableParams);
       done();

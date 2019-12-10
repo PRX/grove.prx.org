@@ -14,17 +14,11 @@ import {
   CampaignFlightDatesPipe,
   CampaignFlightTargetsPipe,
   CampaignFlightZonesPipe,
-  CampaignTypePipe } from './card/';
+  CampaignTypePipe
+} from './campaign-card';
 
-import {
-  CampaignListComponent,
-  CampaignListTotalPagesPipe,
-  CampaignFilterComponent,
-  FilterFacetComponent,
-  FilterTextComponent,
-  FilterDateComponent } from './list';
-
-import { CampaignListService } from './campaign-list.service';
+import { CampaignListComponent, CampaignListTotalPagesPipe, CampaignFilterComponent } from './campaign-list';
+import { FilterFacetComponent, FilterTextComponent, FilterDateComponent } from './filter';
 
 @NgModule({
   declarations: [
@@ -51,9 +45,6 @@ import { CampaignListService } from './campaign-list.service';
     MatNativeDateModule,
     MatSelectModule
   ],
-  exports: [
-    CampaignListComponent
-  ]
+  exports: [CampaignListComponent]
 })
-
-export class CampaignListModule { }
+export class DashboardModule {}

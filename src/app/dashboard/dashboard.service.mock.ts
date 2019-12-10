@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { Campaign, Flight, Facets, CampaignParams, CampaignRouteParams } from './campaign-list.service';
+import { Campaign, Flight, Facets, CampaignParams, CampaignRouteParams } from './dashboard.service';
 
 export const flights: Flight[] = [
   {
@@ -68,12 +68,33 @@ export const campaigns: Campaign[] = [
 ];
 
 export const facets: Facets = {
-  advertiser: [{ id: 3, label: 'Toyota' }, { id: 2, label: 'Griddy' }, { id: 1, label: 'Adidas' }],
-  podcast: [{ id: 3, label: 'Podcast 3' }, { id: 2, label: 'Podcast 2' }, { id: 1, label: 'Podcast 1' }],
-  status: [{ id: 'canceled', label: 'Canceled' }, { id: 'approved', label: 'Approved' }, { id: 'sold', label: 'Sold' }],
-  type: [{ id: 'house', label: 'House' }, { id: 'paid_campaign', label: 'Paid Campaign' }],
-  geo: [{ id: 'US', label: 'United States' }, { id: 'CA', label: 'Canada' }],
-  zone: [{ id: 'mid_1', label: 'Midroll' }, { id: 'pre_1', label: 'Preroll' }]
+  advertiser: [
+    { id: 3, label: 'Toyota' },
+    { id: 2, label: 'Griddy' },
+    { id: 1, label: 'Adidas' }
+  ],
+  podcast: [
+    { id: 3, label: 'Podcast 3' },
+    { id: 2, label: 'Podcast 2' },
+    { id: 1, label: 'Podcast 1' }
+  ],
+  status: [
+    { id: 'canceled', label: 'Canceled' },
+    { id: 'approved', label: 'Approved' },
+    { id: 'sold', label: 'Sold' }
+  ],
+  type: [
+    { id: 'house', label: 'House' },
+    { id: 'paid_campaign', label: 'Paid Campaign' }
+  ],
+  geo: [
+    { id: 'US', label: 'United States' },
+    { id: 'CA', label: 'Canada' }
+  ],
+  zone: [
+    { id: 'mid_1', label: 'Midroll' },
+    { id: 'pre_1', label: 'Preroll' }
+  ]
 };
 
 export const params: CampaignParams = {
@@ -93,7 +114,7 @@ export const params: CampaignParams = {
 };
 
 @Injectable()
-export class CampaignListServiceMock {
+export class DashboardServiceMock {
   params = { page: 1, per: 9 };
 
   constructor(private augury: MockHalService) {}

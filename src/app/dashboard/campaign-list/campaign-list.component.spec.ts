@@ -8,23 +8,17 @@ import { MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateM
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
-import { CampaignListService } from '../campaign-list.service';
-import { CampaignListServiceMock, campaigns as campaignsFixture, params } from '../campaign-list.service.mock';
-import {
-  CampaignListComponent,
-  CampaignListTotalPagesPipe,
-  CampaignFilterComponent,
-  FilterFacetComponent,
-  FilterTextComponent,
-  FilterDateComponent
-} from './';
+import { DashboardService } from '../dashboard.service';
+import { DashboardServiceMock, campaigns as campaignsFixture, params } from '../dashboard.service.mock';
+import { CampaignListComponent, CampaignListTotalPagesPipe, CampaignFilterComponent } from './';
+import { FilterFacetComponent, FilterTextComponent, FilterDateComponent } from '../filter';
 import {
   CampaignCardComponent,
   CampaignFlightDatesPipe,
   CampaignFlightTargetsPipe,
   CampaignFlightZonesPipe,
   CampaignTypePipe
-} from '../card/';
+} from '../campaign-card';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
@@ -33,8 +27,8 @@ describe('CampaignListComponent', () => {
   let el: HTMLElement;
   let router: Router;
   const mockHal = new MockHalService();
-  const mockCampaignListService = new CampaignListServiceMock(mockHal);
-  let campaignListService: CampaignListService;
+  const mockDashboardService = new DashboardServiceMock(mockHal);
+  let dashboardService: DashboardService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -64,8 +58,8 @@ describe('CampaignListComponent', () => {
       ],
       providers: [
         {
-          provide: CampaignListService,
-          useValue: mockCampaignListService
+          provide: DashboardService,
+          useValue: mockDashboardService
         }
       ]
     })
@@ -75,7 +69,7 @@ describe('CampaignListComponent', () => {
         comp = fix.componentInstance;
         de = fix.debugElement;
         el = de.nativeElement;
-        campaignListService = TestBed.get(CampaignListService);
+        dashboardService = TestBed.get(DashboardService);
         router = TestBed.get(Router);
         fix.detectChanges();
       });
@@ -100,11 +94,11 @@ describe('CampaignListComponent', () => {
   });
 
   it('should load campaign list on params change', () => {
-    jest.spyOn(campaignListService, 'loadCampaignList');
+    jest.spyOn(dashboardService, 'loadCampaignList');
     comp.routedParams = params;
     fix.detectChanges();
     comp.ngOnChanges();
-    expect(campaignListService.loadCampaignList).toHaveBeenCalledWith(params);
+    expect(dashboardService.loadCampaignList).toHaveBeenCalledWith(params);
   });
 
   it('should route to campaigns asc or desc', () => {
@@ -120,7 +114,7 @@ describe('CampaignListComponent', () => {
     toggle.nativeElement.click();
     expect(toggle.nativeElement.checked).toBeFalsy();
     expect(router.navigate).toHaveBeenCalledWith(['/'], {
-      queryParams: campaignListService.getRouteQueryParams({ desc: false, page: params.page })
+      queryParams: dashboardService.getRouteQueryParams({ desc: false, page: params.page })
     });
   });
 });

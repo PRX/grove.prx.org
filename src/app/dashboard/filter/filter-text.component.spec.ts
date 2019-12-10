@@ -13,25 +13,21 @@ describe('FilterTextComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MatFormFieldModule,
-        MatInputModule,
-        NoopAnimationsModule
-      ],
-      declarations: [
-        FilterTextComponent
-      ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(FilterTextComponent);
-      comp = fix.componentInstance;
-      de = fix.debugElement;
-      el = de.nativeElement;
-      fix.detectChanges();
-      spyOn(comp.search, 'emit');
-    });
+      imports: [MatFormFieldModule, MatInputModule, NoopAnimationsModule],
+      declarations: [FilterTextComponent]
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(FilterTextComponent);
+        comp = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        fix.detectChanges();
+        spyOn(comp.search, 'emit');
+      });
   }));
 
-  it ('should emit search text', (done) => {
+  it('should emit search text', done => {
     const str = 'search string';
     comp.searchOutput$.subscribe(() => {
       expect(comp.search.emit).toHaveBeenCalledWith(str);

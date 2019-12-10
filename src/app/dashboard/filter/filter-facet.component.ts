@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Facet } from '../campaign-list.service';
+import { Facet } from '../dashboard.service';
 
 @Component({
   selector: 'grove-filter-facet',

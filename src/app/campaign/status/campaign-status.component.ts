@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CampaignState } from '../../core';
-import { CampaignListService, CampaignRouteParams } from '../../campaign-list/campaign-list.service';
+import { DashboardService, CampaignRouteParams } from '../../dashboard/dashboard.service';
 
 @Component({
   selector: 'grove-campaign-status',
@@ -22,7 +22,7 @@ export class CampaignStatusComponent {
   @Input() isSaving: boolean;
   @Output() save = new EventEmitter();
 
-  constructor(private campaignListService: CampaignListService) {}
+  constructor(private dashboardService: DashboardService) {}
 
   get anyInvalid(): boolean {
     if (this.state) {
@@ -41,7 +41,7 @@ export class CampaignStatusComponent {
   }
 
   get queryParams(): CampaignRouteParams {
-    return this.campaignListService.getRouteQueryParams({});
+    return this.dashboardService.getRouteQueryParams({});
   }
 
   onSave() {

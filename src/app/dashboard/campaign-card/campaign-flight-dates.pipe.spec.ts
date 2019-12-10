@@ -1,5 +1,5 @@
 import { CampaignFlightDatesPipe } from './campaign-flight-dates.pipe';
-import { flights } from '../campaign-list.service.mock';
+import { flights } from '../dashboard.service.mock';
 
 describe('CampaignFlightDatesPipe', () => {
   const pipe = new CampaignFlightDatesPipe();

@@ -1,7 +1,7 @@
 import { Component, OnChanges, ChangeDetectionStrategy, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { Campaign, CampaignListService, Facets, CampaignParams } from '../campaign-list.service';
+import { Campaign, DashboardService, Facets, CampaignParams } from '../dashboard.service';
 
 @Component({
   selector: 'grove-campaign-list',
@@ -42,7 +42,7 @@ export class CampaignListComponent implements OnChanges {
   @Input() routedParams: CampaignParams;
   campaigns$: Observable<Campaign[]> = this.campaignListService.loadedCampaigns;
 
-  constructor(private campaignListService: CampaignListService, private router: Router) {}
+  constructor(private campaignListService: DashboardService, private router: Router) {}
 
   ngOnChanges() {
     this.campaignListService.loadCampaignList(this.routedParams);

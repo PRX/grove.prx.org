@@ -5,13 +5,8 @@ import { By } from '@angular/platform-browser';
 
 import { SharedModule } from '../../shared/shared.module';
 
-import { campaigns as campaignsFixture } from '../campaign-list.service.mock';
-import {
-  CampaignCardComponent,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe,
-  CampaignTypePipe } from './';
+import { campaigns as campaignsFixture } from '../dashboard.service.mock';
+import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe, CampaignTypePipe } from '.';
 
 describe('CampaignCardComponent', () => {
   let comp: CampaignCardComponent;
@@ -21,25 +16,18 @@ describe('CampaignCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        SharedModule
-      ],
-      declarations: [
-        CampaignCardComponent,
-        CampaignFlightDatesPipe,
-        CampaignFlightTargetsPipe,
-        CampaignFlightZonesPipe,
-        CampaignTypePipe
-      ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(CampaignCardComponent);
-      comp = fix.componentInstance;
-      de = fix.debugElement;
-      el = de.nativeElement;
-      comp.campaign = campaignsFixture[0];
-      fix.detectChanges();
-    });
+      imports: [RouterTestingModule, SharedModule],
+      declarations: [CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe, CampaignTypePipe]
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(CampaignCardComponent);
+        comp = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        comp.campaign = campaignsFixture[0];
+        fix.detectChanges();
+      });
   }));
 
   it('should show the advertiser and link to the campaign', () => {

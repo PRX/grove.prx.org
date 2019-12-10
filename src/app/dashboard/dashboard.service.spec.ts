@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { MockHalService, HalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
-import { CampaignListService } from './campaign-list.service';
-import { campaigns as campaignsFixture, flights as flightsFixture, facets } from './campaign-list.service.mock';
+import { DashboardService } from './dashboard.service';
+import { campaigns as campaignsFixture, flights as flightsFixture, facets } from './dashboard.service.mock';
 
-describe('CampaignListService', () => {
+describe('DashboardService', () => {
   let auguryService: AuguryService;
-  let campaignListService: CampaignListService;
+  let campaignListService: DashboardService;
   const mockHalService = new MockHalService();
 
   const mockCampaignsResponse = mockHalService.mock('prx:campaigns', {
@@ -24,7 +24,7 @@ describe('CampaignListService', () => {
     TestBed.configureTestingModule({
       providers: [
         AuguryService,
-        CampaignListService,
+        DashboardService,
         {
           provide: HalService,
           useValue: mockHalService
@@ -33,7 +33,7 @@ describe('CampaignListService', () => {
     });
 
     auguryService = TestBed.get(AuguryService);
-    campaignListService = TestBed.get(CampaignListService);
+    campaignListService = TestBed.get(DashboardService);
     campaignListService.loadCampaignList();
   });
 

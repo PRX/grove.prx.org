@@ -1,26 +1,26 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { Campaign } from '../campaign-list.service';
+import { Campaign } from '../dashboard.service';
 
 @Component({
   selector: 'grove-campaign-card',
   template: `
-    <div class="header {{campaign?.status}}"></div>
+    <div class="header {{ campaign?.status }}"></div>
     <section *ngIf="campaign">
-      <div>{{campaign.flights | campaignFlightDates}}</div>
+      <div>{{ campaign.flights | campaignFlightDates }}</div>
       <h3>
-        <a routerLink="{{'/campaign/' + campaign.id}}">
-          {{campaign.advertiser && campaign.advertiser.label}}
+        <a routerLink="{{ '/campaign/' + campaign.id }}">
+          {{ campaign.advertiser && campaign.advertiser.label }}
         </a>
       </h3>
       <div>
-        <span class="status {{campaign.status}}">{{campaign.status}}</span>
-        {{campaign.type | campaignType}}
+        <span class="status {{ campaign.status }}">{{ campaign.status }}</span>
+        {{ campaign.type | campaignType }}
       </div>
       <div *ngIf="campaign.flights | campaignFlightTargets as targets">
         <prx-icon size="1em" name="globe-americas"></prx-icon>
-        {{targets}}
+        {{ targets }}
       </div>
-      <div>{{campaign.flights | campaignFlightZones}}</div>
+      <div>{{ campaign.flights | campaignFlightZones }}</div>
     </section>
     <section class="loading" *ngIf="!campaign">
       <prx-spinner></prx-spinner>
