@@ -2,17 +2,18 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CampaignParams } from '../dashboard/dashboard.service';
+import { DashboardParams } from '../dashboard/dashboard.service';
 
 @Component({
   template: `
-    <grove-campaign-list [routedParams]="params$ | async"></grove-campaign-list>
+    <grove-dashboard [routedParams]="params$ | async"></grove-dashboard>
   `
 })
 export class HomeComponent {
-  params$: Observable<CampaignParams> = this.route.queryParams.pipe(
+  params$: Observable<DashboardParams> = this.route.queryParams.pipe(
     map(
-      (params): CampaignParams => {
+      (params): DashboardParams => {
+        const view = params['view'] || 'flights';
         const page = params['page'] && +params['page'];
         const advertiser = params['advertiser'] && +params['advertiser'];
         const podcast = params['podcast'] && +params['podcast'];
@@ -25,7 +26,7 @@ export class HomeComponent {
         const before = params['before'] && new Date(params['before']);
         const after = params['after'] && new Date(params['after']);
         const desc = params['desc'] && params['desc'].toLowerCase() !== 'false';
-        return { page, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc };
+        return { view, page, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc };
       }
     )
   );

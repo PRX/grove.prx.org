@@ -293,7 +293,7 @@ export class DashboardService {
         per,
         zoom,
         ...(filters && { filters }),
-        sort: sort + ':' + (desc ? 'desc' : 'asc')
+        sorts: sort + ':' + (desc ? 'desc' : 'asc')
       })
       .pipe(
         switchMap(result => {

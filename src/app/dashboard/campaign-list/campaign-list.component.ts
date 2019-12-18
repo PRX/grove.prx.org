@@ -1,25 +1,10 @@
-import { Component, OnChanges, ChangeDetectionStrategy, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Campaign, DashboardService, Facets, CampaignParams } from '../dashboard.service';
+import { Campaign, DashboardService, DashboardParams } from '../dashboard.service';
 
 @Component({
   selector: 'grove-campaign-list',
   template: `
-    <grove-campaign-filter [params]="params" [facets]="facets" (campaignListParams)="routeToParams($event)"> </grove-campaign-filter>
-    <div class="campaigns-head">
-      <h2>Campaigns</h2>
-      <div>
-        <input
-          type="checkbox"
-          class="updown-toggle"
-          id="desc"
-          [checked]="routedParams?.desc"
-          (click)="routeToParams({ desc: !routedParams.desc })"
-        />
-        <label for="desc"></label>
-      </div>
-    </div>
     <ul>
       <li *ngFor="let campaign of campaigns$ | async">
         <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
@@ -31,81 +16,50 @@ import { Campaign, DashboardService, Facets, CampaignParams } from '../dashboard
       </ng-container>
     </ul>
     <hr />
-    <prx-paging [currentPage]="currentPage" [totalPages]="totalPer | campaignListTotalPages" (showPage)="routeToParams({ page: $event })">
+    <prx-paging
+      [currentPage]="currentPage"
+      [totalPages]="totalPer | campaignListTotalPages"
+      (showPage)="routeToParams.emit({ page: $event })"
+    >
     </prx-paging>
     <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
   `,
   styleUrls: ['campaign-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignListComponent implements OnChanges {
-  @Input() routedParams: CampaignParams;
-  campaigns$: Observable<Campaign[]> = this.campaignListService.loadedCampaigns;
-
-  constructor(private campaignListService: DashboardService, private router: Router) {}
-
-  ngOnChanges() {
-    this.campaignListService.loadCampaignList(this.routedParams);
+export class CampaignListComponent {
+  // tslint:disable-next-line
+  private _routedParams: DashboardParams;
+  get routedParams(): DashboardParams {
+    return this._routedParams;
   }
+  @Input()
+  set routedParams(routedParams: DashboardParams) {
+    this._routedParams = routedParams;
+    this.dashboardService.loadCampaignList(this.routedParams);
+  }
+  @Output() routeToParams = new EventEmitter<DashboardParams>();
+  campaigns$: Observable<Campaign[]> = this.dashboardService.loadedCampaigns;
+
+  constructor(private dashboardService: DashboardService) {}
 
   get loading$(): Observable<boolean[]> {
-    return this.campaignListService.loading;
+    return this.dashboardService.loading;
   }
 
   get currentPage(): number {
-    return this.campaignListService.params.page;
+    return this.dashboardService.params.page;
   }
 
   get count(): number {
-    return this.campaignListService.count;
+    return this.dashboardService.campaignCount;
   }
 
   get total(): number {
-    return this.campaignListService.total;
+    return this.dashboardService.campaignTotal;
   }
 
   get totalPer(): { total: number; per: number } {
-    return { total: this.campaignListService.total, per: this.campaignListService.params.per };
-  }
-
-  get params(): CampaignParams {
-    return this.campaignListService.params;
-  }
-
-  get facets(): Facets {
-    return this.campaignListService.facets;
-  }
-
-  routeToParams(partialParams: CampaignParams) {
-    const {
-      page,
-      advertiser,
-      podcast,
-      status,
-      type,
-      before,
-      after,
-      geo,
-      zone,
-      text,
-      representative,
-      desc
-    } = this.campaignListService.getRouteQueryParams(partialParams);
-    this.router.navigate(['/'], {
-      queryParams: {
-        ...(page && { page }),
-        ...(advertiser && { advertiser }),
-        ...(podcast && { podcast }),
-        ...(status && { status }),
-        ...(type && { type }),
-        ...(before && { before }),
-        ...(after && { after }),
-        ...(geo && { geo }),
-        ...(zone && { zone }),
-        ...(text && { text }),
-        ...(representative && { representative }),
-        ...(desc !== undefined && { desc })
-      }
-    });
+    return { total: this.dashboardService.campaignTotal, per: this.dashboardService.params.per };
   }
 }

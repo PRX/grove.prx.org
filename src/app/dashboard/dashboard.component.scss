@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  padding: 40px;
+}
+
+grove-dashboard-filter {
+  display: block;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.list-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+h2 {
+  font-weight: 700;
+  font-size: 1.5em;
+  line-height: 2em;
+  color: #676767;
+}
+h2 > .btn-link {
+  font-weight: 700;
+}
+h2 > .btn-link[disabled] {
+  color: #676767;
+}

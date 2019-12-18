@@ -5,16 +5,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
 import { MockHalService } from 'ngx-prx-styleguide';
-import { DashboardService, CampaignParams } from '../dashboard/dashboard.service';
+import { DashboardService, DashboardParams } from '../dashboard/dashboard.service';
 import { DashboardServiceMock, params } from '../dashboard/dashboard.service.mock';
 import { HomeComponent } from './home.component';
 
 @Component({
-  selector: 'grove-campaign-list',
+  selector: 'grove-dashboard',
   template: ``
 })
-class MockGroveCampaignListComponent {
-  @Input() routedParams: CampaignParams;
+class MockGroveDashboardComponent {
+  @Input() routedParams: DashboardParams;
 }
 
 describe('HomeComponent', () => {
@@ -29,7 +29,7 @@ describe('HomeComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [HomeComponent, MockGroveCampaignListComponent],
+      declarations: [HomeComponent, MockGroveDashboardComponent],
       providers: [
         {
           provide: ActivatedRoute,
@@ -61,8 +61,8 @@ describe('HomeComponent', () => {
   }));
 
   it('map route params to campaign params', done => {
-    comp.params$.subscribe(campaignParams => {
-      expect(campaignParams).toEqual(routableParams);
+    comp.params$.subscribe(dashboardParams => {
+      expect(dashboardParams).toEqual(routableParams);
       done();
     });
   });

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CampaignState } from '../../core';
-import { DashboardService, CampaignRouteParams } from '../../dashboard/dashboard.service';
+import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboard.service';
 
 @Component({
   selector: 'grove-campaign-status',
@@ -40,7 +40,7 @@ export class CampaignStatusComponent {
     }
   }
 
-  get queryParams(): CampaignRouteParams {
+  get queryParams(): DashboardRouteParams {
     return this.dashboardService.getRouteQueryParams({});
   }
 
