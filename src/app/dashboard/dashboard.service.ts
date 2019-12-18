@@ -13,7 +13,8 @@ interface KeyValue {
 export type Target = KeyValue;
 export type Advertiser = KeyValue;
 export type Facet = KeyValue;
-export interface CampaignParams {
+export interface DashboardParams {
+  view?: 'flights' | 'campaigns';
   page?: number;
   per?: number;
   advertiser?: number;
@@ -26,12 +27,13 @@ export interface CampaignParams {
   representative?: string;
   before?: Date;
   after?: Date;
+  sort?: string;
   desc?: boolean;
 }
 
 // TODO: Omit is added in TS 3.5
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export interface CampaignRouteParams extends Omit<CampaignParams, 'geo' | 'zone' | 'before' | 'after'> {
+export interface DashboardRouteParams extends Omit<DashboardParams, 'geo' | 'zone' | 'before' | 'after'> {
   geo?: string;
   zone?: string;
   before?: string;
@@ -47,12 +49,32 @@ export interface Facets {
   zone?: Facet[];
 }
 
+export const FlightSortParams = {
+  id: 'id',
+  name: 'name',
+  startAt: 'start_at',
+  endAt: 'end_at',
+  totalGoal: 'total_goal',
+  advertiser: 'advertiser',
+  campaignStatus: 'campaign_status',
+  campaignName: 'campaign_name',
+  campaignType: 'campaign_type',
+  repName: 'campaign_representative',
+  podcast: 'podcast',
+  zones: 'zone',
+  targets: 'geo'
+};
+
 export interface Flight {
+  id: number;
   name: string;
   startAt: Date;
   endAt: Date;
   zones: string[];
+  totalGoal?: number;
   targets?: Target[];
+  podcast?: string;
+  parent?: Campaign;
 }
 
 export interface Campaign {
@@ -72,15 +94,23 @@ export interface Campaign {
   providedIn: 'root'
 })
 export class DashboardService {
-  params: CampaignParams = { page: 1, per: 12 };
-  facets: Facets;
-  total: number;
-  count: number;
+  params: DashboardParams = { page: 1 };
+  campaignFacets: Facets;
+  flightFacets: Facets;
+  campaignTotal: number;
+  campaignCount: number;
+  flightTotal: number;
+  flightCount: number;
   error: Error;
   // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{ [id: number]: Campaign }>({});
   // tslint:disable-next-line: variable-name
   private _currentCampaignIds: number[]; // campaign ids for current request/filter params
+
+  // tslint:disable-next-line: variable-name
+  private _flights = new BehaviorSubject<{ [id: number]: Flight }>({});
+  // tslint:disable-next-line: variable-name
+  private _currentFlightIds: number[]; // flight ids for current request/filter params
 
   constructor(private augury: AuguryService) {}
 
@@ -108,10 +138,29 @@ export class DashboardService {
     return this.campaigns.pipe(map((campaigns: Campaign[]) => campaigns && campaigns.filter(c => !c.loading)));
   }
 
-  loadCampaignList(newParams?: CampaignParams) {
-    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', newParams)
+  get flights(): Observable<Flight[]> {
+    return this._flights.pipe(
+      map((flightEntites: {}) => {
+        if (this._currentFlightIds && this._currentFlightIds.length) {
+          return (
+            this._currentFlightIds
+              // map from array of Ids
+              .filter(flightId => flightEntites[flightId])
+              .map(flightId => flightEntites[flightId])
+          );
+        }
+      })
+    );
+  }
+
+  loadCampaignList(newParams?: DashboardParams) {
+    this.campaignCount = 0;
+    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', 'flight_start_at', { ...newParams, per: 12 })
       .pipe(
-        switchMap((campaignDocs: HalDoc[]) => {
+        switchMap(([{ count, total, facets }, campaignDocs]) => {
+          this.campaignFacets = facets;
+          this.campaignTotal = total;
+          this.campaignCount = count;
           this._campaigns.next(
             campaignDocs.reduce((acc, doc) => {
               return { ...acc, [doc.id]: { loading: true } };
@@ -142,12 +191,14 @@ export class DashboardService {
             loading: false,
             advertiser: { id: advertiserDoc['id'], label: advertiserDoc['name'] },
             flights: flightDocs.map(doc => ({
+              id: doc['id'],
               name: doc['name'],
               startAt: doc['startAt'] && new Date(doc['startAt']),
               endAt: doc['endAt'] && new Date(doc['endAt']),
               // map zonesId from facets
               zones: doc['zones'].map(zoneId => {
-                const zoneFacet = this.facets && this.facets.zone && this.facets.zone.find(facet => facet.id === zoneId);
+                const zoneFacet =
+                  this.campaignFacets && this.campaignFacets.zone && this.campaignFacets.zone.find(facet => facet.id === zoneId);
                 return (zoneFacet && zoneFacet.label) || zoneId;
               })
               // TODO: no targets yet?
@@ -165,11 +216,74 @@ export class DashboardService {
       );
   }
 
-  loadList(list: string, zoom: string, newParams?: CampaignParams): Observable<HalDoc[]> {
-    this.count = 0;
+  loadFlightList(newParams?: DashboardParams) {
+    this.flightCount = 0;
+    this.loadList('prx:flights', 'prx:campaign,prx:advertiser', FlightSortParams[(newParams && newParams.sort) || 'startAt'], {
+      ...newParams,
+      per: (newParams && newParams.per) || 25
+    })
+      .pipe(
+        switchMap(([{ count, total, facets }, flightDocs]) => {
+          this.flightFacets = facets;
+          this.flightTotal = total;
+          this.flightCount = count;
+          this._currentFlightIds = flightDocs.map(c => c['id']);
+          return flightDocs.map(doc => combineLatest(of(doc), doc.follow('prx:campaign'), doc.follow('prx:advertiser')));
+        }),
+        concatAll(),
+        withLatestFrom(this._flights)
+      )
+      .subscribe(
+        ([[flightDoc, campaignDoc, advertiserDoc], flights]) => {
+          const flight: Flight = {
+            id: flightDoc['id'],
+            name: flightDoc['name'],
+            startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
+            endAt: flightDoc['endAt'] && new Date(flightDoc['endAt']),
+            totalGoal: flightDoc['totalGoal'] || 0,
+            // map zonesId from facets
+            zones: flightDoc['zones'].map(zoneId => {
+              const zoneFacet = this.flightFacets && this.flightFacets.zone && this.flightFacets.zone.find(facet => facet.id === zoneId);
+              return (zoneFacet && zoneFacet.label) || zoneId;
+            }),
+            ...(flightDoc['_links'] &&
+              flightDoc['_links']['prx:inventory'] &&
+              flightDoc['_links']['prx:inventory']['title'] && {
+                podcast: flightDoc['_links']['prx:inventory']['title']
+              }),
+            parent: {
+              id: campaignDoc['id'],
+              ...(campaignDoc['_links'] &&
+                campaignDoc['_links']['prx:account'] && {
+                  accountId: parseInt(campaignDoc['_links']['prx:account']['href'].split('/').pop(), 10)
+                }),
+              name: campaignDoc['name'],
+              type: campaignDoc['type'],
+              status: campaignDoc['status'],
+              repName: campaignDoc['repName'],
+              notes: campaignDoc['notes'],
+              advertiser: { id: advertiserDoc['id'], label: advertiserDoc['name'] }
+            }
+          };
 
-    // newParams includes all params (from route) except per
-    this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
+          // set _flights[flight.id]
+          this._flights.next({
+            ...flights,
+            [flight.id]: flight
+          });
+        },
+        err => (this.error = err)
+      );
+  }
+
+  loadList(
+    list: string,
+    zoom: string,
+    sort: string,
+    newParams?: DashboardParams
+  ): Observable<[{ count: number; total: number; facets: Facets }, HalDoc[]]> {
+    // newParams may include all params (from route) except per
+    this.params = { ...newParams, page: (newParams && newParams.page) || 1 };
     const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc } = this.params;
     const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
 
@@ -179,19 +293,19 @@ export class DashboardService {
         per,
         zoom,
         ...(filters && { filters }),
-        sorts: 'flight_start_at:' + (desc ? 'desc' : 'asc')
+        sort: sort + ':' + (desc ? 'desc' : 'asc')
       })
       .pipe(
         switchMap(result => {
-          this.count = +result['count'];
-          this.total = +result['total'];
-          this.facets = result['facets'];
-          return result.followList('prx:items');
+          return combineLatest(
+            of({ count: +result['count'], total: +result['total'], facets: result['facets'] }),
+            result.followList('prx:items')
+          );
         })
       );
   }
 
-  getFilters(params: CampaignParams) {
+  getFilters(params: DashboardParams) {
     let filters = '';
     if (params.advertiser) {
       filters += `advertiser=${params.advertiser}`;
@@ -253,11 +367,14 @@ export class DashboardService {
     return filters;
   }
 
-  getRouteQueryParams(partialParams: CampaignParams): CampaignRouteParams {
-    let { page, advertiser, podcast, status, type, text, representative, desc } = partialParams;
+  getRouteQueryParams(partialParams: DashboardParams): DashboardRouteParams {
+    let { view, page, advertiser, podcast, status, type, text, representative, desc } = partialParams;
 
     // this function takes partial parameters (what changed)
     // mix in the existing this.params unless property was explicitly set in partialParams
+    if (!partialParams.hasOwnProperty('view') && this.params.view) {
+      view = this.params.view;
+    }
     if (!partialParams.hasOwnProperty('page') && this.params.page) {
       page = this.params.page;
     }
@@ -307,6 +424,7 @@ export class DashboardService {
       zone = this.params.zone.join('|');
     }
     return {
+      ...(view && { view }),
       ...(page && { page }),
       ...(advertiser && { advertiser }),
       ...(podcast && { podcast }),

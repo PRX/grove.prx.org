@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { Campaign, Flight, Facets, CampaignParams, CampaignRouteParams } from './dashboard.service';
+import { Campaign, Flight, Facets, DashboardParams, DashboardRouteParams } from './dashboard.service';
 
 export const flights: Flight[] = [
   {
+    id: 1,
     name: 'Flight 1',
     startAt: new Date('2019-09-01 0:0:0'),
     endAt: new Date('2019-09-10 0:0:0'),
@@ -20,6 +21,7 @@ export const flights: Flight[] = [
     ]
   },
   {
+    id: 2,
     name: 'Flight 2',
     startAt: new Date('2019-09-02 0:0:0'),
     endAt: new Date('2019-09-13 0:0:0'),
@@ -97,7 +99,8 @@ export const facets: Facets = {
   ]
 };
 
-export const params: CampaignParams = {
+export const params: DashboardParams = {
+  view: 'flights',
   page: 1,
   per: 2,
   advertiser: 2,
@@ -119,7 +122,7 @@ export class DashboardServiceMock {
 
   constructor(private augury: MockHalService) {}
 
-  loadCampaignList(newParams: CampaignParams) {
+  loadCampaignList(newParams: DashboardParams) {
     this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
   }
 
@@ -131,7 +134,7 @@ export class DashboardServiceMock {
     return of(campaigns.filter(c => !c.loading));
   }
 
-  getRouteQueryParams(partialParams: CampaignParams): CampaignRouteParams {
+  getRouteQueryParams(partialParams: DashboardParams): DashboardRouteParams {
     const omitPer = allParams => {
       const { per, ...theRest } = allParams;
       return theRest;
