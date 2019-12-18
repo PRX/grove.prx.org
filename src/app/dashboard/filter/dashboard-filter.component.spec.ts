@@ -7,12 +7,11 @@ import { SharedModule } from '../../shared/shared.module';
 
 import { facets } from '../dashboard.service.mock';
 
-import { CampaignFilterComponent } from '.';
-import { FilterFacetComponent, FilterTextComponent, FilterDateComponent } from '../filter';
+import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from '.';
 
-describe('CampaignFilterComponent', () => {
-  let comp: CampaignFilterComponent;
-  let fix: ComponentFixture<CampaignFilterComponent>;
+describe('DashboardFilterComponent', () => {
+  let comp: DashboardFilterComponent;
+  let fix: ComponentFixture<DashboardFilterComponent>;
   let de: DebugElement;
   let el: HTMLElement;
 
@@ -27,11 +26,11 @@ describe('CampaignFilterComponent', () => {
         MatSelectModule,
         NoopAnimationsModule
       ],
-      declarations: [CampaignFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent]
+      declarations: [DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent]
     })
       .compileComponents()
       .then(() => {
-        fix = TestBed.createComponent(CampaignFilterComponent);
+        fix = TestBed.createComponent(DashboardFilterComponent);
         comp = fix.componentInstance;
         de = fix.debugElement;
         el = de.nativeElement;
