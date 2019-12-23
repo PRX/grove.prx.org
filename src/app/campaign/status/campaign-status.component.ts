@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Observable } from 'rxjs';
 import { CampaignState } from '../../core';
 import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboard.service';
 
@@ -6,7 +7,7 @@ import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboar
   selector: 'grove-campaign-status',
   template: `
     <prx-status-bar>
-      <a prx-status-bar-link routerLink="/" [queryParams]="queryParams">
+      <a prx-status-bar-link routerLink="/" [queryParams]="queryParams$ | async">
         <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
       </a>
       <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
@@ -40,7 +41,7 @@ export class CampaignStatusComponent {
     }
   }
 
-  get queryParams(): DashboardRouteParams {
+  get queryParams$(): Observable<DashboardRouteParams> {
     return this.dashboardService.getRouteQueryParams({});
   }
 

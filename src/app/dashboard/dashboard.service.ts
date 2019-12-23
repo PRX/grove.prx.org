@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Router, Params } from '@angular/router';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { switchMap, concatAll, withLatestFrom, map } from 'rxjs/operators';
+import { switchMap, concatAll, withLatestFrom, map, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -94,7 +95,6 @@ export interface Campaign {
   providedIn: 'root'
 })
 export class DashboardService {
-  params: DashboardParams = { page: 1 };
   campaignFacets: Facets;
   flightFacets: Facets;
   campaignTotal: number;
@@ -103,16 +103,21 @@ export class DashboardService {
   flightCount: number;
   error: Error;
   // tslint:disable-next-line: variable-name
+  private _params = new BehaviorSubject<DashboardParams>({ page: 1, view: 'flights' });
+  // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{ [id: number]: Campaign }>({});
   // tslint:disable-next-line: variable-name
   private _currentCampaignIds: number[]; // campaign ids for current request/filter params
-
   // tslint:disable-next-line: variable-name
   private _flights = new BehaviorSubject<{ [id: number]: Flight }>({});
   // tslint:disable-next-line: variable-name
   private _currentFlightIds: number[]; // flight ids for current request/filter params
 
-  constructor(private augury: AuguryService) {}
+  constructor(private augury: AuguryService, private router: Router) {}
+
+  get params(): Observable<DashboardParams> {
+    return this._params.asObservable();
+  }
 
   get loading(): Observable<boolean[]> {
     return this.campaigns.pipe(map(campaigns => campaigns && campaigns.filter(c => c.loading).map(c => c.loading)));
@@ -153,9 +158,9 @@ export class DashboardService {
     );
   }
 
-  loadCampaignList(newParams?: DashboardParams) {
-    this.campaignCount = 0;
-    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', 'flight_start_at', { ...newParams, per: 12 })
+  loadCampaignList(params?: DashboardParams) {
+    this.campaignCount = null;
+    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: (params && params.per) || 12, sort: 'flight_start_at' })
       .pipe(
         switchMap(([{ count, total, facets }, campaignDocs]) => {
           this.campaignFacets = facets;
@@ -216,11 +221,12 @@ export class DashboardService {
       );
   }
 
-  loadFlightList(newParams?: DashboardParams) {
-    this.flightCount = 0;
-    this.loadList('prx:flights', 'prx:campaign,prx:advertiser', FlightSortParams[(newParams && newParams.sort) || 'startAt'], {
-      ...newParams,
-      per: (newParams && newParams.per) || 25
+  loadFlightList(params?: DashboardParams) {
+    this.flightCount = null;
+    this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
+      ...params,
+      per: (params && params.per) || 25,
+      sort: FlightSortParams[params.sort || 'startAt']
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {
@@ -276,15 +282,8 @@ export class DashboardService {
       );
   }
 
-  loadList(
-    list: string,
-    zoom: string,
-    sort: string,
-    newParams?: DashboardParams
-  ): Observable<[{ count: number; total: number; facets: Facets }, HalDoc[]]> {
-    // newParams may include all params (from route) except per
-    this.params = { ...newParams, page: (newParams && newParams.page) || 1 };
-    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, desc } = this.params;
+  loadList(list: string, zoom: string, params?: DashboardParams): Observable<[{ count: number; total: number; facets: Facets }, HalDoc[]]> {
+    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, sort, desc } = params;
     const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
 
     return this.augury
@@ -367,76 +366,171 @@ export class DashboardService {
     return filters;
   }
 
-  getRouteQueryParams(partialParams: DashboardParams): DashboardRouteParams {
-    let { view, page, advertiser, podcast, status, type, text, representative, desc } = partialParams;
+  getRouteQueryParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
+    return this.getRouteParams(partialParams).pipe(
+      map(params => {
+        // view is in url, not a queryParam
+        const { view, ...queryParams } = params;
+        return queryParams;
+      })
+    );
+  }
 
-    // this function takes partial parameters (what changed)
-    // mix in the existing this.params unless property was explicitly set in partialParams
-    if (!partialParams.hasOwnProperty('view') && this.params.view) {
-      view = this.params.view;
+  getRouteParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
+    let { view, page, per, advertiser, podcast, status, type, text, representative, sort, desc } = partialParams;
+
+    return this.params.pipe(
+      map(params => {
+        // this function takes partial parameters (what changed)
+        // mix in the existing this._params unless property was explicitly set in partialParams
+        if (!partialParams.hasOwnProperty('view') && params.view) {
+          view = params.view;
+        }
+        if (!partialParams.hasOwnProperty('page') && params.page) {
+          page = params.page;
+        }
+        if (!partialParams.hasOwnProperty('per') && params.per) {
+          per = params.per;
+        }
+        if (!partialParams.hasOwnProperty('advertiser') && params.advertiser) {
+          advertiser = params.advertiser;
+        }
+        if (!partialParams.hasOwnProperty('podcast') && params.podcast) {
+          podcast = params.podcast;
+        }
+        if (!partialParams.hasOwnProperty('status') && params.status) {
+          status = params.status;
+        }
+        if (!partialParams.hasOwnProperty('type') && params.type) {
+          type = params.type;
+        }
+        if (!partialParams.hasOwnProperty('text') && params.text) {
+          text = params.text;
+        }
+        if (!partialParams.hasOwnProperty('representative') && params.representative) {
+          representative = params.representative;
+        }
+        if (!partialParams.hasOwnProperty('sort') && params.hasOwnProperty('sort')) {
+          sort = params.sort;
+        }
+        if (!partialParams.hasOwnProperty('desc') && params.hasOwnProperty('desc')) {
+          desc = params.desc;
+        }
+        let before: string;
+        let after: string;
+        if (partialParams.before) {
+          before = partialParams.before.toISOString();
+        } else if (!partialParams.hasOwnProperty('before') && params.before) {
+          before = params.before.toISOString();
+        }
+        if (partialParams.after) {
+          after = partialParams.after.toISOString();
+        } else if (!partialParams.hasOwnProperty('after') && params.after) {
+          after = params.after.toISOString();
+        }
+        let geo;
+        if (partialParams.geo) {
+          geo = partialParams.geo.join('|');
+        } else if (params.geo) {
+          geo = params.geo.join('|');
+        }
+        let zone: string;
+        if (partialParams.zone) {
+          zone = partialParams.zone.join('|');
+        } else if (params.zone) {
+          zone = params.zone.join('|');
+        }
+        return {
+          ...(view && { view }),
+          ...(page && { page }),
+          ...(per && { per }),
+          ...(advertiser && { advertiser }),
+          ...(podcast && { podcast }),
+          ...(status && { status }),
+          ...(type && { type }),
+          ...(geo && { geo }),
+          ...(zone && { zone }),
+          ...(text && { text }),
+          ...(representative && { representative }),
+          ...(before && { before }),
+          ...(after && { after }),
+          ...(sort && { sort }),
+          ...((desc || desc === false) && { desc })
+        };
+      })
+    );
+  }
+
+  setParamsFromRoute(queryParams: Params, view: 'flights' | 'campaigns') {
+    if (queryParams) {
+      const page = (queryParams['page'] && +queryParams['page']) || 1;
+      const per = queryParams['per'] && +queryParams['per'];
+      const advertiser = queryParams['advertiser'] && +queryParams['advertiser'];
+      const podcast = queryParams['podcast'] && +queryParams['podcast'];
+      const status = queryParams['status'];
+      const type = queryParams['type'];
+      const geo = queryParams['geo'] && queryParams['geo'].split('|');
+      const zone = queryParams['zone'] && queryParams['zone'].split('|');
+      const text = queryParams['text'];
+      const representative = queryParams['representative'];
+      const before = queryParams['before'] && new Date(queryParams['before']);
+      const after = queryParams['after'] && new Date(queryParams['after']);
+      const sort = queryParams['sort'] && queryParams['sort'];
+      const desc = queryParams['desc'] && queryParams['desc'].toLowerCase() !== 'false';
+
+      const params: DashboardParams = {
+        view,
+        page,
+        per,
+        advertiser,
+        podcast,
+        status,
+        type,
+        geo,
+        zone,
+        text,
+        representative,
+        before,
+        after,
+        sort,
+        desc
+      };
+      switch (view) {
+        case 'campaigns':
+          this.loadCampaignList(params);
+          break;
+        case 'flights':
+        default:
+          this.loadFlightList(params);
+          break;
+      }
+      this._params.next(params);
     }
-    if (!partialParams.hasOwnProperty('page') && this.params.page) {
-      page = this.params.page;
-    }
-    if (!partialParams.hasOwnProperty('advertiser') && this.params.advertiser) {
-      advertiser = this.params.advertiser;
-    }
-    if (!partialParams.hasOwnProperty('podcast') && this.params.podcast) {
-      podcast = this.params.podcast;
-    }
-    if (!partialParams.hasOwnProperty('status') && this.params.status) {
-      status = this.params.status;
-    }
-    if (!partialParams.hasOwnProperty('type') && this.params.type) {
-      type = this.params.type;
-    }
-    if (!partialParams.hasOwnProperty('text') && this.params.text) {
-      text = this.params.text;
-    }
-    if (!partialParams.hasOwnProperty('representative') && this.params.representative) {
-      representative = this.params.representative;
-    }
-    if (!partialParams.hasOwnProperty('desc') && this.params.hasOwnProperty('desc')) {
-      desc = this.params.desc;
-    }
-    let before: string;
-    let after: string;
-    if (partialParams.before) {
-      before = partialParams.before.toISOString();
-    } else if (!partialParams.hasOwnProperty('before') && this.params.before) {
-      before = this.params.before.toISOString();
-    }
-    if (partialParams.after) {
-      after = partialParams.after.toISOString();
-    } else if (!partialParams.hasOwnProperty('after') && this.params.after) {
-      after = this.params.after.toISOString();
-    }
-    let geo;
-    if (partialParams.geo) {
-      geo = partialParams.geo.join('|');
-    } else if (this.params.geo) {
-      geo = this.params.geo.join('|');
-    }
-    let zone;
-    if (partialParams.zone) {
-      zone = partialParams.zone.join('|');
-    } else if (this.params.zone) {
-      zone = this.params.zone.join('|');
-    }
-    return {
-      ...(view && { view }),
-      ...(page && { page }),
-      ...(advertiser && { advertiser }),
-      ...(podcast && { podcast }),
-      ...(status && { status }),
-      ...(type && { type }),
-      ...(geo && { geo }),
-      ...(zone && { zone }),
-      ...(text && { text }),
-      ...(representative && { representative }),
-      ...(before && { before }),
-      ...(after && { after }),
-      ...((desc || desc === false) && { desc })
-    };
+  }
+
+  routeToParams(partialParams: DashboardParams) {
+    this.getRouteParams(partialParams)
+      .pipe(first())
+      .subscribe(params => {
+        const { view, page, per, advertiser, podcast, status, type, before, after, geo, zone, text, representative, sort, desc } = params;
+        this.router.navigate([view || 'flights'], {
+          queryParams: {
+            ...(page && { page }),
+            ...(per && { per }),
+            ...(advertiser && { advertiser }),
+            ...(podcast && { podcast }),
+            ...(status && { status }),
+            ...(type && { type }),
+            ...(before && { before }),
+            ...(after && { after }),
+            ...(geo && { geo }),
+            ...(zone && { zone }),
+            ...(text && { text }),
+            ...(representative && { representative }),
+            ...(sort && { sort }),
+            ...(desc !== undefined && { desc })
+          }
+        });
+      });
   }
 }

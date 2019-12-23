@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, ChangeDetectionStrategy, Input, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
 import { Campaign, DashboardService, DashboardParams } from '../dashboard.service';
 
 @Component({
@@ -16,39 +17,44 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
       </ng-container>
     </ul>
     <hr />
-    <prx-paging
-      [currentPage]="currentPage"
-      [totalPages]="totalPer | campaignListTotalPages"
-      (showPage)="routeToParams.emit({ page: $event })"
-    >
+    <prx-paging [currentPage]="currentPage" [totalPages]="totalPer | campaignListTotalPages" (showPage)="routeToParams({ page: $event })">
     </prx-paging>
     <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
   `,
   styleUrls: ['campaign-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignListComponent {
-  // tslint:disable-next-line
-  private _routedParams: DashboardParams;
-  get routedParams(): DashboardParams {
-    return this._routedParams;
-  }
-  @Input()
-  set routedParams(routedParams: DashboardParams) {
-    this._routedParams = routedParams;
-    this.dashboardService.loadCampaignList(this.routedParams);
-  }
-  @Output() routeToParams = new EventEmitter<DashboardParams>();
+export class CampaignListComponent implements OnInit, OnDestroy {
+  @Input() routedParams: DashboardParams;
   campaigns$: Observable<Campaign[]> = this.dashboardService.loadedCampaigns;
+  routeSub: Subscription;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.setParamsFromRoute();
+  }
+
+  ngOnDestroy() {
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+  }
+
+  setParamsFromRoute() {
+    this.routeSub = this.route.queryParams.subscribe((params: Params) => this.dashboardService.setParamsFromRoute(params, 'campaigns'));
+  }
+
+  routeToParams(params) {
+    this.dashboardService.routeToParams(params);
+  }
 
   get loading$(): Observable<boolean[]> {
     return this.dashboardService.loading;
   }
 
   get currentPage(): number {
-    return this.dashboardService.params.page;
+    return this.routedParams.page;
   }
 
   get count(): number {
@@ -60,6 +66,6 @@ export class CampaignListComponent {
   }
 
   get totalPer(): { total: number; per: number } {
-    return { total: this.dashboardService.campaignTotal, per: this.dashboardService.params.per };
+    return { total: this.dashboardService.campaignTotal, per: this.routedParams.per };
   }
 }

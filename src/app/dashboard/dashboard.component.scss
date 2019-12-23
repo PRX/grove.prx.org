@@ -9,20 +9,10 @@ grove-dashboard-filter {
   margin-bottom: 20px;
 }
 
-.list-head {
+.tabs {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   margin-bottom: 10px;
-}
-h2 {
-  font-weight: 700;
-  font-size: 1.5em;
-  line-height: 2em;
-  color: #676767;
-}
-h2 > .btn-link {
-  font-weight: 700;
-}
-h2 > .btn-link[disabled] {
-  color: #676767;
+  margin-right: 10px;
 }

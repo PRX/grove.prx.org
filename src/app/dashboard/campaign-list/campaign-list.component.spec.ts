@@ -109,7 +109,7 @@ describe('CampaignListComponent', () => {
     toggle.nativeElement.click();
     expect(toggle.nativeElement.checked).toBeFalsy();
     expect(router.navigate).toHaveBeenCalledWith(['/'], {
-      queryParams: dashboardService.getRouteQueryParams({ desc: false, page: params.page })
+      queryParams: dashboardService.getRouteParams({ desc: false, page: params.page })
     });
   });
 });

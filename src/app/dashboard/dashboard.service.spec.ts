@@ -85,7 +85,7 @@ describe('DashboardService', () => {
     const before = new Date('2019-10-31');
     const after = new Date('2019-10-01');
     expect(
-      campaignListService.getRouteQueryParams({
+      campaignListService.getRouteParams({
         page: 2,
         geo: ['US', 'CA'],
         zone: ['pre_1', 'house_pre_1'],

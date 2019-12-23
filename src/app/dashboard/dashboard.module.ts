@@ -9,6 +9,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { SharedModule } from '../shared/shared.module';
 import { PagingModule } from 'ngx-prx-styleguide';
 
@@ -21,9 +22,10 @@ import {
 } from './campaign-card';
 
 import { DashboardComponent } from './dashboard.component';
-import { CampaignListComponent, CampaignListTotalPagesPipe } from './campaign-list';
+import { dashboardRouting } from './dashboard.routing';
+import { CampaignListContainerComponent, CampaignListComponent, CampaignListTotalPagesPipe } from './campaign-list';
 import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from './filter';
-import { FlightTableComponent } from './flight-table/';
+import { FlightTableContainerComponent, FlightTableComponent } from './flight-table/';
 
 @NgModule({
   declarations: [
@@ -32,6 +34,7 @@ import { FlightTableComponent } from './flight-table/';
     FilterFacetComponent,
     FilterTextComponent,
     FilterDateComponent,
+    CampaignListContainerComponent,
     CampaignListComponent,
     CampaignCardComponent,
     CampaignFlightDatesPipe,
@@ -39,9 +42,11 @@ import { FlightTableComponent } from './flight-table/';
     CampaignFlightZonesPipe,
     CampaignTypePipe,
     CampaignListTotalPagesPipe,
+    FlightTableContainerComponent,
     FlightTableComponent
   ],
   imports: [
+    dashboardRouting,
     CommonModule,
     PagingModule,
     RouterModule,
@@ -53,8 +58,9 @@ import { FlightTableComponent } from './flight-table/';
     MatPaginatorModule,
     MatSelectModule,
     MatSortModule,
-    MatTableModule
+    MatTableModule,
+    MatTabsModule
   ],
-  exports: [CampaignListComponent, DashboardComponent]
+  exports: [DashboardComponent]
 })
 export class DashboardModule {}

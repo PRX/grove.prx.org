@@ -1,6 +1,6 @@
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs';
-import { DashboardService, Flight, DashboardParams } from '../dashboard.service';
+import { DashboardService, Flight } from '../dashboard.service';
 
 export class FlightsDataSource implements DataSource<Flight> {
   constructor(private dashboardService: DashboardService) {}
@@ -10,8 +10,4 @@ export class FlightsDataSource implements DataSource<Flight> {
   }
 
   disconnect(collectionViewer: CollectionViewer): void {}
-
-  loadFlights(params: DashboardParams) {
-    this.dashboardService.loadFlightList(params);
-  }
 }

@@ -1,4 +1,5 @@
-import { Component, Input, AfterViewInit, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, AfterViewInit, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -8,21 +9,11 @@ import { DashboardParams, DashboardService } from '../dashboard.service';
 @Component({
   selector: 'grove-flight-table',
   templateUrl: 'flight-table.component.html',
-  styleUrls: ['flight-table.component.scss']
+  styleUrls: ['flight-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
-  // tslint:disable-next-line
-  private _routedParams: DashboardParams;
-  get routedParams(): DashboardParams {
-    return this._routedParams;
-  }
-  @Input()
-  set routedParams(routedParams: DashboardParams) {
-    this._routedParams = routedParams;
-    if (this.dataSource) {
-      this.dataSource.loadFlights(this.routedParams);
-    }
-  }
+  @Input() routedParams: DashboardParams;
 
   displayedColumns: string[] = [
     'name',
@@ -41,34 +32,32 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   dataSource: FlightsDataSource;
   pageSub: Subscription;
   sortSub: Subscription;
+  routeSub: Subscription;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.dataSource = new FlightsDataSource(this.dashboardService);
-    this.dataSource.loadFlights(this.routedParams);
+    this.setParamsFromRoute();
   }
 
   ngAfterViewInit() {
-    this.pageSub = this.paginator.page.subscribe((page: PageEvent) => {
-      const params = this.routedParams;
-      params.page = page.pageIndex + 1;
-      params.per = page.pageSize;
-      this.dataSource.loadFlights(params);
+    this.pageSub = this.paginator.page.subscribe((event: PageEvent) => {
+      const page = event.pageIndex + 1;
+      const per = event.pageSize;
+      this.dashboardService.routeToParams({ page, per });
     });
 
-    this.sortSub = this.sort.sortChange.subscribe((sort: Sort) => {
-      console.log(sort);
-      const params = this.routedParams;
+    this.sortSub = this.sort.sortChange.subscribe((event: Sort) => {
       // reset the page index when sorted
       this.paginator.pageIndex = 0;
-      params.page = 1;
-      params.sort = sort.active;
-      params.desc = sort.direction === 'desc';
-      this.dataSource.loadFlights(params);
+      const page = 1;
+      const sort = event.active;
+      const desc = event.direction === 'desc';
+      this.dashboardService.routeToParams({ page, sort, desc });
     });
   }
 
@@ -79,6 +68,13 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.sortSub) {
       this.sortSub.unsubscribe();
     }
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
+    }
+  }
+
+  setParamsFromRoute() {
+    this.routeSub = this.route.queryParams.subscribe((params: Params) => this.dashboardService.setParamsFromRoute(params, 'flights'));
   }
 
   get total(): number {

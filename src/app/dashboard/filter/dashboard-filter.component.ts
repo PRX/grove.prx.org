@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { DashboardParams, Facets } from '../dashboard.service';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { DashboardService, DashboardParams, Facets } from '../dashboard.service';
 
 @Component({
   selector: 'grove-dashboard-filter',
@@ -13,7 +13,7 @@ import { DashboardParams, Facets } from '../dashboard.service';
         facetName="Podcast"
         [options]="facets?.podcast"
         [selectedOptions]="params?.podcast"
-        (selectedOptionsChange)="routeToParams.emit({ podcast: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ podcast: $event, page: 1 })"
       >
       </grove-filter-facet>
       <grove-filter-facet
@@ -21,7 +21,7 @@ import { DashboardParams, Facets } from '../dashboard.service';
         multiple="true"
         [options]="facets?.zone"
         [selectedOptions]="params?.zone"
-        (selectedOptionsChange)="routeToParams.emit({ zone: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ zone: $event, page: 1 })"
       >
       </grove-filter-facet>
       <grove-filter-facet
@@ -29,38 +29,38 @@ import { DashboardParams, Facets } from '../dashboard.service';
         multiple="true"
         [options]="facets?.geo"
         [selectedOptions]="params?.geo"
-        (selectedOptionsChange)="routeToParams.emit({ geo: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ geo: $event, page: 1 })"
       >
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Advertiser"
         [options]="facets?.advertiser"
         [selectedOptions]="params?.advertiser"
-        (selectedOptionsChange)="routeToParams.emit({ advertiser: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ advertiser: $event, page: 1 })"
       >
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Status"
         [options]="facets?.status"
         [selectedOptions]="params?.status"
-        (selectedOptionsChange)="routeToParams.emit({ status: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ status: $event, page: 1 })"
       >
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Type"
         [options]="facets?.type"
         [selectedOptions]="params?.type"
-        (selectedOptionsChange)="routeToParams.emit({ type: $event, page: 1 })"
+        (selectedOptionsChange)="routeToParams({ type: $event, page: 1 })"
       >
       </grove-filter-facet>
     </div>
     <div class="text">
-      <grove-filter-text textName="Campaign" [searchText]="params?.text" (search)="routeToParams.emit({ text: $event, page: 1 })">
+      <grove-filter-text textName="Campaign" [searchText]="params?.text" (search)="routeToParams({ text: $event, page: 1 })">
       </grove-filter-text>
       <grove-filter-text
         textName="Rep Name"
         [searchText]="params?.representative"
-        (search)="routeToParams.emit({ representative: $event, page: 1 })"
+        (search)="routeToParams({ representative: $event, page: 1 })"
       >
       </grove-filter-text>
     </div>
@@ -71,9 +71,14 @@ import { DashboardParams, Facets } from '../dashboard.service';
 export class DashboardFilterComponent {
   @Input() params: DashboardParams;
   @Input() facets: Facets;
-  @Output() routeToParams = new EventEmitter<DashboardParams>();
+
+  constructor(private dashboardService: DashboardService) {}
 
   onDateChange(dates: { before?: Date; after?: Date }) {
-    this.routeToParams.emit({ ...dates, page: 1 });
+    this.dashboardService.routeToParams({ ...dates, page: 1 });
+  }
+
+  routeToParams(params: DashboardParams) {
+    this.dashboardService.routeToParams(params);
   }
 }
