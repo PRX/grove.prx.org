@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { switchMap, concatAll, withLatestFrom, map, first } from 'rxjs/operators';
+import { switchMap, concatAll, withLatestFrom, map, first, tap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -112,6 +112,8 @@ export class DashboardService {
   private _flights = new BehaviorSubject<{ [id: number]: Flight }>({});
   // tslint:disable-next-line: variable-name
   private _currentFlightIds: number[]; // flight ids for current request/filter params
+  // tslint:disable-next-line: variable-name
+  private _flightsLoading = new BehaviorSubject<boolean>(false);
 
   constructor(private augury: AuguryService, private router: Router) {}
 
@@ -119,8 +121,12 @@ export class DashboardService {
     return this._params.asObservable();
   }
 
-  get loading(): Observable<boolean[]> {
+  get campaignLoading(): Observable<boolean[]> {
     return this.campaigns.pipe(map(campaigns => campaigns && campaigns.filter(c => c.loading).map(c => c.loading)));
+  }
+
+  get flightsLoading(): Observable<boolean> {
+    return this._flightsLoading.asObservable();
   }
 
   get campaigns(): Observable<Campaign[]> {
@@ -160,7 +166,7 @@ export class DashboardService {
 
   loadCampaignList(params?: DashboardParams) {
     this.campaignCount = null;
-    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: (params && params.per) || 12, sort: 'flight_start_at' })
+    this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: 12, sort: 'flight_start_at' })
       .pipe(
         switchMap(([{ count, total, facets }, campaignDocs]) => {
           this.campaignFacets = facets;
@@ -223,10 +229,11 @@ export class DashboardService {
 
   loadFlightList(params?: DashboardParams) {
     this.flightCount = null;
+    this._flightsLoading.next(true);
     this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
       ...params,
       per: (params && params.per) || 25,
-      sort: FlightSortParams[params.sort || 'startAt']
+      sort: FlightSortParams[(params && params.sort) || 'startAt']
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {
@@ -277,6 +284,7 @@ export class DashboardService {
             ...flights,
             [flight.id]: flight
           });
+          this._flightsLoading.next(false);
         },
         err => (this.error = err)
       );

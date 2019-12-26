@@ -50,7 +50,7 @@ export class CampaignListComponent implements OnInit, OnDestroy {
   }
 
   get loading$(): Observable<boolean[]> {
-    return this.dashboardService.loading;
+    return this.dashboardService.campaignLoading;
   }
 
   get currentPage(): number {

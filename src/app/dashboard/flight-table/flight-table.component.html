@@ -96,8 +96,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
-</div>
-<div class="example-container mat-elevation-z8">
+
   <mat-paginator
     [length]="total"
     [pageIndex]="routedParams?.page - 1 || 0"

@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy, Input, AfterViewInit, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -37,28 +36,15 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private dashboardService: DashboardService, private route: ActivatedRoute) {}
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     this.dataSource = new FlightsDataSource(this.dashboardService);
-    this.setParamsFromRoute();
   }
 
   ngAfterViewInit() {
-    this.pageSub = this.paginator.page.subscribe((event: PageEvent) => {
-      const page = event.pageIndex + 1;
-      const per = event.pageSize;
-      this.dashboardService.routeToParams({ page, per });
-    });
-
-    this.sortSub = this.sort.sortChange.subscribe((event: Sort) => {
-      // reset the page index when sorted
-      this.paginator.pageIndex = 0;
-      const page = 1;
-      const sort = event.active;
-      const desc = event.direction === 'desc';
-      this.dashboardService.routeToParams({ page, sort, desc });
-    });
+    this.routeOnPageEvent();
+    this.routeOnSortEvent();
   }
 
   ngOnDestroy() {
@@ -68,13 +54,25 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.sortSub) {
       this.sortSub.unsubscribe();
     }
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
   }
 
-  setParamsFromRoute() {
-    this.routeSub = this.route.queryParams.subscribe((params: Params) => this.dashboardService.setParamsFromRoute(params, 'flights'));
+  routeOnPageEvent() {
+    this.pageSub = this.paginator.page.subscribe((event: PageEvent) => {
+      const page = event.pageIndex + 1;
+      const per = event.pageSize;
+      this.dashboardService.routeToParams({ page, per });
+    });
+  }
+
+  routeOnSortEvent() {
+    this.sortSub = this.sort.sortChange.subscribe((event: Sort) => {
+      // reset the page index when sorted
+      this.paginator.pageIndex = 0;
+      const page = 1;
+      const sort = event.active;
+      const desc = event.direction === 'desc';
+      this.dashboardService.routeToParams({ page, sort, desc });
+    });
   }
 
   get total(): number {
