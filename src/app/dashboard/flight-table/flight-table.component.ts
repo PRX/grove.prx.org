@@ -17,16 +17,16 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   displayedColumns: string[] = [
     'name',
     'advertiser',
-    'startAt',
-    'endAt',
-    'totalGoal',
-    'campaignStatus',
-    'zones',
-    'targets',
+    'start_at',
+    'end_at',
+    'total_goal',
+    'campaign_status',
+    'zone',
+    'geo',
     'podcast',
-    'campaignName',
-    'campaignType',
-    'repName'
+    'campaign_name',
+    'campaign_type',
+    'campaign_representative'
   ];
   dataSource: FlightsDataSource;
   pageSub: Subscription;

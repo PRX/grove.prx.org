@@ -50,22 +50,6 @@ export interface Facets {
   zone?: Facet[];
 }
 
-export const FlightSortParams = {
-  id: 'id',
-  name: 'name',
-  startAt: 'start_at',
-  endAt: 'end_at',
-  totalGoal: 'total_goal',
-  advertiser: 'advertiser',
-  campaignStatus: 'campaign_status',
-  campaignName: 'campaign_name',
-  campaignType: 'campaign_type',
-  repName: 'campaign_representative',
-  podcast: 'podcast',
-  zones: 'zone',
-  targets: 'geo'
-};
-
 export interface Flight {
   id: number;
   name: string;
@@ -233,7 +217,7 @@ export class DashboardService {
     this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
       ...params,
       per: (params && params.per) || 25,
-      sort: FlightSortParams[(params && params.sort) || 'startAt']
+      sort: (params && params.sort) || 'start_at'
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {

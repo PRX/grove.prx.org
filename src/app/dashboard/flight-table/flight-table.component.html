@@ -23,42 +23,42 @@
       <td mat-cell *matCellDef="let element">{{ element?.parent?.advertiser?.label }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="startAt">
+    <ng-container matColumnDef="start_at">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Start
       </th>
       <td mat-cell *matCellDef="let element">{{ element.startAt | date: 'shortDate' }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="endAt">
+    <ng-container matColumnDef="end_at">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         End
       </th>
       <td mat-cell *matCellDef="let element">{{ element.endAt | date: 'shortDate' }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="totalGoal">
+    <ng-container matColumnDef="total_goal">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Goal
       </th>
       <td mat-cell *matCellDef="let element">{{ element.totalGoal }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="campaignStatus">
+    <ng-container matColumnDef="campaign_status">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Status
       </th>
       <td mat-cell *matCellDef="let element">{{ element?.parent?.status | titlecase }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="zones">
+    <ng-container matColumnDef="zone">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Zone
       </th>
       <td mat-cell *matCellDef="let element">{{ element?.zones.join(', ') }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="targets">
+    <ng-container matColumnDef="geo">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Geotarget
       </th>
@@ -72,21 +72,21 @@
       <td mat-cell *matCellDef="let element">{{ element.podcast }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="campaignName">
+    <ng-container matColumnDef="campaign_name">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Campaign Name
       </th>
       <td mat-cell *matCellDef="let element">{{ element.parent?.name }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="campaignType">
+    <ng-container matColumnDef="campaign_type">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Type
       </th>
       <td mat-cell *matCellDef="let element">{{ element.parent?.type }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="repName">
+    <ng-container matColumnDef="campaign_representative">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Rep
       </th>
