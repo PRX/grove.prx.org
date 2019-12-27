@@ -66,6 +66,6 @@ export class CampaignListComponent implements OnInit, OnDestroy {
   }
 
   get totalPer(): { total: number; per: number } {
-    return { total: this.dashboardService.campaignTotal, per: this.routedParams.per };
+    return { total: this.dashboardService.campaignTotal, per: 12 };
   }
 }
