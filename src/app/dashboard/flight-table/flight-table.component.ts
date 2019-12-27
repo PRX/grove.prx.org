@@ -14,6 +14,7 @@ import { DashboardParams, DashboardService } from '../dashboard.service';
 export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() routedParams: DashboardParams;
 
+  pageSizeOptions = [25, 50, 100];
   displayedColumns: string[] = [
     'name',
     'advertiser',

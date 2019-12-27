@@ -1,5 +1,4 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, pluck } from 'rxjs/operators';
 import { DashboardParams, DashboardRouteParams, DashboardService, Facets } from './dashboard.service';
@@ -34,7 +33,7 @@ import { DashboardParams, DashboardRouteParams, DashboardService, Facets } from 
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
-  constructor(private dashboardService: DashboardService, private route: ActivatedRoute) {}
+  constructor(private dashboardService: DashboardService) {}
 
   get routedParams$(): Observable<DashboardParams> {
     return this.dashboardService.params;

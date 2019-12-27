@@ -32,16 +32,19 @@ describe('CampaignStatusComponent', () => {
         comp = fix.componentInstance;
         de = fix.debugElement;
         dashboardService = TestBed.get(DashboardService);
+        dashboardService.setParamsFromRoute(params, 'flights');
         fix.detectChanges();
       });
   }));
 
-  it('links to dashboard with params', () => {
-    dashboardService.loadCampaignList(params);
-    const queryParams = dashboardService.getRouteQueryParams(params);
-    const queryParamsStr = Object.keys(queryParams)
-      .map(key => `${key}=${queryParams[key]}`.replace('|', '%7C'))
-      .join('&');
-    expect(de.query(By.css('prx-status-bar a')).nativeElement.href).toEqual(`http://localhost/?${queryParamsStr}`);
+  it('links to dashboard with params', done => {
+    // dashboardService.loadCampaignList(params);
+    dashboardService.getRouteQueryParams(params).subscribe(queryParams => {
+      const queryParamsStr = Object.keys(queryParams)
+        .map(key => `${key}=${queryParams[key]}`.replace('|', '%7C'))
+        .join('&');
+      expect(de.query(By.css('prx-status-bar a')).nativeElement.href).toEqual(`http://localhost/?${queryParamsStr}`);
+      done();
+    });
   });
 });

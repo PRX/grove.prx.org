@@ -32,6 +32,7 @@ describe('DashboardFilterComponent', () => {
       ],
       declarations: [DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent],
       providers: [
+        MatDatepickerModule,
         {
           provide: DashboardService,
           useValue: mockDashboardService

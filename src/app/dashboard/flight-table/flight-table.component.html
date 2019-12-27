@@ -99,8 +99,9 @@
 
   <mat-paginator
     [length]="total"
+    [pageSize]="routedParams?.per || 25"
     [pageIndex]="routedParams?.page - 1 || 0"
-    [pageSizeOptions]="[25, 50, 100]"
+    [pageSizeOptions]="pageSizeOptions"
     showFirstLastButtons
   ></mat-paginator>
 </div>

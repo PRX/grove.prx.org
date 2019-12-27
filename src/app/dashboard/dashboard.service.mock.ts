@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, first } from 'rxjs/operators';
 import { MockHalService } from 'ngx-prx-styleguide';
 import { Campaign, Flight, Facets, DashboardParams, DashboardRouteParams } from './dashboard.service';
 
@@ -9,6 +10,7 @@ export const flights: Flight[] = [
     name: 'Flight 1',
     startAt: new Date('2019-09-01 0:0:0'),
     endAt: new Date('2019-09-10 0:0:0'),
+    totalGoal: 1234,
     zones: ['Preroll', 'Midroll'],
     targets: [
       { id: 1, label: 'LAN' },
@@ -25,6 +27,7 @@ export const flights: Flight[] = [
     name: 'Flight 2',
     startAt: new Date('2019-09-02 0:0:0'),
     endAt: new Date('2019-09-13 0:0:0'),
+    totalGoal: 54321,
     zones: ['Midroll', 'Preroll'],
     targets: [{ id: 1, label: 'Global' }]
   }
@@ -68,6 +71,8 @@ export const campaigns: Campaign[] = [
     loading: false
   }
 ];
+
+flights.forEach(flight => (flight.parent = campaigns[0]));
 
 export const facets: Facets = {
   advertiser: [
@@ -113,18 +118,18 @@ export const params: DashboardParams = {
   representative: 'Schmidt',
   before: new Date('2019-09-30'),
   after: new Date('2019-09-01'),
-  desc: false
+  direction: 'asc'
 };
 
 @Injectable()
 export class DashboardServiceMock {
-  params = { page: 1, per: 9 };
+  // tslint:disable-next-line: variable-name
+  _params: BehaviorSubject<DashboardParams> = new BehaviorSubject({ page: 1, per: 9 });
+  get params(): Observable<DashboardParams> {
+    return this._params.asObservable();
+  }
 
   constructor(private augury: MockHalService) {}
-
-  loadCampaignList(newParams: DashboardParams) {
-    this.params = { ...newParams, per: this.params.per, page: (newParams && newParams.page) || 1 };
-  }
 
   get campaigns(): Observable<Campaign[]> {
     return of(campaigns);
@@ -134,11 +139,46 @@ export class DashboardServiceMock {
     return of(campaigns.filter(c => !c.loading));
   }
 
-  getRouteQueryParams(partialParams: DashboardParams): DashboardRouteParams {
-    const omitPer = allParams => {
-      const { per, ...theRest } = allParams;
-      return theRest;
-    };
-    return { ...omitPer(params), ...omitPer(partialParams), geo: 'US|CA', zone: 'mid_1|pre_1', before: '2019-09-30', after: '2019-09-01' };
+  get flights(): Observable<Flight[]> {
+    return of(flights);
+  }
+
+  getRouteQueryParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
+    return this.params.pipe(
+      map(existingParams => {
+        return { ...existingParams, ...partialParams, geo: 'US|CA', zone: 'mid_1|pre_1', before: '2019-09-30', after: '2019-09-01' };
+      })
+    );
+  }
+
+  getRouteParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
+    return this.params.pipe(
+      map(existingParams => {
+        const withoutView = (p: DashboardParams) => {
+          const { view, ...rest } = p;
+          return rest;
+        };
+        return {
+          ...withoutView(existingParams),
+          ...withoutView(partialParams),
+          geo: 'US|CA',
+          zone: 'mid_1|pre_1',
+          before: '2019-09-30',
+          after: '2019-09-01'
+        };
+      })
+    );
+  }
+
+  setParamsFromRoute(routeParams: DashboardParams, view: 'flights' | 'campaigns') {
+    this.params.pipe(first()).subscribe(existingParams => {
+      this._params.next({ ...existingParams, ...routeParams, view });
+    });
+  }
+
+  routeToParams(partialParams: DashboardParams) {
+    this.params.pipe(first()).subscribe(existingParams => {
+      this._params.next({ ...existingParams, ...partialParams });
+    });
   }
 }
