@@ -56,6 +56,6 @@ export class DashboardComponent {
   }
 
   get queryParams$(): Observable<DashboardRouteParams> {
-    return this.dashboardService.getRouteQueryParams({});
+    return this.dashboardService.getRouteQueryParams({ page: 1 });
   }
 }
