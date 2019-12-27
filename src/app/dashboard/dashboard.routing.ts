@@ -4,10 +4,10 @@ import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { DashboardComponent } from './dashboard.component';
 import { FlightTableContainerComponent } from './flight-table';
-import { CampaignListContainerComponent } from './campaign-list/campaign-list-container.component';
+import { CampaignListComponent } from './campaign-list/campaign-list.component';
 
 const dashboardChildRoutes: Routes = [
-  { path: 'campaigns', component: CampaignListContainerComponent },
+  { path: 'campaigns', component: CampaignListComponent },
   { path: 'flights', component: FlightTableContainerComponent },
   { path: '', redirectTo: 'flights', pathMatch: 'full' }
 ];

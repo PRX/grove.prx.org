@@ -20,14 +20,10 @@ import { DashboardParams, DashboardRouteParams, DashboardService, Facets } from 
           </a>
         </nav>
         <div *ngIf="routedParams?.view === 'campaigns'">
-          <input
-            type="checkbox"
-            class="updown-toggle"
-            id="desc"
-            [checked]="routedParams?.desc"
-            (click)="routeToParams({ desc: !routedParams.desc })"
-          />
-          <label for="desc"></label>
+          <grove-campaign-list-sort
+            [direction]="routedParams?.desc"
+            (changeDirection)="routeToParams({ desc: $event, page: 1 })"
+          ></grove-campaign-list-sort>
         </div>
       </div>
 

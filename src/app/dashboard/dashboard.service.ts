@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { switchMap, concatAll, withLatestFrom, map, first, tap } from 'rxjs/operators';
+import { switchMap, concatAll, withLatestFrom, map, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 

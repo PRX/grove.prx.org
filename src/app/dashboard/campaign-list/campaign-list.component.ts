@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
+import { pluck } from 'rxjs/operators';
 import { Campaign, DashboardService, DashboardParams } from '../dashboard.service';
 
 @Component({
@@ -17,7 +18,11 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
       </ng-container>
     </ul>
     <hr />
-    <prx-paging [currentPage]="currentPage" [totalPages]="totalPer | campaignListTotalPages" (showPage)="routeToParams({ page: $event })">
+    <prx-paging
+      [currentPage]="currentPage$ | async"
+      [totalPages]="totalPer | campaignListTotalPages"
+      (showPage)="routeToParams({ page: $event })"
+    >
     </prx-paging>
     <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
   `,
@@ -25,7 +30,7 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignListComponent implements OnInit, OnDestroy {
-  @Input() routedParams: DashboardParams;
+  routedParams$: Observable<DashboardParams> = this.dashboardService.params;
   campaigns$: Observable<Campaign[]> = this.dashboardService.loadedCampaigns;
   routeSub: Subscription;
 
@@ -53,8 +58,8 @@ export class CampaignListComponent implements OnInit, OnDestroy {
     return this.dashboardService.campaignLoading;
   }
 
-  get currentPage(): number {
-    return this.routedParams.page;
+  get currentPage$(): Observable<number> {
+    return this.routedParams$.pipe(pluck('page'));
   }
 
   get count(): number {

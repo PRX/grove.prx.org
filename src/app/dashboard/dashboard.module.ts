@@ -4,10 +4,11 @@ import { RouterModule } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule, MatSpinner, MatProgressSpinnerModule } from '@angular/material';
+import { MatNativeDateModule } from '@angular/material';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SharedModule } from '../shared/shared.module';
@@ -23,7 +24,7 @@ import {
 
 import { DashboardComponent } from './dashboard.component';
 import { dashboardRouting } from './dashboard.routing';
-import { CampaignListContainerComponent, CampaignListComponent, CampaignListTotalPagesPipe } from './campaign-list';
+import { CampaignListComponent, CampaignListSortComponent, CampaignListTotalPagesPipe } from './campaign-list';
 import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from './filter';
 import { FlightTableContainerComponent, FlightTableComponent } from './flight-table/';
 
@@ -34,13 +35,13 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     FilterFacetComponent,
     FilterTextComponent,
     FilterDateComponent,
-    CampaignListContainerComponent,
     CampaignListComponent,
     CampaignCardComponent,
     CampaignFlightDatesPipe,
     CampaignFlightTargetsPipe,
     CampaignFlightZonesPipe,
     CampaignTypePipe,
+    CampaignListSortComponent,
     CampaignListTotalPagesPipe,
     FlightTableContainerComponent,
     FlightTableComponent
