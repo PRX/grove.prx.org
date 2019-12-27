@@ -3,8 +3,8 @@
     mat-table
     [dataSource]="dataSource"
     matSort
-    [matSortActive]="routedParams?.sort || 'startAt'"
-    [matSortDirection]="routedParams?.desc ? 'desc' : 'asc'"
+    [matSortActive]="routedParams?.sort || 'start_at'"
+    [matSortDirection]="routedParams?.direction || 'asc'"
     matSortDisableClear
   >
     <ng-container matColumnDef="name" sticky="true">

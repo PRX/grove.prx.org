@@ -29,7 +29,7 @@ export interface DashboardParams {
   before?: Date;
   after?: Date;
   sort?: string;
-  desc?: boolean;
+  direction?: 'desc' | 'asc' | '';
 }
 
 // TODO: Omit is added in TS 3.5
@@ -275,7 +275,7 @@ export class DashboardService {
   }
 
   loadList(list: string, zoom: string, params?: DashboardParams): Observable<[{ count: number; total: number; facets: Facets }, HalDoc[]]> {
-    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, sort, desc } = params;
+    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, sort, direction } = params;
     const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
 
     return this.augury
@@ -284,7 +284,7 @@ export class DashboardService {
         per,
         zoom,
         ...(filters && { filters }),
-        sorts: sort + ':' + (desc ? 'desc' : 'asc')
+        ...(sort && { sorts: sort + ':' + (direction || 'asc') })
       })
       .pipe(
         switchMap(result => {
@@ -369,7 +369,7 @@ export class DashboardService {
   }
 
   getRouteParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
-    let { view, page, per, advertiser, podcast, status, type, text, representative, sort, desc } = partialParams;
+    let { view, page, per, advertiser, podcast, status, type, text, representative, sort, direction } = partialParams;
 
     return this.params.pipe(
       map(params => {
@@ -405,8 +405,8 @@ export class DashboardService {
         if (!partialParams.hasOwnProperty('sort') && params.hasOwnProperty('sort')) {
           sort = params.sort;
         }
-        if (!partialParams.hasOwnProperty('desc') && params.hasOwnProperty('desc')) {
-          desc = params.desc;
+        if (!partialParams.hasOwnProperty('direction') && params.hasOwnProperty('direction')) {
+          direction = params.direction;
         }
         let before: string;
         let after: string;
@@ -447,7 +447,7 @@ export class DashboardService {
           ...(before && { before }),
           ...(after && { after }),
           ...(sort && { sort }),
-          ...((desc || desc === false) && { desc })
+          ...(direction && { direction })
         };
       })
     );
@@ -468,7 +468,7 @@ export class DashboardService {
       const before = queryParams['before'] && new Date(queryParams['before']);
       const after = queryParams['after'] && new Date(queryParams['after']);
       const sort = queryParams['sort'] && queryParams['sort'];
-      const desc = queryParams['desc'] && queryParams['desc'].toLowerCase() !== 'false';
+      const direction = queryParams['direction'] && queryParams['direction'];
 
       const params: DashboardParams = {
         view,
@@ -485,7 +485,7 @@ export class DashboardService {
         before,
         after,
         sort,
-        desc
+        direction
       };
       switch (view) {
         case 'campaigns':
@@ -504,7 +504,23 @@ export class DashboardService {
     this.getRouteParams(partialParams)
       .pipe(first())
       .subscribe(params => {
-        const { view, page, per, advertiser, podcast, status, type, before, after, geo, zone, text, representative, sort, desc } = params;
+        const {
+          view,
+          page,
+          per,
+          advertiser,
+          podcast,
+          status,
+          type,
+          before,
+          after,
+          geo,
+          zone,
+          text,
+          representative,
+          sort,
+          direction
+        } = params;
         this.router.navigate([view || 'flights'], {
           queryParams: {
             ...(page && { page }),
@@ -520,7 +536,7 @@ export class DashboardService {
             ...(text && { text }),
             ...(representative && { representative }),
             ...(sort && { sort }),
-            ...(desc !== undefined && { desc })
+            ...(direction && { direction })
           }
         });
       });

@@ -70,8 +70,8 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
       this.paginator.pageIndex = 0;
       const page = 1;
       const sort = event.active;
-      const desc = event.direction === 'desc';
-      this.dashboardService.routeToParams({ page, sort, desc });
+      const direction = event.direction;
+      this.dashboardService.routeToParams({ page, sort, direction });
     });
   }
 

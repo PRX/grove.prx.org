@@ -21,8 +21,8 @@ import { DashboardParams, DashboardRouteParams, DashboardService, Facets } from 
         </nav>
         <div *ngIf="routedParams?.view === 'campaigns'">
           <grove-campaign-list-sort
-            [direction]="routedParams?.desc"
-            (changeDirection)="routeToParams({ desc: $event, page: 1 })"
+            [direction]="routedParams?.direction === 'desc'"
+            (changeDirection)="routeToParams({ direction: $event ? 'desc' : 'asc', page: 1 })"
           ></grove-campaign-list-sort>
         </div>
       </div>
