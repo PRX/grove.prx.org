@@ -11,24 +11,29 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
       {{ error }}
     </div>
     <ng-template #campaigns>
-      <ul>
-        <li *ngFor="let campaign of campaigns$ | async">
-          <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
-        </li>
-        <ng-container *ngIf="loading$ | async as loading">
-          <li *ngFor="let c of loading; let i = index">
-            <grove-campaign-card></grove-campaign-card>
+      <div class="spinner-container" *ngIf="campaignsLoading$ | async; else campaignsLoaded">
+        <mat-spinner></mat-spinner>
+      </div>
+      <ng-template #campaignsLoaded>
+        <ul>
+          <li *ngFor="let campaign of campaigns$ | async">
+            <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
           </li>
-        </ng-container>
-      </ul>
-      <hr />
-      <prx-paging
-        [currentPage]="currentPage$ | async"
-        [totalPages]="totalPer | campaignListTotalPages"
-        (showPage)="routeToParams({ page: $event })"
-      >
-      </prx-paging>
-      <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
+          <ng-container *ngIf="loading$ | async as loading">
+            <li *ngFor="let c of loading; let i = index">
+              <grove-campaign-card></grove-campaign-card>
+            </li>
+          </ng-container>
+        </ul>
+        <hr />
+        <prx-paging
+          [currentPage]="currentPage$ | async"
+          [totalPages]="totalPer | campaignListTotalPages"
+          (showPage)="routeToParams({ page: $event })"
+        >
+        </prx-paging>
+        <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
+      </ng-template>
     </ng-template>
   `,
   styleUrls: ['campaign-list.component.scss'],
@@ -61,6 +66,10 @@ export class CampaignListComponent implements OnInit, OnDestroy {
 
   get error$(): Observable<Error> {
     return this.dashboardService.error;
+  }
+
+  get campaignsLoading$(): Observable<boolean> {
+    return this.dashboardService.campaignsLoading;
   }
 
   get loading$(): Observable<boolean[]> {

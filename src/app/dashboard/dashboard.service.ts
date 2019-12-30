@@ -94,6 +94,8 @@ export class DashboardService {
   // tslint:disable-next-line: variable-name
   private _currentCampaignIds: number[]; // campaign ids for current request/filter params
   // tslint:disable-next-line: variable-name
+  private _campaignsLoading = new BehaviorSubject<boolean>(false);
+  // tslint:disable-next-line: variable-name
   private _flights = new BehaviorSubject<{ [id: number]: Flight }>({});
   // tslint:disable-next-line: variable-name
   private _currentFlightIds: number[]; // flight ids for current request/filter params
@@ -112,6 +114,10 @@ export class DashboardService {
 
   get campaignLoading(): Observable<boolean[]> {
     return this.campaigns.pipe(map(campaigns => campaigns && campaigns.filter(c => c.loading).map(c => c.loading)));
+  }
+
+  get campaignsLoading(): Observable<boolean> {
+    return this._campaignsLoading.asObservable();
   }
 
   get flightsLoading(): Observable<boolean> {
@@ -155,6 +161,7 @@ export class DashboardService {
 
   loadCampaignList(params?: DashboardParams) {
     this.campaignCount = null;
+    this._campaignsLoading.next(true);
     this._error.next(null);
     this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: 12, sort: 'flight_start_at' })
       .pipe(
@@ -174,7 +181,8 @@ export class DashboardService {
           });
         }),
         concatAll(),
-        withLatestFrom(this._campaigns)
+        withLatestFrom(this._campaigns),
+        finalize(() => this._campaignsLoading.next(false))
       )
       .subscribe(
         ([[campaignDoc, advertiserDoc, flightDocs], campaigns]) => {

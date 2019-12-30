@@ -5,12 +5,12 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDatepickerModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatSelectModule } from '@angular/material';
+import { MatProgressSpinnerModule } from '@angular/material';
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
 import { DashboardService } from '../dashboard.service';
-import { DashboardServiceMock, campaigns as campaignsFixture, params } from '../dashboard.service.mock';
+import { DashboardServiceMock, campaigns as campaignsFixture } from '../dashboard.service.mock';
 import { CampaignListComponent, CampaignListTotalPagesPipe } from './';
 import {
   CampaignCardComponent,
@@ -32,17 +32,7 @@ describe('CampaignListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        MatDatepickerModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatNativeDateModule,
-        MatSelectModule,
-        NoopAnimationsModule,
-        PagingModule,
-        SharedModule
-      ],
+      imports: [RouterTestingModule, MatProgressSpinnerModule, NoopAnimationsModule, PagingModule, SharedModule],
       declarations: [
         CampaignCardComponent,
         CampaignFlightDatesPipe,
