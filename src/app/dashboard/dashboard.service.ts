@@ -302,58 +302,31 @@ export class DashboardService {
       filters += `advertiser=${params.advertiser}`;
     }
     if (params.podcast) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `podcast=${params.podcast}`;
+      filters += `${filters ? ',' : ''}podcast=${params.podcast}`;
     }
     if (params.status) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `status=${params.status}`;
+      filters += `${filters ? ',' : ''}status=${params.status}`;
     }
     if (params.type) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `type=${params.type}`;
+      filters += `${filters ? ',' : ''}type=${params.type}`;
     }
     if (params.geo && params.geo.length) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `geo=${params.geo.join(',')}`;
+      filters += `${filters ? ',' : ''}geo=${params.geo.join(',')}`;
     }
     if (params.zone && params.zone.length) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `zone=${params.zone.join(',')}`;
+      filters += `${filters ? ',' : ''}zone=${params.zone.join(',')}`;
     }
     if (params.text) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `text=${params.text}`;
+      filters += `${filters ? ',' : ''}text=${params.text}`;
     }
     if (params.representative) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `representative=${params.representative}`;
+      filters += `${filters ? ',' : ''}representative=${params.representative}`;
     }
     if (params.before) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `before=${params.before.toISOString()}`;
+      filters += `${filters ? ',' : ''}before=${params.before.toISOString()}`;
     }
     if (params.after) {
-      if (filters) {
-        filters += ',';
-      }
-      filters += `after=${params.after.toISOString()}`;
+      filters += `${filters ? ',' : ''}after=${params.after.toISOString()}`;
     }
     return filters;
   }
@@ -374,7 +347,8 @@ export class DashboardService {
     return this.params.pipe(
       map(params => {
         // this function takes partial parameters (what changed)
-        // mix in the existing this._params unless property was explicitly set in partialParams
+        // then mixed in the existing this.params unless property was explicitly set in partialParams
+        // partialParams can explicitly clear properties/set to undefined, so check hasOwnProperty
         if (!partialParams.hasOwnProperty('view') && params.view) {
           view = params.view;
         }
@@ -432,6 +406,7 @@ export class DashboardService {
         } else if (params.zone) {
           zone = params.zone.join('|');
         }
+        // properties that are undefined/falsey do not appear in the route
         return {
           ...(view && { view }),
           ...(page && { page }),
@@ -455,37 +430,22 @@ export class DashboardService {
 
   setParamsFromRoute(queryParams: Params, view: 'flights' | 'campaigns') {
     if (queryParams) {
-      const page = (queryParams['page'] && +queryParams['page']) || 1;
-      const per = queryParams['per'] && +queryParams['per'];
-      const advertiser = queryParams['advertiser'] && +queryParams['advertiser'];
-      const podcast = queryParams['podcast'] && +queryParams['podcast'];
-      const status = queryParams['status'];
-      const type = queryParams['type'];
-      const geo = queryParams['geo'] && queryParams['geo'].split('|');
-      const zone = queryParams['zone'] && queryParams['zone'].split('|');
-      const text = queryParams['text'];
-      const representative = queryParams['representative'];
-      const before = queryParams['before'] && new Date(queryParams['before']);
-      const after = queryParams['after'] && new Date(queryParams['after']);
-      const sort = queryParams['sort'] && queryParams['sort'];
-      const direction = queryParams['direction'] && queryParams['direction'];
-
       const params: DashboardParams = {
         view,
-        page,
-        per,
-        advertiser,
-        podcast,
-        status,
-        type,
-        geo,
-        zone,
-        text,
-        representative,
-        before,
-        after,
-        sort,
-        direction
+        page: (queryParams['page'] && +queryParams['page']) || 1,
+        ...(queryParams['per'] && { per: +queryParams['per'] }),
+        ...(queryParams['advertiser'] && { advertiser: +queryParams['advertiser'] }),
+        ...(queryParams['podcast'] && { podcast: +queryParams['podcast'] }),
+        ...(queryParams['status'] && { status: queryParams['status'] }),
+        ...(queryParams['type'] && { type: queryParams['type'] }),
+        ...(queryParams['geo'] && { geo: queryParams['geo'].split('|') }),
+        ...(queryParams['zone'] && { zone: queryParams['zone'].split('|') }),
+        ...(queryParams['text'] && { text: queryParams['text'] }),
+        ...(queryParams['representative'] && { representative: queryParams['representative'] }),
+        ...(queryParams['before'] && { before: new Date(queryParams['before']) }),
+        ...(queryParams['after'] && { after: new Date(queryParams['after']) }),
+        ...(queryParams['sort'] && { sort: queryParams['sort'] }),
+        ...(queryParams['direction'] && { direction: queryParams['direction'] })
       };
       switch (view) {
         case 'campaigns':

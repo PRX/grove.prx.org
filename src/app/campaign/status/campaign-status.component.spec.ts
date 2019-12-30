@@ -38,7 +38,6 @@ describe('CampaignStatusComponent', () => {
   }));
 
   it('links to dashboard with params', done => {
-    // dashboardService.loadCampaignList(params);
     dashboardService.getRouteQueryParams(params).subscribe(queryParams => {
       const queryParamsStr = Object.keys(queryParams)
         .map(key => `${key}=${queryParams[key]}`.replace('|', '%7C'))

@@ -1,10 +1,16 @@
 import { TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { MockHalService, HalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 import { DashboardService } from './dashboard.service';
 import { campaigns as campaignsFixture, flights as flightsFixture, facets } from './dashboard.service.mock';
+
+@Component({ template: `` })
+export class FlightTableComponent {}
+@Component({ template: `` })
+export class CampaignListComponent {}
 
 describe('DashboardService', () => {
   const mockHalService = new MockHalService();
@@ -37,7 +43,13 @@ describe('DashboardService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule.withRoutes([])],
+      declarations: [CampaignListComponent, FlightTableComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: 'campaigns', component: CampaignListComponent },
+          { path: 'flights', component: FlightTableComponent }
+        ])
+      ],
       providers: [
         AuguryService,
         DashboardService,
@@ -114,7 +126,7 @@ describe('DashboardService', () => {
     ).toEqual(`advertiser=3,podcast=2,status=approved,before=${before.toISOString()},after=${after.toISOString()}`);
   });
 
-  it('should build router query params', done => {
+  it('should build router params', done => {
     const before = new Date('2019-10-31');
     const after = new Date('2019-10-01');
     dashboardService
@@ -137,6 +149,23 @@ describe('DashboardService', () => {
       });
   });
 
+  it('should build router params from existing and given params', done => {
+    dashboardService.setParamsFromRoute({ page: 1, sort: 'start_at', direction: 'asc' }, 'flights');
+    dashboardService
+      .getRouteParams({
+        page: 2
+      })
+      .subscribe(params => {
+        expect(params).toMatchObject({
+          view: 'flights',
+          page: 2,
+          sort: 'start_at',
+          direction: 'asc'
+        });
+        done();
+      });
+  });
+
   it('should exclude view param from router query params', done => {
     const before = new Date('2019-10-31');
     const after = new Date('2019-10-01');
@@ -151,6 +180,26 @@ describe('DashboardService', () => {
         });
         done();
       });
+  });
+
+  it('should set dashboard params from route params and load flights or campaigns', () => {
+    jest.spyOn(dashboardService, 'loadCampaignList');
+    jest.spyOn(dashboardService, 'loadFlightList');
+    dashboardService.setParamsFromRoute({ page: 1, sort: 'start_at', direction: 'asc' }, 'flights');
+    expect(dashboardService.loadFlightList).toHaveBeenCalledWith({ view: 'flights', page: 1, sort: 'start_at', direction: 'asc' });
+    dashboardService.setParamsFromRoute({ page: 1, geo: 'US' }, 'campaigns');
+    expect(dashboardService.loadCampaignList).toHaveBeenCalledWith({ view: 'campaigns', page: 1, geo: ['US'] });
+  });
+
+  it('should route to params using existing and given params', () => {
+    jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
+    dashboardService.setParamsFromRoute({ page: 1, status: 'approved' }, 'flights');
+    dashboardService.routeToParams({ geo: ['US'] });
+    expect(router.navigate).toHaveBeenCalledWith(['flights'], { queryParams: { page: 1, status: 'approved', geo: 'US' } });
+    dashboardService.routeToParams({ view: 'campaigns' });
+    expect(router.navigate).toHaveBeenCalledWith(['campaigns'], {
+      queryParams: { page: 1, status: 'approved' }
+    });
   });
 
   it('should handle errors on load', done => {
