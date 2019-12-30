@@ -4,8 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { MockHalService, HalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
-import { DashboardService } from './dashboard.service';
+import { DashboardService, Campaign } from './dashboard.service';
 import { campaigns as campaignsFixture, flights as flightsFixture, facets } from './dashboard.service.mock';
+import { withLatestFrom } from 'rxjs/operators';
 
 @Component({ template: `` })
 export class FlightTableComponent {}
@@ -205,8 +206,8 @@ describe('DashboardService', () => {
   it('should handle errors on load', done => {
     mockHalService.mockError('prx:campaigns', 'Bad Request');
     dashboardService.loadCampaignList();
-    dashboardService.campaigns.subscribe(campaigns => {
-      expect(dashboardService.error).toEqual(new Error('Bad Request'));
+    dashboardService.campaigns.pipe(withLatestFrom(dashboardService.error)).subscribe(([campaigns, error]: [Campaign[], Error]) => {
+      expect(error).toEqual(new Error('Bad Request'));
       done();
     });
   });

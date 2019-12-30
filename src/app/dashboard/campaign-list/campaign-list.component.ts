@@ -7,24 +7,29 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
 @Component({
   selector: 'grove-campaign-list',
   template: `
-    <ul>
-      <li *ngFor="let campaign of campaigns$ | async">
-        <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
-      </li>
-      <ng-container *ngIf="loading$ | async as loading">
-        <li *ngFor="let c of loading; let i = index">
-          <grove-campaign-card></grove-campaign-card>
+    <div *ngIf="error$ | async as error; else campaigns">
+      {{ error }}
+    </div>
+    <ng-template #campaigns>
+      <ul>
+        <li *ngFor="let campaign of campaigns$ | async">
+          <grove-campaign-card [campaign]="campaign"></grove-campaign-card>
         </li>
-      </ng-container>
-    </ul>
-    <hr />
-    <prx-paging
-      [currentPage]="currentPage$ | async"
-      [totalPages]="totalPer | campaignListTotalPages"
-      (showPage)="routeToParams({ page: $event })"
-    >
-    </prx-paging>
-    <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
+        <ng-container *ngIf="loading$ | async as loading">
+          <li *ngFor="let c of loading; let i = index">
+            <grove-campaign-card></grove-campaign-card>
+          </li>
+        </ng-container>
+      </ul>
+      <hr />
+      <prx-paging
+        [currentPage]="currentPage$ | async"
+        [totalPages]="totalPer | campaignListTotalPages"
+        (showPage)="routeToParams({ page: $event })"
+      >
+      </prx-paging>
+      <div class="count-of-total">Showing {{ count }} of {{ total }}</div>
+    </ng-template>
   `,
   styleUrls: ['campaign-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -52,6 +57,10 @@ export class CampaignListComponent implements OnInit, OnDestroy {
 
   routeToParams(params) {
     this.dashboardService.routeToParams(params);
+  }
+
+  get error$(): Observable<Error> {
+    return this.dashboardService.error;
   }
 
   get loading$(): Observable<boolean[]> {

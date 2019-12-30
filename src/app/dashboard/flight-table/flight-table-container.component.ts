@@ -5,11 +5,16 @@ import { DashboardService } from '../dashboard.service';
 
 @Component({
   template: `
-    <div class="spinner-container" *ngIf="loading$ | async; else flightTable">
-      <mat-spinner></mat-spinner>
+    <div *ngIf="error$ | async as error; else flights">
+      {{ error }}
     </div>
-    <ng-template #flightTable>
-      <grove-flight-table [routedParams]="routedParams$ | async"></grove-flight-table>
+    <ng-template #flights>
+      <div class="spinner-container" *ngIf="loading$ | async; else flightTable">
+        <mat-spinner></mat-spinner>
+      </div>
+      <ng-template #flightTable>
+        <grove-flight-table [routedParams]="routedParams$ | async"></grove-flight-table>
+      </ng-template>
     </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -28,6 +33,10 @@ export class FlightTableContainerComponent implements OnInit, OnDestroy {
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }
+  }
+
+  get error$(): Observable<Error> {
+    return this.dashboardService.error;
   }
 
   get loading$(): Observable<boolean> {

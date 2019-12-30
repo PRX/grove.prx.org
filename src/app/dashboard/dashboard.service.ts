@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
-import { switchMap, concatAll, withLatestFrom, map, first } from 'rxjs/operators';
+import { switchMap, concatAll, withLatestFrom, map, first, finalize } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -85,7 +85,8 @@ export class DashboardService {
   campaignCount: number;
   flightTotal: number;
   flightCount: number;
-  error: Error;
+  // tslint:disable-next-line: variable-name
+  private _error = new BehaviorSubject<Error>(null);
   // tslint:disable-next-line: variable-name
   private _params = new BehaviorSubject<DashboardParams>({ page: 1, view: 'flights' });
   // tslint:disable-next-line: variable-name
@@ -100,6 +101,10 @@ export class DashboardService {
   private _flightsLoading = new BehaviorSubject<boolean>(false);
 
   constructor(private augury: AuguryService, private router: Router) {}
+
+  get error(): Observable<Error> {
+    return this._error.asObservable();
+  }
 
   get params(): Observable<DashboardParams> {
     return this._params.asObservable();
@@ -150,6 +155,7 @@ export class DashboardService {
 
   loadCampaignList(params?: DashboardParams) {
     this.campaignCount = null;
+    this._error.next(null);
     this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: 12, sort: 'flight_start_at' })
       .pipe(
         switchMap(([{ count, total, facets }, campaignDocs]) => {
@@ -207,13 +213,14 @@ export class DashboardService {
             [campaign.id]: campaign
           });
         },
-        err => (this.error = err)
+        err => this._error.next(err)
       );
   }
 
   loadFlightList(params?: DashboardParams) {
     this.flightCount = null;
     this._flightsLoading.next(true);
+    this._error.next(null);
     this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
       ...params,
       per: (params && params.per) || 25,
@@ -228,7 +235,8 @@ export class DashboardService {
           return flightDocs.map(doc => combineLatest(of(doc), doc.follow('prx:campaign'), doc.follow('prx:advertiser')));
         }),
         concatAll(),
-        withLatestFrom(this._flights)
+        withLatestFrom(this._flights),
+        finalize(() => this._flightsLoading.next(false))
       )
       .subscribe(
         ([[flightDoc, campaignDoc, advertiserDoc], flights]) => {
@@ -268,9 +276,8 @@ export class DashboardService {
             ...flights,
             [flight.id]: flight
           });
-          this._flightsLoading.next(false);
         },
-        err => (this.error = err)
+        err => this._error.next(err)
       );
   }
 
