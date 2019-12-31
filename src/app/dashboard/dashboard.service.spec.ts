@@ -108,6 +108,7 @@ describe('DashboardService', () => {
   it('should build filters for API request', () => {
     expect(
       dashboardService.getFilters({
+        view: 'campaigns',
         type: 'house',
         geo: ['US', 'CA'],
         zone: ['mid_1', 'pre_1'],
@@ -118,6 +119,7 @@ describe('DashboardService', () => {
     const after = new Date();
     expect(
       dashboardService.getFilters({
+        view: 'campaigns',
         advertiser: 3,
         podcast: 2,
         status: 'approved',
@@ -125,6 +127,14 @@ describe('DashboardService', () => {
         after
       })
     ).toEqual(`advertiser=3,podcast=2,status=approved,before=${before.toISOString()},after=${after.toISOString()}`);
+    expect(
+      dashboardService.getFilters({
+        view: 'flights',
+        geo: ['US', 'CA'],
+        zone: ['mid_1', 'pre_1'],
+        representative: 'Mich'
+      })
+    ).toEqual('geo=US,CA,zone=mid_1,pre_1,campaign_representative=Mich');
   });
 
   it('should build router params', done => {

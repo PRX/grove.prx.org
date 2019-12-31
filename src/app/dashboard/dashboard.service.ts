@@ -290,8 +290,8 @@ export class DashboardService {
   }
 
   loadList(list: string, zoom: string, params?: DashboardParams): Observable<[{ count: number; total: number; facets: Facets }, HalDoc[]]> {
-    const { page, per, advertiser, podcast, status, type, geo, zone, text, representative, before, after, sort, direction } = params;
-    const filters = this.getFilters({ advertiser, podcast, status, type, geo, zone, text, representative, before, after });
+    const { page, per, sort, direction } = params;
+    const filters = this.getFilters(params);
 
     return this.augury
       .follow(list, {
@@ -335,7 +335,11 @@ export class DashboardService {
       filters += `${filters ? ',' : ''}text=${params.text}`;
     }
     if (params.representative) {
-      filters += `${filters ? ',' : ''}representative=${params.representative}`;
+      if (params.view === 'campaigns') {
+        filters += `${filters ? ',' : ''}representative=${params.representative}`;
+      } else if (params.view === 'flights') {
+        filters += `${filters ? ',' : ''}campaign_representative=${params.representative}`;
+      }
     }
     if (params.before) {
       filters += `${filters ? ',' : ''}before=${params.before.toISOString()}`;
