@@ -320,10 +320,18 @@ export class DashboardService {
       filters += `${filters ? ',' : ''}podcast=${params.podcast}`;
     }
     if (params.status) {
-      filters += `${filters ? ',' : ''}status=${params.status}`;
+      if (params.view === 'campaigns') {
+        filters += `${filters ? ',' : ''}status=${params.status}`;
+      } else if (params.view === 'flights') {
+        filters += `${filters ? ',' : ''}campaign_status=${params.status}`;
+      }
     }
     if (params.type) {
-      filters += `${filters ? ',' : ''}type=${params.type}`;
+      if (params.view === 'campaigns') {
+        filters += `${filters ? ',' : ''}type=${params.type}`;
+      } else if (params.view === 'flights') {
+        filters += `${filters ? ',' : ''}campaign_type=${params.type}`;
+      }
     }
     if (params.geo && params.geo.length) {
       filters += `${filters ? ',' : ''}geo=${params.geo.join(',')}`;
