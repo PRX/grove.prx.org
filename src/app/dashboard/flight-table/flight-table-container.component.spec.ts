@@ -14,6 +14,7 @@ import { MockHalService } from 'ngx-prx-styleguide';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock } from '../dashboard.service.mock';
 
+import { CampaignTypePipe } from '../campaign-card';
 import { FlightTableComponent } from './flight-table.component';
 import { FlightTableContainerComponent } from './flight-table-container.component';
 
@@ -30,7 +31,7 @@ describe('FlightTableContainerComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatTableModule, NoopAnimationsModule, RouterTestingModule],
-      declarations: [FlightTableContainerComponent, FlightTableComponent],
+      declarations: [FlightTableContainerComponent, FlightTableComponent, CampaignTypePipe],
       providers: [
         {
           provide: DashboardService,
