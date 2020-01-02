@@ -112,9 +112,9 @@ export class CampaignStoreService {
 
                   // initialize week entry with day 0 values
                   acc.totals.groups[weekBeginString] = {
-                    allocated: day.allocated || 0,
-                    availability: day.availability || 0,
-                    allocationPreview: day.allocationPreview || 0,
+                    allocated: day.allocated,
+                    availability: day.availability,
+                    allocationPreview: day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
                     groups: [day]
@@ -122,9 +122,9 @@ export class CampaignStoreService {
                 } else {
                   // accumulate values onto week
                   acc.totals.groups[weekBeginString] = {
-                    allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
-                    availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
-                    allocationPreview: acc.totals.groups[weekBeginString].allocationPreview + (day.allocationPreview || 0),
+                    allocated: acc.totals.groups[weekBeginString].allocated + day.allocated,
+                    availability: acc.totals.groups[weekBeginString].availability + day.availability,
+                    allocationPreview: acc.totals.groups[weekBeginString].allocationPreview + day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
                     groups: acc.totals.groups[weekBeginString].groups.concat([day])
