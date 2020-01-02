@@ -173,8 +173,11 @@ describe('CampaignStoreService', () => {
   });
 
   it('returns changes for new campaigns and flights', done => {
-    const unsavedId = 'unsaved-id';
-    const newState = { ...campaignStateFixture, remoteCampaign: null, flights: { 'unsaved-id': { ...flightFixture, remoteFlight: null } } };
+    const newState: CampaignState = {
+      ...campaignStateFixture,
+      remoteCampaign: null,
+      flights: { 'unsaved-id': { localFlight: flightFixture, remoteFlight: null, changed: true, valid: true } }
+    };
     campaignService.getCampaign = jest.fn(id => of(newState)) as any;
     store.storeCampaign().subscribe(([changes, deletedDocs]) => {
       expect(changes).toEqual({ id: 1, prevId: null, flights: { 'unsaved-id': 9 } });
@@ -273,7 +276,7 @@ describe('CampaignStoreService', () => {
   });
 
   it('handles putting flights correctly when no flights exist', done => {
-    campaignService.getCampaign = jest.fn(() => of({...campaignStateFixture, flights: {}}));
+    campaignService.getCampaign = jest.fn(() => of({ ...campaignStateFixture, flights: {} }));
     store.load(1);
     store.putFlights().subscribe(res => {
       expect(res).toMatchObject([]);

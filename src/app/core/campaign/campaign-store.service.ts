@@ -380,10 +380,11 @@ export class CampaignStoreService {
           return of([]);
         }
         return forkJoin(
-          Object.keys(state.flights).map(key => {
-            return this.campaignService.putFlight(state.flights[key]).pipe(
-              map(newState => {
-                return { prevId: key, state: newState };
+          Object.keys(state.flights).map(flightId => {
+            return this.campaignService.putFlight(state.flights[flightId]).pipe(
+              map((newState: FlightState) => {
+                this.loadAvailability(state.flights[flightId].localFlight, flightId);
+                return { prevId: flightId, state: newState };
               })
             );
           })
