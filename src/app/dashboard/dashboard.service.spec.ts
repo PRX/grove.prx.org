@@ -112,9 +112,10 @@ describe('DashboardService', () => {
         type: 'house',
         geo: ['US', 'CA'],
         zone: ['mid_1', 'pre_1'],
-        representative: 'Mich'
+        representative: 'Mich',
+        text: 'Oscorp'
       })
-    ).toEqual('type=house,geo=US,CA,zone=mid_1,pre_1,representative=Mich');
+    ).toEqual('type=house,geo=US,CA,zone=mid_1,pre_1,text=Oscorp,representative=Mich');
     const before = new Date();
     const after = new Date();
     expect(
@@ -130,11 +131,12 @@ describe('DashboardService', () => {
     expect(
       dashboardService.getFilters({
         view: 'flights',
+        type: 'house',
         geo: ['US', 'CA'],
         zone: ['mid_1', 'pre_1'],
         representative: 'Mich'
       })
-    ).toEqual('geo=US,CA,zone=mid_1,pre_1,campaign_representative=Mich');
+    ).toEqual('campaign_type=house,geo=US,CA,zone=mid_1,pre_1,campaign_representative=Mich');
   });
 
   it('should build router params', done => {
@@ -161,7 +163,26 @@ describe('DashboardService', () => {
   });
 
   it('should build router params from existing and given params', done => {
-    dashboardService.setParamsFromRoute({ page: 1, sort: 'start_at', direction: 'asc' }, 'flights');
+    const before = new Date('2020-01-31').toISOString();
+    const after = new Date('2020-01-01').toISOString();
+    dashboardService.setParamsFromRoute(
+      {
+        page: 1,
+        per: 25,
+        advertiser: 3,
+        podcast: 2,
+        type: 'house',
+        geo: 'US|CA',
+        zone: 'pre_1|house_pre_1',
+        text: 'Oscorp',
+        representative: 'Mich',
+        sort: 'start_at',
+        direction: 'asc',
+        after,
+        before
+      },
+      'flights'
+    );
     dashboardService
       .getRouteParams({
         page: 2
@@ -170,8 +191,18 @@ describe('DashboardService', () => {
         expect(params).toMatchObject({
           view: 'flights',
           page: 2,
+          per: 25,
+          advertiser: 3,
+          podcast: 2,
+          type: 'house',
+          geo: 'US|CA',
+          zone: 'pre_1|house_pre_1',
+          text: 'Oscorp',
+          representative: 'Mich',
           sort: 'start_at',
-          direction: 'asc'
+          direction: 'asc',
+          after,
+          before
         });
         done();
       });
