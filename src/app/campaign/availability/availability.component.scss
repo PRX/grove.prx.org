@@ -1,3 +1,6 @@
+@import '~src/sass/colors';
+@import '~@angular/material/theming';
+
 :host {
   margin: 20px 10px 20px 20px;
 }
@@ -12,6 +15,7 @@ section {
   display: flex;
   align-items: center;
   border-bottom: 1px solid #ddd;
+  white-space: nowrap;
 }
 .row.head {
   border-top: 1px solid #ddd;
@@ -68,4 +72,7 @@ prx-icon.hide {
 }
 .error {
   font-style: italic;
+}
+.preview {
+  color: mat-color($prx-green, 700);
 }

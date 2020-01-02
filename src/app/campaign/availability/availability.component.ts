@@ -39,12 +39,9 @@ import { Flight, Availability, InventoryZone } from '../../core';
               </button>
             </div>
             <div class="avail">{{ week.allocated + week.availability | largeNumber }}</div>
-            <div class="goal">
-              {{
-                week.allocationPreview || week.allocationPreview === 0
-                  ? (week.allocationPreview | largeNumber)
-                  : (week.allocated | largeNumber)
-              }}
+            <div class="goal" [class.preview]="changed && week.allocationPreview >= 0">
+              {{ changed && week.allocationPreview >= 0 ? (week.allocationPreview | largeNumber) : (week.allocated | largeNumber) }}
+              <span *ngIf="changed && week.allocationPreview >= 0">*</span>
             </div>
             <div class="edit">
               <button class="btn-link" aria-label="Edit">
@@ -64,14 +61,11 @@ import { Flight, Availability, InventoryZone } from '../../core';
               <div class="avail">
                 <span>&mdash;</span><span>{{ day.allocated + day.availability | largeNumber }}</span>
               </div>
-              <div class="goal">
+              <div class="goal" [class.preview]="changed && day.allocationPreview >= 0">
                 <span>&mdash;</span>
                 <span>
-                  {{
-                    day.allocationPreview || day.allocationPreview === 0
-                      ? (day.allocationPreview | largeNumber)
-                      : (day.allocated | largeNumber)
-                  }}
+                  {{ changed && day.allocationPreview >= 0 ? (day.allocationPreview | largeNumber) : (day.allocated | largeNumber) }}
+                  <span *ngIf="changed && day.allocationPreview >= 0">*</span>
                 </span>
               </div>
               <div class="edit"></div>
@@ -81,12 +75,13 @@ import { Flight, Availability, InventoryZone } from '../../core';
         <div class="row totals" [class.row-highlight]="zone.totals.allocated + zone.totals.availability < zone.totals.allocationPreview">
           <div class="date">TOTALS</div>
           <div class="avail">{{ zone.totals.allocated + zone.totals.availability | largeNumber }}</div>
-          <div class="goal">
+          <div class="goal" [class.preview]="changed && zone.totals.allocationPreview >= 0">
             {{
-              zone.totals.allocationPreview || zone.totals.allocationPreview == 0
+              changed && zone.totals.allocationPreview >= 0
                 ? (zone.totals.allocationPreview | largeNumber)
                 : (zone.totals.allocated | largeNumber)
             }}
+            <span *ngIf="changed && zone.totals.allocationPreview >= 0">*</span>
           </div>
           <div class="edit"></div>
         </div>
@@ -98,6 +93,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
 })
 export class AvailabilityComponent {
   @Input() flight: Flight;
+  @Input() changed: boolean;
   @Input() zones: InventoryZone[];
   @Input() availabilityZones: Availability[];
   @Input() allocationPreviewError: any;
