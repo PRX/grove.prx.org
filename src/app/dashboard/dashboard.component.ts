@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, pluck } from 'rxjs/operators';
+import { mergeMap, pluck } from 'rxjs/operators';
 import { DashboardParams, DashboardRouteParams, DashboardService, Facets } from './dashboard.service';
 
 @Component({
@@ -42,7 +42,7 @@ export class DashboardComponent {
   get facets$(): Observable<Facets> {
     return this.dashboardService.params.pipe(
       pluck('view'),
-      map(view => (view === 'flights' ? this.dashboardService.flightFacets : this.dashboardService.campaignFacets))
+      mergeMap(view => (view === 'flights' ? this.dashboardService.flightFacets : this.dashboardService.campaignFacets))
     );
   }
 

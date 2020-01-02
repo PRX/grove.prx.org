@@ -143,6 +143,14 @@ export class DashboardServiceMock {
     return of(flights);
   }
 
+  get campaignFacets(): Observable<Facets> {
+    return of(facets);
+  }
+
+  get flightFacets(): Observable<Facets> {
+    return of(facets);
+  }
+
   // TODO: seems like getRouteQueryParams should return withOut view, and getRouteParams should have view
   getRouteQueryParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
     return this.params.pipe(

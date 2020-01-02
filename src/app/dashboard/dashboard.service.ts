@@ -79,8 +79,10 @@ export interface Campaign {
   providedIn: 'root'
 })
 export class DashboardService {
-  campaignFacets: Facets;
-  flightFacets: Facets;
+  // tslint:disable-next-line: variable-name
+  private _campaignFacets = new BehaviorSubject<Facets>({});
+  // tslint:disable-next-line: variable-name
+  private _flightFacets = new BehaviorSubject<Facets>({});
   campaignTotal: number;
   campaignCount: number;
   flightTotal: number;
@@ -159,6 +161,14 @@ export class DashboardService {
     );
   }
 
+  get campaignFacets(): Observable<Facets> {
+    return this._campaignFacets.asObservable();
+  }
+
+  get flightFacets(): Observable<Facets> {
+    return this._flightFacets.asObservable();
+  }
+
   loadCampaignList(params?: DashboardParams) {
     this.campaignCount = null;
     this._campaignsLoading.next(true);
@@ -166,7 +176,7 @@ export class DashboardService {
     this.loadList('prx:campaigns', 'prx:flights,prx:advertiser', { ...params, per: 12, sort: 'flight_start_at' })
       .pipe(
         switchMap(([{ count, total, facets }, campaignDocs]) => {
-          this.campaignFacets = facets;
+          this._campaignFacets.next(facets);
           this.campaignTotal = total;
           this.campaignCount = count;
           this._campaigns.next(
@@ -181,11 +191,15 @@ export class DashboardService {
           });
         }),
         concatAll(),
-        withLatestFrom(this._campaigns),
+        withLatestFrom(this._campaigns, this._campaignFacets),
         finalize(() => this._campaignsLoading.next(false))
       )
       .subscribe(
-        ([[campaignDoc, advertiserDoc, flightDocs], campaigns]) => {
+        ([[campaignDoc, advertiserDoc, flightDocs], campaigns, campaignFacets]: [
+          [HalDoc, HalDoc, HalDoc[]],
+          { [id: number]: Campaign },
+          Facets
+        ]) => {
           const campaign: Campaign = {
             id: campaignDoc['id'],
             ...(campaignDoc['_links'] &&
@@ -206,8 +220,7 @@ export class DashboardService {
               endAt: doc['endAt'] && new Date(doc['endAt']),
               // map zonesId from facets
               zones: doc['zones'].map(zoneId => {
-                const zoneFacet =
-                  this.campaignFacets && this.campaignFacets.zone && this.campaignFacets.zone.find(facet => facet.id === zoneId);
+                const zoneFacet = campaignFacets && campaignFacets.zone && campaignFacets.zone.find(facet => facet.id === zoneId);
                 return (zoneFacet && zoneFacet.label) || zoneId;
               })
               // TODO: no targets yet?
@@ -236,18 +249,22 @@ export class DashboardService {
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {
-          this.flightFacets = facets;
+          this._flightFacets.next(facets);
           this.flightTotal = total;
           this.flightCount = count;
           this._currentFlightIds = flightDocs.map(c => c['id']);
           return flightDocs.map(doc => combineLatest(of(doc), doc.follow('prx:campaign'), doc.follow('prx:advertiser')));
         }),
         concatAll(),
-        withLatestFrom(this._flights),
+        withLatestFrom(this._flights, this._flightFacets),
         finalize(() => this._flightsLoading.next(false))
       )
       .subscribe(
-        ([[flightDoc, campaignDoc, advertiserDoc], flights]) => {
+        ([[flightDoc, campaignDoc, advertiserDoc], flights, flightFacets]: [
+          [HalDoc, HalDoc, HalDoc],
+          { [id: number]: Flight },
+          Facets
+        ]) => {
           const flight: Flight = {
             id: flightDoc['id'],
             name: flightDoc['name'],
@@ -256,7 +273,7 @@ export class DashboardService {
             totalGoal: flightDoc['totalGoal'] || 0,
             // map zonesId from facets
             zones: flightDoc['zones'].map(zoneId => {
-              const zoneFacet = this.flightFacets && this.flightFacets.zone && this.flightFacets.zone.find(facet => facet.id === zoneId);
+              const zoneFacet = flightFacets && flightFacets.zone && flightFacets.zone.find(facet => facet.id === zoneId);
               return (zoneFacet && zoneFacet.label) || zoneId;
             }),
             ...(flightDoc['_links'] &&
