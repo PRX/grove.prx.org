@@ -121,13 +121,16 @@ export class CampaignStoreService {
                   };
                 } else {
                   // accumulate values onto week
+                  const weekTotals = acc.totals.groups[weekBeginString];
                   acc.totals.groups[weekBeginString] = {
-                    allocated: acc.totals.groups[weekBeginString].allocated + day.allocated,
-                    availability: acc.totals.groups[weekBeginString].availability + day.availability,
-                    allocationPreview: acc.totals.groups[weekBeginString].allocationPreview + day.allocationPreview,
+                    allocated: weekTotals.allocated ? weekTotals.allocated + day.allocated : day.allocated,
+                    availability: weekTotals.availability ? weekTotals.availability + day.availability : day.availability,
+                    allocationPreview: weekTotals.allocationPreview
+                      ? weekTotals.allocationPreview + day.allocationPreview
+                      : day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
-                    groups: acc.totals.groups[weekBeginString].groups.concat([day])
+                    groups: weekTotals.groups.concat([day])
                   };
                 }
                 // accumulate days onto totals
