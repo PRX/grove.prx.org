@@ -151,11 +151,21 @@ export class DashboardServiceMock {
     return of(facets);
   }
 
-  // TODO: seems like getRouteQueryParams should return withOut view, and getRouteParams should have view
   getRouteQueryParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
+    const withoutView = (p: DashboardParams) => {
+      const { view, ...rest } = p;
+      return rest;
+    };
     return this.params.pipe(
       map(existingParams => {
-        return { ...existingParams, ...partialParams, geo: 'US|CA', zone: 'mid_1|pre_1', before: '2019-09-30', after: '2019-09-01' };
+        return {
+          ...withoutView(existingParams),
+          ...withoutView(partialParams),
+          geo: 'US|CA',
+          zone: 'mid_1|pre_1',
+          before: '2019-09-30',
+          after: '2019-09-01'
+        };
       })
     );
   }
@@ -163,13 +173,9 @@ export class DashboardServiceMock {
   getRouteParams(partialParams: DashboardParams): Observable<DashboardRouteParams> {
     return this.params.pipe(
       map(existingParams => {
-        const withoutView = (p: DashboardParams) => {
-          const { view, ...rest } = p;
-          return rest;
-        };
         return {
-          ...withoutView(existingParams),
-          ...withoutView(partialParams),
+          ...existingParams,
+          ...partialParams,
           geo: 'US|CA',
           zone: 'mid_1|pre_1',
           before: '2019-09-30',
