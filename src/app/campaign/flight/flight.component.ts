@@ -2,6 +2,13 @@ import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy
 import { Flight, Inventory, InventoryZone } from '../../core';
 import { FormBuilder, Validators } from '@angular/forms';
 
+interface FlightFormShape {
+  name: string;
+  dateRange: { startDate: Date, endDate: Date};
+  zones: string[];
+  set_inventory_uri: string;
+}
+
 @Component({
   selector: 'grove-flight',
   templateUrl: './flight.component.html',
@@ -55,18 +62,35 @@ export class FlightComponent implements OnInit {
       if (filteredValues.length !== this.zones.value.length) {
         this.zones.setValue(filteredValues);
         this.zones.markAsDirty();
-        this.formStatusChanged(this.flightForm.value);
+        this.formStatusChanged(this.formToFlight(this.flightForm.value));
       }
     }
   }
 
-  flightForm = this.fb.group({
-    name: ['', Validators.required],
-    startAt: ['', Validators.required],
-    endAt: ['', Validators.required],
-    zones: ['', Validators.required],
-    set_inventory_uri: ['', Validators.required]
-  });
+  flightForm = this.fb.group(this.formShape);
+
+  // Reactive forms are, unfortunately, not strongly typed: https://github.com/angular/angular/issues/13721
+  // this is a bit of a kludge to make sure that our form conforms to the shape we expect it to
+  get formShape(): {[key in keyof FlightFormShape]: [string | {startDate: any, endDate: any}, Validators]} {
+    return {
+      name: ['', Validators.required],
+      dateRange: [{startDate: null, endDate: null}, Validators.required],
+      // startAt: ['', Validators.required],
+      // endAt: ['', Validators.required],
+      zones: ['', Validators.required],
+      set_inventory_uri: ['', Validators.required]
+    }
+  }
+
+  formToFlight(formData: FlightFormShape): Flight {
+    const { dateRange: {startDate, endDate}, ...restOfFlight } = formData;
+    return {
+      startAt: startDate ? startDate.toISOString() : null,
+      endAt: endDate ? endDate.toISOString() : null,
+      totalGoal: this.flight.totalGoal,
+      ...restOfFlight
+    };
+  }
 
   get name() {
     return this.flightForm.get('name');
@@ -80,20 +104,25 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
-      this.formStatusChanged({ ...cmp, id: this.flight.id });
+      this.formStatusChanged({ ...this.formToFlight(cmp), id: this.flight.id });
     });
   }
 
   formStatusChanged(flight?: Flight) {
     this.flightUpdate.emit({
-      flight: { ...flight, totalGoal: this.flight.totalGoal },
+      flight,
       changed: this.flightForm.dirty,
       valid: this.flightForm.valid
     });
   }
 
   updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
-    this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
+    this.flightForm.reset({
+      dateRange: {
+        startDate: startAt ? new Date(startAt) : startAt,
+        endDate: endAt ? new Date(endAt) : endAt },
+        ...restOfFlight
+      }, { emitEvent: false });
   }
 
   onFlightDuplicate() {
