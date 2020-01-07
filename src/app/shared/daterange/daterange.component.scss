@@ -1,0 +1,7 @@
+@import '~src/sass/colors';
+@import '~@angular/material/theming';
+
+.start-date {
+  background: mat-color($prx-aqua, 500);
+  border-radius: 100%;
+}

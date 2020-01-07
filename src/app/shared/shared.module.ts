@@ -9,6 +9,8 @@ import * as autocomplete from './autocomplete';
 import { AuthGuard, DeactivateGuard, UnauthGuard,
   IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
 import { LargeNumberPipe } from './pipes/large-number.pipe';
+import { DaterangeModule } from './daterange/daterange.module';
+
 @NgModule({
   declarations: [
     autocomplete.OptionsPipe,
@@ -17,6 +19,7 @@ import { LargeNumberPipe } from './pipes/large-number.pipe';
   ],
   imports: [
     CommonModule,
+    DaterangeModule,
     MatAutocompleteModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -29,6 +32,7 @@ import { LargeNumberPipe } from './pipes/large-number.pipe';
     ImageModule,
     SpinnerModule,
     ToastrModule,
+    DaterangeModule,
     autocomplete.OptionsPipe,
     autocomplete.AutocompleteComponent
   ],
