@@ -62,10 +62,7 @@ export class CampaignStoreService {
       this._campaign$.next(newState);
       return of(newState);
     } else {
-      const loading = this.campaignService.getCampaign(id).pipe(
-        first(),
-        share()
-      );
+      const loading = this.campaignService.getCampaign(id).pipe(first(), share());
       loading.subscribe(state => this._campaign$.next(state));
       return loading;
     }
@@ -115,22 +112,25 @@ export class CampaignStoreService {
 
                   // initialize week entry with day 0 values
                   acc.totals.groups[weekBeginString] = {
-                    allocated: day.allocated || 0,
-                    availability: day.availability || 0,
-                    allocationPreview: day.allocationPreview || 0,
+                    allocated: day.allocated,
+                    availability: day.availability,
+                    allocationPreview: day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
                     groups: [day]
                   };
                 } else {
                   // accumulate values onto week
+                  const weekTotals = acc.totals.groups[weekBeginString];
                   acc.totals.groups[weekBeginString] = {
-                    allocated: acc.totals.groups[weekBeginString].allocated + (day.allocated || 0),
-                    availability: acc.totals.groups[weekBeginString].availability + (day.availability || 0),
-                    allocationPreview: acc.totals.groups[weekBeginString].allocationPreview + (day.allocationPreview || 0),
+                    allocated: weekTotals.allocated ? weekTotals.allocated + day.allocated : day.allocated,
+                    availability: weekTotals.availability ? weekTotals.availability + day.availability : day.availability,
+                    allocationPreview: weekTotals.allocationPreview
+                      ? weekTotals.allocationPreview + day.allocationPreview
+                      : day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
-                    groups: acc.totals.groups[weekBeginString].groups.concat([day])
+                    groups: weekTotals.groups.concat([day])
                   };
                 }
                 // accumulate days onto totals
@@ -196,24 +196,19 @@ export class CampaignStoreService {
           });
         })
       ).pipe(share());
-      loading
-        .pipe(
-          first(),
-          withLatestFrom(this._campaign$)
-        )
-        .subscribe(([availabilities, state]) => {
-          const updatedState = {
-            ...state,
-            availability: {
-              ...state.availability,
-              ...availabilities.reduce(
-                (acc, availability) => ({ ...acc, [`${flightId || flight.id}-${availability.zone}`]: availability }),
-                {}
-              )
-            }
-          };
-          this._campaign$.next(updatedState);
-        });
+      loading.pipe(first(), withLatestFrom(this._campaign$)).subscribe(([availabilities, state]) => {
+        const updatedState = {
+          ...state,
+          availability: {
+            ...state.availability,
+            ...availabilities.reduce(
+              (acc, availability) => ({ ...acc, [`${flightId || flight.id}-${availability.zone}`]: availability }),
+              {}
+            )
+          }
+        };
+        this._campaign$.next(updatedState);
+      });
       return loading;
     }
   }
@@ -248,46 +243,41 @@ export class CampaignStoreService {
       }),
       share()
     );
-    loading
-      .pipe(
-        first(),
-        withLatestFrom(this._campaign$)
-      )
-      .subscribe(([result, state]) => {
-        let updatedState: CampaignState;
-        if (result && result.zones) {
-          updatedState = {
-            ...state,
-            allocationPreview: {
-              ...state.allocationPreview,
-              [`${flightId || id}`]: result.zones.reduce(
-                (previewByZone, zone) => ({
-                  ...previewByZone,
-                  [`${zone}`]: {
-                    ...result,
-                    allocations: (result.allocations as Allocation[])
-                      .filter(a => a.zoneName === zone)
-                      .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
-                    zones: [zone]
-                  }
-                }),
-                {}
-              )
-            }
-          };
-        } else {
-          // if no result clear allocationPreview for flight
-          updatedState = {
-            ...state,
-            allocationPreview: {
-              ...state.allocationPreview,
-              [`${flightId || id}`]: null
-            }
-          };
-        }
-        updatedState.dailyMinimum = { ...updatedState.dailyMinimum, [`${flightId || id}`]: dailyMinimum };
-        this._campaign$.next(updatedState);
-      });
+    loading.pipe(first(), withLatestFrom(this._campaign$)).subscribe(([result, state]) => {
+      let updatedState: CampaignState;
+      if (result && result.zones) {
+        updatedState = {
+          ...state,
+          allocationPreview: {
+            ...state.allocationPreview,
+            [`${flightId || id}`]: result.zones.reduce(
+              (previewByZone, zone) => ({
+                ...previewByZone,
+                [`${zone}`]: {
+                  ...result,
+                  allocations: (result.allocations as Allocation[])
+                    .filter(a => a.zoneName === zone)
+                    .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
+                  zones: [zone]
+                }
+              }),
+              {}
+            )
+          }
+        };
+      } else {
+        // if no result clear allocationPreview for flight
+        updatedState = {
+          ...state,
+          allocationPreview: {
+            ...state.allocationPreview,
+            [`${flightId || id}`]: null
+          }
+        };
+      }
+      updatedState.dailyMinimum = { ...updatedState.dailyMinimum, [`${flightId || id}`]: dailyMinimum };
+      this._campaign$.next(updatedState);
+    });
     return loading;
   }
 
@@ -393,10 +383,11 @@ export class CampaignStoreService {
           return of([]);
         }
         return forkJoin(
-          Object.keys(state.flights).map(key => {
-            return this.campaignService.putFlight(state.flights[key]).pipe(
-              map(newState => {
-                return { prevId: key, state: newState };
+          Object.keys(state.flights).map(flightId => {
+            return this.campaignService.putFlight(state.flights[flightId]).pipe(
+              map((newState: FlightState) => {
+                this.loadAvailability(state.flights[flightId].localFlight, flightId);
+                return { prevId: flightId, state: newState };
               })
             );
           })

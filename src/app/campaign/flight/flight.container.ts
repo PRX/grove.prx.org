@@ -11,7 +11,7 @@ import {
   Availability
 } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, filter, first } from 'rxjs/operators';
+import { map, filter, first, pluck } from 'rxjs/operators';
 
 @Component({
   selector: 'grove-flight.container',
@@ -29,6 +29,7 @@ import { map, filter, first } from 'rxjs/operators';
       <grove-availability
         *ngIf="flightAvailability$"
         [flight]="flightLocal$ | async"
+        [changed]="flightChanged$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
         [allocationPreviewError]="allocationPreviewError"
@@ -49,6 +50,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightState$ = new ReplaySubject<FlightState>(1);
   flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
   softDeleted$ = this.flightState$.pipe(map(state => state.softDeleted));
+  flightChanged$ = this.flightState$.pipe(pluck('changed'));
   flightAvailability$: Observable<Availability[]>;
   flightDailyMin$: Observable<number>;
   currentInventoryUri$ = new ReplaySubject<string>(1);
