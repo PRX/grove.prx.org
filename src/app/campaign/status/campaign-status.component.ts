@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Observable } from 'rxjs';
 import { CampaignState } from '../../core';
-import { CampaignListService, CampaignRouteParams } from '../../campaign-list/campaign-list.service';
+import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboard.service';
 
 @Component({
   selector: 'grove-campaign-status',
   template: `
     <prx-status-bar>
-      <a prx-status-bar-link routerLink="/" [queryParams]="queryParams">
+      <a prx-status-bar-link routerLink="/" [queryParams]="queryParams$ | async">
         <prx-status-bar-icon name="chevron-left" aria-label="Return To Home"></prx-status-bar-icon>
       </a>
       <prx-status-bar-text bold uppercase>Edit Campaign</prx-status-bar-text>
@@ -22,7 +23,7 @@ export class CampaignStatusComponent {
   @Input() isSaving: boolean;
   @Output() save = new EventEmitter();
 
-  constructor(private campaignListService: CampaignListService) {}
+  constructor(private dashboardService: DashboardService) {}
 
   get anyInvalid(): boolean {
     if (this.state) {
@@ -40,8 +41,8 @@ export class CampaignStatusComponent {
     }
   }
 
-  get queryParams(): CampaignRouteParams {
-    return this.campaignListService.getRouteQueryParams({});
+  get queryParams$(): Observable<DashboardRouteParams> {
+    return this.dashboardService.getRouteQueryParams({});
   }
 
   onSave() {

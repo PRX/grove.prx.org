@@ -1,0 +1,54 @@
+@import '~src/sass/colors';
+@import '~@angular/material/theming';
+
+.table-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  margin: 0 auto;
+}
+
+.mat-table {
+  width: 100%;
+  font-size: 1rem;
+}
+
+.mat-table a {
+  text-decoration: none;
+  font-weight: 700;
+  color: mat-color($prx-blue, 500);
+}
+
+.mat-table-sticky:first-child {
+  border-right: 1px solid mat-color($prx-gray, 300);
+}
+
+.mat-header-cell {
+  background: mat-color($prx-gray, 300);
+  border: white;
+  padding: 3px 5px;
+  line-height: 1.25em;
+}
+
+.mat-cell:first-of-type,
+.mat-header-cell:first-of-type {
+  padding-left: 5px;
+}
+
+.mat-row:nth-child(even) {
+  background-color: white;
+}
+
+.mat-row:nth-child(odd) {
+  background-color: mat-color($prx-gray, 100);
+}
+
+.mat-cell {
+  padding: 3px 5px;
+  font-size: 0.75rem;
+}
+
+.mat-sort-header-container,
+.mat-sort-header-button {
+  flex-direction: column;
+}

@@ -1,0 +1,18 @@
+:host {
+  display: block;
+  padding: 40px;
+}
+
+grove-dashboard-filter {
+  display: block;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}

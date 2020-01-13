@@ -1,0 +1,29 @@
+ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  grid-gap: 20px;
+}
+
+@media (min-width: 768px) {
+  ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  ul {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+prx-paging {
+  display: block;
+  text-align: center;
+}
+
+.count-of-total {
+  text-align: center;
+  color: #676767;
+  font-style: italic;
+}
