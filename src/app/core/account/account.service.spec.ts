@@ -10,8 +10,8 @@ describe('AccountService', () => {
     account = new AccountService(user as any);
   });
 
-  it('lists accounts', done => {
-    account.listAccounts().subscribe(accounts => {
+  it('loads accounts', done => {
+    account.loadAccounts().subscribe(accounts => {
       expect(accounts.length).toEqual(2);
       expect(accounts[0]).toMatchObject({ id: 12 });
       expect(accounts[1]).toMatchObject({ id: 11 });
