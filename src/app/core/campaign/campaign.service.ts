@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign, Flight, FlightState, Availability } from './campaign.models';
+import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
 
 @Injectable()
 export class CampaignService {
@@ -13,7 +13,7 @@ export class CampaignService {
   constructor(private augury: AuguryService) {}
 
   getCampaign(id: number | string): Observable<CampaignState> {
-    return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
+    return this.augury.follow('prx:campaign', { id }).pipe(
       switchMap(doc => doc.followItems('prx:flights').pipe(map(flightDocs => ({ doc, flightDocs })))),
       map(({ doc, flightDocs }) => {
         this.campaignDoc = doc;
