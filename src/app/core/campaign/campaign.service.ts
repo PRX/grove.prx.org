@@ -14,7 +14,10 @@ export class CampaignService {
 
   getCampaign(id: number | string): Observable<CampaignState> {
     return this.augury.follow('prx:campaign', { id }).pipe(
-      switchMap(doc => doc.followItems('prx:flights').pipe(map(flightDocs => ({ doc, flightDocs })))),
+      switchMap(doc => doc.follow('prx:flights').pipe(map(flights => ({ doc, flights })))),
+      switchMap(({ doc, flights }: { doc: HalDoc; flights: HalDoc }) =>
+        doc.followItems('prx:flights', { per: +flights['total'] }).pipe(map(flightDocs => ({ doc, flightDocs })))
+      ),
       map(({ doc, flightDocs }) => {
         this.campaignDoc = doc;
         this.flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});
