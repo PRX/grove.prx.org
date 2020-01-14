@@ -1,22 +1,43 @@
+:host {
+  ::ng-deep {
+    .mat-form-field {
+      display: inline;
+    }
+
+    .mat-form-field-infix {
+      width: 100%;
+    }
+
+    .mat-form-field-outline:not(.mat-form-field-outline-thick) {
+      .mat-form-field-outline-start,
+      .mat-form-field-outline-end {
+        background-color: white
+      }
+    }
+  }
+}
+
 h1 {
   font-weight: 700;
   font-size: 1.75em;
   line-height: 2em;
   color: #676767;
-}
-div {
-  display: flex;
+  white-space: nowrap;
 }
 .dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(46vw, 1fr));
   justify-content: space-between;
 }
 .selects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+  grid-column-gap: 10px;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 .text {
-  justify-content: flex-start;
-}
-grove-filter-text + grove-filter-text {
-  margin-left: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(45vw, 1fr));
+  grid-column-gap: 10px;
+  justify-content: space-between;
 }
