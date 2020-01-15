@@ -94,7 +94,8 @@ describe('FlightContainerComponent', () => {
     });
   });
 
-  it('redirects to campaign if the flight does not exist', () => {
+  // TODO: no longer does this because it caused a premature navigation bug, should we create a better way to detect it?
+  xit('redirects to campaign if the flight does not exist', () => {
     campaign.next({ flights: { 123: { name: 'my-flight' } } });
     routeId.next('456');
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', 'new']);
