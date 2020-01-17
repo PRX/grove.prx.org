@@ -50,11 +50,32 @@ describe('AllocationPreviewService', () => {
 
   beforeEach(() => {
     augury.mock('prx:flight-allocation-preview', allocationPreviewFixture);
+    augury.mock('prx:flight', { id: 1 }).mock('preview', allocationPreviewFixture);
   });
 
-  it('gets allocation preview', done => {
+  it('gets allocation preview for unsaved flights', done => {
     allocationPreviewService
       .getAllocationPreview({
+        id: undefined,
+        startAt: '2019-10-01',
+        endAt: '2019-11;01',
+        name: 'flight 1',
+        set_inventory_uri: '/some/url',
+        zones: ['pre_1'],
+        totalGoal: 999,
+        dailyMinimum: 90
+      })
+      .subscribe(alloc => {
+        const { startAt, endAt, dailyMinimum, totalGoal, zones } = allocationPreview;
+        expect(alloc).toMatchObject({ startAt, endAt, dailyMinimum, totalGoal, zones });
+        done();
+      });
+  });
+
+  it('gets allocation preview for saved flights', done => {
+    allocationPreviewService
+      .getAllocationPreview({
+        id: 1,
         startAt: '2019-10-01',
         endAt: '2019-11;01',
         name: 'flight 1',

@@ -232,6 +232,7 @@ export class CampaignStoreService {
           dailyMinimum = state.dailyMinimum[`${flightId || id}`];
         }
         return this.allocationPreviewService.getAllocationPreview({
+          ...(id === +flightId && { id }),
           set_inventory_uri,
           name,
           startAt,
