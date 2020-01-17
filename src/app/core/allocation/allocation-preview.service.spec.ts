@@ -4,7 +4,8 @@ import { AuguryService } from '../augury.service';
 
 describe('AllocationPreviewService', () => {
   const augury = new MockHalService();
-  const allocationPreviewService = new AllocationPreviewService(new AuguryService(augury as any));
+  const auguryService = new AuguryService(augury as any);
+  const allocationPreviewService = new AllocationPreviewService(auguryService);
   const allocationPreviewFixture = {
     startAt: '2019-10-01',
     endAt: '2019-11-01',
@@ -73,6 +74,7 @@ describe('AllocationPreviewService', () => {
   });
 
   it('gets allocation preview for saved flights', done => {
+    jest.spyOn(auguryService, 'follow');
     allocationPreviewService
       .getAllocationPreview({
         id: 1,
@@ -84,9 +86,8 @@ describe('AllocationPreviewService', () => {
         totalGoal: 999,
         dailyMinimum: 90
       })
-      .subscribe(alloc => {
-        const { startAt, endAt, dailyMinimum, totalGoal, zones } = allocationPreview;
-        expect(alloc).toMatchObject({ startAt, endAt, dailyMinimum, totalGoal, zones });
+      .subscribe(() => {
+        expect(auguryService.follow).toHaveBeenCalledWith('prx:flight', { id: 1 });
         done();
       });
   });
