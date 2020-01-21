@@ -1,5 +1,6 @@
 import { CampaignComponent } from './campaign.component';
-import { CampaignStoreService, CampaignState, FlightState, AdvertiserService } from '../core';
+import { CampaignStoreService, CampaignState, FlightState, AccountService, AdvertiserService } from '../core';
+import { AccountServiceMock } from '../core/account/account.service.mock';
 import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
 import { ReplaySubject, of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,6 +11,7 @@ describe('CampaignComponent', () => {
   let routeId: ReplaySubject<string>;
   let route: ActivatedRoute;
   let router: Router;
+  let accountService: AccountService;
   let advertiserService: AdvertiserService;
   let toastrService: ToastrService;
   let campaignStoreService: CampaignStoreService;
@@ -55,7 +57,8 @@ describe('CampaignComponent', () => {
       setFlight: jest.fn()
     } as any;
     advertiserService = new AdvertiserServiceMock(new MockHalService()) as any;
-    component = new CampaignComponent(route, router, toastrService, campaignStoreService, advertiserService);
+    accountService = new AccountServiceMock() as any;
+    component = new CampaignComponent(route, router, toastrService, campaignStoreService, accountService, advertiserService);
     component.ngOnInit();
   });
 
@@ -74,7 +77,10 @@ describe('CampaignComponent', () => {
     const flight2 = flightFactory({ name: 'Name 2' });
     campaignState.next({ ...campaign, flights: { flight1, flight2 } });
     component.campaignFlights$.subscribe(options => {
-      expect(options).toMatchObject([{ id: 'flight1', name: 'Name 1' }, { id: 'flight2', name: 'Name 2' }]);
+      expect(options).toMatchObject([
+        { id: 'flight1', name: 'Name 1' },
+        { id: 'flight2', name: 'Name 2' }
+      ]);
       done();
     });
   });

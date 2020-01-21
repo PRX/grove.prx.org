@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { CampaignStoreService, AdvertiserService } from '../core';
+import { CampaignStoreService, AdvertiserService, AccountService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 
 @Component({
@@ -49,6 +49,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     private router: Router,
     private toastr: ToastrService,
     public campaignStoreService: CampaignStoreService,
+    private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
 
@@ -57,9 +58,12 @@ export class CampaignComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((params: ParamMap) => {
           return this.advertiserService.loadAdvertisers().pipe(map(advertisers => ({ params, advertisers })));
+        }),
+        switchMap(({ params, advertisers }) => {
+          return this.accountService.loadAccounts().pipe(map(accounts => ({ params, advertisers, accounts })));
         })
       )
-      .subscribe(({ params, advertisers }) => {
+      .subscribe(({ params, advertisers, accounts }) => {
         this.campaignStoreService.load(params.get('id'));
       });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(

@@ -18,16 +18,14 @@ import { withLatestFrom } from 'rxjs/operators';
 })
 export class CampaignFormContainerComponent {
   campaign$: Observable<Campaign> = this.campaignStoreService.localCampaign$;
-  accounts$: Observable<Account[]>;
+  accounts$: Observable<Account[]> = this.accountService.accounts;
   advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
 
   constructor(
     public campaignStoreService: CampaignStoreService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
-  ) {
-    this.accounts$ = this.accountService.listAccounts();
-  }
+  ) {}
 
   campaignUpdateFromForm(newState: { campaign: Campaign; changed: boolean; valid: boolean }) {
     const { campaign, changed, valid } = newState;
@@ -41,7 +39,7 @@ export class CampaignFormContainerComponent {
       // TODO: how are we notifying in this app, material or the ol' toast?
       // this.toastr.success('Advertiser added');
       this.campaignStoreService.setCampaign({
-        localCampaign: {...campaign, set_advertiser_uri: result.set_advertiser_uri},
+        localCampaign: { ...campaign, set_advertiser_uri: result.set_advertiser_uri },
         changed: true,
         valid: true
       });

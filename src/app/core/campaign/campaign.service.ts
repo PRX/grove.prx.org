@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign, Flight, FlightState, Availability } from './campaign.models';
+import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
 
 @Injectable()
 export class CampaignService {
@@ -14,7 +14,15 @@ export class CampaignService {
 
   getCampaign(id: number | string): Observable<CampaignState> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
-      switchMap(doc => doc.followItems('prx:flights').pipe(map(flightDocs => ({ doc, flightDocs })))),
+      switchMap(doc => doc.follow('prx:flights').pipe(map(flights => ({ doc, flights })))),
+      switchMap(({ doc, flights }: { doc: HalDoc; flights: HalDoc }) => {
+        // if total is greater than count, request all flights
+        let params: any;
+        if (+flights['total'] > +flights['count']) {
+          params = { per: +flights['total'] };
+        }
+        return doc.followItems('prx:flights', params).pipe(map(flightDocs => ({ doc, flightDocs })));
+      }),
       map(({ doc, flightDocs }) => {
         this.campaignDoc = doc;
         this.flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});

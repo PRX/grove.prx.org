@@ -11,7 +11,7 @@ describe('CampaignFormContainerComponent', () => {
   let component: CampaignFormContainerComponent;
 
   beforeEach(() => {
-    accountService = { listAccounts: jest.fn(() => of([])) } as any;
+    accountService = { loadAccounts: jest.fn(() => of([])) } as any;
     advertiserService = new AdvertiserServiceMock(new MockHalService()) as any;
     campaignStoreService = { localCampaign$: of({}), setCampaign: jest.fn(() => of({})) } as any;
     component = new CampaignFormContainerComponent(campaignStoreService, accountService, advertiserService);

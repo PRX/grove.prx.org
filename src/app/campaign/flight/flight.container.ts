@@ -94,10 +94,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       this.currentFlightId = id;
       this.flightState$.next(state.flights[id]);
       this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
-    } else {
-      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
-      this.router.navigate(['/campaign', campaignId]);
-    }
+    } /*
+    else {
+      TODO: what to do about an invalid flight id and how to tell if a flight doesn't exist or hasn't yet been loaded into state
+    }*/
   }
 
   flightUpdateFromForm({ flight, changed, valid }) {
