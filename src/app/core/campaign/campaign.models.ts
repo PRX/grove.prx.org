@@ -67,7 +67,7 @@ export interface Flight {
   totalGoal: number;
   zones: string[];
   set_inventory_uri: string;
-  status: string;
+  status?: string;
   status_message?: string;
 }
 
