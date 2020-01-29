@@ -13,6 +13,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
       <ul class="errors" *ngIf="getFlightErrors()">
         <li class="error" *ngFor="let error of errors"><mat-icon>priority_high</mat-icon> {{error}}</li>
       </ul>
+      <mat-divider></mat-divider>
       <section *ngFor="let zone of availabilityZones">
         <h3>{{ getZoneName(zone.zone) }}</h3>
         <div class="row head">

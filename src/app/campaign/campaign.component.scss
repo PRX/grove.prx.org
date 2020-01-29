@@ -1,3 +1,5 @@
+@import '~src/sass/variables';
+
 mat-drawer-content {
   min-height: 150px;
 }
@@ -10,27 +12,45 @@ mat-drawer {
 
 .mat-list-base {
   padding-top: 0;
-}
 
-.mat-list-base .mat-list-item {
-  background: #ddd;
-  color: #0089bd;
-  font-weight: 700;
-  margin: 0 0 2px;
-}
+  .mat-list-item {
+    transition: border-left 100ms ease-out 0ms;
+    background: #ddd;
+    color: $primary;
+    font-weight: 700;
+    margin: 0 0 2px;
+    border-left: 0 solid $primary;
 
-.mat-list-base .mat-list-item.active-link {
-  background: #fff;
-  color: #0089bd;
-  font-style: italic;
+    &:hover {
+      border-left: 4px solid $primary;
+    }
+  }
+
+  .mat-list-item.active-link {
+    background: #fff;
+    color: $primary;
+    border-left: 4px solid $primary;
+  }
+
+  .mat-list-item.deleted-flight {
+    text-decoration: line-through;
+    color: $warn;
+  }
 }
 
 .add-flight {
+  transition: background-color 100ms linear 0ms;
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-column-gap: 0.25rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border: 1px dashed mat-color($prx-gray, 300);
   text-align: center;
-  padding: 12px 0;
-}
 
-.mat-list-base .mat-list-item.deleted-flight {
-  text-decoration: line-through;
-  color: #f00;
+  &:hover {
+    background-color: mat-color($prx-gray, 100);
+  }
 }

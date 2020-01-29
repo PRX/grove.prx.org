@@ -1,11 +1,11 @@
 :host {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr minmax(200px, 400px);
 }
 grove-flight {
-  flex-basis: 600px;
 }
 grove-availability {
-  flex-basis: calc(100% - 600px);
+  min-width: 200px;
 }
 
 .loading-form {

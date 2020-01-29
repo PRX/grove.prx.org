@@ -27,9 +27,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
             {{ flight.name }}
           </a>
         </mat-nav-list>
-        <div class="add-flight">
-          <a [routerLink]="" (click)="createFlight()">+ Add a Flight</a>
-        </div>
+        <a class="add-flight" [routerLink]="" (click)="createFlight()"><mat-icon>add</mat-icon> Add a Flight</a>
       </mat-drawer>
       <mat-drawer-content role="main">
         <router-outlet></router-outlet>
