@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, SimpleChange } from '@angular/core';
 import { Flight, Availability, InventoryZone } from '../../core';
 
 @Component({
@@ -10,7 +10,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
     </p>
     <ng-template #inventory>
       <grove-goal-form [flight]="flight" [dailyMinimum]="dailyMinimum" (goalChange)="goalChange.emit($event)"></grove-goal-form>
-      <ul class="errors" *ngIf="getFlightErrors()">
+      <ul class="errors" *ngIf="hasErrors">
         <li class="error" *ngFor="let error of errors"><mat-icon>priority_high</mat-icon> {{error}}</li>
       </ul>
       <mat-divider></mat-divider>
@@ -104,7 +104,12 @@ export class AvailabilityComponent {
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
   zoneWeekHover = {};
+  hasErrors = false;
   errors = [];
+
+  ngOnChanges() {
+    this.getFlightErrors();
+  }
 
   toggleZoneWeekExpanded(zone: string, date: string) {
     this.zoneWeekExpanded[`${zone}-${date}`] = !this.zoneWeekExpanded[`${zone}-${date}`];
@@ -122,6 +127,7 @@ export class AvailabilityComponent {
   }
 
   getFlightErrors() {
+    this.hasErrors = false;
     this.errors = [];
 
     if (this.allocationPreviewError) {
@@ -132,7 +138,9 @@ export class AvailabilityComponent {
       this.errors.push(this.flight.status_message);
     }
 
-    return !!this.errors.length;
+    this.hasErrors = !!this.errors.length;
+
+    return this.errors;
   }
 
   getZoneName(zoneId: string): string {

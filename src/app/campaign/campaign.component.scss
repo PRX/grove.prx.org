@@ -6,6 +6,7 @@ mat-drawer-content {
 
 mat-drawer {
   min-width: 250px;
+  max-width: 400px;
   background: #f0f0f0;
   border-right: none;
 }
@@ -21,20 +22,33 @@ mat-drawer {
     margin: 0 0 2px;
     border-left: 0 solid $primary;
 
-    &:hover {
-      border-left: 4px solid $primary;
+    &:hover,
+    &.active-link,
+    &.changed {
+      border-left-width: 4px;
     }
-  }
 
-  .mat-list-item.active-link {
-    background: #fff;
-    color: $primary;
-    border-left: 4px solid $primary;
-  }
+    &.active-link {
+      background: #fff;
+      color: $primary;
+    }
 
-  .mat-list-item.deleted-flight {
-    text-decoration: line-through;
-    color: $warn;
+    &.changed {
+      &.valid {
+        border-left-color: $success;
+      }
+
+      &.invalid,
+      &.error {
+        border-left-color: $warn;
+      }
+    }
+
+    &.deleted-flight {
+      text-decoration: line-through;
+      color: $warn;
+      border-left-color: $warn;
+    }
   }
 }
 

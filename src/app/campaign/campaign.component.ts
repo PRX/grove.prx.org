@@ -5,6 +5,15 @@ import { map, switchMap } from 'rxjs/operators';
 import { CampaignStoreService, AdvertiserService, AccountService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 
+export interface LocalFlightState {
+  id: string;
+  name: string;
+  changed: boolean;
+  valid: boolean;
+  softDeleted: boolean;
+  statusOk: boolean;
+}
+
 @Component({
   selector: 'grove-campaign',
   template: `
@@ -19,12 +28,17 @@ import { ToastrService } from 'ngx-prx-styleguide';
           <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./">Campaign</a>
           <a
             mat-list-item
-            *ngFor="let flight of campaignFlights$ | async"
+            *ngFor="let flight of campaignFlights$ | async; let i = index"
             [routerLink]="['flight', flight.id]"
             routerLinkActive="active-link"
             [class.deleted-flight]="flight.softDeleted"
+            [class.changed]="flight.changed"
+            [class.valid]="flight.valid"
+            [class.invalid]="!flight.valid"
+            [class.error]="!flight.statusOk"
           >
-            {{ flight.name }}
+            <span matLine>{{ flight.name }}</span>
+            <mat-icon color="warn" *ngIf="!flight.statusOk">priority_high</mat-icon>
           </a>
         </mat-nav-list>
         <a class="add-flight" [routerLink]="" (click)="createFlight()"><mat-icon>add</mat-icon> Add a Flight</a>
@@ -38,7 +52,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignComponent implements OnInit, OnDestroy {
-  campaignFlights$: Observable<{ id: string; name: string; softDeleted: boolean }[]>;
+  campaignFlights$: Observable<LocalFlightState[]>;
   campaignSaving: boolean;
   routeSub: Subscription;
 
@@ -66,8 +80,15 @@ export class CampaignComponent implements OnInit, OnDestroy {
       });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
       map(flightStates => {
-        return Object.keys(flightStates).map(id => {
-          return { id, name: flightStates[id].localFlight.name || '(Flight)', softDeleted: !!flightStates[id].softDeleted };
+        return Object.keys(flightStates).map((id): LocalFlightState => {
+          return {
+            id,
+            name: flightStates[id].localFlight.name || '(Flight)',
+            softDeleted: !!flightStates[id].softDeleted,
+            changed: flightStates[id].changed,
+            valid: flightStates[id].valid,
+            statusOk: !flightStates[id].localFlight.status || flightStates[id].localFlight.status === 'ok'
+          };
         });
       })
     );
