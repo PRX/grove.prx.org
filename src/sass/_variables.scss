@@ -1,0 +1,18 @@
+@import '~@angular/material/theming';
+@import 'colors';
+
+//// Colors
+
+// Define theme pallets.
+$prx-primary: mat-palette($prx-blue, 500, 200, 800);
+$prx-neutral: mat-palette($prx-gray, 500, 200, 800);
+$prx-accent: mat-palette($prx-orange, 500, 200, 800);
+$prx-success: mat-palette($prx-green);
+$prx-warn: mat-palette($prx-red);
+
+// Define color variables.
+$primary: mat-color($prx-primary);
+$neutral: mat-color($prx-neutral);
+$accent: mat-color($prx-accent);
+$success: mat-color($prx-success);
+$warn: mat-color($prx-warn);

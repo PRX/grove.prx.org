@@ -1,5 +1,4 @@
-@import '~src/sass/colors';
-@import '~@angular/material/theming';
+@import '~src/sass/variables';
 
 :host {
   margin: 20px 10px 20px 20px;
@@ -67,12 +66,19 @@ prx-icon.hide {
   visibility: hidden;
 }
 .row-highlight,
-.error {
-  color: #ee4d3e;
+.errors {
+  color: $warn;
 }
-.error {
+.errors {
+  display: grid;
+  grid-row-gap: 0.5rem;
+  margin: 0 2rem 1rem 0;
   font-style: italic;
 }
+.error {
+  display: flex;
+  align-items: center;
+}
 .preview {
-  color: mat-color($prx-green, 700);
+  color: $success;
 }
