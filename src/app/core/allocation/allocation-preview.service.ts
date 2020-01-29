@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
-import { HalDoc } from 'ngx-prx-styleguide';
+import { map, tap, catchError, mergeMap } from 'rxjs/operators';
+import { HalObservable, HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 import { AllocationPreview } from '../campaign/campaign.models';
 
@@ -11,9 +11,24 @@ export class AllocationPreviewService {
 
   constructor(private augury: AuguryService) {}
 
-  getAllocationPreview({ set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones }): Observable<AllocationPreview> {
-    return this.augury
-      .follow('prx:flight-allocation-preview', {
+  getAllocationPreview({ id, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones }): Observable<AllocationPreview> {
+    let preview: HalObservable<HalDoc>;
+    if (id) {
+      preview = this.augury.follow('prx:flight', { id }).pipe(
+        mergeMap(flightDoc =>
+          flightDoc.follow('preview', {
+            set_inventory_uri,
+            name,
+            startAt,
+            endAt,
+            totalGoal,
+            dailyMinimum,
+            zones
+          })
+        )
+      ) as HalObservable<HalDoc>;
+    } else {
+      preview = this.augury.follow('prx:flight-allocation-preview', {
         set_inventory_uri,
         name,
         startAt,
@@ -21,13 +36,14 @@ export class AllocationPreviewService {
         totalGoal,
         dailyMinimum,
         zones
-      })
-      .pipe(
-        // clear error on new request
-        tap(() => (this.error = null)),
-        map(docs => this.docToAllocationPreview(docs)),
-        catchError(err => this.handleError(err))
-      );
+      });
+    }
+    return preview.pipe(
+      // clear error on new request
+      tap(() => (this.error = null)),
+      map(docs => this.docToAllocationPreview(docs)),
+      catchError(err => this.handleError(err))
+    );
   }
 
   docToAllocationPreview(doc: HalDoc): AllocationPreview {

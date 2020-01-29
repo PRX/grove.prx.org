@@ -13,7 +13,7 @@ import {
   AllocationPreview
 } from './campaign.models';
 import { ReplaySubject, Observable, forkJoin, of } from 'rxjs';
-import { map, first, switchMap, share, withLatestFrom, mergeMap } from 'rxjs/operators';
+import { map, first, switchMap, share, withLatestFrom, concatMap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 @Injectable({ providedIn: 'root' })
@@ -227,11 +227,12 @@ export class CampaignStoreService {
     startAt = new Date(startAt.valueOf()).toISOString().slice(0, 10);
     endAt = new Date(endAt.valueOf()).toISOString().slice(0, 10);
     const loading = this._campaign$.pipe(
-      mergeMap(state => {
+      concatMap(state => {
         if (!dailyMinimum && dailyMinimum !== 0 && state.dailyMinimum) {
           dailyMinimum = state.dailyMinimum[`${flightId || id}`];
         }
         return this.allocationPreviewService.getAllocationPreview({
+          id,
           set_inventory_uri,
           name,
           startAt,
