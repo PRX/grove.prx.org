@@ -12,7 +12,12 @@ $prx-warn: mat-palette($prx-red);
 
 // Define color variables.
 $primary: mat-color($prx-primary);
+$primary-contrast: mat-color($prx-primary, default-contrast);
 $neutral: mat-color($prx-neutral);
+$neutral-contrast: mat-color($prx-neutral, default-contrast);
 $accent: mat-color($prx-accent);
+$accent-contrast: mat-color($prx-accent, default-contrast);
 $success: mat-color($prx-success);
+$success-contrast: mat-color($prx-success, default-contrast);
 $warn: mat-color($prx-warn);
+$warn-contrast: mat-color($prx-warn, default-contrast);

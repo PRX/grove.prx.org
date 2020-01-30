@@ -38,6 +38,6 @@ describe('CampaignCardComponent', () => {
   });
 
   it('should show campaign status', () => {
-    expect(de.query(By.css('span.status')).nativeElement.textContent).toMatch(comp.campaign.status);
+    expect(de.query(By.css('span.status')).nativeElement.textContent.toLowerCase()).toMatch(comp.campaign.status);
   });
 });

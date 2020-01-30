@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -30,7 +31,7 @@ describe('FlightTableContainerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatTableModule, NoopAnimationsModule, RouterTestingModule],
+      imports: [MatIconModule, MatPaginatorModule, MatSortModule, MatProgressSpinnerModule, MatTableModule, NoopAnimationsModule, RouterTestingModule],
       declarations: [FlightTableContainerComponent, FlightTableComponent, CampaignTypePipe],
       providers: [
         {

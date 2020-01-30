@@ -13,7 +13,7 @@ import { Campaign } from '../dashboard.service';
         </a>
       </h3>
       <div>
-        <span class="status {{ campaign.status }}">{{ campaign.status }}</span>
+        <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
         {{ campaign.type | campaignType }}
       </div>
       <div *ngIf="campaign.flights | campaignFlightTargets as targets">

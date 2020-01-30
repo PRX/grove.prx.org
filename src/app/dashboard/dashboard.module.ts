@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -47,13 +48,14 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     FlightTableComponent
   ],
   imports: [
-    dashboardRouting,
+  dashboardRouting,
     CommonModule,
     PagingModule,
     RouterModule,
     SharedModule,
     MatDatepickerModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatNativeDateModule,
     MatPaginatorModule,

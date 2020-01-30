@@ -53,6 +53,8 @@ export interface Facets {
 export interface Flight {
   id: number;
   name: string;
+  status: string,
+  statusOk: boolean,
   startAt: Date;
   endAt: Date;
   zones: string[];
@@ -216,6 +218,8 @@ export class DashboardService {
             flights: flightDocs.map(doc => ({
               id: doc['id'],
               name: doc['name'],
+              status: doc['status'],
+              statusOk: doc['status'] === 'ok',
               startAt: doc['startAt'] && new Date(doc['startAt']),
               endAt: doc['endAt'] && new Date(doc['endAt']),
               // map zonesId from facets
@@ -245,7 +249,8 @@ export class DashboardService {
     this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
       ...params,
       per: (params && params.per) || 25,
-      sort: (params && params.sort) || 'start_at'
+      sort: (params && params.sort) || 'start_at',
+      direction: (params && params.direction) || 'desc'
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {
@@ -268,6 +273,8 @@ export class DashboardService {
           const flight: Flight = {
             id: flightDoc['id'],
             name: flightDoc['name'],
+            status: flightDoc['status'],
+            statusOk: flightDoc['status'] === 'ok',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
             endAt: flightDoc['endAt'] && new Date(flightDoc['endAt']),
             totalGoal: flightDoc['totalGoal'] || 0,
