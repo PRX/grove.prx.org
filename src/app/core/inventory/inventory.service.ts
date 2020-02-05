@@ -57,7 +57,7 @@ export class InventoryService {
       totals: {
         startDate: doc['startDate'],
         endDate: doc['endDate'],
-        groups: doc['availabilityAllocationDays'].map(allocation => ({
+        groups: doc['days'].map(allocation => ({
           allocated: allocation.allocated,
           availability: allocation.availability,
           startDate: allocation.date,

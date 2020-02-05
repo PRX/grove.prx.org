@@ -14,7 +14,7 @@ describe('InventoryService', () => {
   const availabilityFixture = {
     startDate: '2019-10-01',
     endDate: '2019-11-01',
-    availabilityAllocationDays: [
+    days: [
       { allocated: 0, availability: 1, date: '2019-10-01' },
       { allocated: 0, availability: 0, date: '2019-10-02' },
       { allocated: 0, availability: 9858, date: '2019-10-03' },
@@ -67,7 +67,7 @@ describe('InventoryService', () => {
         expect(avail.totals.startDate).toEqual(availabilityFixture.startDate);
         expect(avail.totals.endDate).toEqual(availabilityFixture.endDate);
         expect(avail.totals.groups.length).toEqual(availability.totals.groups.length);
-        expect(avail.totals.groups[0].startDate).toEqual(availabilityFixture.availabilityAllocationDays[0].date);
+        expect(avail.totals.groups[0].startDate).toEqual(availabilityFixture.days[0].date);
         done();
       });
   });
