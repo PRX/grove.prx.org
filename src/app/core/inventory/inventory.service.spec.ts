@@ -60,7 +60,7 @@ describe('InventoryService', () => {
         id: 1,
         startDate: '2019-10-01',
         endDate: '2019-11;01',
-        zoneName: 'pre_1',
+        zone: 'pre_1',
         flightId: 1
       })
       .subscribe(avail => {
