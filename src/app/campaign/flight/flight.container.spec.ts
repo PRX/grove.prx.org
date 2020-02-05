@@ -94,6 +94,42 @@ describe('FlightContainerComponent', () => {
     });
   });
 
+  it('does not load allocation preview if flight name changes', () => {
+    const flight = {
+      id: 123,
+      name: 'my-flight'
+    };
+    campaign.next({
+      flights: {
+        123: {
+          localFlight: flight
+        }
+      },
+      availability: {}
+    });
+    routeId.next('123');
+    component.flightUpdateFromForm({ flight: { ...flight, name: 'my-other-flight' }, changed: true, valid: true });
+    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
+  });
+
+  it('does not load allocation preview if id does not match flight in state', () => {
+    const flight = {
+      id: 123,
+      name: 'my-flight'
+    };
+    campaign.next({
+      flights: {
+        123: {
+          localFlight: flight
+        }
+      },
+      availability: {}
+    });
+    routeId.next('123');
+    component.flightUpdateFromForm({ flight: { id: 124, name: 'New Flight 124' }, changed: true, valid: true });
+    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
+  });
+
   // TODO: no longer does this because it caused a premature navigation bug, should we create a better way to detect it?
   xit('redirects to campaign if the flight does not exist', () => {
     campaign.next({ flights: { 123: { name: 'my-flight' } } });
