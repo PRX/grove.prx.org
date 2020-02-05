@@ -190,7 +190,7 @@ export class CampaignStoreService {
             id: inventoryId,
             startDate,
             endDate,
-            zoneName,
+            zone: zoneName,
             // flight.id will be undefined if flight is not yet created, which is when flightId is provided as the temp id
             flightId: flight.id
           });
