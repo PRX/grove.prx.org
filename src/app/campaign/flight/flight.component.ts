@@ -85,15 +85,27 @@ export class FlightComponent implements OnInit {
   }
 
   formStatusChanged(flight?: Flight) {
+    // emit dates as UTC midnight
+    const startAtDate = new Date(flight.startAt);
+    const startAt = new Date(Date.UTC(startAtDate.getUTCFullYear(), startAtDate.getUTCMonth(), startAtDate.getUTCDate())).toUTCString();
+    const endAtDate = new Date(flight.endAt);
+    const endAt = new Date(Date.UTC(endAtDate.getUTCFullYear(), endAtDate.getUTCMonth(), endAtDate.getUTCDate())).toUTCString();
     this.flightUpdate.emit({
-      flight: { ...flight, totalGoal: this.flight.totalGoal },
+      flight: { ...flight, startAt, endAt, totalGoal: this.flight.totalGoal },
       changed: this.flightForm.dirty,
       valid: this.flightForm.valid
     });
   }
 
-  updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
-    this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
+  updateFlightForm(flight: Flight) {
+    const startAtDate = new Date(flight.startAt);
+    const startAt = new Date(Date.UTC(startAtDate.getUTCFullYear(), startAtDate.getUTCMonth(), startAtDate.getUTCDate()));
+    const endAtDate = new Date(flight.endAt);
+    const endAt = new Date(Date.UTC(endAtDate.getUTCFullYear(), endAtDate.getUTCMonth(), endAtDate.getUTCDate()));
+    // set time to Timezone offset ahead of midnight UTC because the datepickers display in local timezone, which will be midnight locally
+    startAt.setMinutes(startAt.getMinutes() + startAt.getTimezoneOffset());
+    endAt.setMinutes(endAt.getMinutes() + endAt.getTimezoneOffset());
+    this.flightForm.reset({ ...flight, startAt, endAt }, { emitEvent: false });
   }
 
   onFlightDuplicate() {
