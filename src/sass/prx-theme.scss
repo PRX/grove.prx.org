@@ -1,13 +1,6 @@
-@import '~@angular/material/theming';
-@import 'colors';
+@import 'variables';
 
 @include mat-core();
-
-$prx-primary: mat-palette($prx-blue, 500, 200, 800);
-$prx-neutral: mat-palette($prx-gray, 500, 200, 800);
-$prx-accent: mat-palette($prx-orange, 500, 200, 800);
-
-$prx-warn: mat-palette($prx-red);
 
 $prx: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
 

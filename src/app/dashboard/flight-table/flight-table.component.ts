@@ -21,11 +21,11 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
     'start_at',
     'end_at',
     'total_goal',
-    'campaign_status',
     'zone',
     'geo',
     'podcast',
     'campaign_name',
+    'campaign_status',
     'campaign_type',
     'campaign_representative'
   ];

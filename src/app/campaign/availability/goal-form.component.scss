@@ -1,0 +1,15 @@
+@import '~src/sass/variables';
+
+$gap-size: 0.75rem;
+
+.goal-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(180px - #{$gap-size}), 1fr));
+  grid-gap: $gap-size;
+
+  margin-bottom: 1rem;
+
+  ::ng-deep .mat-form-field-wrapper {
+    padding: 0;
+  }
+}

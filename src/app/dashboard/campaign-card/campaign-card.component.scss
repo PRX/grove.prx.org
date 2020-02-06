@@ -1,5 +1,6 @@
-@import '~src/sass/colors';
 @import '~@angular/material/theming';
+@import '~src/sass/colors';
+@import '~src/sass/status';
 
 :host {
   display: block;
@@ -21,31 +22,4 @@ h3 {
   font-weight: 700;
   line-height: 1.25em;
   margin-bottom: 0.5em;
-}
-.status {
-  padding: 2px 4px;
-}
-.draft {
-  color: mat-color($prx-blue-palette, lighter-contrast);
-  background-color: mat-color($prx-blue-palette, lighter);
-}
-.approved {
-  color: mat-color($prx-green-palette, default-contrast);
-  background-color: mat-color($prx-green-palette, default);
-}
-.paused {
-  color: mat-color($prx-yellow-palette, default-contrast);
-  background-color: mat-color($prx-yellow-palette, default);
-}
-.canceled {
-  color: mat-color($prx-red-palette, default-contrast);
-  background-color: mat-color($prx-red-palette, default);
-}
-.hold {
-  color: mat-color($prx-orange-palette, default-contrast);
-  background-color: mat-color($prx-orange-palette, default);
-}
-.sold {
-  color: mat-color($prx-aqua-palette, default-contrast);
-  background-color: mat-color($prx-aqua-palette, default);
 }

@@ -7,7 +7,7 @@ import { Flight } from '../../core';
 @Component({
   selector: 'grove-goal-form',
   template: `
-    <form [formGroup]="goalForm" ngNativeValidate>
+    <form class="goal-form" [formGroup]="goalForm" ngNativeValidate>
       <mat-form-field appearance="outline">
         <mat-label>Total Goal</mat-label>
         <input type="number" matInput placeholder="Total Goal" formControlName="totalGoal" required />
@@ -18,6 +18,7 @@ import { Flight } from '../../core';
       </mat-form-field>
     </form>
   `,
+  styleUrls: ['goal-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GoalFormComponent implements OnInit, OnDestroy {

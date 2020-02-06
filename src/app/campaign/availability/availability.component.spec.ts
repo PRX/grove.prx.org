@@ -3,7 +3,7 @@ import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatFormFieldModule, MatInputModule } from '@angular/material';
+import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
 import { GoalFormComponent } from './goal-form.component';
@@ -15,7 +15,7 @@ describe('AvailabilityComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule],
       declarations: [AvailabilityComponent, GoalFormComponent]
     })
       .compileComponents()
