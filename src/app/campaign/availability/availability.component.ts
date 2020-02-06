@@ -10,8 +10,8 @@ import { Flight, Availability, InventoryZone } from '../../core';
     </p>
     <ng-template #inventory>
       <grove-goal-form [flight]="flight" [dailyMinimum]="dailyMinimum" (goalChange)="goalChange.emit($event)"></grove-goal-form>
-      <ul class="errors" *ngIf="hasErrors">
-        <li class="error" *ngFor="let error of errors"><mat-icon>priority_high</mat-icon> {{error}}</li>
+      <ul class="errors" *ngIf="errors as flightErrors">
+        <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{error}}</li>
       </ul>
       <mat-divider></mat-divider>
       <section *ngFor="let zone of availabilityZones">
@@ -104,11 +104,22 @@ export class AvailabilityComponent {
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
   zoneWeekHover = {};
-  hasErrors = false;
-  errors = [];
 
-  ngOnChanges() {
-    this.getFlightErrors();
+  get errors() {
+    const errors = [];
+
+    // Check for allocation preview error.
+    // TODO: Updated with discussed "nice_message" when available.
+    if (this.allocationPreviewError) {
+      errors.push(`Got error ${ this.allocationPreviewError.status } from allocation preview.`);
+    }
+
+    // Check for flight status message, which should only exist when there was an error.
+    if (this.flight.status_message) {
+      errors.push(this.flight.status_message);
+    }
+
+    return errors;
   }
 
   toggleZoneWeekExpanded(zone: string, date: string) {
@@ -124,23 +135,6 @@ export class AvailabilityComponent {
       this.flight &&
       (!this.flight.startAt || !this.flight.endAt || !this.flight.set_inventory_uri || !(this.flight.zones && this.flight.zones.length))
     );
-  }
-
-  getFlightErrors() {
-    this.hasErrors = false;
-    this.errors = [];
-
-    if (this.allocationPreviewError) {
-      this.errors.push(`Got error ${ this.allocationPreviewError.status } from allocation preview.`);
-    }
-
-    if (this.flight.status_message) {
-      this.errors.push(this.flight.status_message);
-    }
-
-    this.hasErrors = !!this.errors.length;
-
-    return this.errors;
   }
 
   getZoneName(zoneId: string): string {
