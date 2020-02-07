@@ -102,10 +102,11 @@ export class CampaignComponent implements OnInit, OnDestroy {
   createFlight() {
     this.campaignStoreService.campaignFirst$.subscribe(state => {
       const flightId = Date.now();
+      const date = new Date(flightId);
       const flight = {
         name: 'New Flight ' + (Object.keys(state.flights).length + 1),
-        startAt: new Date().toISOString(),
-        endAt: new Date().toISOString(),
+        startAt: new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toUTCString(),
+        endAt: new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1)).toUTCString(),
         totalGoal: null,
         zones: [],
         set_inventory_uri: null
