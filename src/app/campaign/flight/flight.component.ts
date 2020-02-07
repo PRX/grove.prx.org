@@ -84,28 +84,39 @@ export class FlightComponent implements OnInit {
     });
   }
 
+  // emits updates when reactive form fields change
   formStatusChanged(flight?: Flight) {
-    // emit dates as UTC midnight
-    const startAtDate = new Date(flight.startAt);
-    const startAt = new Date(Date.UTC(startAtDate.getUTCFullYear(), startAtDate.getUTCMonth(), startAtDate.getUTCDate())).toUTCString();
-    const endAtDate = new Date(flight.endAt);
-    const endAt = new Date(Date.UTC(endAtDate.getUTCFullYear(), endAtDate.getUTCMonth(), endAtDate.getUTCDate())).toUTCString();
     this.flightUpdate.emit({
-      flight: { ...flight, startAt, endAt, totalGoal: this.flight.totalGoal },
+      flight: { ...flight, totalGoal: this.flight.totalGoal },
       changed: this.flightForm.dirty,
       valid: this.flightForm.valid
     });
   }
 
-  updateFlightForm(flight: Flight) {
-    const startAtDate = new Date(flight.startAt);
-    const startAt = new Date(Date.UTC(startAtDate.getUTCFullYear(), startAtDate.getUTCMonth(), startAtDate.getUTCDate()));
-    const endAtDate = new Date(flight.endAt);
-    const endAt = new Date(Date.UTC(endAtDate.getUTCFullYear(), endAtDate.getUTCMonth(), endAtDate.getUTCDate()));
-    // set time to Timezone offset ahead of midnight UTC because the datepickers display in local timezone, which will be midnight locally
-    startAt.setMinutes(startAt.getMinutes() + startAt.getTimezoneOffset());
-    endAt.setMinutes(endAt.getMinutes() + endAt.getTimezoneOffset());
-    this.flightForm.reset({ ...flight, startAt, endAt }, { emitEvent: false });
+  get startAt() {
+    return this.flight && new Date(this.flight.startAt);
+  }
+
+  get endAt() {
+    return this.flight && new Date(this.flight.endAt);
+  }
+
+  onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
+    this.flightUpdate.emit({
+      flight: {
+        ...this.flight,
+        ...(startAt && { startAt: startAt.toUTCString() }),
+        ...(endAt && { endAt: endAt.toUTCString() }),
+        totalGoal: this.flight.totalGoal
+      },
+      changed: true,
+      valid: this.flightForm.valid
+    });
+  }
+
+  // updates the form from @Input() set flight
+  updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
+    this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
   }
 
   onFlightDuplicate() {

@@ -1,3 +1,6 @@
+@import '~src/sass/colors';
+@import '~@angular/material/theming';
+
 mat-card {
   min-height: 400px;
   border-radius: 0;
@@ -25,8 +28,14 @@ mat-card form > * {
 .flight-dates {
   display: flex;
 }
-.flight-dates > mat-form-field {
+.flight-dates > prx-datepicker {
   flex: 1;
+  margin-bottom: 20px;
+  ::ng-deep input {
+    width: 100%;
+    color: mat-color($prx-gray, 900);
+    border-radius: 5px;
+  }
   &:first-child {
     margin-right: 20px;
   }

@@ -1,18 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {
-  MatCardModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatSelectModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
-  MatButtonModule,
-  MatIconModule
-} from '@angular/material';
+import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
 import { Flight } from '../../core';
+import { DatepickerModule } from 'ngx-prx-styleguide';
 
 describe('FlightComponent', () => {
   let component: FlightComponent;
@@ -28,8 +20,7 @@ describe('FlightComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
+        DatepickerModule,
         MatButtonModule,
         MatIconModule
       ],
@@ -40,9 +31,7 @@ describe('FlightComponent', () => {
   beforeEach(() => {
     const today = new Date();
     const startAt = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const endAt = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 1));
-    startAt.setMinutes(today.getTimezoneOffset());
-    endAt.setMinutes(today.getTimezoneOffset());
+    const endAt = new Date(Date.UTC(today.getFullYear(), today.getMonth() + 1, today.getDate()));
     flightFixture = {
       name: 'my-flight',
       startAt: startAt.toUTCString(),
@@ -73,18 +62,6 @@ describe('FlightComponent', () => {
       done();
     });
     component.name.setValue('brand new name');
-  });
-
-  it('emits form changes dates at midnight UTC', done => {
-    component.flight = flightFixture;
-    component.flightUpdate.subscribe(updates => {
-      const startAt = new Date(flightFixture.startAt);
-      expect(updates).toMatchObject({
-        flight: { startAt: new Date(Date.UTC(startAt.getFullYear(), startAt.getMonth(), startAt.getDate())).toUTCString() }
-      });
-      done();
-    });
-    component.flightForm.get('startAt').setValue(flightFixture.startAt);
   });
 
   it('preserves totalGoal when emitting form changes', done => {
