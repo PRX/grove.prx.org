@@ -185,13 +185,6 @@
   resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-7.2.15.tgz#b2ba33e472dc5e530047c408ff7a35deba4427b8"
   integrity sha512-Ig5Jr7mnDelaZvSbUd9YhI5am3q1ku9xelAuwvtyDKvQJeKQj3BtTagcOgWrnQBfrJ/FsA/M5Zo48ncSsV0tqQ==
 
-"@angular/material-moment-adapter@^7.3.7":
-  version "7.3.7"
-  resolved "https://registry.yarnpkg.com/@angular/material-moment-adapter/-/material-moment-adapter-7.3.7.tgz#8ad991a1035764fffc5a433dc4038e2ea8c93104"
-  integrity sha512-Nb8hZkF6zcni7Jb+FXcTKKmbp8PhhFAhJSkch9FnKcFs1Py+sCNTLIH/cI53nPrTglkJwlVLwMW7fxj4w9I1CQ==
-  dependencies:
-    tslib "^1.7.1"
-
 "@angular/material@~7.3.7":
   version "7.3.7"
   resolved "https://registry.yarnpkg.com/@angular/material/-/material-7.3.7.tgz#dcd95e6618ba6254c5880efee1aad349cf5b9140"
@@ -6017,10 +6010,10 @@ ng2-dragula@^1.3.1:
   dependencies:
     dragula "^3.7.2"
 
-ngx-prx-styleguide@2.19.1:
-  version "2.19.1"
-  resolved "https://registry.yarnpkg.com/ngx-prx-styleguide/-/ngx-prx-styleguide-2.19.1.tgz#d2697a8f5a961b62fd8b02987e80b1d1e86d6912"
-  integrity sha512-oYLAHXvFefN2nsWKo7CnV+OLd/RHYaUnFdGJBKYjJjNI1sxAeap8B1DcKPt8UdQP4vvsuZ8oCZe7Sej6e0Xj7A==
+ngx-prx-styleguide@2.20.0:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/ngx-prx-styleguide/-/ngx-prx-styleguide-2.20.0.tgz#1ca913efdf7e79b91416e58a39da536884ee23a3"
+  integrity sha512-s0xBAsw98zy6ZjC5qX1EMRhjAec/pGj+I3PI5HTjlplul5QXzTTDz7/qbdlwQSiiaeyflxAYugKD9IlwPza+1Q==
   dependencies:
     "@ng-select/ng-select" "^2.15.3"
     c3 "^0.4.11"
