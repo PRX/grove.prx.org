@@ -97,6 +97,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     } /*
     else {
       TODO: what to do about an invalid flight id and how to tell if a flight doesn't exist or hasn't yet been loaded into state
+      TODO: I think when I removed this, it broke the browser refresh on a new flight form, just shows loading spinner
     }*/
   }
 
@@ -112,6 +113,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         filter((flightState: FlightState) => {
           // determine if the availability fields are present and have changed since the last update from form
           const { localFlight } = flightState;
+          const idMatch = flight.id === localFlight.id;
           // dates come back as Date but typed string on Flight
           const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
           const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
@@ -124,7 +126,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
               flightEndAtDate.valueOf() !== new Date(localFlight.endAt).valueOf() ||
               flight.set_inventory_uri !== localFlight.set_inventory_uri ||
               !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
-          return dateRangeValid && availabilityParamsChanged;
+          return idMatch && dateRangeValid && availabilityParamsChanged;
         }),
         first()
       )
