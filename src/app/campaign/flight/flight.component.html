@@ -5,18 +5,8 @@
       <input matInput placeholder="Flight Name" formControlName="name" required />
     </mat-form-field>
     <div class="flight-dates">
-      <mat-form-field appearance="outline">
-        <mat-label>Actual Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" placeholder="Actual Start date" formControlName="startAt" />
-        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-        <mat-datepicker #startPicker></mat-datepicker>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Actual End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" placeholder="Actual End date" formControlName="endAt" />
-        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-        <mat-datepicker #endPicker></mat-datepicker>
-      </mat-form-field>
+      <prx-datepicker [date]="startAt" [maxDate]="endAt" UTC="true" (dateChange)="onDateRangeChange({ startAt: $event })"></prx-datepicker>
+      <prx-datepicker [date]="endAt" [minDate]="startAt" UTC="true" (dateChange)="onDateRangeChange({ endAt: $event })"></prx-datepicker>
     </div>
     <mat-form-field appearance="outline">
       <mat-label>Series</mat-label>

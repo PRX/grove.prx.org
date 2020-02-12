@@ -10,11 +10,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
+import { StatusBarModule, FancyFormModule, DatepickerModule } from 'ngx-prx-styleguide';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -28,13 +26,12 @@ import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
     MatSelectModule,
     MatSidenavModule,
     MatListModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatProgressSpinnerModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,
     FancyFormModule,
+    DatepickerModule,
     campaignRouting
   ]
 })
