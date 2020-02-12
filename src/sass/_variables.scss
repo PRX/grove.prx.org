@@ -66,7 +66,7 @@ $warn-contrast: mat-color($prx-warn, default-contrast);
   //    slider-off-active
   $foreground: map-get($theme, foreground);
 
-  @return (
+  @return map-merge($theme, (
     background: map-merge($background, (
       app-area: mat-color($background, card),
       tab: mat-color($background, hover),
@@ -80,19 +80,19 @@ $warn-contrast: mat-color($prx-warn, default-contrast);
       selected-tab: $primary,
       link: $primary
     ))
-  )
+  ));
 };
 
 // Helper function to simplify getting theme background values.
-@function prx-theme-background($prop) {
+@function prx-theme-background($prop, $opacity: null) {
   $background: map-get(prx-theme(), background);
 
-  @return map-get($background, $prop);
+  @return mat-color($background, $prop, $opacity);
 };
 
 // Helper function to simplify getting theme forground values.
-@function prx-theme-foreground($prop) {
+@function prx-theme-foreground($prop, $opacity: null) {
   $foreground: map-get(prx-theme(), foreground);
 
-  @return map-get($foreground, $prop);
+  @return mat-color($foreground, $prop, $opacity);
 };
