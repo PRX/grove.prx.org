@@ -4,15 +4,14 @@ mat-card {
   border-radius: 0;
 }
 
-mat-card form > * {
-  max-width: 600px;
-  width: 100%;
+mat-card form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(auto, 600px));
+  grid-column-gap: 0.5rem;
 }
 
-.mat-select-value,
-.mat-input-element {
+.campaign-form-field {
   font-size: 1rem;
-  color: #555;
 }
 
 .mat-form-field-wrapper {

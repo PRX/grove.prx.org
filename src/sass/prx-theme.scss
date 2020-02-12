@@ -2,6 +2,4 @@
 
 @include mat-core();
 
-$prx: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
-
-@include angular-material-theme($prx);
+@include angular-material-theme($prx-theme);

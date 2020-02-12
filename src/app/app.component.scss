@@ -1,7 +1,14 @@
+@import '~src/sass/variables';
+
 prx-header {
   max-width: 100%;
 }
 
 prx-header a {
   color: #FFFFFF;
+}
+
+main {
+  padding-bottom: 0;
+  background-color: prx-theme-background(app-bar);
 }

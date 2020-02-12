@@ -7,7 +7,7 @@ mat-drawer-content {
 mat-drawer {
   min-width: 250px;
   max-width: 400px;
-  background: #f0f0f0;
+  background: prx-theme-background(app-bar);
   border-right: none;
 }
 
@@ -16,8 +16,8 @@ mat-drawer {
 
   .mat-list-item {
     transition: border-left 100ms ease-out 0ms;
-    background: #ddd;
-    color: $primary;
+    background: prx-theme-background(tab);
+    color: prx-theme-foreground(tab);
     font-weight: 700;
     margin: 0 0 2px;
     border-left: 0 solid $primary;
@@ -29,8 +29,8 @@ mat-drawer {
     }
 
     &.active-link {
-      background: #fff;
-      color: $primary;
+      background: prx-theme-background(selected-tab);
+      color: prx-theme-foreground(selected-tab);
     }
 
     &.changed {
@@ -61,10 +61,10 @@ mat-drawer {
   align-items: center;
   margin: 0.5rem;
   padding: 0.5rem;
-  border: 1px dashed mat-color($prx-gray, 300);
+  border: 1px dashed prx-theme-foreground(divider);
   text-align: center;
 
   &:hover {
-    background-color: mat-color($prx-gray, 100);
+    background-color: prx-theme-background(selected-tab);
   }
 }

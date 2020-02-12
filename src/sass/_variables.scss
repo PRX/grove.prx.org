@@ -10,7 +10,10 @@ $prx-accent: mat-palette($prx-orange, 500, 200, 800);
 $prx-success: mat-palette($prx-green);
 $prx-warn: mat-palette($prx-red);
 
+$prx-theme: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
+
 // Define color variables.
+//// Theme colors
 $primary: mat-color($prx-primary);
 $primary-contrast: mat-color($prx-primary, default-contrast);
 $neutral: mat-color($prx-neutral);
@@ -21,3 +24,75 @@ $success: mat-color($prx-success);
 $success-contrast: mat-color($prx-success, default-contrast);
 $warn: mat-color($prx-warn);
 $warn-contrast: mat-color($prx-warn, default-contrast);
+
+//// Define theme functions.
+
+// Theme function to merge a few of our own theme props to Material's theme.
+//
+// See node_modules/@angular/material/_theming.scss for prop values provided
+// on background and foreground maps by default.
+@function prx-theme($theme: $prx-theme) {
+  // Default background props:
+  //    status-bar
+  //    app-bar
+  //    background
+  //    hover
+  //    card
+  //    dialog
+  //    disabled-button
+  //    raised-button
+  //    focused-button
+  //    selected-button
+  //    selected-disabled-button
+  //    disabled-button-toggle
+  //    unselected-chip
+  //    disabled-list-option
+  $background: map-get($theme, background);
+  // Default foreground props:
+  //    base
+  //    divider
+  //    dividers
+  //    disabled
+  //    disabled-button
+  //    disabled-text
+  //    elevation
+  //    hint-text
+  //    secondary-text
+  //    icon
+  //    icons
+  //    text
+  //    slider-min
+  //    slider-off
+  //    slider-off-active
+  $foreground: map-get($theme, foreground);
+
+  @return (
+    background: map-merge($background, (
+      app-area: mat-color($background, card),
+      tab: mat-color($background, hover),
+      selected-tab: mat-color($background, card),
+      table-header: mat-color($background, status-bar),
+      table-row: mat-color($background, card),
+      table-row-stripe: mat-color($background, app-bar)
+    )),
+    foreground: map-merge($foreground, (
+      tab: $primary,
+      selected-tab: $primary,
+      link: $primary
+    ))
+  )
+};
+
+// Helper function to simplify getting theme background values.
+@function prx-theme-background($prop) {
+  $background: map-get(prx-theme(), background);
+
+  @return map-get($background, $prop);
+};
+
+// Helper function to simplify getting theme forground values.
+@function prx-theme-foreground($prop) {
+  $foreground: map-get(prx-theme(), foreground);
+
+  @return map-get($foreground, $prop);
+};

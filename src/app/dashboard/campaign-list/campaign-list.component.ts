@@ -27,6 +27,7 @@ import { Campaign, DashboardService, DashboardParams } from '../dashboard.servic
         </ul>
         <hr />
         <prx-paging
+          class="paging"
           [currentPage]="currentPage$ | async"
           [totalPages]="totalPer | campaignListTotalPages"
           (showPage)="routeToParams({ page: $event })"

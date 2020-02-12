@@ -3,22 +3,22 @@
 :host {
   margin: 20px 10px 20px 20px;
 }
-h2,
-h3 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
 section {
   margin: 20px 0;
+}
+.title {
+  color: prx-theme-foreground(text);
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 .row {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid prx-theme-foreground(divider);
   white-space: nowrap;
 }
 .row.head {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid prx-theme-foreground(divider);
 }
 .row:not(.expand),
 .row.head {
