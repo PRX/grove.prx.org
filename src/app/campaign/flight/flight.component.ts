@@ -84,6 +84,7 @@ export class FlightComponent implements OnInit {
     });
   }
 
+  // emits updates when reactive form fields change
   formStatusChanged(flight?: Flight) {
     this.flightUpdate.emit({
       flight: { ...flight, totalGoal: this.flight.totalGoal },
@@ -92,6 +93,28 @@ export class FlightComponent implements OnInit {
     });
   }
 
+  get startAt() {
+    return this.flight && new Date(this.flight.startAt);
+  }
+
+  get endAt() {
+    return this.flight && new Date(this.flight.endAt);
+  }
+
+  onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
+    this.flightUpdate.emit({
+      flight: {
+        ...this.flight,
+        ...(startAt && { startAt: startAt.toUTCString() }),
+        ...(endAt && { endAt: endAt.toUTCString() }),
+        totalGoal: this.flight.totalGoal
+      },
+      changed: true,
+      valid: this.flightForm.valid
+    });
+  }
+
+  // updates the form from @Input() set flight
   updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
     this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
   }

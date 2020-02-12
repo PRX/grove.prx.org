@@ -26,7 +26,7 @@
     "@angular/router": "~7.2.0",
     "angulartics2": "^7.5.2",
     "core-js": "^2.5.4",
-    "ngx-prx-styleguide": "2.19.1",
+    "ngx-prx-styleguide": "2.20.0",
     "prx-ng-serve": "^1.1.0",
     "rxjs": "~6.3.3",
     "tslib": "^1.9.0",
