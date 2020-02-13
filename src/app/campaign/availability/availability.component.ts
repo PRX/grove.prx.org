@@ -30,16 +30,8 @@ import { Flight, Availability, InventoryZone, AvailabilityAllocation } from '../
             [class.expanded]="isZoneWeekExpanded(zone, week)"
           >
             <div class="expand">
-              <button
-                class="btn-link"
-                (click)="toggleZoneWeekExpanded(zone, week)"
-              >
-                <prx-icon
-                  class="icon"
-                  name="arrows-alt-v"
-                  size="1rem"
-                  color="primary"
-                ></prx-icon>
+              <button class="btn-link" (click)="toggleZoneWeekExpanded(zone, week)">
+                <prx-icon class="icon" name="arrows-alt-v" size="1rem" color="primary"></prx-icon>
               </button>
             </div>
             <div class="date">
@@ -56,17 +48,13 @@ import { Flight, Availability, InventoryZone, AvailabilityAllocation } from '../
             </div>
             <div class="days-wrapper">
               <div class="days" [cssProps]="{ '--num-days': getDaysForWeek(week) }">
-                <div
-                  class="row day"
-                  [class.row-highlight]="allocationPreviewExceedsAvailable(day)"
-                  *ngFor="let day of week.groups"
-                >
+                <div class="row day" [class.row-highlight]="allocationPreviewExceedsAvailable(day)" *ngFor="let day of week.groups">
                   <div class="expand"></div>
                   <div class="date">
                     <span>{{ day.startDate | date: 'M/dd' }}</span>
                   </div>
                   <div class="avail">
-                    <span>{{ getAvailable(day)| largeNumber }}</span>
+                    <span>{{ getAvailable(day) | largeNumber }}</span>
                   </div>
                   <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(day)">
                     <span>{{ getAllocationValue(day) | largeNumber }}</span>
@@ -101,7 +89,6 @@ export class AvailabilityComponent {
   @Input() dailyMinimum: number;
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
-  zoneWeekHover = {};
 
   get errors() {
     const errors = [];
@@ -136,13 +123,12 @@ export class AvailabilityComponent {
 
   cantShowInventory() {
     return (
-      this.flight &&
-      (!this.flight.startAt || !this.flight.endAt || !this.flight.set_inventory_uri || !(this.flight.zones && this.flight.zones.length))
+      !this.flight || !this.flight.startAt || !this.flight.endAt || !this.flight.set_inventory_uri || !(this.flight.zones && this.flight.zones.length)
     );
   }
 
-  hasAllocationPrevieweAfterChange({ allocationPreview }: AvailabilityAllocation) {
-    return this.changed && allocationPreview >= 0;
+  hasAllocationPrevieweAfterChange({ allocationPreview }: AvailabilityAllocation): boolean {
+    return !!this.changed && allocationPreview >= 0;
   }
 
   getAllocationValue(period: AvailabilityAllocation): number {

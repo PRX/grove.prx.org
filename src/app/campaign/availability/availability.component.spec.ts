@@ -7,13 +7,14 @@ import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } f
 import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
 import { GoalFormComponent } from './goal-form.component';
+import { Flight, InventoryZone, Availability } from '../../core';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
   let fix: ComponentFixture<AvailabilityComponent>;
   let de: DebugElement;
 
-  const mockZone = {
+  const mockAvailabilityZone = {
     zone: 'pre_1',
     totals: {
       startDate: '2019-10-01',
@@ -27,10 +28,32 @@ describe('AvailabilityComponent', () => {
       ]
     }
   };
+  const mockFlight = {
+    id: 9,
+    name: 'my flight name',
+    startAt: '2019-10-01',
+    endAt: '2019-11-01',
+    totalGoal: 999,
+    zones: ['pre_1'],
+    set_inventory_uri: '/some/inventory'
+  };
+  const mockZones = [{ id: 'pre_1', label: 'Preroll 1' }];
+  const mockAvailabilityZones = [mockAvailabilityZone];
+
+  const zone = mockAvailabilityZone;
+  const week = mockAvailabilityZone.totals.groups[0];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule],
+      imports: [
+        SharedModule,
+        NoopAnimationsModule,
+        ReactiveFormsModule,
+        MatDividerModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule
+      ],
       declarations: [AvailabilityComponent, GoalFormComponent]
     })
       .compileComponents()
@@ -38,17 +61,9 @@ describe('AvailabilityComponent', () => {
         fix = TestBed.createComponent(AvailabilityComponent);
         comp = fix.componentInstance;
         de = fix.debugElement;
-        comp.flight = {
-          id: 9,
-          name: 'my flight name',
-          startAt: '2019-10-01',
-          endAt: '2019-11-01',
-          totalGoal: 999,
-          zones: ['pre_1'],
-          set_inventory_uri: '/some/inventory'
-        };
-        comp.zones = [{ id: 'pre_1', label: 'Preroll 1' }];
-        comp.availabilityZones = [mockZone];
+        comp.flight = mockFlight;
+        comp.zones = mockZones;
+        comp.availabilityZones = mockAvailabilityZones;
         fix.detectChanges();
       });
   }));
@@ -58,17 +73,87 @@ describe('AvailabilityComponent', () => {
   });
 
   it('should return zone week key name', () => {
-    expect(comp.getZoneWeekKey(mockZone, mockZone.totals.groups[0])).toEqual('pre_1-2019-10-01');
+    expect(comp.getZoneWeekKey(zone, week)).toEqual('pre_1-2019-10-01');
   });
 
   it('toggles week expanded', () => {
-    comp.toggleZoneWeekExpanded(mockZone, mockZone.totals.groups[0]);
+    expect(comp.zoneWeekExpanded['pre_1-2019-10-01']).toBeFalsy();
+    comp.toggleZoneWeekExpanded(zone, week);
     expect(comp.zoneWeekExpanded['pre_1-2019-10-01']).toBeTruthy();
+  });
+
+  it('should check zone week expanded status', () => {
+    expect(comp.isZoneWeekExpanded(zone, week)).toBeFalsy();
+    comp.toggleZoneWeekExpanded(zone, week);
+    expect(comp.isZoneWeekExpanded(zone, week)).toBeTruthy();
+  });
+
+  it('should be truthy when flight data is incomplete or missing', () => {
+    expect(comp.cantShowInventory()).toBeFalsy();
+
+    comp.flight = null;
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...mockFlight,
+      startAt: null
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...mockFlight,
+      endAt: null
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...mockFlight,
+      set_inventory_uri: null
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...mockFlight,
+      zones: null
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...mockFlight,
+      zones: []
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
   });
 
   it('highlights rows where more allocated than available', () => {
     const row = de.query(By.css('.row-highlight'));
     expect(row).toBeDefined();
     expect(row.nativeElement.textContent).toContain('10/01');
+  });
+
+  it('should return truthy when preview allocations exist after change', () => {
+    expect(comp.hasAllocationPrevieweAfterChange(week)).toBeFalsy();
+    comp.changed = true;
+    expect(comp.hasAllocationPrevieweAfterChange(week)).toBeTruthy();
+  });
+
+  it('should return correct allocation value', () => {
+    expect(comp.getAllocationValue(week)).toEqual(1);
+    comp.changed = true;
+    expect(comp.getAllocationValue(week)).toEqual(3);
+  });
+
+  it('should return number of zone groups or zero', () => {
+    expect(comp.getDaysForWeek(week)).toEqual(0)
+    expect(comp.getDaysForWeek({ ...week, groups: [week] })).toEqual(1)
+  });
+
+  it('should return combined value of allocated and availability', () => {
+    expect(comp.getAvailable(week)).toEqual(2);
+  });
+
+  it('should return truthy when preview exceeds availabile', () => {
+    expect(comp.allocationPreviewExceedsAvailable(week)).toBeTruthy();
+    expect(comp.allocationPreviewExceedsAvailable({ ...week, allocated: 9 })).toBeFalsy();
   });
 });
