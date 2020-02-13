@@ -1,5 +1,10 @@
 @import '~src/sass/variables';
 
+$row-line-height: 20px;
+$row-divider-height: 1px;
+$row-divider-border: $row-divider-height solid prx-theme-foreground(divider);
+$row-height: $row-line-height + $row-divider-height;
+
 :host {
   margin: 20px 10px 20px 20px;
 }
@@ -12,74 +17,130 @@ section {
   margin-bottom: 1rem;
 }
 .row {
-  display: flex;
+  transition: background-color 0.6s cubic-bezier(.25,.8,.25,1);
+  display: grid;
+  grid-template-columns: 2rem repeat(3, 1fr) 2rem;
+  grid-column-gap: 0.35rem;
+  justify-content: space-around;
+  justify-items: stretch;
   align-items: center;
-  border-bottom: 1px solid prx-theme-foreground(divider);
+
   white-space: nowrap;
-}
-.row.head {
-  border-top: 1px solid prx-theme-foreground(divider);
-}
-.row:not(.expand),
-.row.head {
-  line-height: 28px;
-}
-.row.head > * {
-  text-align: center;
-  font-weight: bold;
-}
-.row > * {
-  margin-left: 5%;
-  margin-right: 5%;
-}
-.row.expand > * {
-  margin-right: 2%;
-  display: flex;
-  justify-content: space-between;
-}
-.row.expand > * > span:first-child {
-  flex-basis: calc(100% / 3);
-}
-.row.totals > * {
-  font-weight: 700;
-  font-style: italic;
-}
-.date {
-  flex-basis: 20%;
+
   text-align: right;
+  line-height: $row-line-height;
+
+  & + & {
+    border-top: $row-divider-border;
+  }
+
+  &.head {
+    background-color: prx-theme-background(table-header);
+
+    line-height: 28px;
+
+    & > * {
+      font-weight: bold;
+    }
+  }
+
+  &.week {
+    line-height: 28px;
+  }
+
+  &.totals {
+    & > * {
+      font-weight: 700;
+      font-style: italic;
+    }
+  }
+
+  &.expanded {
+    background-color: prx-theme-background(table-row-stripe);
+  }
 }
-.date button {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+
+.expand {
+  justify-self: center;
+  align-self: center;
+
+  .icon {
+    transition: opacity 0.6s cubic-bezier(.25,.8,.25,1);
+    opacity: 0.12;
+
+    ::ng-deep {
+      .wrapper {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  .expanded &, .row:hover & {
+    .icon {
+      opacity: 1;
+    }
+  }
 }
-.avail,
-.goal {
-  flex-basis: 30%;
-  text-align: right;
-}
+
 .edit {
-  flex-basis: 20%;
-  text-align: center;
+  justify-self: center;
+  align-self: center;
 }
-prx-icon.hide {
-  visibility: hidden;
+
+.date {
+  justify-self: start;
 }
+
+.days-wrapper {
+  --num-days: 0;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: stretch;
+}
+
+.days {
+  transition: height calc(var(--num-days) * 0.1s) cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  height: 0;
+  overflow: hidden;
+
+  background-color: prx-theme-background(table-row-stripe);
+  border-top: $row-divider-border;
+
+  .expand {
+    justify-self: stretch;
+    align-self: stretch;
+    background-color: prx-theme-foreground(divider);
+  }
+
+  .expanded & {
+    height: auto; // Fallback for IE 11. Won't be animated.
+    height: calc(var(--num-days) * #{$row-height});
+    min-height: 0;
+  }
+}
+
 .row-highlight,
 .errors {
   color: $warn;
 }
+
 .errors {
   display: grid;
   grid-row-gap: 0.5rem;
   margin: 0 2rem 1rem 0;
   font-style: italic;
 }
+
 .error {
   display: flex;
   align-items: center;
 }
+
 .preview {
   color: $success;
+
+  &::after {
+    content: '*';
+  }
 }

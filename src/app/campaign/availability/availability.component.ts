@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, SimpleChange } from '@angular/core';
-import { Flight, Availability, InventoryZone } from '../../core';
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Flight, Availability, InventoryZone, AvailabilityAllocation } from '../../core';
 
 @Component({
   selector: 'grove-availability',
@@ -11,80 +11,78 @@ import { Flight, Availability, InventoryZone } from '../../core';
     <ng-template #inventory>
       <grove-goal-form [flight]="flight" [dailyMinimum]="dailyMinimum" (goalChange)="goalChange.emit($event)"></grove-goal-form>
       <ul class="errors" *ngIf="errors as flightErrors">
-        <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{error}}</li>
+        <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{ error }}</li>
       </ul>
       <mat-divider></mat-divider>
       <section *ngFor="let zone of availabilityZones">
         <h3 class="title">{{ getZoneName(zone.zone) }}</h3>
         <div class="row head">
+          <div class="expand"></div>
           <div class="date">Week</div>
           <div class="avail">Available</div>
           <div class="goal">Goal</div>
           <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
         </div>
         <ng-container *ngFor="let week of zone.totals.groups">
-          <div class="row" [class.row-highlight]="week.allocated + week.availability < week.allocationPreview">
-            <div class="date">
+          <div
+            class="row week"
+            [class.row-highlight]="allocationPreviewExceedsAvailable(week)"
+            [class.expanded]="isZoneWeekExpanded(zone, week)"
+          >
+            <div class="expand">
               <button
                 class="btn-link"
-                (click)="toggleZoneWeekExpanded(zone.zone, week.startDate)"
-                (mouseover)="toggleZoneWeekHover(zone.zone, week.startDate)"
-                (mouseleave)="toggleZoneWeekHover(zone.zone, week.startDate)"
+                (click)="toggleZoneWeekExpanded(zone, week)"
               >
                 <prx-icon
-                  [class.hide]="!(zoneWeekHover[zone.zone + '-' + week.startDate] || zoneWeekExpanded[zone.zone + '-' + week.startDate])"
+                  class="icon"
                   name="arrows-alt-v"
-                  size="6px"
+                  size="1rem"
                   color="primary"
-                >
-                </prx-icon>
-                {{ week.startDate | date: 'M/dd' }}
+                ></prx-icon>
               </button>
             </div>
-            <div class="avail">{{ week.allocated + week.availability | largeNumber }}</div>
-            <div class="goal" [class.preview]="changed && week.allocationPreview >= 0">
-              {{ changed && week.allocationPreview >= 0 ? (week.allocationPreview | largeNumber) : (week.allocated | largeNumber) }}
-              <span *ngIf="changed && week.allocationPreview >= 0">*</span>
+            <div class="date">
+              {{ week.startDate | date: 'M/dd' }}
+            </div>
+            <div class="avail">{{ getAvailable(week) | largeNumber }}</div>
+            <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(week)">
+              {{ getAllocationValue(week) | largeNumber }}
             </div>
             <div class="edit">
               <button class="btn-link" aria-label="Edit">
                 <prx-icon name="pencil" size="14px" color="primary"></prx-icon>
               </button>
             </div>
-          </div>
-          <ng-container *ngIf="zoneWeekExpanded[zone.zone + '-' + week.startDate]">
-            <div
-              class="row expand"
-              [class.row-highlight]="day.allocated + day.availability < day.allocationPreview"
-              *ngFor="let day of week.groups"
-            >
-              <div class="date">
-                <span>&mdash;</span><span>{{ day.startDate | date: 'M/dd' }}</span>
+            <div class="days-wrapper">
+              <div class="days" [cssProps]="{ '--num-days': getDaysForWeek(week) }">
+                <div
+                  class="row day"
+                  [class.row-highlight]="allocationPreviewExceedsAvailable(day)"
+                  *ngFor="let day of week.groups"
+                >
+                  <div class="expand"></div>
+                  <div class="date">
+                    <span>{{ day.startDate | date: 'M/dd' }}</span>
+                  </div>
+                  <div class="avail">
+                    <span>{{ getAvailable(day)| largeNumber }}</span>
+                  </div>
+                  <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(day)">
+                    <span>{{ getAllocationValue(day) | largeNumber }}</span>
+                  </div>
+                  <div class="edit"></div>
+                </div>
               </div>
-              <div class="avail">
-                <span>&mdash;</span><span>{{ day.allocated + day.availability | largeNumber }}</span>
-              </div>
-              <div class="goal" [class.preview]="changed && day.allocationPreview >= 0">
-                <span>&mdash;</span>
-                <span>
-                  {{ changed && day.allocationPreview >= 0 ? (day.allocationPreview | largeNumber) : (day.allocated | largeNumber) }}
-                  <span *ngIf="changed && day.allocationPreview >= 0">*</span>
-                </span>
-              </div>
-              <div class="edit"></div>
             </div>
-          </ng-container>
+          </div>
         </ng-container>
-        <div class="row totals" [class.row-highlight]="zone.totals.allocated + zone.totals.availability < zone.totals.allocationPreview">
+        <div class="row totals" [class.row-highlight]="allocationPreviewExceedsAvailable(zone.totals)">
+          <div class="expand"></div>
           <div class="date">TOTALS</div>
-          <div class="avail">{{ zone.totals.allocated + zone.totals.availability | largeNumber }}</div>
-          <div class="goal" [class.preview]="changed && zone.totals.allocationPreview >= 0">
-            {{
-              changed && zone.totals.allocationPreview >= 0
-                ? (zone.totals.allocationPreview | largeNumber)
-                : (zone.totals.allocated | largeNumber)
-            }}
-            <span *ngIf="changed && zone.totals.allocationPreview >= 0">*</span>
+          <div class="avail">{{ getAvailable(zone.totals) | largeNumber }}</div>
+          <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(zone.totals)">
+            {{ getAllocationValue(zone.totals) | largeNumber }}
           </div>
           <div class="edit"></div>
         </div>
@@ -111,7 +109,7 @@ export class AvailabilityComponent {
     // Check for allocation preview error.
     // TODO: Updated with discussed "nice_message" when available.
     if (this.allocationPreviewError) {
-      errors.push(`Got error ${ this.allocationPreviewError.status } from allocation preview.`);
+      errors.push(`Got error ${this.allocationPreviewError.status} from allocation preview.`);
     }
 
     // Check for flight status message, which should only exist when there was an error.
@@ -122,12 +120,18 @@ export class AvailabilityComponent {
     return errors;
   }
 
-  toggleZoneWeekExpanded(zone: string, date: string) {
-    this.zoneWeekExpanded[`${zone}-${date}`] = !this.zoneWeekExpanded[`${zone}-${date}`];
+  getZoneWeekKey({ zone }: Availability, { startDate }: AvailabilityAllocation): string {
+    return `${zone}-${startDate}`;
   }
 
-  toggleZoneWeekHover(zone: string, date: string) {
-    this.zoneWeekHover[`${zone}-${date}`] = !this.zoneWeekHover[`${zone}-${date}`];
+  isZoneWeekExpanded(zone: Availability, week: AvailabilityAllocation): boolean {
+    const zoneWeekKey = this.getZoneWeekKey(zone, week);
+    return this.zoneWeekExpanded[zoneWeekKey];
+  }
+
+  toggleZoneWeekExpanded(zone: Availability, week: AvailabilityAllocation) {
+    const zoneWeekKey = this.getZoneWeekKey(zone, week);
+    this.zoneWeekExpanded[zoneWeekKey] = !this.zoneWeekExpanded[zoneWeekKey];
   }
 
   cantShowInventory() {
@@ -137,8 +141,30 @@ export class AvailabilityComponent {
     );
   }
 
+  hasAllocationPrevieweAfterChange({ allocationPreview }: AvailabilityAllocation) {
+    return this.changed && allocationPreview >= 0;
+  }
+
+  getAllocationValue(period: AvailabilityAllocation): number {
+    const { allocated, allocationPreview } = period;
+    return this.hasAllocationPrevieweAfterChange(period) ? allocationPreview : allocated;
+  }
+
+  getDaysForWeek({ groups }: AvailabilityAllocation): number {
+    return groups ? groups.length : 0;
+  }
+
   getZoneName(zoneId: string): string {
     const zone = this.zones && this.zones.find(z => z.id === zoneId);
     return zone && zone.label;
+  }
+
+  getAvailable({ allocated, availability }: AvailabilityAllocation): number {
+    return allocated + availability;
+  }
+
+  allocationPreviewExceedsAvailable(period: AvailabilityAllocation): boolean {
+    const { allocationPreview } = period;
+    return this.getAvailable(period) < allocationPreview;
   }
 }

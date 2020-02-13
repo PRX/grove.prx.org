@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import * as autocomplete from './autocomplete';
+import { CSSPropsDirective } from './css-props/css-props.directive'
 import { AuthGuard, DeactivateGuard, UnauthGuard,
   IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
 import { LargeNumberPipe } from './pipes/large-number.pipe';
@@ -13,6 +14,7 @@ import { LargeNumberPipe } from './pipes/large-number.pipe';
   declarations: [
     autocomplete.OptionsPipe,
     autocomplete.AutocompleteComponent,
+    CSSPropsDirective,
     LargeNumberPipe
   ],
   imports: [
@@ -30,7 +32,8 @@ import { LargeNumberPipe } from './pipes/large-number.pipe';
     SpinnerModule,
     ToastrModule,
     autocomplete.OptionsPipe,
-    autocomplete.AutocompleteComponent
+    autocomplete.AutocompleteComponent,
+    CSSPropsDirective
   ],
   providers: [
     AuthGuard,
