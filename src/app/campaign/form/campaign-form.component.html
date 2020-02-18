@@ -1,12 +1,13 @@
 <mat-card>
   <form [formGroup]="campaignForm" ngNativeValidate>
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Campaign Name</mat-label>
       <input matInput placeholder="Campaign Name" formControlName="name" required />
     </mat-form-field>
 
     <grove-autocomplete
       *ngIf="advertisers"
+      class="campaign-form-field"
       [formGroup]="campaignForm"
       controlName="set_advertiser_uri"
       label="Advertiser"
@@ -14,33 +15,33 @@
       (addOption)="onAddAdvertiser($event)">
     </grove-autocomplete>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Campaign Type</mat-label>
       <mat-select formControlName="type" required>
         <mat-option *ngFor="let type of typeOptions" [value]="type.value">{{ type.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Campaign Status</mat-label>
       <mat-select formControlName="status" required>
         <mat-option *ngFor="let status of statusOptions" [value]="status.value">{{ status.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Campaign Rep</mat-label>
       <input matInput placeholder="Campaign Rep" formControlName="repName" required />
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Owner</mat-label>
       <mat-select formControlName="set_account_uri" required>
         <mat-option *ngFor="let acct of accounts" [value]="acct.self_uri">{{ acct.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Notes</mat-label>
       <textarea matInput formControlName="notes" placeholder="Enter notes"></textarea>
     </mat-form-field>

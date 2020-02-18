@@ -1,8 +1,41 @@
+@import '~src/sass/variables';
+
 ul {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: 1fr;
   grid-gap: 20px;
+}
+
+grove-campaign-card {
+  height: 100%;
+}
+
+prx-paging {
+  display: block;
+  text-align: center;
+}
+
+.paging {
+  ::ng-deep {
+    .paging {
+      color: $primary;
+
+      &[disabled] {
+        color: prx-theme-foreground(disabled);
+      }
+
+      &.active {
+        color: prx-theme-foreground(text);
+      }
+    }
+  }
+}
+
+.count-of-total {
+  text-align: center;
+  color: prx-theme-foreground(text);
+  font-style: italic;
 }
 
 @media (min-width: 768px) {
@@ -15,15 +48,4 @@ ul {
   ul {
     grid-template-columns: repeat(4, 1fr);
   }
-}
-
-prx-paging {
-  display: block;
-  text-align: center;
-}
-
-.count-of-total {
-  text-align: center;
-  color: #676767;
-  font-style: italic;
 }

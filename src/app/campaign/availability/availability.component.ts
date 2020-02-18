@@ -4,7 +4,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
 @Component({
   selector: 'grove-availability',
   template: `
-    <h2>Impressions</h2>
+    <h2 class="title">Impressions</h2>
     <p *ngIf="cantShowInventory(); else inventory">
       Please select Start and End Dates, Series, and Zones to view inventory.
     </p>
@@ -15,7 +15,7 @@ import { Flight, Availability, InventoryZone } from '../../core';
       </ul>
       <mat-divider></mat-divider>
       <section *ngFor="let zone of availabilityZones">
-        <h3>{{ getZoneName(zone.zone) }}</h3>
+        <h3 class="title">{{ getZoneName(zone.zone) }}</h3>
         <div class="row head">
           <div class="date">Week</div>
           <div class="avail">Available</div>

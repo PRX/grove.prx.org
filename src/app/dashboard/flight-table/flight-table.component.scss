@@ -23,11 +23,11 @@ $cell-padding: $cell-padding-v $cell-padding-h;
 }
 
 .mat-table-sticky:first-child {
-  border-right: 1px solid mat-color($prx-gray, 300);
+  border-right: 1px solid prx-theme-foreground(divider);
 }
 
 .mat-header-cell {
-  background: mat-color($prx-gray, 300);
+  background: prx-theme-background(table-header);
   border: white;
   padding: $cell-padding;
   line-height: $row-height;
@@ -44,11 +44,11 @@ $cell-padding: $cell-padding-v $cell-padding-h;
 }
 
 .mat-row:nth-child(even) {
-  background-color: white;
+  background-color: prx-theme-background(table-row);
 }
 
 .mat-row:nth-child(odd) {
-  background-color: mat-color($prx-gray, 100);
+  background-color: prx-theme-background(table-row-stripe);
 }
 
 .mat-cell {
@@ -81,4 +81,9 @@ $cell-padding: $cell-padding-v $cell-padding-h;
     background-color: $warn;
     color: $warn-contrast;
   }
+}
+
+.paginator {
+  position: sticky;
+  left: 0;
 }

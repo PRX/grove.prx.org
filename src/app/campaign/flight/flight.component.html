@@ -1,20 +1,20 @@
 <mat-card>
   <form [formGroup]="flightForm" ngNativeValidate>
-    <mat-form-field appearance="outline">
+    <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Flight Name</mat-label>
       <input matInput placeholder="Flight Name" formControlName="name" required />
     </mat-form-field>
     <div class="flight-dates">
-      <prx-datepicker [date]="startAt" [maxDate]="endAt" UTC="true" (dateChange)="onDateRangeChange({ startAt: $event })"></prx-datepicker>
-      <prx-datepicker [date]="endAt" [minDate]="startAt" UTC="true" (dateChange)="onDateRangeChange({ endAt: $event })"></prx-datepicker>
+      <prx-datepicker class="flight-form-field" [date]="startAt" [maxDate]="endAt" UTC="true" (dateChange)="onDateRangeChange({ startAt: $event })"></prx-datepicker>
+      <prx-datepicker class="flight-form-field" [date]="endAt" [minDate]="startAt" UTC="true" (dateChange)="onDateRangeChange({ endAt: $event })"></prx-datepicker>
     </div>
-    <mat-form-field appearance="outline">
+    <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Series</mat-label>
       <mat-select formControlName="set_inventory_uri" required>
         <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Zones</mat-label>
       <mat-select formControlName="zones" multiple required>
         <mat-option *ngFor="let zone of zoneOptions" [value]="zone.id">{{ zone.label }}</mat-option>

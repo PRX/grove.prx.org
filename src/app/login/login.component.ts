@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  styleUrls: ['login.component.css'],
+  styleUrls: ['login.component.scss'],
   template: `
     <div class="login">
       <h1>Login</h1>

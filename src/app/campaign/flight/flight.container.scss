@@ -2,11 +2,6 @@
   display: grid;
   grid-template-columns: 2fr minmax(200px, 400px);
 }
-grove-flight {
-}
-grove-availability {
-  min-width: 200px;
-}
 
 .loading-form {
   display: flex;
