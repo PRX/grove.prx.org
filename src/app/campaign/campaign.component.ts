@@ -1,7 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, first, share } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import * as actions from './store/actions';
+import { selectLocalCampaign } from './store/selectors';
 import { CampaignStoreService, AdvertiserService, AccountService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 
@@ -61,6 +64,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     private router: Router,
     private toastr: ToastrService,
     public campaignStoreService: CampaignStoreService,
+    public store: Store<any>,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
@@ -77,19 +81,26 @@ export class CampaignComponent implements OnInit, OnDestroy {
       )
       .subscribe(({ params, advertisers, accounts }) => {
         this.campaignStoreService.load(params.get('id'));
+        if (params.get('id')) {
+          this.store.dispatch(new actions.CampaignLoad({ id: +params.get('id') }));
+        } else {
+          this.store.dispatch(new actions.CampaignNew());
+        }
       });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
       map(flightStates => {
-        return Object.keys(flightStates).map((id): LocalFlightState => {
-          return {
-            id,
-            name: flightStates[id].localFlight.name || '(Flight)',
-            softDeleted: !!flightStates[id].softDeleted,
-            changed: flightStates[id].changed,
-            valid: flightStates[id].valid,
-            statusOk: !flightStates[id].localFlight.status || flightStates[id].localFlight.status === 'ok'
-          };
-        });
+        return Object.keys(flightStates).map(
+          (id): LocalFlightState => {
+            return {
+              id,
+              name: flightStates[id].localFlight.name || '(Flight)',
+              softDeleted: !!flightStates[id].softDeleted,
+              changed: flightStates[id].changed,
+              valid: flightStates[id].valid,
+              statusOk: !flightStates[id].localFlight.status || flightStates[id].localFlight.status === 'ok'
+            };
+          }
+        );
       })
     );
   }
@@ -101,6 +112,10 @@ export class CampaignComponent implements OnInit, OnDestroy {
   }
 
   campaignSubmit() {
+    this.store
+      .pipe(select(selectLocalCampaign), first())
+      .subscribe(campaign => this.store.dispatch(new actions.CampaignFormSave({ campaign })));
+
     this.campaignSaving = true;
     this.campaignStoreService.storeCampaign().subscribe(([changes, deletedDocs]) => {
       this.toastr.success('Campaign saved');

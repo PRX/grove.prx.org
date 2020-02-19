@@ -15,10 +15,11 @@ import { CampaignModule } from './campaign/campaign.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { StoreModule } from '@ngrx/store';
-import { reducers, metaReducers } from './store/reducers';
-import { CustomRouterSerializer } from './store/router-store/custom-router-serializer';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { reducers, metaReducers } from './store/reducers';
+import { CustomRouterSerializer } from './store/router-store/custom-router-serializer';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -36,6 +37,7 @@ import { environment } from '../environments/environment';
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreModule.forRoot({ router: routerReducer }),
     StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+    EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
   providers: [{ provide: ErrorHandler, useClass: ErrorService }],
