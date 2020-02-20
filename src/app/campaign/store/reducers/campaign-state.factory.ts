@@ -24,7 +24,9 @@ export const createCampaignState = () => ({
   campaign: {
     localCampaign: campaignFixture,
     changed: false,
-    valid: true
+    valid: true,
+    loading: false,
+    saving: false
   }
 });
 

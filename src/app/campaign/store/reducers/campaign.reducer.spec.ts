@@ -18,7 +18,9 @@ describe('Campaign Reducer', () => {
       {
         localCampaign: campaign,
         changed: true,
-        valid: true
+        valid: true,
+        saving: false,
+        loading: false
       },
       new ACTIONS.CampaignNew()
     );
@@ -53,5 +55,17 @@ describe('Campaign Reducer', () => {
     expect(result.remoteCampaign).toMatchObject(campaign);
     expect(result.changed).toBe(false);
     expect(result.valid).toBe(true);
+    expect(result.loading).toBe(false);
+    expect(result.saving).toBe(false);
+  });
+
+  it('should set campaign from campaign form save success', () => {
+    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign }));
+    expect(result.localCampaign).toMatchObject(campaign);
+    expect(result.remoteCampaign).toMatchObject(campaign);
+    expect(result.changed).toBe(false);
+    expect(result.valid).toBe(true);
+    expect(result.loading).toBe(false);
+    expect(result.saving).toBe(false);
   });
 });

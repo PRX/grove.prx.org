@@ -17,6 +17,9 @@ export interface CampaignState {
   remoteCampaign?: Campaign;
   changed: boolean;
   valid: boolean;
+  loading: boolean;
+  saving: boolean;
+  error?: any;
 }
 
 export const initialState: CampaignState = {
@@ -30,7 +33,9 @@ export const initialState: CampaignState = {
     set_advertiser_uri: null
   },
   changed: false,
-  valid: false
+  valid: false,
+  loading: false,
+  saving: false
 };
 
 export function reducer(state = initialState, action: CampaignActions): CampaignState {
@@ -50,14 +55,43 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
         valid
       };
     }
-    case CampaignActionTypes.CAMPAIGN_LOAD_SUCCESS: {
+    case CampaignActionTypes.CAMPAIGN_LOAD: {
+      return {
+        ...state,
+        loading: true
+      };
+    }
+    case CampaignActionTypes.CAMPAIGN_FORM_SAVE: {
+      return {
+        ...state,
+        saving: true
+      };
+    }
+    case CampaignActionTypes.CAMPAIGN_LOAD_SUCCESS:
+    case CampaignActionTypes.CAMPAIGN_FORM_SAVE_SUCCESS: {
       const { campaign } = action.payload;
       return {
         ...state,
         localCampaign: campaign,
         remoteCampaign: campaign,
         changed: false,
-        valid: true
+        valid: true,
+        saving: false,
+        loading: false
+      };
+    }
+    case CampaignActionTypes.CAMPAIGN_LOAD_FAILURE: {
+      return {
+        ...state,
+        loading: false,
+        error: action.payload.error
+      };
+    }
+    case CampaignActionTypes.CAMPAIGN_FORM_SAVE_FAILURE: {
+      return {
+        ...state,
+        saving: false,
+        error: action.payload.error
       };
     }
     default:
