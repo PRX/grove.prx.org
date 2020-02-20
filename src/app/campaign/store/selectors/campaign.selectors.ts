@@ -6,3 +6,4 @@ export const selectCampaignStoreState = createFeatureSelector('campaignState');
 export const selectCampaign = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.campaign);
 
 export const selectLocalCampaign = createSelector(selectCampaign, (state: CampaignState) => state && state.localCampaign);
+export const selectCampaignDoc = createSelector(selectCampaign, (state: CampaignState) => state && state.doc);

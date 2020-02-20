@@ -1,3 +1,4 @@
+import { MockHalDoc } from 'ngx-prx-styleguide';
 import { reducer, initialState } from './campaign.reducer';
 import * as ACTIONS from '../actions';
 import { campaignFixture as campaign } from './campaign-state.factory';
@@ -50,7 +51,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign from campaign load success', () => {
-    const result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign }));
+    const result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign, doc: new MockHalDoc(campaign) }));
     expect(result.localCampaign).toMatchObject(campaign);
     expect(result.remoteCampaign).toMatchObject(campaign);
     expect(result.changed).toBe(false);
@@ -60,7 +61,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign from campaign form save success', () => {
-    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign }));
+    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign, doc: new MockHalDoc(campaign) }));
     expect(result.localCampaign).toMatchObject(campaign);
     expect(result.remoteCampaign).toMatchObject(campaign);
     expect(result.changed).toBe(false);

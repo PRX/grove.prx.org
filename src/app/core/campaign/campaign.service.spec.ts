@@ -1,3 +1,5 @@
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { CampaignService } from './campaign.service';
 import { Campaign, CampaignState, Flight, FlightState } from './campaign.models';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
@@ -18,10 +20,10 @@ describe('CampaignService', () => {
   let flightFixture: Flight;
   let campaignStateFixture: CampaignState;
   let flightStateFixture: FlightState;
+  let store: Store<any>;
+  let campaignDoc: MockHalDoc;
 
   beforeEach(() => {
-    augury = new MockHalService();
-    campaign = new CampaignService(new AuguryService(augury as any));
     campaignFixture = {
       id: 1,
       name: 'my campaign name',
@@ -49,6 +51,11 @@ describe('CampaignService', () => {
       valid: true,
       flights: { 9: flightStateFixture }
     };
+    augury = new MockHalService();
+    campaignDoc = augury.mock('prx:campaign', campaignFixture);
+    store = of({ campaignState: { ...campaignStateFixture, doc: campaignDoc } }) as any;
+    campaign = new CampaignService(new AuguryService(augury as any), store);
+    campaign.campaignDoc$ = of(campaignDoc);
   });
 
   it('gets a campaign + flights', done => {
@@ -103,9 +110,8 @@ describe('CampaignService', () => {
   });
 
   it('updates existing campaigns', done => {
-    const doc = augury.mock('prx:campaign', { any: 'thing' });
-    doc.mockItems('prx:flights', []);
-    const spy = jest.spyOn(doc, 'update');
+    campaignDoc.mockItems('prx:flights', []);
+    const spy = jest.spyOn(campaignDoc, 'update');
     campaign.getCampaign(1).subscribe();
     campaign.putCampaign({ ...campaignStateFixture, changed: true }).subscribe(() => {
       expect(spy).toHaveBeenCalled();
@@ -132,7 +138,7 @@ describe('CampaignService', () => {
     });
 
     it('creates new flights', done => {
-      const spy = jest.spyOn(doc, 'create');
+      const spy = jest.spyOn(campaignDoc, 'create');
       campaign.putFlight({ ...flightStateFixture, remoteFlight: null, changed: true }).subscribe(() => {
         expect(spy).toHaveBeenCalled();
         expect(spy.mock.calls[0][0]).toEqual('prx:flights');
