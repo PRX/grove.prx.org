@@ -367,13 +367,17 @@ export class CampaignStoreService {
 
   private putCampaign(): Observable<{ prevId: number; state: CampaignState }> {
     return this.campaignFirst$.pipe(
-      switchMap(state => {
-        return this.campaignService.putCampaign(state).pipe(
-          map(newState => {
-            return { prevId: state.remoteCampaign ? state.remoteCampaign.id : null, state: newState };
-          })
-        );
-      })
+      map(state => ({
+        prevId: state.remoteCampaign ? state.remoteCampaign.id : null,
+        state: {
+          ...state,
+          remoteCampaign: state.localCampaign,
+          localCampaign: state.localCampaign,
+          flights: state.flights,
+          changed: false,
+          valid: true
+        }
+      }))
     );
   }
 
