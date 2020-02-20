@@ -1,16 +1,41 @@
 import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { Routes } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { HalHttpError } from 'ngx-prx-styleguide';
+import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
 import { CampaignService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { reducers } from '../';
 import { campaignFixture, flightFixture } from '../reducers/campaign-state.factory';
 import * as ACTIONS from '../actions';
 import { CampaignEffects } from './campaign.effects';
+
+@Component({
+  selector: 'grove-test-component',
+  template: ``
+})
+class TestComponent {}
+const campaignChildRoutes: Routes = [
+  { path: '', component: TestComponent },
+  { path: 'flight/:flightid', component: TestComponent }
+];
+const routes: Routes = [
+  {
+    path: 'campaign/new',
+    component: TestComponent,
+    children: campaignChildRoutes
+  },
+  {
+    path: 'campaign/:id',
+    component: TestComponent,
+    children: campaignChildRoutes
+  }
+];
 
 describe('CampaignEffects', () => {
   let effects: CampaignEffects;
@@ -19,7 +44,8 @@ describe('CampaignEffects', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [StoreModule.forRoot({ ...reducers }), EffectsModule.forRoot([CampaignEffects])],
+      declarations: [TestComponent],
+      imports: [StoreModule.forRoot({ ...reducers }), EffectsModule.forRoot([CampaignEffects]), RouterTestingModule.withRoutes(routes)],
       providers: [
         CampaignEffects,
         {
@@ -39,9 +65,10 @@ describe('CampaignEffects', () => {
   }));
 
   it('should load campaign with flights zoomed', () => {
-    campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaign: campaignFixture, flights: [flightFixture] }));
+    const doc = new MockHalDoc(campaignFixture);
+    campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaign: campaignFixture, doc, flights: [flightFixture] }));
     const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const success = new ACTIONS.CampaignLoadSuccess({ campaign: campaignFixture });
+    const success = new ACTIONS.CampaignLoadSuccess({ campaign: campaignFixture, doc });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -54,7 +81,7 @@ describe('CampaignEffects', () => {
     campaignService.loadCampaignZoomFlights = jest.fn(() => errorResponse);
 
     const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const outcome = new ACTIONS.CampaignLoadFailure(halError);
+    const outcome = new ACTIONS.CampaignLoadFailure({ error: halError });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('--b', { b: outcome });
@@ -62,12 +89,13 @@ describe('CampaignEffects', () => {
   });
 
   it('should create or update campaign from campaign form save', () => {
-    campaignService.createCampaign = jest.fn(campaign => of({ ...campaign, id: 1 }));
-    campaignService.updateCampaign = jest.fn(campaign => of(campaign));
+    const doc = new MockHalDoc(campaignFixture);
+    campaignService.createCampaign = jest.fn(campaign => of({ campaign: { ...campaign, id: 1 }, doc }));
+    campaignService.updateCampaign = jest.fn(campaign => of({ campaign, doc }));
     const { id, ...createCampaign } = campaignFixture;
     const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
     const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaign: campaignFixture });
+    const success = new ACTIONS.CampaignFormSaveSuccess({ campaign: campaignFixture, doc });
 
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('-r-r', { r: success });
@@ -83,7 +111,7 @@ describe('CampaignEffects', () => {
     const { id, ...createCampaign } = campaignFixture;
     const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
     const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const outcome = new ACTIONS.CampaignFormSaveFailure(halError);
+    const outcome = new ACTIONS.CampaignFormSaveFailure({ error: halError });
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('--r-r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);

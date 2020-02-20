@@ -174,7 +174,8 @@ describe('CampaignComponent', () => {
     expect(toastrService.success).toHaveBeenCalledWith('Campaign saved');
   });
 
-  it('redirects to a new campaign', () => {
+  // TODO: moved to campaign.effects.ts
+  xit('redirects to a new campaign', () => {
     const changes: CampaignStateChanges = { id: 1234, prevId: null, flights: { 9999: 9999 } };
     campaignStoreService.storeCampaign.mockImplementation(() => of([changes, []] as [CampaignStateChanges, HalDoc[]]));
     component.campaignSubmit();

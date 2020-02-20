@@ -122,13 +122,18 @@ export class CampaignComponent implements OnInit, OnDestroy {
       this.campaignSaving = false;
 
       // TODO: a better way to do this. like, much better.
-      const flightId = this.router.url.split('/flight/').pop();
-      if (this.router.url.includes('/flight/') && !changes.flights[flightId]) {
-        this.router.navigate(['/campaign', changes.id]);
-      } else if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
-        this.router.navigate(['/campaign', changes.id, 'flight', changes.flights[flightId]]);
-      } else if (changes.prevId !== changes.id) {
-        this.router.navigate(['/campaign', changes.id]);
+      // TODO: when on a flight with a new campaign, don't have the new campaign.id
+      //  so only route to flight if campaign already existed,
+      //  otherwise just let campaign.effects route to the new campaign for now
+      if (changes.id) {
+        const flightId = this.router.url.split('/flight/').pop();
+        if (this.router.url.includes('/flight/') && !changes.flights[flightId]) {
+          this.router.navigate(['/campaign', changes.id]);
+        } else if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
+          this.router.navigate(['/campaign', changes.id, 'flight', changes.flights[flightId]]);
+        } // else if (changes.prevId !== changes.id) {
+        //   this.router.navigate(['/campaign', changes.id]);
+        // }
       }
     });
   }
