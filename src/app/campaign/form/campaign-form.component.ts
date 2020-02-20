@@ -92,7 +92,7 @@ export class CampaignFormComponent implements OnInit {
     if (campaign.set_advertiser_uri) {
       const findAdvertiserByName = this.advertisers && this.advertisers.find(adv => adv.name === campaign.set_advertiser_uri);
       if (findAdvertiserByName) {
-        campaign = {...campaign, set_advertiser_uri: findAdvertiserByName.set_advertiser_uri};
+        campaign = { ...campaign, set_advertiser_uri: findAdvertiserByName.set_advertiser_uri };
       }
     }
     this.campaignUpdate.emit({
@@ -102,18 +102,24 @@ export class CampaignFormComponent implements OnInit {
     });
   }
 
-  updateCampaignForm({ name, type, status, repName, notes, set_account_uri, set_advertiser_uri }: Campaign) {
-    const findAdvertiserByURI = set_advertiser_uri && this.advertisers &&
-      this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
-    this.campaignForm.patchValue({
-      ...(name && {name}),
-      ...(type && {type}),
-      ...(status && {status}),
-      ...(repName && {repName}),
-      ...(notes && {notes}),
-      ...(set_account_uri && {set_account_uri}),
-      ...(findAdvertiserByURI && {set_advertiser_uri: findAdvertiserByURI.set_advertiser_uri})
-    }, {emitEvent: false, onlySelf: true});
+  updateCampaignForm(campaign: Campaign) {
+    const { name, type, status, repName, notes, set_account_uri, set_advertiser_uri } = campaign;
+    const findAdvertiserByURI =
+      set_advertiser_uri && this.advertisers && this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
+    // only set fields that are present, but allow fields to be explicitly set to null or empty string (new campaign)
+    this.campaignForm.patchValue(
+      {
+        ...(campaign.hasOwnProperty('name') && { name }),
+        ...(campaign.hasOwnProperty('type') && { type }),
+        ...(campaign.hasOwnProperty('status') && { status }),
+        ...(campaign.hasOwnProperty('repName') && { repName }),
+        ...(campaign.hasOwnProperty('notes') && { notes }),
+        ...(campaign.hasOwnProperty('set_account_uri') && { set_account_uri }),
+        ...((findAdvertiserByURI && { set_advertiser_uri: findAdvertiserByURI.set_advertiser_uri }) ||
+          (campaign.hasOwnProperty('set_advertiser_uri') && !set_advertiser_uri && { set_advertiser_uri }))
+      },
+      { emitEvent: false, onlySelf: true }
+    );
   }
 
   onAddAdvertiser(name: string) {

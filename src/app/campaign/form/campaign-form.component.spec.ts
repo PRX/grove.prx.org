@@ -69,7 +69,7 @@ describe('CampaignFormComponent', () => {
     component.set_advertiser_uri.setValue('more ads');
   });
 
-  it('sets advertiser in the form when one is matched by URI', () => {
+  it('sets advertiser in the form when one is matched by URI or to null', () => {
     component.campaign = campaignFixture;
     jest.spyOn(component.campaignForm, 'patchValue');
     component.updateCampaignForm({ set_advertiser_uri: '/any/random/value' } as Campaign);
@@ -79,5 +79,7 @@ describe('CampaignFormComponent', () => {
       { set_advertiser_uri: '/advertiser/2' },
       { emitEvent: false, onlySelf: true }
     );
+    component.updateCampaignForm({ set_advertiser_uri: null } as Campaign);
+    expect(component.campaignForm.patchValue).toHaveBeenCalledWith({ set_advertiser_uri: null }, { emitEvent: false, onlySelf: true });
   });
 });
