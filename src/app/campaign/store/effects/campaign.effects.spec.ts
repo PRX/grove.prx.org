@@ -1,7 +1,7 @@
 import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
 import { Component } from '@angular/core';
-import { Routes } from '@angular/router';
+import { Routes, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
@@ -41,6 +41,7 @@ describe('CampaignEffects', () => {
   let effects: CampaignEffects;
   let actions$: TestActions;
   let campaignService: CampaignService;
+  let router: Router;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -62,6 +63,8 @@ describe('CampaignEffects', () => {
     effects = TestBed.get(CampaignEffects);
     actions$ = TestBed.get(Actions);
     campaignService = TestBed.get(CampaignService);
+    router = TestBed.get(Router);
+    jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
   }));
 
   it('should load campaign with flights zoomed', () => {
@@ -115,5 +118,17 @@ describe('CampaignEffects', () => {
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('--r-r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);
+  });
+
+  it('redirects to a new campaign', () => {
+    const doc = new MockHalDoc(campaignFixture);
+    const { id, ...createCampaign } = campaignFixture;
+    campaignService.createCampaign = jest.fn(campaign => of({ campaign: { ...campaignFixture }, doc }));
+    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
+    const success = new ACTIONS.CampaignFormSaveSuccess({ campaign: campaignFixture, doc });
+    actions$.stream = hot('-a', { a: createAction });
+    const expected = cold('-r', { r: success });
+    expect(effects.campaignFormSave$).toBeObservable(expected);
+    expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
   });
 });

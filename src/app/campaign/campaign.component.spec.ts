@@ -174,15 +174,6 @@ describe('CampaignComponent', () => {
     expect(toastrService.success).toHaveBeenCalledWith('Campaign saved');
   });
 
-  // TODO: moved to campaign.effects.ts
-  xit('redirects to a new campaign', () => {
-    const changes: CampaignStateChanges = { id: 1234, prevId: null, flights: { 9999: 9999 } };
-    campaignStoreService.storeCampaign.mockImplementation(() => of([changes, []] as [CampaignStateChanges, HalDoc[]]));
-    component.campaignSubmit();
-    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1234]);
-  });
-
   it('redirects to a new flight', () => {
     jest.spyOn(router, 'url', 'get').mockReturnValue('/campaign/null/flight/9999');
     const changes: CampaignStateChanges = { id: 1234, prevId: null, flights: { 9999: 8888 } };
