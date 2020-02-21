@@ -8,7 +8,23 @@ describe('Campaign Selectors', () => {
   });
 
   it('should select local campaign', () => {
-    const state = campaignStateFactory.createState();
-    expect(campaignSelectors.selectCampaign.projector(state).localCampaign).toBe(campaignStateFactory.campaignFixture);
+    const state = campaignStateFactory.createCampaignState().campaign;
+    expect(campaignSelectors.selectLocalCampaign.projector(state)).toBe(campaignStateFactory.campaignFixture);
+  });
+
+  it('should select campaign doc', () => {
+    const state = campaignStateFactory.createCampaignState().campaign;
+    expect(campaignSelectors.selectCampaignDoc.projector(state)).toBeDefined();
+    expect(campaignSelectors.selectCampaignDoc.projector(state).id).toBe(campaignStateFactory.campaignFixture.id);
+  });
+
+  it('should select campaign loading', () => {
+    const state = campaignStateFactory.createCampaignState().campaign;
+    expect(campaignSelectors.selectCampaignLoading.projector(state)).toBe(state.loading);
+  });
+
+  it('should select campaign saving', () => {
+    const state = campaignStateFactory.createCampaignState().campaign;
+    expect(campaignSelectors.selectCampaignLoading.projector(state)).toBe(state.saving);
   });
 });

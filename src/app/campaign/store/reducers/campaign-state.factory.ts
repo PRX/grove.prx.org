@@ -1,4 +1,5 @@
 import { CampaignStoreState } from '..';
+import { MockHalDoc } from 'ngx-prx-styleguide';
 
 export const campaignFixture = {
   id: 1,
@@ -26,7 +27,8 @@ export const createCampaignState = () => ({
     changed: false,
     valid: true,
     loading: false,
-    saving: false
+    saving: false,
+    doc: new MockHalDoc(campaignFixture)
   }
 });
 

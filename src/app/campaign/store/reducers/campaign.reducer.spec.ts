@@ -50,6 +50,15 @@ describe('Campaign Reducer', () => {
     expect(result.localCampaign.type).toBe(campaign.type);
   });
 
+  it('should set campaign loading', () => {
+    let result = reducer(initialState, new ACTIONS.CampaignLoad({ id: campaign.id }));
+    expect(result.loading).toBe(true);
+    result = reducer(initialState, new ACTIONS.CampaignLoadFailure({ error: 'something bad happened' }));
+    expect(result.loading).toBe(false);
+    result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign, doc: new MockHalDoc(campaign) }));
+    expect(result.loading).toBe(false);
+  });
+
   it('should set campaign from campaign load success', () => {
     const result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign, doc: new MockHalDoc(campaign) }));
     expect(result.localCampaign).toMatchObject(campaign);
@@ -57,6 +66,15 @@ describe('Campaign Reducer', () => {
     expect(result.changed).toBe(false);
     expect(result.valid).toBe(true);
     expect(result.loading).toBe(false);
+    expect(result.saving).toBe(false);
+  });
+
+  it('should set campaign saving', () => {
+    let result = reducer(initialState, new ACTIONS.CampaignFormSave({ campaign }));
+    expect(result.saving).toBe(true);
+    result = reducer(initialState, new ACTIONS.CampaignFormSaveFailure({ error: 'something bad happened' }));
+    expect(result.saving).toBe(false);
+    result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign, doc: new MockHalDoc(campaign) }));
     expect(result.saving).toBe(false);
   });
 

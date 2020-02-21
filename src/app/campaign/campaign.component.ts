@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { map, switchMap, first, share } from 'rxjs/operators';
+import { map, switchMap, first } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import * as actions from './store/actions';
-import { selectLocalCampaign } from './store/selectors';
+import { selectLocalCampaign, selectCampaignSaving } from './store/selectors';
 import { CampaignStoreService, AdvertiserService, AccountService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 
@@ -22,7 +22,7 @@ export interface LocalFlightState {
   template: `
     <grove-campaign-status
       [state]="campaignStoreService.campaign$ | async"
-      [isSaving]="campaignSaving"
+      [isSaving]="campaignSaving$ | async"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
     <mat-drawer-container autosize>
@@ -56,7 +56,7 @@ export interface LocalFlightState {
 })
 export class CampaignComponent implements OnInit, OnDestroy {
   campaignFlights$: Observable<LocalFlightState[]>;
-  campaignSaving: boolean;
+  campaignSaving$: Observable<boolean>;
   routeSub: Subscription;
 
   constructor(
@@ -70,6 +70,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));
     this.routeSub = this.route.paramMap
       .pipe(
         switchMap((params: ParamMap) => {
@@ -116,10 +117,8 @@ export class CampaignComponent implements OnInit, OnDestroy {
       .pipe(select(selectLocalCampaign), first())
       .subscribe(campaign => this.store.dispatch(new actions.CampaignFormSave({ campaign })));
 
-    this.campaignSaving = true;
     this.campaignStoreService.storeCampaign().subscribe(([changes, deletedDocs]) => {
       this.toastr.success('Campaign saved');
-      this.campaignSaving = false;
 
       // TODO: a better way to do this. like, much better.
       // TODO: when on a flight with a new campaign, don't have the new campaign.id
