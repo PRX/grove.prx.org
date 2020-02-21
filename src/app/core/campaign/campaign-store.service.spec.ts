@@ -144,7 +144,7 @@ describe('CampaignStoreService', () => {
     };
   });
 
-  xit('creates a new campaign', done => {
+  it('creates a new campaign', done => {
     store.campaign$.subscribe(camp => {
       expect(camp.remoteCampaign).toBeFalsy();
       expect(camp.localCampaign).toMatchObject({ name: null });
@@ -156,7 +156,7 @@ describe('CampaignStoreService', () => {
     store.load(null);
   });
 
-  xit('loads an existing campaign', done => {
+  it('loads an existing campaign', done => {
     store.campaign$.subscribe(camp => {
       expect(camp).toMatchObject(campaignStateFixture);
       done();
@@ -164,7 +164,7 @@ describe('CampaignStoreService', () => {
     store.load(1);
   });
 
-  xit('stores a campaign', done => {
+  it('stores a campaign', done => {
     store.storeCampaign().subscribe(changes => {
       expect(changes).toEqual([{ id: 1, prevId: 1, flights: { 9: 9 } }, []]);
       done();
@@ -172,7 +172,7 @@ describe('CampaignStoreService', () => {
     store.load(1);
   });
 
-  xit('returns changes for new campaigns and flights', done => {
+  it('returns changes for new campaigns and flights', done => {
     const newState: CampaignState = {
       ...campaignStateFixture,
       remoteCampaign: null,
@@ -225,7 +225,7 @@ describe('CampaignStoreService', () => {
     store.load(1);
   });
 
-  xit('updates campaigns', done => {
+  it('updates campaigns', done => {
     const updateCampaign = { localCampaign: { ...campaignFixture, name: 'foo' }, changed: true, valid: false };
     store.load(1);
     store.setCampaign(updateCampaign);
@@ -235,7 +235,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('adds new flights', done => {
+  it('adds new flights', done => {
     const newFlight: FlightState = { localFlight: flightFixture, changed: true, valid: false };
     store.load(1);
     store.setFlight(newFlight, 9999);
@@ -245,7 +245,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('removes flights', done => {
+  it('removes flights', done => {
     const [retainId, deleteId] = [1, 2];
     const retainFlight: FlightState = { localFlight: { ...flightFixture, id: retainId }, changed: true, valid: false };
     const deleteFlight: FlightState = { localFlight: { ...flightFixture, id: deleteId }, changed: true, valid: false };
@@ -266,7 +266,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('updates existing flights', done => {
+  it('updates existing flights', done => {
     const existingFlight: FlightState = { localFlight: { ...flightFixture, name: 'foo' }, changed: true, valid: false };
     store.load(1);
     store.setFlight(existingFlight, 9);
@@ -276,7 +276,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('handles putting flights correctly when no flights exist', done => {
+  it('handles putting flights correctly when no flights exist', done => {
     campaignService.getCampaign = jest.fn(() => of({ ...campaignStateFixture, flights: {} }));
     store.load(1);
     store.putFlights().subscribe(res => {
@@ -285,7 +285,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('loads availability', done => {
+  it('loads availability', done => {
     store.load(1);
     store.loadAvailability(flightFixture).subscribe(availabilty => {
       expect(availabilty.length).toEqual(flightFixture.zones.length);
@@ -295,7 +295,7 @@ describe('CampaignStoreService', () => {
     });
   });
 
-  xit('loads allocation preview and transforms it into state entities keyed by flight id', done => {
+  it('loads allocation preview and transforms it into state entities keyed by flight id', done => {
     store.load(1);
     store
       .loadAllocationPreview(flightFixture, flightFixture.id, 90)
@@ -312,7 +312,7 @@ describe('CampaignStoreService', () => {
       });
   });
 
-  xit('saves dailyMinimum in state', done => {
+  it('saves dailyMinimum in state', done => {
     store.load(1);
     store
       .loadAllocationPreview(flightFixture, flightFixture.id, 90)
@@ -324,7 +324,7 @@ describe('CampaignStoreService', () => {
       });
   });
 
-  xit('rolls up into weekly availability and includes allocation preview', done => {
+  it('rolls up into weekly availability and includes allocation preview', done => {
     store.load(1);
     store
       .loadAvailability(flightFixture)
@@ -343,7 +343,7 @@ describe('CampaignStoreService', () => {
       });
   });
 
-  xit('gets flight availability weekly rollup', done => {
+  it('gets flight availability weekly rollup', done => {
     store.load(1);
     store.loadAvailability(flightFixture);
     store.getFlightAvailabilityRollup$(flightFixture.id.toString()).subscribe(rollup => {
