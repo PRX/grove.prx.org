@@ -68,10 +68,11 @@ describe('CampaignEffects', () => {
   }));
 
   it('should load campaign with flights zoomed', () => {
-    const doc = new MockHalDoc(campaignFixture);
-    campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaign: campaignFixture, doc, flights: [flightFixture] }));
+    const campaignDoc = new MockHalDoc(campaignFixture);
+    const flightDocs = [new MockHalDoc(flightFixture)];
+    campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
     const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const success = new ACTIONS.CampaignLoadSuccess({ campaign: campaignFixture, doc });
+    const success = new ACTIONS.CampaignLoadSuccess({ campaignDoc, flightDocs });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -92,13 +93,13 @@ describe('CampaignEffects', () => {
   });
 
   it('should create or update campaign from campaign form save', () => {
-    const doc = new MockHalDoc(campaignFixture);
-    campaignService.createCampaign = jest.fn(campaign => of({ campaign: { ...campaign, id: 1 }, doc }));
-    campaignService.updateCampaign = jest.fn(campaign => of({ campaign, doc }));
+    const campaignDoc = new MockHalDoc(campaignFixture);
+    campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
+    campaignService.updateCampaign = jest.fn(campaign => of({ campaignDoc }));
     const { id, ...createCampaign } = campaignFixture;
     const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
     const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaign: campaignFixture, doc });
+    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
 
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('-r-r', { r: success });
@@ -121,11 +122,11 @@ describe('CampaignEffects', () => {
   });
 
   it('redirects to a new campaign', () => {
-    const doc = new MockHalDoc(campaignFixture);
+    const campaignDoc = new MockHalDoc(campaignFixture);
     const { id, ...createCampaign } = campaignFixture;
-    campaignService.createCampaign = jest.fn(campaign => of({ campaign: { ...campaignFixture }, doc }));
+    campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
     const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaign: campaignFixture, doc });
+    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);

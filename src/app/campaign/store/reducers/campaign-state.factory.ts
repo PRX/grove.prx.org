@@ -9,7 +9,11 @@ export const campaignFixture = {
   repName: 'me',
   notes: '',
   set_account_uri: 'some/account/id',
-  set_advertiser_uri: 'some/advertiser/id'
+  set_advertiser_uri: 'some/advertiser/id',
+  _links: {
+    'prx:account': { href: 'some/account/id' },
+    'prx:advertiser': { href: 'some/advertiser/id' }
+  }
 };
 export const flightFixture = {
   id: 9,

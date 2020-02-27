@@ -15,7 +15,7 @@ export class CampaignLoad implements Action {
 export class CampaignLoadSuccess implements Action {
   readonly type = actionTypes.CAMPAIGN_LOAD_SUCCESS;
 
-  constructor(public payload: { campaign: Campaign; doc: HalDoc }) {}
+  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[] }) {}
 }
 export class CampaignLoadFailure implements Action {
   readonly type = actionTypes.CAMPAIGN_LOAD_FAILURE;
@@ -37,7 +37,7 @@ export class CampaignFormSave implements Action {
 export class CampaignFormSaveSuccess implements Action {
   readonly type = actionTypes.CAMPAIGN_FORM_SAVE_SUCCESS;
 
-  constructor(public payload: { campaign: Campaign; doc: HalDoc }) {}
+  constructor(public payload: { campaignDoc: HalDoc }) {}
 }
 export class CampaignFormSaveFailure implements Action {
   readonly type = actionTypes.CAMPAIGN_FORM_SAVE_FAILURE;

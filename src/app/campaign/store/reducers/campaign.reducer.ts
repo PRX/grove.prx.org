@@ -1,7 +1,7 @@
 import { CampaignActions } from '../actions/';
 import { CampaignActionTypes } from '../actions/campaign.action.types';
 import { HalDoc } from 'ngx-prx-styleguide';
-
+import { docToCampaign } from './haldoc-to-model.utils';
 export interface Campaign {
   id?: number;
   name: string;
@@ -71,10 +71,11 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
     }
     case CampaignActionTypes.CAMPAIGN_LOAD_SUCCESS:
     case CampaignActionTypes.CAMPAIGN_FORM_SAVE_SUCCESS: {
-      const { campaign, doc } = action.payload;
+      const { campaignDoc } = action.payload;
+      const campaign = docToCampaign(campaignDoc);
       return {
         ...state,
-        doc,
+        doc: campaignDoc,
         localCampaign: campaign,
         remoteCampaign: campaign,
         changed: false,

@@ -1,7 +1,7 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { reducer, initialState } from './campaign.reducer';
 import * as ACTIONS from '../actions';
-import { campaignFixture as campaign } from './campaign-state.factory';
+import { campaignFixture, flightFixture } from './campaign-state.factory';
 
 describe('Campaign Reducer', () => {
   describe('an unknown action', () => {
@@ -17,7 +17,7 @@ describe('Campaign Reducer', () => {
   it('should reset to initial state for a new campaign', () => {
     const result = reducer(
       {
-        localCampaign: campaign,
+        localCampaign: campaignFixture,
         changed: true,
         valid: true,
         saving: false,
@@ -32,12 +32,12 @@ describe('Campaign Reducer', () => {
     let result = reducer(
       initialState,
       new ACTIONS.CampaignFormUpdate({
-        campaign,
+        campaign: campaignFixture,
         changed: true,
         valid: true
       })
     );
-    expect(result.localCampaign).toMatchObject(campaign);
+    expect(result.localCampaign).toMatchObject(campaignFixture);
     result = reducer(
       result,
       new ACTIONS.CampaignFormUpdate({
@@ -47,20 +47,27 @@ describe('Campaign Reducer', () => {
       })
     );
     expect(result.localCampaign.name).toBe('new name');
-    expect(result.localCampaign.type).toBe(campaign.type);
+    expect(result.localCampaign.type).toBe(campaignFixture.type);
   });
 
   it('should set campaign loading', () => {
-    let result = reducer(initialState, new ACTIONS.CampaignLoad({ id: campaign.id }));
+    let result = reducer(initialState, new ACTIONS.CampaignLoad({ id: campaignFixture.id }));
     expect(result.loading).toBe(true);
     result = reducer(initialState, new ACTIONS.CampaignLoadFailure({ error: 'something bad happened' }));
     expect(result.loading).toBe(false);
-    result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign, doc: new MockHalDoc(campaign) }));
+    result = reducer(
+      initialState,
+      new ACTIONS.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignFixture), flightDocs: [new MockHalDoc(flightFixture)] })
+    );
     expect(result.loading).toBe(false);
   });
 
   it('should set campaign from campaign load success', () => {
-    const result = reducer(initialState, new ACTIONS.CampaignLoadSuccess({ campaign, doc: new MockHalDoc(campaign) }));
+    const result = reducer(
+      initialState,
+      new ACTIONS.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignFixture), flightDocs: [new MockHalDoc(flightFixture)] })
+    );
+    const { _links, ...campaign } = campaignFixture;
     expect(result.localCampaign).toMatchObject(campaign);
     expect(result.remoteCampaign).toMatchObject(campaign);
     expect(result.changed).toBe(false);
@@ -70,16 +77,17 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign saving', () => {
-    let result = reducer(initialState, new ACTIONS.CampaignFormSave({ campaign }));
+    let result = reducer(initialState, new ACTIONS.CampaignFormSave({ campaign: campaignFixture }));
     expect(result.saving).toBe(true);
     result = reducer(initialState, new ACTIONS.CampaignFormSaveFailure({ error: 'something bad happened' }));
     expect(result.saving).toBe(false);
-    result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign, doc: new MockHalDoc(campaign) }));
+    result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaignDoc: new MockHalDoc(campaignFixture) }));
     expect(result.saving).toBe(false);
   });
 
   it('should set campaign from campaign form save success', () => {
-    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaign, doc: new MockHalDoc(campaign) }));
+    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaignDoc: new MockHalDoc(campaignFixture) }));
+    const { _links, ...campaign } = campaignFixture;
     expect(result.localCampaign).toMatchObject(campaign);
     expect(result.remoteCampaign).toMatchObject(campaign);
     expect(result.changed).toBe(false);

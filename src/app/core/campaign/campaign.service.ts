@@ -59,37 +59,32 @@ export class CampaignService {
     }
   }
 
-  loadCampaignZoomFlights(id: number): Observable<{ campaign: Campaign; doc: HalDoc; flights: Flight[] }> {
+  loadCampaignZoomFlights(id: number): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[] }> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
-      switchMap(doc => doc.follow('prx:flights').pipe(map(flights => ({ doc, flights })))),
-      switchMap(({ doc, flights }: { doc: HalDoc; flights: HalDoc }) => {
+      switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
+      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
         // if total is greater than count, request all flights
         let params: any;
-        if (+flights['total'] > +flights['count']) {
-          params = { per: +flights['total'] };
+        if (+flightDocs['total'] > +flightDocs['count']) {
+          params = { per: +flightDocs['total'] };
         }
-        return doc.followItems('prx:flights', params).pipe(map(flightDocs => ({ doc, flightDocs })));
-      }),
-      map(({ doc, flightDocs }) => {
-        const campaign = this.docToCampaign(doc);
-        const flights = flightDocs.map(flight => this.docToFlight(flight));
-        return { campaign, doc, flights };
+        return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       }),
       catchError(this.handleError)
     );
   }
 
-  updateCampaign(campaign: Campaign): Observable<{ campaign: Campaign; doc: HalDoc }> {
+  updateCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
     return this.campaignDoc$.pipe(
       switchMap(doc => doc.update(campaign)),
-      map(updatedDoc => ({ campaign: this.docToCampaign(updatedDoc), doc: updatedDoc }))
+      map(updatedDoc => ({ campaignDoc: updatedDoc }))
     );
   }
 
-  createCampaign(campaign: Campaign): Observable<{ campaign: Campaign; doc: HalDoc }> {
+  createCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
     return this.augury.root.pipe(
       switchMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)),
-      map(doc => ({ campaign: this.docToCampaign(doc), doc }))
+      map(doc => ({ campaignDoc: doc }))
     );
   }
 
@@ -116,19 +111,6 @@ export class CampaignService {
 
   deleteFlight(flightId): Observable<HalDoc> {
     return this.flightDocs[flightId].destroy();
-  }
-
-  docToCampaign(doc: HalDoc): Campaign {
-    const campaign = this.filter(doc) as Campaign;
-    campaign.set_advertiser_uri = doc.expand('prx:advertiser');
-    campaign.set_account_uri = doc.expand('prx:account');
-    return campaign;
-  }
-
-  docToFlight(doc: HalDoc): Flight {
-    const flight = this.filter(doc) as Flight;
-    flight.set_inventory_uri = doc.expand('prx:inventory');
-    return flight;
   }
 
   docToCampaignState(doc: HalDoc): CampaignState {
