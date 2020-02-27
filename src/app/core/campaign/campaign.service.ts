@@ -1,16 +1,24 @@
 import { Injectable } from '@angular/core';
+import { Store, select } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { map, switchMap, catchError, find } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
+import { selectCampaignDoc } from '../../campaign/store/selectors';
 
 @Injectable()
 export class CampaignService {
-  private campaignDoc: HalDoc;
-  private flightDocs: { [id: number]: HalDoc };
+  campaignDoc$: Observable<HalDoc>;
+  private flightDocs: { [id: number]: HalDoc } = {};
 
-  constructor(private augury: AuguryService) {}
+  constructor(private augury: AuguryService, private store: Store<any>) {
+    this.campaignDoc$ = this.store.pipe(
+      select(selectCampaignDoc),
+      // wait for campaign doc to be defined (on new campaign)
+      find(doc => !!doc)
+    );
+  }
 
   getCampaign(id: number | string): Observable<CampaignState> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
@@ -24,10 +32,9 @@ export class CampaignService {
         return doc.followItems('prx:flights', params).pipe(map(flightDocs => ({ doc, flightDocs })));
       }),
       map(({ doc, flightDocs }) => {
-        this.campaignDoc = doc;
         this.flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});
-        const campaign = this.docToCampaign(doc);
-        const flights = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: this.docToFlight(flight) }), {});
+        const campaign = this.docToCampaignState(doc);
+        const flights = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: this.docToFlightState(flight) }), {});
         return { ...campaign, flights };
       }),
       catchError(this.handleError)
@@ -38,21 +45,47 @@ export class CampaignService {
     if (!state.changed) {
       return of(state);
     } else if (state.remoteCampaign) {
-      return this.campaignDoc.update(state.localCampaign).pipe(
-        map(doc => {
-          this.campaignDoc = doc;
-          return this.docToCampaign(doc);
-        })
+      return this.campaignDoc$.pipe(
+        switchMap(doc => doc.update(state.localCampaign)),
+        map(doc => this.docToCampaignState(doc))
       );
     } else {
       return this.augury.root.pipe(
         switchMap(rootDoc => rootDoc.create('prx:campaign', {}, state.localCampaign)),
         map(doc => {
-          this.campaignDoc = doc;
-          return this.docToCampaign(doc);
+          return this.docToCampaignState(doc);
         })
       );
     }
+  }
+
+  loadCampaignZoomFlights(id: number): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[] }> {
+    return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
+      switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
+      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
+        // if total is greater than count, request all flights
+        let params: any;
+        if (+flightDocs['total'] > +flightDocs['count']) {
+          params = { per: +flightDocs['total'] };
+        }
+        return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  updateCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
+    return this.campaignDoc$.pipe(
+      switchMap(doc => doc.update(campaign)),
+      map(updatedDoc => ({ campaignDoc: updatedDoc }))
+    );
+  }
+
+  createCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
+    return this.augury.root.pipe(
+      switchMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)),
+      map(doc => ({ campaignDoc: doc }))
+    );
   }
 
   putFlight(state: FlightState): Observable<FlightState> {
@@ -62,14 +95,15 @@ export class CampaignService {
       return this.flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(
         map(doc => {
           this.flightDocs[doc.id] = doc;
-          return this.docToFlight(doc);
+          return this.docToFlightState(doc);
         })
       );
     } else {
-      return this.campaignDoc.create('prx:flights', {}, state.localFlight).pipe(
+      return this.campaignDoc$.pipe(
+        switchMap(doc => doc.create('prx:flights', {}, state.localFlight)),
         map(doc => {
           this.flightDocs[doc.id] = doc;
-          return this.docToFlight(doc);
+          return this.docToFlightState(doc);
         })
       );
     }
@@ -79,7 +113,7 @@ export class CampaignService {
     return this.flightDocs[flightId].destroy();
   }
 
-  docToCampaign(doc: HalDoc): CampaignState {
+  docToCampaignState(doc: HalDoc): CampaignState {
     const campaign = this.filter(doc) as Campaign;
     campaign.set_advertiser_uri = doc.expand('prx:advertiser');
     campaign.set_account_uri = doc.expand('prx:account');
@@ -92,7 +126,7 @@ export class CampaignService {
     };
   }
 
-  docToFlight(doc: HalDoc): FlightState {
+  docToFlightState(doc: HalDoc): FlightState {
     const flight = this.filter(doc) as Flight;
     flight.set_inventory_uri = doc.expand('prx:inventory');
     return {

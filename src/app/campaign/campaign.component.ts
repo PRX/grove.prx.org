@@ -1,7 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, first } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import * as actions from './store/actions';
+import { selectLocalCampaign, selectCampaignSaving } from './store/selectors';
 import { CampaignStoreService, AdvertiserService, AccountService } from '../core';
 import { ToastrService } from 'ngx-prx-styleguide';
 
@@ -19,7 +22,7 @@ export interface LocalFlightState {
   template: `
     <grove-campaign-status
       [state]="campaignStoreService.campaign$ | async"
-      [isSaving]="campaignSaving"
+      [isSaving]="campaignSaving$ | async"
       (save)="campaignSubmit()"
     ></grove-campaign-status>
     <mat-drawer-container autosize>
@@ -53,7 +56,7 @@ export interface LocalFlightState {
 })
 export class CampaignComponent implements OnInit, OnDestroy {
   campaignFlights$: Observable<LocalFlightState[]>;
-  campaignSaving: boolean;
+  campaignSaving$: Observable<boolean>;
   routeSub: Subscription;
 
   constructor(
@@ -61,11 +64,13 @@ export class CampaignComponent implements OnInit, OnDestroy {
     private router: Router,
     private toastr: ToastrService,
     public campaignStoreService: CampaignStoreService,
+    public store: Store<any>,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
 
   ngOnInit() {
+    this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));
     this.routeSub = this.route.paramMap
       .pipe(
         switchMap((params: ParamMap) => {
@@ -77,19 +82,26 @@ export class CampaignComponent implements OnInit, OnDestroy {
       )
       .subscribe(({ params, advertisers, accounts }) => {
         this.campaignStoreService.load(params.get('id'));
+        if (params.get('id')) {
+          this.store.dispatch(new actions.CampaignLoad({ id: +params.get('id') }));
+        } else {
+          this.store.dispatch(new actions.CampaignNew());
+        }
       });
     this.campaignFlights$ = this.campaignStoreService.flights$.pipe(
       map(flightStates => {
-        return Object.keys(flightStates).map((id): LocalFlightState => {
-          return {
-            id,
-            name: flightStates[id].localFlight.name || '(Flight)',
-            softDeleted: !!flightStates[id].softDeleted,
-            changed: flightStates[id].changed,
-            valid: flightStates[id].valid,
-            statusOk: !flightStates[id].localFlight.status || flightStates[id].localFlight.status === 'ok'
-          };
-        });
+        return Object.keys(flightStates).map(
+          (id): LocalFlightState => {
+            return {
+              id,
+              name: flightStates[id].localFlight.name || '(Flight)',
+              softDeleted: !!flightStates[id].softDeleted,
+              changed: flightStates[id].changed,
+              valid: flightStates[id].valid,
+              statusOk: !flightStates[id].localFlight.status || flightStates[id].localFlight.status === 'ok'
+            };
+          }
+        );
       })
     );
   }
@@ -101,19 +113,26 @@ export class CampaignComponent implements OnInit, OnDestroy {
   }
 
   campaignSubmit() {
-    this.campaignSaving = true;
+    this.store
+      .pipe(select(selectLocalCampaign), first())
+      .subscribe(campaign => this.store.dispatch(new actions.CampaignFormSave({ campaign })));
+
     this.campaignStoreService.storeCampaign().subscribe(([changes, deletedDocs]) => {
       this.toastr.success('Campaign saved');
-      this.campaignSaving = false;
 
       // TODO: a better way to do this. like, much better.
-      const flightId = this.router.url.split('/flight/').pop();
-      if (this.router.url.includes('/flight/') && !changes.flights[flightId]) {
-        this.router.navigate(['/campaign', changes.id]);
-      } else if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
-        this.router.navigate(['/campaign', changes.id, 'flight', changes.flights[flightId]]);
-      } else if (changes.prevId !== changes.id) {
-        this.router.navigate(['/campaign', changes.id]);
+      // TODO: when on a flight with a new campaign, don't have the new campaign.id
+      //  so only route to flight if campaign already existed,
+      //  otherwise just let campaign.effects route to the new campaign for now
+      if (changes.id) {
+        const flightId = this.router.url.split('/flight/').pop();
+        if (this.router.url.includes('/flight/') && !changes.flights[flightId]) {
+          this.router.navigate(['/campaign', changes.id]);
+        } else if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
+          this.router.navigate(['/campaign', changes.id, 'flight', changes.flights[flightId]]);
+        } // else if (changes.prevId !== changes.id) {
+        //   this.router.navigate(['/campaign', changes.id]);
+        // }
       }
     });
   }

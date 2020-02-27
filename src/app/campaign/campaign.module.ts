@@ -13,6 +13,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StatusBarModule, FancyFormModule, DatepickerModule } from 'ngx-prx-styleguide';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import * as fromCampaignState from './store';
+import { CampaignEffects } from './store/effects/campaign.effects';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -32,7 +36,9 @@ import { StatusBarModule, FancyFormModule, DatepickerModule } from 'ngx-prx-styl
     StatusBarModule,
     FancyFormModule,
     DatepickerModule,
-    campaignRouting
+    campaignRouting,
+    StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
+    EffectsModule.forFeature([CampaignEffects])
   ]
 })
 export class CampaignModule {}

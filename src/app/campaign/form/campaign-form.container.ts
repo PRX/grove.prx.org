@@ -1,7 +1,10 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Store, select } from '@ngrx/store';
 import { AccountService, Account, Advertiser, AdvertiserService, CampaignStoreService, Campaign } from '../../core';
+import { selectLocalCampaign } from '../store/selectors';
 import { withLatestFrom } from 'rxjs/operators';
+import { CampaignFormUpdate } from '../store/actions';
 
 @Component({
   selector: 'grove-campaign-form.container',
@@ -16,20 +19,26 @@ import { withLatestFrom } from 'rxjs/operators';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CampaignFormContainerComponent {
-  campaign$: Observable<Campaign> = this.campaignStoreService.localCampaign$;
+export class CampaignFormContainerComponent implements OnInit {
+  campaign$: Observable<Campaign>;
   accounts$: Observable<Account[]> = this.accountService.accounts;
   advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
 
   constructor(
     public campaignStoreService: CampaignStoreService,
+    public store: Store<any>,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
 
+  ngOnInit() {
+    this.campaign$ = this.store.pipe(select(selectLocalCampaign));
+  }
+
   campaignUpdateFromForm(newState: { campaign: Campaign; changed: boolean; valid: boolean }) {
     const { campaign, changed, valid } = newState;
     this.campaignStoreService.setCampaign({ localCampaign: campaign, changed, valid });
+    this.store.dispatch(new CampaignFormUpdate({ campaign, changed, valid }));
   }
 
   onAddAdvertiser(name: string) {

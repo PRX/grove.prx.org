@@ -39,9 +39,9 @@ describe('CampaignFormComponent', () => {
     fixture = TestBed.createComponent(CampaignFormComponent);
     component = fixture.componentInstance;
     component.advertisers = [
-      {id: 1, name: 'some ads', set_advertiser_uri: '/advertiser/1'},
-      {id: 2, name: 'more ads', set_advertiser_uri: '/advertiser/2'},
-      {id: 3, name: 'less ads', set_advertiser_uri: '/advertiser/3'}
+      { id: 1, name: 'some ads', set_advertiser_uri: '/advertiser/1' },
+      { id: 2, name: 'more ads', set_advertiser_uri: '/advertiser/2' },
+      { id: 3, name: 'less ads', set_advertiser_uri: '/advertiser/3' }
     ];
     fixture.detectChanges();
   });
@@ -69,14 +69,17 @@ describe('CampaignFormComponent', () => {
     component.set_advertiser_uri.setValue('more ads');
   });
 
-  it('sets advertiser in the form when one is matched by URI', () => {
+  it('sets advertiser in the form when one is matched by URI or to null', () => {
     component.campaign = campaignFixture;
     jest.spyOn(component.campaignForm, 'patchValue');
-    component.updateCampaignForm({set_advertiser_uri : '/any/random/value'} as Campaign);
-    expect(component.campaignForm.patchValue).toHaveBeenCalledWith({}, {emitEvent: false, onlySelf: true});
-    component.updateCampaignForm({set_advertiser_uri : '/advertiser/2'} as Campaign);
+    component.updateCampaignForm({ set_advertiser_uri: '/any/random/value' } as Campaign);
+    expect(component.campaignForm.patchValue).toHaveBeenCalledWith({}, { emitEvent: false, onlySelf: true });
+    component.updateCampaignForm({ set_advertiser_uri: '/advertiser/2' } as Campaign);
     expect(component.campaignForm.patchValue).toHaveBeenCalledWith(
-      {set_advertiser_uri: '/advertiser/2'}, {emitEvent: false, onlySelf: true}
+      { set_advertiser_uri: '/advertiser/2' },
+      { emitEvent: false, onlySelf: true }
     );
+    component.updateCampaignForm({ set_advertiser_uri: null } as Campaign);
+    expect(component.campaignForm.patchValue).toHaveBeenCalledWith({ set_advertiser_uri: null }, { emitEvent: false, onlySelf: true });
   });
 });

@@ -8,7 +8,7 @@ import { withLatestFrom } from 'rxjs/operators';
 
 describe('CampaignStoreService', () => {
   let store: CampaignStoreService;
-  let campaignService: CampaignService;
+  let campaignService;
   let inventoryService: InventoryService;
   let allocationPreviewService: AllocationPreviewService;
   let campaignFixture: Campaign;
@@ -188,17 +188,15 @@ describe('CampaignStoreService', () => {
 
   it('returns deletion docs for deleted flights', done => {
     const deletedId = 'deleted-id';
-    const newState = {
-      ...campaignStateFixture,
-      remoteCampaign: { ...campaignFixture },
-      flights: {
-        [deletedId]: {
-          ...flightStateFixture,
-          ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: deletedId }, softDeleted: true }
-        }
-      }
-    };
-    campaignService.putCampaign = jest.fn(id => of(newState)) as any;
+    store.setCampaign(campaignStateFixture);
+    store.setFlight(
+      {
+        ...flightStateFixture,
+        ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: (deletedId as any) as number } },
+        softDeleted: true
+      },
+      deletedId
+    );
     store.storeCampaign().subscribe(([changes, deletedDocs]) => {
       expect(campaignService.deleteFlight).toHaveBeenCalledWith(deletedId);
       expect(deletedDocs).toMatchObject([{ id: deletedId }]);
@@ -209,13 +207,16 @@ describe('CampaignStoreService', () => {
 
   it('removes and deletes flights marked for deletion when storing a campaign', done => {
     const softDeletedId = 'deletion-id';
-    const newState = {
-      ...campaignStateFixture,
-      remoteCampaign: { ...campaignFixture },
-      flights: { [softDeletedId]: { ...flightStateFixture, softDeleted: true } }
-    };
+    store.setCampaign(campaignStateFixture);
+    store.setFlight(
+      {
+        ...flightStateFixture,
+        ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: (softDeletedId as any) as number } },
+        softDeleted: true
+      },
+      softDeletedId
+    );
     const removeFlightSpy = jest.spyOn(store, 'removeFlight');
-    campaignService.putCampaign = jest.fn(id => of(newState));
     store.storeCampaign().subscribe(changes => {
       expect(removeFlightSpy).toHaveBeenCalledWith(softDeletedId);
       expect(campaignService.deleteFlight).toHaveBeenCalledWith(softDeletedId);
