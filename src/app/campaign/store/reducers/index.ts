@@ -1,1 +1,1 @@
-export { CampaignState, Campaign } from './campaign.reducer';
+export { CampaignState, Campaign, FlightState, Flight } from './campaign.models';

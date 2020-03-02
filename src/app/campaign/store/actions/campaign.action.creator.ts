@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
-import { CampaignActionTypes as actionTypes } from './campaign.action.types';
-import { Campaign } from '../reducers/';
+import { ActionTypes as actionTypes } from './action.types';
+import { Campaign, Flight } from '../reducers/';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export class CampaignNew implements Action {
@@ -29,20 +29,42 @@ export class CampaignFormUpdate implements Action {
   constructor(public payload: { campaign: Campaign; changed: boolean; valid: boolean }) {}
 }
 
-export class CampaignFormSave implements Action {
-  readonly type = actionTypes.CAMPAIGN_FORM_SAVE;
+export class CampaignSave implements Action {
+  readonly type = actionTypes.CAMPAIGN_SAVE;
 
   constructor(public payload: { campaign: Campaign }) {}
 }
-export class CampaignFormSaveSuccess implements Action {
-  readonly type = actionTypes.CAMPAIGN_FORM_SAVE_SUCCESS;
+export class CampaignSaveSuccess implements Action {
+  readonly type = actionTypes.CAMPAIGN_SAVE_SUCCESS;
 
   constructor(public payload: { campaignDoc: HalDoc }) {}
 }
-export class CampaignFormSaveFailure implements Action {
-  readonly type = actionTypes.CAMPAIGN_FORM_SAVE_FAILURE;
+export class CampaignSaveFailure implements Action {
+  readonly type = actionTypes.CAMPAIGN_SAVE_FAILURE;
 
   constructor(public payload: { error: any }) {}
+}
+
+export class CampaignAddFlight implements Action {
+  readonly type = actionTypes.CAMPAIGN_ADD_FLIGHT;
+}
+
+export class CampaignDupFlight implements Action {
+  readonly type = actionTypes.CAMPAIGN_DUP_FLIGHT;
+
+  constructor(public payload: { flight: Flight }) {}
+}
+
+export class CampaignDeleteFlight implements Action {
+  readonly type = actionTypes.CAMPAIGN_DELETE_FLIGHT;
+
+  constructor(public payload: { id: number; softDeleted: boolean }) {}
+}
+
+export class CampaignFlightFormUpdate implements Action {
+  readonly type = actionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE;
+
+  constructor(public payload: { id: number; flight: Flight; changed: boolean; valid: boolean }) {}
 }
 
 export type CampaignActions =
@@ -51,6 +73,10 @@ export type CampaignActions =
   | CampaignLoadSuccess
   | CampaignLoadFailure
   | CampaignFormUpdate
-  | CampaignFormSave
-  | CampaignFormSaveSuccess
-  | CampaignFormSaveFailure;
+  | CampaignFlightFormUpdate
+  | CampaignAddFlight
+  | CampaignDupFlight
+  | CampaignDeleteFlight
+  | CampaignSave
+  | CampaignSaveSuccess
+  | CampaignSaveFailure;

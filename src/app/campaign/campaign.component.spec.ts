@@ -19,7 +19,7 @@ import {
 import { AccountServiceMock } from '../core/account/account.service.mock';
 import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
 import { ActivatedRouteStub } from '../../testing/stub.router';
-import { FancyFormModule, StatusBarModule, ToastrService, MockHalService, HalDoc } from 'ngx-prx-styleguide';
+import { FancyFormModule, StatusBarModule, ToastrService, MockHalService } from 'ngx-prx-styleguide';
 import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
 import { CampaignComponent } from './campaign.component';
@@ -32,7 +32,7 @@ import { CampaignStatusComponent } from './status/campaign-status.component';
 class TestComponent {}
 const campaignChildRoutes: Routes = [
   { path: '', component: TestComponent },
-  { path: 'flight/:flightid', component: TestComponent }
+  { path: 'flight/:flightId', component: TestComponent }
 ];
 const campaignRoutes: Routes = [
   {

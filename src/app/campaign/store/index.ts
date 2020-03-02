@@ -1,13 +1,17 @@
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
+import { CampaignState } from './reducers/';
 import * as fromCampaign from './reducers/campaign.reducer';
+import * as fromFlight from './reducers/flight.reducer';
 
 export interface CampaignStoreState {
-  campaign: fromCampaign.CampaignState;
+  campaign: CampaignState;
+  flights: fromFlight.State;
 }
 
 export const reducers: ActionReducerMap<CampaignStoreState> = {
-  campaign: fromCampaign.reducer
+  campaign: fromCampaign.reducer,
+  flights: fromFlight.reducer
 };
 
 export const metaReducers: MetaReducer<CampaignStoreState>[] = !environment.production ? [] : [];

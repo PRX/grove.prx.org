@@ -13,7 +13,7 @@ import { GoalFormComponent } from './availability/goal-form.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
-  { path: 'flight/:flightid', component: FlightContainerComponent }
+  { path: 'flight/:flightId', component: FlightContainerComponent }
 ];
 
 export const campaignRoutes: Routes = [

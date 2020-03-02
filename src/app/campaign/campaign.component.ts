@@ -115,7 +115,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   campaignSubmit() {
     this.store
       .pipe(select(selectLocalCampaign), first())
-      .subscribe(campaign => this.store.dispatch(new actions.CampaignFormSave({ campaign })));
+      .subscribe(campaign => this.store.dispatch(new actions.CampaignSave({ campaign })));
 
     this.campaignStoreService.storeCampaign().subscribe(([changes, deletedDocs]) => {
       this.toastr.success('Campaign saved');
@@ -138,6 +138,8 @@ export class CampaignComponent implements OnInit, OnDestroy {
   }
 
   createFlight() {
+    this.store.dispatch(new actions.CampaignAddFlight());
+
     this.campaignStoreService.campaignFirst$.subscribe(state => {
       const flightId = Date.now();
       const date = new Date(flightId);

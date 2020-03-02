@@ -5,15 +5,14 @@ import { of } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import * as actions from '../actions';
-import { CampaignActionTypes } from '../actions/campaign.action.types';
-import { Campaign } from '../reducers';
+import { ActionTypes } from '../actions/action.types';
 import { CampaignService } from '../../../core';
 
 @Injectable()
 export class CampaignEffects {
   @Effect()
   campaignLoad$ = this.actions$.pipe(
-    ofType(CampaignActionTypes.CAMPAIGN_LOAD),
+    ofType(ActionTypes.CAMPAIGN_LOAD),
     map((action: actions.CampaignLoad) => action.payload),
     mergeMap(payload =>
       this.campaignService.loadCampaignZoomFlights(payload.id).pipe(
@@ -25,8 +24,8 @@ export class CampaignEffects {
 
   @Effect()
   campaignFormSave$ = this.actions$.pipe(
-    ofType(CampaignActionTypes.CAMPAIGN_FORM_SAVE),
-    map((action: actions.CampaignFormSave) => action.payload),
+    ofType(ActionTypes.CAMPAIGN_SAVE),
+    map((action: actions.CampaignSave) => action.payload),
     mergeMap((payload: { campaign }) => {
       const result = payload.campaign.id
         ? this.campaignService.updateCampaign(payload.campaign)
@@ -48,8 +47,8 @@ export class CampaignEffects {
             this.router.navigate(['/campaign', campaignDoc.id]);
           }
         }),
-        map(({ campaignDoc }: { campaignDoc: HalDoc }) => new actions.CampaignFormSaveSuccess({ campaignDoc })),
-        catchError(error => of(new actions.CampaignFormSaveFailure({ error })))
+        map(({ campaignDoc }: { campaignDoc: HalDoc }) => new actions.CampaignSaveSuccess({ campaignDoc })),
+        catchError(error => of(new actions.CampaignSaveFailure({ error })))
       );
     })
   );

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Store, select } from '@ngrx/store';
 import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
 import {
   Inventory,
@@ -12,6 +13,8 @@ import {
 } from '../../core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, filter, first, pluck } from 'rxjs/operators';
+import * as actions from '../store/actions';
+import { selectRoutedFlight } from '../store/selectors';
 
 @Component({
   selector: 'grove-flight.container',
@@ -62,7 +65,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private inventoryService: InventoryService,
     private campaignStoreService: CampaignStoreService,
-    private router: Router
+    private router: Router,
+    private store: Store<any>
   ) {}
 
   ngOnInit() {
@@ -74,7 +78,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
       })
     );
     this.flightSub = combineLatest(this.route.paramMap, this.campaignStoreService.campaign$).subscribe(([params, campaignState]) => {
-      this.setFlightId(params.get('flightid'), campaignState);
+      this.setFlightId(params.get('flightId'), campaignState);
     });
   }
 
@@ -105,6 +109,23 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.loadAvailabilityAllocationIfChanged(flight);
     this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
     this.currentInventoryUri$.next(flight.set_inventory_uri);
+
+    this.store
+      .pipe(
+        select(selectRoutedFlight),
+        filter(state => !!(state && state.id)),
+        first()
+      )
+      .subscribe(state =>
+        this.store.dispatch(
+          new actions.CampaignFlightFormUpdate({
+            id: state.id,
+            flight: { ...flight, startAt: new Date(flight.startAt.valueOf()), endAt: new Date(flight.endAt.valueOf()) },
+            changed,
+            valid
+          })
+        )
+      );
   }
 
   loadAvailabilityAllocationIfChanged(flight: Flight) {
@@ -151,6 +172,9 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightDuplicate(flight: Flight) {
+    const storeFlight = { ...flight, startAt: new Date(flight.startAt.valueOf()), endAt: new Date(flight.endAt.valueOf()) };
+    this.store.dispatch(new actions.CampaignDupFlight({ flight: storeFlight }));
+
     const localFlight: Flight = { ...flight, name: `${flight.name} (Copy)` };
     this.campaignStoreService.campaignFirst$.subscribe(state => {
       const flightId = Date.now();
@@ -162,6 +186,14 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightDeleteToggle() {
+    this.store
+      .pipe(
+        select(selectRoutedFlight),
+        filter(state => !!(state && state.id)),
+        first()
+      )
+      .subscribe(state => this.store.dispatch(new actions.CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
+
     this.campaignStoreService.campaignFirst$.subscribe(state => {
       const currentState = state.flights[this.currentFlightId];
       const newState = { ...currentState, changed: true, softDeleted: !currentState.softDeleted };

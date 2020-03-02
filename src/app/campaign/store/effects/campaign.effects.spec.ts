@@ -12,7 +12,7 @@ import { CampaignService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { reducers } from '../';
 import { campaignFixture, flightFixture } from '../reducers/campaign-state.factory';
-import * as ACTIONS from '../actions';
+import * as actions from '../actions';
 import { CampaignEffects } from './campaign.effects';
 
 @Component({
@@ -22,7 +22,7 @@ import { CampaignEffects } from './campaign.effects';
 class TestComponent {}
 const campaignChildRoutes: Routes = [
   { path: '', component: TestComponent },
-  { path: 'flight/:flightid', component: TestComponent }
+  { path: 'flight/:flightId', component: TestComponent }
 ];
 const routes: Routes = [
   {
@@ -71,8 +71,8 @@ describe('CampaignEffects', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const flightDocs = [new MockHalDoc(flightFixture)];
     campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
-    const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const success = new ACTIONS.CampaignLoadSuccess({ campaignDoc, flightDocs });
+    const action = new actions.CampaignLoad({ id: 1 });
+    const success = new actions.CampaignLoadSuccess({ campaignDoc, flightDocs });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -84,8 +84,8 @@ describe('CampaignEffects', () => {
     const errorResponse = cold('-#|', {}, halError);
     campaignService.loadCampaignZoomFlights = jest.fn(() => errorResponse);
 
-    const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const outcome = new ACTIONS.CampaignLoadFailure({ error: halError });
+    const action = new actions.CampaignLoad({ id: 1 });
+    const outcome = new actions.CampaignLoadFailure({ error: halError });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('--b', { b: outcome });
@@ -97,9 +97,9 @@ describe('CampaignEffects', () => {
     campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
     campaignService.updateCampaign = jest.fn(campaign => of({ campaignDoc }));
     const { id, ...createCampaign } = campaignFixture;
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
+    const createAction = new actions.CampaignSave({ campaign: createCampaign });
+    const updateAction = new actions.CampaignSave({ campaign: campaignFixture });
+    const success = new actions.CampaignSaveSuccess({ campaignDoc });
 
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('-r-r', { r: success });
@@ -113,9 +113,9 @@ describe('CampaignEffects', () => {
     campaignService.updateCampaign = jest.fn(() => errorResponse);
 
     const { id, ...createCampaign } = campaignFixture;
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const outcome = new ACTIONS.CampaignFormSaveFailure({ error: halError });
+    const createAction = new actions.CampaignSave({ campaign: createCampaign });
+    const updateAction = new actions.CampaignSave({ campaign: campaignFixture });
+    const outcome = new actions.CampaignSaveFailure({ error: halError });
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('--r-r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);
@@ -125,8 +125,8 @@ describe('CampaignEffects', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const { id, ...createCampaign } = campaignFixture;
     campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
+    const createAction = new actions.CampaignSave({ campaign: createCampaign });
+    const success = new actions.CampaignSaveSuccess({ campaignDoc });
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);
