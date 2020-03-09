@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, Input, Output, E
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Flight } from '../../core';
+import { Flight } from '../store/reducers';
 
 @Component({
   selector: 'grove-goal-form',

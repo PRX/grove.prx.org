@@ -53,12 +53,26 @@ export class CampaignSaveFailure implements Action {
 
 export class CampaignAddFlight implements Action {
   readonly type = actionTypes.CAMPAIGN_ADD_FLIGHT;
+
+  constructor(public payload: { campaignId: number | string }) {}
+}
+
+export class CampaignAddFlightWithTempId implements Action {
+  readonly type = actionTypes.CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID;
+
+  constructor(public payload: { flightId: number; startAt: Date; endAt: Date }) {}
 }
 
 export class CampaignDupFlight implements Action {
   readonly type = actionTypes.CAMPAIGN_DUP_FLIGHT;
 
-  constructor(public payload: { flight: Flight }) {}
+  constructor(public payload: { campaignId; flight: Flight }) {}
+}
+
+export class CampaignDupFlightWithTempId implements Action {
+  readonly type = actionTypes.CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID;
+
+  constructor(public payload: { flightId: number; flight: Flight }) {}
 }
 
 export class CampaignDeleteFlight implements Action {
@@ -82,7 +96,9 @@ export type CampaignActions =
   | CampaignSetAdvertiser
   | CampaignFlightFormUpdate
   | CampaignAddFlight
+  | CampaignAddFlightWithTempId
   | CampaignDupFlight
+  | CampaignDupFlightWithTempId
   | CampaignDeleteFlight
   | CampaignSave
   | CampaignSaveSuccess

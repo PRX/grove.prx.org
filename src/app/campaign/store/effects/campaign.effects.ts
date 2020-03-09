@@ -53,5 +53,30 @@ export class CampaignEffects {
     })
   );
 
+  @Effect()
+  addFlight$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_ADD_FLIGHT),
+    map((action: actions.CampaignAddFlight) => {
+      const date = new Date();
+      const flightId = date.getTime();
+      const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
+      this.router.navigate(['/campaign', action.payload.campaignId, 'flight', flightId]);
+      return new actions.CampaignAddFlightWithTempId({ flightId, startAt, endAt });
+    })
+  );
+
+  @Effect()
+  dupFlight$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_DUP_FLIGHT),
+    map((action: actions.CampaignDupFlight) => {
+      const { campaignId, flight } = action.payload;
+      const date = new Date();
+      const flightId = date.getTime();
+      this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+      return new actions.CampaignDupFlightWithTempId({ flightId, flight });
+    })
+  );
+
   constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router) {}
 }

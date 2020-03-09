@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { Flight, Availability, InventoryZone, AvailabilityAllocation } from '../../core';
+import { Availability, InventoryZone, AvailabilityAllocation } from '../../core';
+import { Flight } from '../store/reducers';
 
 @Component({
   selector: 'grove-availability',
@@ -123,7 +124,11 @@ export class AvailabilityComponent {
 
   cantShowInventory() {
     return (
-      !this.flight || !this.flight.startAt || !this.flight.endAt || !this.flight.set_inventory_uri || !(this.flight.zones && this.flight.zones.length)
+      !this.flight ||
+      !this.flight.startAt ||
+      !this.flight.endAt ||
+      !this.flight.set_inventory_uri ||
+      !(this.flight.zones && this.flight.zones.length)
     );
   }
 

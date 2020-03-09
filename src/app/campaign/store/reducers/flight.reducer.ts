@@ -19,10 +19,11 @@ export function reducer(state = initialState, action: CampaignActions): State {
       return adapter.removeAll(state);
     }
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS: {
-      const flights = action.payload.flightDocs.map(flightDoc => {
-        const flight = docToFlight(flightDoc);
+      const flights = action.payload.flightDocs.map(doc => {
+        const flight = docToFlight(doc);
         return {
-          id: flightDoc.id,
+          id: doc.id,
+          doc,
           localFlight: flight,
           remoteFlight: flight,
           changed: false,
@@ -31,15 +32,15 @@ export function reducer(state = initialState, action: CampaignActions): State {
       });
       return adapter.addAll(flights, state);
     }
-    case ActionTypes.CAMPAIGN_ADD_FLIGHT: {
-      const date = new Date();
-      const id = date.getTime();
+    case ActionTypes.CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID: {
+      const { flightId: id, startAt, endAt } = action.payload;
       const initialFlightState: FlightState = {
         id,
         localFlight: {
-          name: 'New Flight ' + state.ids.length + 1,
-          startAt: new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())),
-          endAt: new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1)),
+          id,
+          name: 'New Flight ' + (state.ids.length + 1),
+          startAt,
+          endAt,
           totalGoal: null,
           zones: [],
           set_inventory_uri: null
@@ -49,11 +50,9 @@ export function reducer(state = initialState, action: CampaignActions): State {
       };
       return adapter.addOne(initialFlightState, state);
     }
-    case ActionTypes.CAMPAIGN_DUP_FLIGHT: {
-      const { flight } = action.payload;
-      const date = new Date();
-      const id = date.getTime();
-      const localFlight: Flight = { ...flight, name: `${flight.name} (Copy)` };
+    case ActionTypes.CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID: {
+      const { flight, flightId: id } = action.payload;
+      const localFlight: Flight = { ...flight, id, name: `${flight.name} (Copy)` };
       return adapter.addOne({ id, localFlight, changed: true, valid: true }, state);
     }
     case ActionTypes.CAMPAIGN_DELETE_FLIGHT: {

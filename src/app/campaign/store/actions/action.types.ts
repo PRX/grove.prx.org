@@ -9,7 +9,9 @@ export enum ActionTypes {
   CAMPAIGN_SAVE_SUCCESS = '[Campaign] Form Save Success',
   CAMPAIGN_SAVE_FAILURE = '[Campaign] Form Save Failure',
   CAMPAIGN_ADD_FLIGHT = '[Campaign] Add Flight',
+  CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID = '[Campaign] Add Flight With Temp Id',
   CAMPAIGN_DUP_FLIGHT = '[Campaign] Dup Flight',
+  CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID = '[Campaign] Dup Flight With Temp Id',
   CAMPAIGN_DELETE_FLIGHT = '[Campaign] Delete Flight',
   CAMPAIGN_FLIGHT_FORM_UPDATE = '[Campaign] Flight Form Update'
 }

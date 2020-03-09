@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AccountService, Account, Advertiser, AdvertiserService, CampaignStoreService, Campaign } from '../../core';
+import { AccountService, Account, Advertiser, AdvertiserService, CampaignStoreService } from '../../core';
+import { Campaign } from '../store/reducers';
 import { selectLocalCampaign } from '../store/selectors';
 import { CampaignFormUpdate, CampaignSetAdvertiser } from '../store/actions';
 
