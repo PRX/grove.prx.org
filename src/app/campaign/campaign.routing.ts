@@ -3,9 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { CampaignComponent } from './campaign.component';
-import { CampaignFormComponent } from './form/campaign-form.component';
+import { CampaignNavComponent } from './nav/campaign-nav.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
+import { CampaignFormComponent } from './form/campaign-form.component';
 import { FlightContainerComponent } from './flight/flight.container';
 import { FlightComponent } from './flight/flight.component';
 import { AvailabilityComponent } from './availability/availability.component';
@@ -37,6 +38,7 @@ export const campaignComponents: any[] = [
   CampaignComponent,
   CampaignFormContainerComponent,
   CampaignFormComponent,
+  CampaignNavComponent,
   CampaignStatusComponent,
   FlightContainerComponent,
   FlightComponent,

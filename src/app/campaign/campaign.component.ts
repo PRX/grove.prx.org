@@ -27,24 +27,7 @@ export interface LocalFlightState {
     ></grove-campaign-status>
     <mat-drawer-container autosize>
       <mat-drawer role="navigation" mode="side" opened disableClose>
-        <mat-nav-list>
-          <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="./">Campaign</a>
-          <a
-            mat-list-item
-            *ngFor="let flight of campaignFlights$ | async; let i = index"
-            [routerLink]="['flight', flight.id]"
-            routerLinkActive="active-link"
-            [class.deleted-flight]="flight.softDeleted"
-            [class.changed]="flight.changed"
-            [class.valid]="flight.valid"
-            [class.invalid]="!flight.valid"
-            [class.error]="!flight.statusOk"
-          >
-            <span matLine>{{ flight.name }}</span>
-            <mat-icon color="warn" *ngIf="!flight.statusOk">priority_high</mat-icon>
-          </a>
-        </mat-nav-list>
-        <a class="add-flight" [routerLink]="" (click)="createFlight()"><mat-icon>add</mat-icon> Add a Flight</a>
+        <grove-campaign-nav [flights]="flights$ | async" (createFlight)="createFlight()"></grove-campaign-nav>
       </mat-drawer>
       <mat-drawer-content role="main">
         <router-outlet></router-outlet>
@@ -55,7 +38,7 @@ export interface LocalFlightState {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignComponent implements OnInit, OnDestroy {
-  campaignFlights$: Observable<LocalFlightState[]>;
+  flights$: Observable<FlightState[]>;
   campaignSaving$: Observable<boolean>;
   routeSub: Subscription;
 

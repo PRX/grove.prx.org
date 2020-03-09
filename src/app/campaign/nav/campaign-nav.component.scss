@@ -1,0 +1,59 @@
+@import '~src/sass/variables';
+
+.mat-list-base {
+  padding-top: 0;
+
+  .mat-list-item {
+    transition: border-left 100ms ease-out 0ms;
+    background: prx-theme-background(tab);
+    color: prx-theme-foreground(tab);
+    font-weight: 700;
+    margin: 0 0 2px;
+    border-left: 0 solid $primary;
+
+    &:hover,
+    &.active-link,
+    &.changed {
+      border-left-width: 4px;
+    }
+
+    &.active-link {
+      background: prx-theme-background(selected-tab);
+      color: prx-theme-foreground(selected-tab);
+    }
+
+    &.changed {
+      &.valid {
+        border-left-color: $success;
+      }
+
+      &.invalid,
+      &.error {
+        border-left-color: $warn;
+      }
+    }
+
+    &.deleted-flight {
+      text-decoration: line-through;
+      color: $warn;
+      border-left-color: $warn;
+    }
+  }
+}
+
+.add-flight {
+  transition: background-color 100ms linear 0ms;
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-column-gap: 0.25rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border: 1px dashed prx-theme-foreground(divider);
+  text-align: center;
+
+  &:hover {
+    background-color: prx-theme-background(selected-tab);
+  }
+}
