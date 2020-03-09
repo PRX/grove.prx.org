@@ -29,6 +29,12 @@ export class CampaignFormUpdate implements Action {
   constructor(public payload: { campaign: Campaign; changed: boolean; valid: boolean }) {}
 }
 
+export class CampaignSetAdvertiser implements Action {
+  readonly type = actionTypes.CAMPAIGN_SET_ADVERTISER;
+
+  constructor(public payload: { set_advertiser_uri }) {}
+}
+
 export class CampaignSave implements Action {
   readonly type = actionTypes.CAMPAIGN_SAVE;
 
@@ -73,6 +79,7 @@ export type CampaignActions =
   | CampaignLoadSuccess
   | CampaignLoadFailure
   | CampaignFormUpdate
+  | CampaignSetAdvertiser
   | CampaignFlightFormUpdate
   | CampaignAddFlight
   | CampaignDupFlight

@@ -34,6 +34,17 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
         valid
       };
     }
+    case ActionTypes.CAMPAIGN_SET_ADVERTISER: {
+      const { set_advertiser_uri } = action.payload;
+      return {
+        ...state,
+        localCampaign: {
+          ...state.localCampaign,
+          set_advertiser_uri
+        },
+        changed: true
+      };
+    }
     case ActionTypes.CAMPAIGN_LOAD: {
       return {
         ...state,
