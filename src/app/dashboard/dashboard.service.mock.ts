@@ -44,7 +44,7 @@ export const campaigns: Campaign[] = [
     name: 'New Campaign',
     advertiser: { id: 1, label: 'Adidas' },
     status: 'canceled',
-    type: 'paid_campaign',
+    type: 'paid',
     repName: 'John',
     notes: '',
     flights,
@@ -56,7 +56,7 @@ export const campaigns: Campaign[] = [
     name: 'Another Campaign',
     advertiser: { id: 2, label: 'Griddy' },
     status: 'approved',
-    type: 'paid_campaign',
+    type: 'paid',
     repName: 'Jacob',
     notes: '',
     flights,
@@ -96,7 +96,7 @@ export const facets: Facets = {
   ],
   type: [
     { id: 'house', label: 'House' },
-    { id: 'paid_campaign', label: 'Paid Campaign' }
+    { id: 'paid', label: 'Paid' }
   ],
   geo: [
     { id: 'US', label: 'United States' },
@@ -115,7 +115,7 @@ export const params: DashboardParams = {
   advertiser: 2,
   podcast: 2,
   status: 'approved',
-  type: 'paid_campaign',
+  type: 'paid',
   geo: ['US', 'CA'],
   zone: ['mid_1', 'pre_1'],
   text: 'anything',

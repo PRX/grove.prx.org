@@ -12,7 +12,6 @@ import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock } from '../dashboard.service.mock';
 
 import { FlightTableComponent } from './flight-table.component';
-import { CampaignTypePipe } from '../campaign-card';
 
 describe('FlightTableComponent', () => {
   let comp: FlightTableComponent;
@@ -26,7 +25,7 @@ describe('FlightTableComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [MatPaginatorModule, MatSortModule, MatTableModule, NoopAnimationsModule, RouterTestingModule],
-      declarations: [FlightTableComponent, CampaignTypePipe],
+      declarations: [FlightTableComponent],
       providers: [
         {
           provide: DashboardService,

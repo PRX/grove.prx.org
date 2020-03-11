@@ -14,7 +14,7 @@ import { Campaign } from '../dashboard.service';
       </h3>
       <div>
         <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
-        {{ campaign.type | campaignType }}
+        {{ campaign.type | titlecase }}
       </div>
       <div *ngIf="campaign.flights | campaignFlightTargets as targets">
         <prx-icon size="1em" name="globe-americas"></prx-icon>
