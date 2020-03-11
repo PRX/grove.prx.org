@@ -36,7 +36,7 @@ describe('CampaignStoreService', () => {
     campaignFixture = {
       id: 1,
       name: 'my campaign name',
-      type: 'paid_campaign',
+      type: 'paid',
       status: 'draft',
       repName: 'my rep name',
       notes: 'my notes',

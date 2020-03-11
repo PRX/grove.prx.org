@@ -15,13 +15,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { SharedModule } from '../shared/shared.module';
 import { PagingModule } from 'ngx-prx-styleguide';
 
-import {
-  CampaignCardComponent,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe,
-  CampaignTypePipe
-} from './campaign-card';
+import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe } from './campaign-card';
 
 import { DashboardComponent } from './dashboard.component';
 import { dashboardRouting } from './dashboard.routing';
@@ -41,14 +35,13 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     CampaignFlightDatesPipe,
     CampaignFlightTargetsPipe,
     CampaignFlightZonesPipe,
-    CampaignTypePipe,
     CampaignListSortComponent,
     CampaignListTotalPagesPipe,
     FlightTableContainerComponent,
     FlightTableComponent
   ],
   imports: [
-  dashboardRouting,
+    dashboardRouting,
     CommonModule,
     PagingModule,
     RouterModule,

@@ -29,13 +29,8 @@ export class CampaignFormComponent implements OnInit {
   }
 
   readonly typeOptions = [
-    { name: 'Paid Campaign', value: 'paid_campaign' },
-    { name: 'Cross Promo', value: 'cross_promo' },
-    { name: 'Cross Promo Special', value: 'cross_promo_special' },
-    { name: 'Event', value: 'event' },
-    { name: 'Fundraiser', value: 'fundraiser' },
-    { name: 'House', value: 'house' },
-    { name: 'Survey', value: 'survey' }
+    { name: 'Paid', value: 'paid' },
+    { name: 'House', value: 'house' }
   ];
 
   readonly statusOptions = [
