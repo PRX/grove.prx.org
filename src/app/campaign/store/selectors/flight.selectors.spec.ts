@@ -11,23 +11,58 @@ describe('Flight Selectors', () => {
   it('should select routed flight', () => {
     const flight = flightSelectors.selectRoutedFlight.projector(
       campaignStateFactory.createCampaignStoreState().flights.entities,
-      campaignStateFactory.createRouterState().router.state
+      campaignStateFactory.createRouterState().router.state.flightId
     );
     expect(flight).toBeDefined();
   });
 
   it('should select routed local flight', () => {
     const flight = flightSelectors.selectRoutedLocalFlight.projector(
-      campaignStateFactory.createFlightsState().flights.entities[campaignStateFactory.flightFixture.id]
+      campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
+        campaignStateFactory.flightFixture.id
+      ]
     );
     expect(flight).toBeDefined();
   });
 
-  it('should select routed flight doc', () => {
-    const doc = flightSelectors.selectRoutedFlightDoc.projector({
-      ...campaignStateFactory.createFlightsState().flights.entities[campaignStateFactory.flightFixture.id],
-      doc: new MockHalDoc(campaignStateFactory.flightDocFixture)
-    });
+  it('should select routed local flight zones', () => {
+    const zones = flightSelectors.selectRoutedLocalFlightZones.projector(campaignStateFactory.flightFixture);
+    expect(zones).toEqual(campaignStateFactory.flightFixture.zones);
+  });
+
+  it('should select current/routed local flight inventory uri', () => {
+    const uri = flightSelectors.selectCurrentInventoryUri.projector(campaignStateFactory.flightFixture);
+    expect(uri).toEqual(campaignStateFactory.flightFixture.set_inventory_uri);
+  });
+
+  it('should select routed flight deleted', () => {
+    const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
+      campaignStateFactory.flightFixture.id
+    ];
+    const softDeleted = flightSelectors.selectRoutedFlightDeleted.projector(flightState);
+    expect(softDeleted).toEqual(flightState.softDeleted);
+  });
+
+  it('should select routed flight changed', () => {
+    const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
+      campaignStateFactory.flightFixture.id
+    ];
+    const changed = flightSelectors.selectRoutedFlightChanged.projector(flightState);
+    expect(changed).toEqual(flightState.changed);
+  });
+
+  it('should select routed flight daily minimum', () => {
+    const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
+      campaignStateFactory.flightFixture.id
+    ];
+    const dailyMinimum = flightSelectors.selectRoutedFlightDailyMinimum.projector(flightState);
+    expect(dailyMinimum).toEqual(flightState.dailyMinimum);
+  });
+
+  it('should select flight doc by id', () => {
+    const state = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture));
+    const doc = flightSelectors.selectFlightDocById.projector(state.flights.entities, { id: campaignStateFactory.flightFixture.id });
     expect(doc).toBeDefined();
+    expect(doc.id).toEqual(campaignStateFactory.flightFixture.id);
   });
 });

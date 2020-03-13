@@ -1,7 +1,7 @@
 @import '~src/sass/variables';
 
 mat-drawer-content {
-  min-height: 150px;
+  min-height: 400px;
 }
 
 mat-drawer {
@@ -9,4 +9,15 @@ mat-drawer {
   max-width: 400px;
   background: prx-theme-background(app-bar);
   border-right: none;
+}
+
+.error {
+  color: mat-color($prx-warn);
+}
+.error,
+.loading {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 5em 0;
 }

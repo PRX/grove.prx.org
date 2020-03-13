@@ -2,28 +2,24 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement, Component } from '@angular/core';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSidenavModule, MatListModule, MatIconModule } from '@angular/material';
+import { MatSidenavModule, MatListModule, MatIconModule, MatProgressSpinnerModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { StoreModule } from '@ngrx/store';
-import { ReplaySubject, of } from 'rxjs';
-import { map, first } from 'rxjs/operators';
-import {
-  CampaignStoreService,
-  CampaignState,
-  FlightState,
-  AccountService,
-  AdvertiserService,
-  AuguryService,
-  CampaignStateChanges
-} from '../core';
+import { StoreModule, Store } from '@ngrx/store';
+import { of } from 'rxjs';
+import { AccountService, AdvertiserService, AuguryService, InventoryService } from '../core';
+import { AllocationPreviewService } from '../core/allocation/allocation-preview.service';
 import { AccountServiceMock } from '../core/account/account.service.mock';
 import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
 import { ActivatedRouteStub } from '../../testing/stub.router';
-import { FancyFormModule, StatusBarModule, ToastrService, MockHalService } from 'ngx-prx-styleguide';
+import { FancyFormModule, StatusBarModule, MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
+import * as actions from './store/actions';
+import { selectCampaignWithFlightsForSave, selectCampaignId } from './store/selectors';
+import { campaignDocFixture, flightFixture, flightDocFixture } from './store/reducers/campaign-state.factory';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
+import { CampaignNavComponent } from './nav/campaign-nav.component';
 
 @Component({
   selector: 'grove-test-component',
@@ -37,12 +33,12 @@ const campaignChildRoutes: Routes = [
 const campaignRoutes: Routes = [
   {
     path: 'campaign/new',
-    component: CampaignComponent,
+    component: TestComponent,
     children: campaignChildRoutes
   },
   {
     path: 'campaign/:id',
-    component: CampaignComponent,
+    component: TestComponent,
     children: campaignChildRoutes
   }
 ];
@@ -53,16 +49,9 @@ describe('CampaignComponent', () => {
   let de: DebugElement;
   let el: HTMLElement;
   let router: Router;
+  let store: Store<any>;
+  let dispatchSpy;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
-  const campaignState = new ReplaySubject<CampaignState>(1);
-  const campaignStoreService = {
-    campaignFirst$: campaignState,
-    flights$: campaignState.pipe(map(s => s.flights)),
-    load: jest.fn(() => campaignState),
-    storeCampaign: jest.fn(() => of([{}, []])),
-    setFlight: jest.fn()
-  };
-  const toastrService: ToastrService = { success: jest.fn() } as any;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -74,11 +63,12 @@ describe('CampaignComponent', () => {
         NoopAnimationsModule,
         MatIconModule,
         MatListModule,
+        MatProgressSpinnerModule,
         MatSidenavModule,
         StoreModule.forRoot({}),
         StoreModule.forFeature('campaignState', reducers)
       ],
-      declarations: [CampaignComponent, CampaignStatusComponent, TestComponent],
+      declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, TestComponent],
       providers: [
         {
           provide: ActivatedRoute,
@@ -97,12 +87,14 @@ describe('CampaignComponent', () => {
           useValue: new AdvertiserServiceMock(new MockHalService())
         },
         {
-          provide: CampaignStoreService,
-          useValue: campaignStoreService
+          provide: AllocationPreviewService,
+          useValue: {
+            getAllocationPreview: jest.fn(flight => of(undefined))
+          }
         },
         {
-          provide: ToastrService,
-          useValue: toastrService
+          provide: InventoryService,
+          useValue: { listInventory: jest.fn(() => of([])) }
         }
       ]
     })
@@ -115,87 +107,45 @@ describe('CampaignComponent', () => {
         fix.detectChanges();
 
         router = TestBed.get(Router);
-        jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
+        store = TestBed.get(Store);
+        dispatchSpy = jest.spyOn(store, 'dispatch');
       });
   }));
 
-  function campaignFactory(attrs = {}): CampaignState {
-    return {
-      localCampaign: {
-        name: 'my campaign',
-        type: '',
-        status: '',
-        repName: '',
-        notes: '',
-        set_account_uri: '',
-        set_advertiser_uri: '',
-        ...attrs
-      },
-      changed: false,
-      valid: false,
-      flights: {}
-    };
-  }
-  function flightFactory(attrs = {}): FlightState {
-    return {
-      localFlight: { id: 123, name: 'my flight', startAt: '', endAt: '', totalGoal: 1, set_inventory_uri: '', zones: [], ...attrs },
-      changed: false,
-      valid: false
-    };
-  }
-
-  it('loads the campaign state from the route', done => {
+  it('inits the campaign state from the route', done => {
+    router.navigateByUrl('/campaign/123');
     route.setParamMap({ id: '123' });
-    route.paramMap.subscribe(params => {
-      expect(campaignStoreService.load).toHaveBeenCalledWith('123');
+    route.paramMap.subscribe(() => {
+      expect(dispatchSpy).toHaveBeenCalledWith(new actions.CampaignLoad({ id: 123 }));
       done();
     });
   });
 
-  it('loads flights options from the campaign state', done => {
-    const campaign = campaignFactory();
-    const flight1 = flightFactory({ name: 'Name 1' });
-    const flight2 = flightFactory({ name: 'Name 2' });
-    campaignState.next({ ...campaign, flights: { flight1, flight2 } });
-    component.campaignFlights$.pipe(first()).subscribe(options => {
-      expect(options).toMatchObject([
-        { id: 'flight1', name: 'Name 1' },
-        { id: 'flight2', name: 'Name 2' }
-      ]);
+  it('submits the campaign forms', done => {
+    const flightIds = [flightFixture.id, flightFixture.id + 1, flightFixture.id + 2, flightFixture.id + 3];
+    const campaignDoc = new MockHalDoc(campaignDocFixture);
+    const flightDocs = [
+      new MockHalDoc({ ...flightDocFixture, id: flightIds[0] }),
+      new MockHalDoc({ ...flightDocFixture, id: flightIds[1] }),
+      new MockHalDoc({ ...flightDocFixture, id: flightIds[2] }),
+      new MockHalDoc({ ...flightDocFixture, id: flightIds[3] })
+    ];
+    const loadAction = new actions.CampaignLoadSuccess({ campaignDoc, flightDocs });
+    store.dispatch(loadAction);
+    const goalAction = new actions.CampaignFlightSetGoal({ flightId: flightIds[0], totalGoal: 999, dailyMinimum: 9, valid: true });
+    store.dispatch(goalAction);
+    component.campaignSubmit();
+    store.select(selectCampaignWithFlightsForSave).subscribe(campaignFlights => {
+      expect(dispatchSpy).toHaveBeenLastCalledWith(new actions.CampaignSave(campaignFlights));
       done();
     });
   });
 
-  it('submits the campaign forms', () => {
-    const campaign = campaignFactory();
-    campaignState.next(campaign);
-    component.campaignSubmit();
-    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
-    expect(toastrService.success).toHaveBeenCalledWith('Campaign saved');
-  });
-
-  it('redirects to a new flight', () => {
-    jest.spyOn(router, 'url', 'get').mockReturnValue('/campaign/null/flight/9999');
-    const changes: CampaignStateChanges = { id: 1234, prevId: null, flights: { 9999: 8888 } };
-    campaignStoreService.storeCampaign.mockImplementation(() => of([changes, []]));
-    component.campaignSubmit();
-    expect(campaignStoreService.storeCampaign).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1234, 'flight', 8888]);
-  });
-
-  it('adds a new flight to the state', () => {
-    const spy = jest.spyOn(campaignStoreService, 'setFlight');
-    const campaign = campaignFactory();
-    campaignState.next(campaign);
+  it('calls action to add a new flight', done => {
     component.createFlight();
-    expect(spy).toHaveBeenCalled();
-    const flight = spy.mock.calls[0][0];
-    const id = spy.mock.calls[0][1];
-    expect(flight).toMatchObject({
-      localFlight: { name: 'New Flight 1' },
-      changed: false,
-      valid: true
+    store.select(selectCampaignId).subscribe(campaignId => {
+      expect(dispatchSpy).toHaveBeenCalledWith(new actions.CampaignAddFlight({ campaignId }));
+      done();
     });
-    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 'new', 'flight', id]);
   });
 });

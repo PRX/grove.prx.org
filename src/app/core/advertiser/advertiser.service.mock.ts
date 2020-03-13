@@ -5,19 +5,19 @@ import { Advertiser } from './advertiser.service';
 
 export const advertisers = [
   {
-      id: 1,
-      set_advertiser_uri: '1',
-      name: 'Adidas'
+    id: 1,
+    set_advertiser_uri: '1',
+    name: 'Adidas'
   },
   {
-      id: 2,
-      set_advertiser_uri: '2',
-      name: 'Griddy'
+    id: 2,
+    set_advertiser_uri: '2',
+    name: 'Griddy'
   },
   {
-      id: 3,
-      set_advertiser_uri: '3',
-      name: 'Toyota'
+    id: 3,
+    set_advertiser_uri: '3',
+    name: 'Toyota'
   }
 ];
 
@@ -37,7 +37,8 @@ export class AdvertiserServiceMock {
   }
 
   addAdvertiser(name): Observable<Advertiser> {
-    const advertiser = {name, set_advertiser_uri: '4', id: 4};
+    const id = advertisers.length + 1;
+    const advertiser = { name, set_advertiser_uri: id.toString(), id };
     this._advertisers.next([...this._advertisers.getValue(), advertiser]);
     return of(advertiser);
   }

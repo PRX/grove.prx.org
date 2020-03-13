@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { of, forkJoin, Observable } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
-import { HalDoc } from 'ngx-prx-styleguide';
+import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
 import * as actions from '../actions';
 import { ActionTypes } from '../actions/action.types';
+import { CampaignFormSave } from '../reducers';
 import { CampaignService } from '../../../core';
 
 @Injectable()
@@ -26,28 +27,95 @@ export class CampaignEffects {
   campaignFormSave$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_SAVE),
     map((action: actions.CampaignSave) => action.payload),
-    mergeMap((payload: { campaign }) => {
-      const result = payload.campaign.id
-        ? this.campaignService.updateCampaign(payload.campaign)
-        : this.campaignService.createCampaign(payload.campaign);
-      return result.pipe(
-        tap(({ campaignDoc }: { campaignDoc: HalDoc }) => {
-          // TODO: incorporate flight changes and the rest of routing here
-          // navigate to newly created campaign/flight
-          // const flightId = this.router.url.split('/flight/').pop();
-          // if (this.router.url.includes('/flight/') && !changes.flights[flightId]) {
-          //   // flight not in changes (flight deleted)
-          //   this.router.navigate(['/campaign', campaign.id]);
-          // } else if (this.router.url.includes('/flight/') && flightId !== changes.flights[flightId]) {
-          //   // flight id changed (flight created)
-          //   this.router.navigate(['/campaign', campaign.id, 'flight', changes.flights[flightId]]);
-          // } else
-          if (payload.campaign.id !== campaignDoc.id) {
-            // campaign id changed (campaign created)
-            this.router.navigate(['/campaign', campaignDoc.id]);
-          }
+    mergeMap((payload: CampaignFormSave) => {
+      let campaignSaveResult: Observable<HalDoc>;
+      if (payload.campaign.id) {
+        campaignSaveResult = this.campaignService.updateCampaign(payload.campaign);
+      } else {
+        campaignSaveResult = this.campaignService.createCampaign(payload.campaign);
+      }
+      return campaignSaveResult.pipe(
+        mergeMap((campaignDoc: HalDoc) => {
+          const deletedFlights: { [id: number]: Observable<HalDoc> } = payload.deletedFlights.reduce(
+            (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.deleteFlight(flight.id) }),
+            {}
+          );
+          return payload.deletedFlights.length
+            ? forkJoin(deletedFlights).pipe(map(deletedFlightDocs => ({ campaignDoc, deletedFlightDocs })))
+            : of({ campaignDoc });
         }),
-        map(({ campaignDoc }: { campaignDoc: HalDoc }) => new actions.CampaignSaveSuccess({ campaignDoc })),
+        mergeMap(({ campaignDoc, deletedFlightDocs }: { campaignDoc: HalDoc; deletedFlightDocs: { [id: number]: HalDoc } }) => {
+          const updatedFlights: { [id: number]: Observable<HalDoc> } = payload.updatedFlights.reduce(
+            (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.updateFlight(flight) }),
+            {}
+          );
+          return payload.updatedFlights.length
+            ? forkJoin(updatedFlights).pipe(map(updatedFlightDocs => ({ campaignDoc, deletedFlightDocs, updatedFlightDocs })))
+            : of({ campaignDoc, deletedFlightDocs });
+        }),
+        mergeMap(
+          ({
+            campaignDoc,
+            updatedFlightDocs,
+            deletedFlightDocs
+          }: {
+            campaignDoc: HalDoc;
+            updatedFlightDocs: { [id: number]: HalDoc };
+            deletedFlightDocs: { [id: number]: HalDoc };
+          }) => {
+            const createdFlights: { [id: number]: Observable<HalDoc> } = payload.createdFlights.reduce(
+              (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.createFlight(flight) }),
+              {}
+            );
+            return payload.createdFlights.length
+              ? forkJoin(createdFlights).pipe(
+                  map(createdFlightDocs => ({ campaignDoc, updatedFlightDocs, createdFlightDocs, deletedFlightDocs }))
+                )
+              : of({ campaignDoc, updatedFlightDocs, deletedFlightDocs });
+          }
+        ),
+        tap(
+          ({
+            campaignDoc,
+            deletedFlightDocs,
+            updatedFlightDocs,
+            createdFlightDocs
+          }: {
+            campaignDoc: HalDoc;
+            deletedFlightDocs: { [id: number]: HalDoc };
+            updatedFlightDocs: { [id: number]: HalDoc };
+            createdFlightDocs: { [id: number]: HalDoc };
+          }) => {
+            this.toastr.success('Campaign saved');
+            // navigate to newly created campaign/flight or away from deleted flight
+            const campaignId = campaignDoc.id;
+            const flightId = +this.router.url.split('/flight/').pop();
+            debugger;
+            if (this.router.url.includes('/flight/') && deletedFlightDocs && deletedFlightDocs[flightId]) {
+              // routed flight deleted
+              this.router.navigate(['/campaign', campaignId]);
+            } else if (this.router.url.includes('/flight/') && createdFlightDocs && createdFlightDocs[flightId]) {
+              // flight id changed (flight created)
+              this.router.navigate(['/campaign', campaignId, 'flight', createdFlightDocs[flightId].id]);
+            } else if (!payload.campaign.id || payload.campaign.id !== campaignId) {
+              // campaign id changed (campaign created)
+              this.router.navigate(['/campaign', campaignId]);
+            }
+          }
+        ),
+        map(
+          ({
+            campaignDoc,
+            deletedFlightDocs,
+            updatedFlightDocs,
+            createdFlightDocs
+          }: {
+            campaignDoc: HalDoc;
+            deletedFlightDocs: { [id: number]: HalDoc };
+            updatedFlightDocs: { [id: number]: HalDoc };
+            createdFlightDocs: { [id: number]: HalDoc };
+          }) => new actions.CampaignSaveSuccess({ campaignDoc, deletedFlightDocs, updatedFlightDocs, createdFlightDocs })
+        ),
         catchError(error => of(new actions.CampaignSaveFailure({ error })))
       );
     })
@@ -57,7 +125,7 @@ export class CampaignEffects {
   addFlight$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_ADD_FLIGHT),
     map((action: actions.CampaignAddFlight) => {
-      const date = new Date();
+      const date = new Date(Date.now());
       const flightId = date.getTime();
       const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
       const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
@@ -71,12 +139,11 @@ export class CampaignEffects {
     ofType(ActionTypes.CAMPAIGN_DUP_FLIGHT),
     map((action: actions.CampaignDupFlight) => {
       const { campaignId, flight } = action.payload;
-      const date = new Date();
-      const flightId = date.getTime();
+      const flightId = Date.now();
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
       return new actions.CampaignDupFlightWithTempId({ flightId, flight });
     })
   );
 
-  constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router) {}
+  constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router, private toastr: ToastrService) {}
 }

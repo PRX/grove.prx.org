@@ -1,25 +1,24 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { ReplaySubject, Observable, combineLatest, Subscription } from 'rxjs';
+import { Observable, combineLatest, Subscription } from 'rxjs';
+import { Inventory, InventoryService, CampaignStoreService, InventoryZone, Availability } from '../../core';
+import { Flight } from '../store/reducers';
+import { map, filter, first } from 'rxjs/operators';
 import {
-  Inventory,
-  InventoryService,
-  CampaignStoreService,
-  FlightState,
-  InventoryZone,
-  Flight,
-  CampaignState,
-  Availability
-} from '../../core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { map, filter, first, pluck } from 'rxjs/operators';
-import * as actions from '../store/actions';
-import { selectRoutedFlight } from '../store/selectors';
+  selectCampaignId,
+  selectRoutedFlight,
+  selectRoutedLocalFlight,
+  selectRoutedFlightDeleted,
+  selectRoutedFlightChanged,
+  selectRoutedFlightDailyMinimum,
+  selectCurrentInventoryUri
+} from '../store/selectors';
+import { CampaignFlightSetGoal, CampaignFlightFormUpdate, CampaignDupFlight, CampaignDeleteFlight } from '../store/actions';
 
 @Component({
   selector: 'grove-flight.container',
   template: `
-    <ng-container *ngIf="zoneOptions$ | async as zoneOpts; else loadingForm">
+    <ng-container *ngIf="zoneOptions$ | async as zoneOpts">
       <grove-flight
         [inventory]="inventoryOptions$ | async"
         [zoneOptions]="zoneOpts"
@@ -41,45 +40,40 @@ import { selectRoutedFlight } from '../store/selectors';
       >
       </grove-availability>
     </ng-container>
-    <ng-template #loadingForm>
-      <div class="loading-form"><mat-spinner></mat-spinner></div>
-    </ng-template>
   `,
   styleUrls: ['flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
-  private currentFlightId: string;
-  flightState$ = new ReplaySubject<FlightState>(1);
-  flightLocal$ = this.flightState$.pipe(map((state: FlightState) => state.localFlight));
-  softDeleted$ = this.flightState$.pipe(map(state => state.softDeleted));
-  flightChanged$ = this.flightState$.pipe(pluck('changed'));
+  private currentFlightId: number;
+  flightLocal$: Observable<Flight>;
+  softDeleted$: Observable<boolean>;
+  flightChanged$: Observable<boolean>;
   flightAvailability$: Observable<Availability[]>;
   flightDailyMin$: Observable<number>;
-  currentInventoryUri$ = new ReplaySubject<string>(1);
+  currentInventoryUri$: Observable<string>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
 
-  constructor(
-    private route: ActivatedRoute,
-    private inventoryService: InventoryService,
-    private campaignStoreService: CampaignStoreService,
-    private router: Router,
-    private store: Store<any>
-  ) {}
+  constructor(private inventoryService: InventoryService, private campaignStoreService: CampaignStoreService, private store: Store<any>) {}
 
   ngOnInit() {
+    this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
+    this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
+    this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
+    this.flightDailyMin$ = this.store.pipe(select(selectRoutedFlightDailyMinimum));
+    this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
+    this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$();
+
     this.inventoryOptions$ = this.inventoryService.listInventory();
-    this.zoneOptions$ = combineLatest(this.inventoryOptions$, this.currentInventoryUri$).pipe(
+    this.zoneOptions$ = combineLatest([this.inventoryOptions$, this.currentInventoryUri$]).pipe(
       map(([options, uri]) => {
         const inventory = options.find(i => i.self_uri === uri);
         return inventory ? inventory.zones : [];
       })
     );
-    this.flightSub = combineLatest(this.route.paramMap, this.campaignStoreService.campaign$).subscribe(([params, campaignState]) => {
-      this.setFlightId(params.get('flightId'), campaignState);
-    });
+    this.onFlightIdChangeLoadAvailability();
   }
 
   ngOnDestroy() {
@@ -88,82 +82,55 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  setFlightId(id: string, state: CampaignState) {
-    if (state.flights[id]) {
-      if (this.currentFlightId !== id) {
-        this.campaignStoreService.loadAvailability(state.flights[id].localFlight);
-        this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$(id);
-        this.flightDailyMin$ = this.campaignStoreService.getFlightDailyMin$(id);
-      }
-      this.currentFlightId = id;
-      this.flightState$.next(state.flights[id]);
-      this.currentInventoryUri$.next(state.flights[id].localFlight.set_inventory_uri);
-    } /*
-    else {
-      TODO: what to do about an invalid flight id and how to tell if a flight doesn't exist or hasn't yet been loaded into state
-      TODO: I think when I removed this, it broke the browser refresh on a new flight form, just shows loading spinner
-    }*/
+  onFlightIdChangeLoadAvailability() {
+    this.flightSub = this.flightLocal$.pipe(filter(flight => flight && this.currentFlightId !== flight.id)).subscribe(flight => {
+      this.campaignStoreService.loadAvailability(flight);
+      this.currentFlightId = flight.id;
+    });
   }
 
-  flightUpdateFromForm({ flight, changed, valid }) {
-    this.loadAvailabilityAllocationIfChanged(flight);
-    this.campaignStoreService.setFlight({ localFlight: flight, changed, valid }, this.currentFlightId);
-    this.currentInventoryUri$.next(flight.set_inventory_uri);
-
+  flightUpdateFromForm({ flight: formFlight, changed, valid }: { flight: Flight; changed: boolean; valid: boolean }) {
     this.store
       .pipe(
         select(selectRoutedFlight),
         filter(state => !!(state && state.id)),
         first()
       )
-      .subscribe(state =>
+      .subscribe(state => {
+        this.loadAvailabilityAllocationIfChanged(formFlight, state.localFlight, state.dailyMinimum);
         this.store.dispatch(
-          new actions.CampaignFlightFormUpdate({
-            id: state.id,
-            flight: { ...flight, startAt: new Date(flight.startAt.valueOf()), endAt: new Date(flight.endAt.valueOf()) },
+          new CampaignFlightFormUpdate({
+            flight: formFlight,
             changed,
             valid
           })
-        )
-      );
+        );
+      });
   }
 
-  loadAvailabilityAllocationIfChanged(flight: Flight) {
-    this.flightState$
-      .pipe(
-        filter((flightState: FlightState) => {
-          // determine if the availability fields are present and have changed since the last update from form
-          const { localFlight } = flightState;
-          const idMatch = flight.id === localFlight.id;
-          // dates come back as Date but typed string on Flight
-          const flightStartAtDate = flight.startAt && new Date(flight.startAt.valueOf());
-          const flightEndAtDate = flight.endAt && new Date(flight.endAt.valueOf());
-          const dateRangeValid = flightStartAtDate && flightEndAtDate && flightStartAtDate.valueOf() < flightEndAtDate.valueOf();
-          const hasAvailabilityParams =
-            flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0;
-          const availabilityParamsChanged =
-            hasAvailabilityParams &&
-            (flightStartAtDate.valueOf() !== new Date(localFlight.startAt).valueOf() ||
-              flightEndAtDate.valueOf() !== new Date(localFlight.endAt).valueOf() ||
-              flight.set_inventory_uri !== localFlight.set_inventory_uri ||
-              !flight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
-          return idMatch && dateRangeValid && availabilityParamsChanged;
-        }),
-        first()
-      )
-      .subscribe(() => {
-        this.campaignStoreService.loadAvailability(flight, this.currentFlightId);
-        if (flight.totalGoal) {
-          this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId);
-        }
-      });
+  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
+    const dateRangeValid = formFlight.startAt && formFlight.endAt && formFlight.startAt.valueOf() < formFlight.endAt.valueOf();
+    const hasAvailabilityParams =
+      formFlight.startAt && formFlight.endAt && formFlight.set_inventory_uri && formFlight.zones && formFlight.zones.length > 0;
+    const availabilityParamsChanged =
+      hasAvailabilityParams &&
+      (formFlight.startAt.getTime() !== localFlight.startAt.getTime() ||
+        formFlight.endAt.getTime() !== localFlight.endAt.getTime() ||
+        formFlight.set_inventory_uri !== localFlight.set_inventory_uri ||
+        !formFlight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
+    if (dateRangeValid && availabilityParamsChanged) {
+      this.campaignStoreService.loadAvailability(formFlight);
+      if (formFlight.totalGoal) {
+        this.campaignStoreService.loadAllocationPreview(formFlight, dailyMinimum);
+      }
+    }
   }
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
     const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
-    this.campaignStoreService.setFlight({ localFlight: flight, changed: true, valid }, this.currentFlightId);
+    this.store.dispatch(new CampaignFlightSetGoal({ flightId: flight.id, totalGoal: flight.totalGoal, dailyMinimum, valid }));
     if (valid) {
-      this.campaignStoreService.loadAllocationPreview(flight, this.currentFlightId, dailyMinimum);
+      this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum);
     }
   }
 
@@ -173,15 +140,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   flightDuplicate(flight: Flight) {
     const storeFlight = { ...flight, startAt: new Date(flight.startAt.valueOf()), endAt: new Date(flight.endAt.valueOf()) };
-    this.store.dispatch(new actions.CampaignDupFlight({ flight: storeFlight }));
-
-    const localFlight: Flight = { ...flight, name: `${flight.name} (Copy)` };
-    this.campaignStoreService.campaignFirst$.subscribe(state => {
-      const flightId = Date.now();
-      this.campaignStoreService.setFlight({ localFlight, changed: true, valid: true }, flightId);
-
-      const campaignId = state.remoteCampaign ? state.remoteCampaign.id : 'new';
-      this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
+      this.store.dispatch(new CampaignDupFlight({ campaignId, flight: storeFlight }));
     });
   }
 
@@ -192,13 +152,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         filter(state => !!(state && state.id)),
         first()
       )
-      .subscribe(state => this.store.dispatch(new actions.CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
-
-    this.campaignStoreService.campaignFirst$.subscribe(state => {
-      const currentState = state.flights[this.currentFlightId];
-      const newState = { ...currentState, changed: true, softDeleted: !currentState.softDeleted };
-      this.campaignStoreService.setFlight(newState, this.currentFlightId);
-      this.flightState$.next(newState);
-    });
+      .subscribe(state => this.store.dispatch(new CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
   }
 }

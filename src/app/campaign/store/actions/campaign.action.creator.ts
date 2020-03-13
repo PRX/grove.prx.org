@@ -1,10 +1,14 @@
 import { Action } from '@ngrx/store';
 import { ActionTypes as actionTypes } from './action.types';
-import { Campaign, Flight } from '../reducers/';
+import { Campaign, Flight, CampaignFormSave } from '../reducers/';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export class CampaignNew implements Action {
   readonly type = actionTypes.CAMPAIGN_NEW;
+}
+
+export class CampaignLoadOptions implements Action {
+  readonly type = actionTypes.CAMPAIGN_LOAD_OPTIONS;
 }
 
 export class CampaignLoad implements Action {
@@ -38,12 +42,19 @@ export class CampaignSetAdvertiser implements Action {
 export class CampaignSave implements Action {
   readonly type = actionTypes.CAMPAIGN_SAVE;
 
-  constructor(public payload: { campaign: Campaign }) {}
+  constructor(public payload: CampaignFormSave) {}
 }
 export class CampaignSaveSuccess implements Action {
   readonly type = actionTypes.CAMPAIGN_SAVE_SUCCESS;
 
-  constructor(public payload: { campaignDoc: HalDoc }) {}
+  constructor(
+    public payload: {
+      campaignDoc: HalDoc;
+      deletedFlightDocs: { [id: number]: HalDoc };
+      updatedFlightDocs: { [id: number]: HalDoc };
+      createdFlightDocs: { [id: number]: HalDoc };
+    }
+  ) {}
 }
 export class CampaignSaveFailure implements Action {
   readonly type = actionTypes.CAMPAIGN_SAVE_FAILURE;
@@ -84,17 +95,25 @@ export class CampaignDeleteFlight implements Action {
 export class CampaignFlightFormUpdate implements Action {
   readonly type = actionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE;
 
-  constructor(public payload: { id: number; flight: Flight; changed: boolean; valid: boolean }) {}
+  constructor(public payload: { flight: Flight; changed: boolean; valid: boolean }) {}
+}
+
+export class CampaignFlightSetGoal implements Action {
+  readonly type = actionTypes.CAMPAIGN_FLIGHT_SET_GOAL;
+
+  constructor(public payload: { flightId: number; totalGoal: number; dailyMinimum: number; valid: boolean }) {}
 }
 
 export type CampaignActions =
   | CampaignNew
+  | CampaignLoadOptions
   | CampaignLoad
   | CampaignLoadSuccess
   | CampaignLoadFailure
   | CampaignFormUpdate
   | CampaignSetAdvertiser
   | CampaignFlightFormUpdate
+  | CampaignFlightSetGoal
   | CampaignAddFlight
   | CampaignAddFlightWithTempId
   | CampaignDupFlight

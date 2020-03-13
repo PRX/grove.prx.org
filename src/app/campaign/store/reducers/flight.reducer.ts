@@ -4,7 +4,7 @@ import { docToFlight, Flight, FlightState } from './campaign.models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection
-  // campaignId?
+  campaignId?: number;
 }
 
 export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>();
@@ -16,7 +16,13 @@ export const initialState: State = adapter.getInitialState({
 export function reducer(state = initialState, action: CampaignActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_NEW: {
-      return adapter.removeAll(state);
+      return { ...adapter.removeAll(state), campaignId: undefined };
+    }
+    case ActionTypes.CAMPAIGN_LOAD: {
+      return {
+        ...adapter.removeAll(state),
+        ...(action.payload && { campaignId: action.payload.id })
+      };
     }
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS: {
       const flights = action.payload.flightDocs.map(doc => {
@@ -60,8 +66,44 @@ export function reducer(state = initialState, action: CampaignActions): State {
       return adapter.updateOne({ id, changes: { softDeleted } }, state);
     }
     case ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE: {
-      const { id, flight: localFlight, changed, valid } = action.payload;
-      return adapter.upsertOne({ id, localFlight, changed, valid }, state);
+      const { flight: localFlight, changed, valid } = action.payload;
+      return adapter.updateOne({ id: localFlight.id, changes: { localFlight, changed, valid } }, state);
+    }
+    case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
+      const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;
+      return adapter.updateOne(
+        { id, changes: { localFlight: { ...state.entities[id].localFlight, totalGoal }, dailyMinimum, changed: true, valid } },
+        state
+      );
+    }
+    case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
+      let newState = state;
+      const { deletedFlightDocs, updatedFlightDocs, createdFlightDocs } = action.payload;
+      if (deletedFlightDocs) {
+        newState = adapter.removeMany(Object.keys(deletedFlightDocs), newState);
+      }
+      if (updatedFlightDocs) {
+        const updatedFlightIds = Object.keys(updatedFlightDocs);
+        newState = adapter.updateMany(
+          updatedFlightIds.map(id => {
+            const doc = docToFlight(updatedFlightDocs[id]);
+            return { id, changes: { localFlight: doc, remoteFlight: doc, changed: false } };
+          }),
+          newState
+        );
+      }
+      if (createdFlightDocs) {
+        const newFlightIds = Object.keys(createdFlightDocs);
+        newState = adapter.removeMany(newFlightIds, newState);
+        newState = adapter.addMany(
+          newFlightIds.map(newId => {
+            const doc = docToFlight(createdFlightDocs[newId]);
+            return { id: createdFlightDocs[newId].id, localFlight: doc, remoteFlight: doc, changed: false, valid: true };
+          }),
+          newState
+        );
+      }
+      return newState;
     }
     default: {
       return state;

@@ -1,5 +1,7 @@
 import { CampaignStoreState } from '..';
-import { MockHalDoc } from 'ngx-prx-styleguide';
+import { MockHalService } from 'ngx-prx-styleguide';
+
+const augury = new MockHalService();
 
 export const campaignFixture = {
   id: 1,
@@ -25,18 +27,20 @@ export const createCampaignState = () => ({
     changed: false,
     valid: true,
     loading: false,
+    loaded: true,
     saving: false,
-    doc: new MockHalDoc(campaignDocFixture)
+    doc: augury.mock('prx:campaign', campaignDocFixture)
   }
 });
 
 export const flightFixture = {
   id: 9,
+  createdAt: new Date(),
   name: 'my flight name',
   startAt: new Date('2019-09-01'),
   endAt: new Date('2019-10-01'),
   totalGoal: 999,
-  zones: [],
+  zones: ['pre_1'],
   set_inventory_uri: '/some/inventory'
 };
 export const flightDocFixture = {
@@ -46,10 +50,21 @@ export const flightDocFixture = {
   }
 };
 
-export const createFlightsState = () => ({
+export const createFlightsState = campaignDoc => ({
   flights: {
     ids: [flightFixture.id],
-    entities: { [flightFixture.id]: { id: flightFixture.id, localFlight: flightFixture, changed: false, valid: true } }
+    entities: {
+      [flightFixture.id]: {
+        id: flightFixture.id,
+        localFlight: flightFixture,
+        remoteFlight: flightFixture,
+        dailyMinimum: 99,
+        changed: false,
+        valid: true,
+        softDeleted: false,
+        doc: campaignDoc.mock('prx:flight', flightDocFixture)
+      }
+    }
   }
 });
 
@@ -64,7 +79,7 @@ export const createRouterState = () => ({
 
 export const createCampaignStoreState = ({
   campaignState = createCampaignState(),
-  flightsState = createFlightsState()
+  flightsState = createFlightsState(campaignState.campaign.doc)
 } = {}): CampaignStoreState => ({
   ...campaignState,
   ...flightsState

@@ -2,10 +2,3 @@
   display: grid;
   grid-template-columns: 2fr minmax(200px, 400px);
 }
-
-.loading-form {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: 5em 0;
-}

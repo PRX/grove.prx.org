@@ -14,13 +14,17 @@ export const initialState: CampaignState = {
   changed: false,
   valid: false,
   loading: false,
+  loaded: false,
   saving: false
 };
 
 export function reducer(state = initialState, action: CampaignActions): CampaignState {
   switch (action.type) {
+    case ActionTypes.CAMPAIGN_LOAD_OPTIONS: {
+      return { ...state, loading: true, loaded: false };
+    }
     case ActionTypes.CAMPAIGN_NEW: {
-      return initialState;
+      return { ...initialState, loading: false, loaded: true };
     }
     case ActionTypes.CAMPAIGN_FORM_UPDATE: {
       const { campaign, changed, valid } = action.payload;
@@ -48,7 +52,8 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
     case ActionTypes.CAMPAIGN_LOAD: {
       return {
         ...state,
-        loading: true
+        loading: true,
+        loaded: false
       };
     }
     case ActionTypes.CAMPAIGN_SAVE: {
@@ -59,23 +64,28 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
     }
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS:
     case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
-      const { campaignDoc } = action.payload;
-      const campaign = docToCampaign(campaignDoc);
-      return {
-        ...state,
-        doc: campaignDoc,
-        localCampaign: campaign,
-        remoteCampaign: campaign,
-        changed: false,
-        valid: true,
-        saving: false,
-        loading: false
-      };
+      if (action.payload.campaignDoc) {
+        const campaign = docToCampaign(action.payload.campaignDoc);
+        return {
+          ...state,
+          doc: action.payload.campaignDoc,
+          localCampaign: campaign,
+          remoteCampaign: campaign,
+          changed: false,
+          valid: true,
+          saving: false,
+          loading: false,
+          loaded: true,
+          error: null
+        };
+      }
+      return state;
     }
     case ActionTypes.CAMPAIGN_LOAD_FAILURE: {
       return {
         ...state,
         loading: false,
+        loaded: true,
         error: action.payload.error
       };
     }

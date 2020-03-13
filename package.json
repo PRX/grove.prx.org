@@ -33,7 +33,7 @@
     "core-js": "^2.5.4",
     "ngx-prx-styleguide": "2.20.0",
     "prx-ng-serve": "^1.1.0",
-    "rxjs": "~6.3.3",
+    "rxjs": "~6.5.4",
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
   },
