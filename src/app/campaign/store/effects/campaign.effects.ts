@@ -90,7 +90,6 @@ export class CampaignEffects {
             // navigate to newly created campaign/flight or away from deleted flight
             const campaignId = campaignDoc.id;
             const flightId = +this.router.url.split('/flight/').pop();
-            debugger;
             if (this.router.url.includes('/flight/') && deletedFlightDocs && deletedFlightDocs[flightId]) {
               // routed flight deleted
               this.router.navigate(['/campaign', campaignId]);

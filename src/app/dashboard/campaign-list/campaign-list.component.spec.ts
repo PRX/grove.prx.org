@@ -12,13 +12,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock, campaigns as campaignsFixture } from '../dashboard.service.mock';
 import { CampaignListComponent, CampaignListTotalPagesPipe } from './';
-import {
-  CampaignCardComponent,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe,
-  CampaignTypePipe
-} from '../campaign-card';
+import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe } from '../campaign-card';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
@@ -38,7 +32,6 @@ describe('CampaignListComponent', () => {
         CampaignFlightDatesPipe,
         CampaignFlightTargetsPipe,
         CampaignFlightZonesPipe,
-        CampaignTypePipe,
         CampaignListComponent,
         CampaignListTotalPagesPipe
       ],

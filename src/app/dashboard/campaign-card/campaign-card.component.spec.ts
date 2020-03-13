@@ -6,7 +6,7 @@ import { By } from '@angular/platform-browser';
 import { SharedModule } from '../../shared/shared.module';
 
 import { campaigns as campaignsFixture } from '../dashboard.service.mock';
-import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe, CampaignTypePipe } from '.';
+import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe } from '.';
 
 describe('CampaignCardComponent', () => {
   let comp: CampaignCardComponent;
@@ -17,7 +17,7 @@ describe('CampaignCardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, SharedModule],
-      declarations: [CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe, CampaignTypePipe]
+      declarations: [CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe]
     })
       .compileComponents()
       .then(() => {
