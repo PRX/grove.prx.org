@@ -7,7 +7,8 @@ import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } f
 import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
 import { GoalFormComponent } from './goal-form.component';
-import { Flight, InventoryZone, Availability } from '../../core';
+import { InventoryZone, Availability } from '../../core';
+import { Flight } from '../store/reducers';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
@@ -31,8 +32,8 @@ describe('AvailabilityComponent', () => {
   const mockFlight = {
     id: 9,
     name: 'my flight name',
-    startAt: '2019-10-01',
-    endAt: '2019-11-01',
+    startAt: new Date('2019-10-01'),
+    endAt: new Date('2019-11-01'),
     totalGoal: 999,
     zones: ['pre_1'],
     set_inventory_uri: '/some/inventory'
@@ -144,8 +145,8 @@ describe('AvailabilityComponent', () => {
   });
 
   it('should return number of zone groups or zero', () => {
-    expect(comp.getDaysForWeek(week)).toEqual(0)
-    expect(comp.getDaysForWeek({ ...week, groups: [week] })).toEqual(1)
+    expect(comp.getDaysForWeek(week)).toEqual(0);
+    expect(comp.getDaysForWeek({ ...week, groups: [week] })).toEqual(1);
   });
 
   it('should return combined value of allocated and availability', () => {
