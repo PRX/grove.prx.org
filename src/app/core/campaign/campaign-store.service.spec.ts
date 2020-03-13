@@ -24,31 +24,8 @@ describe('CampaignStoreService', () => {
     } as any;
     store = of({ router: { state: { params: { flightId: flightFixture.id } } }, campaignState: createCampaignStoreState() }) as any;
 
-<<<<<<< HEAD
     campaignStoreService = new CampaignStoreService(store, inventoryService, allocationPreviewService);
-=======
-    store = new CampaignStoreService(campaignService, inventoryService, allocationPreviewService);
-    campaignFixture = {
-      id: 1,
-      name: 'my campaign name',
-      type: 'paid',
-      status: 'draft',
-      repName: 'my rep name',
-      notes: 'my notes',
-      set_account_uri: '/some/account',
-      set_advertiser_uri: '/some/advertiser'
-    };
-    flightFixture = {
-      id: 9,
-      name: 'my flight name',
-      startAt: '2019-09-01',
-      endAt: '2019-10-01',
-      totalGoal: 999,
-      zones: ['pre_1'],
-      set_inventory_uri: '/some/inventory'
-    };
-    flightStateFixture = { localFlight: flightFixture, remoteFlight: flightFixture, changed: false, valid: true };
->>>>>>> master
+
     availabilityFixture = {
       zone: 'pre_1',
       totals: {
