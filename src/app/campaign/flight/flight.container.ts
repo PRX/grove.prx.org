@@ -139,9 +139,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightDuplicate(flight: Flight) {
-    const storeFlight = { ...flight, startAt: new Date(flight.startAt.valueOf()), endAt: new Date(flight.endAt.valueOf()) };
     this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new CampaignDupFlight({ campaignId, flight: storeFlight }));
+      this.store.dispatch(new CampaignDupFlight({ campaignId, flight }));
     });
   }
 
