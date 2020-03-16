@@ -100,8 +100,8 @@ describe('CampaignEffects', () => {
 
   it('should create or update campaign from campaign form save', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
-    campaignService.createCampaign = jest.fn(campaign => of(campaignDoc));
-    campaignService.updateCampaign = jest.fn(campaign => of(campaignDoc));
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
     const { id, ...createCampaign } = campaignFixture;
     const createAction = new actions.CampaignSave({
       campaign: createCampaign,
@@ -155,7 +155,7 @@ describe('CampaignEffects', () => {
   it('should redirect to a new campaign', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const { id, ...createCampaign } = campaignFixture;
-    campaignService.createCampaign = jest.fn(campaign => of(campaignDoc));
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
     const createAction = new actions.CampaignSave({
       campaign: createCampaign,
       updatedFlights: [],
@@ -177,8 +177,8 @@ describe('CampaignEffects', () => {
   it('should redirect to a new campaign and flight', done => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const flightDoc = new MockHalDoc(flightFixture);
-    campaignService.createCampaign = jest.fn(campaign => of(campaignDoc));
-    campaignService.createFlight = jest.fn(flight => of(flightDoc));
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.createFlight = jest.fn(() => of(flightDoc));
 
     const { id, ...newCampaign } = campaignFixture;
     const flightId = new Date().valueOf();
@@ -207,8 +207,8 @@ describe('CampaignEffects', () => {
   it('should redirect away from a deleted flight to the campaign', done => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const flightDoc = new MockHalDoc(flightFixture);
-    campaignService.updateCampaign = jest.fn(campaign => of(campaignDoc));
-    campaignService.deleteFlight = jest.fn(flight => of(flightDoc));
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.deleteFlight = jest.fn(() => of(flightDoc));
     router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
       const deleteAction = new actions.CampaignSave({
         campaign: campaignFixture,
@@ -233,8 +233,8 @@ describe('CampaignEffects', () => {
   it('should update an existing flight', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const flightDoc = new MockHalDoc(flightFixture);
-    campaignService.updateCampaign = jest.fn(campaign => of(campaignDoc));
-    campaignService.updateFlight = jest.fn(flight => of(flightDoc));
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.updateFlight = jest.fn(() => of(flightDoc));
 
     const updateAction = new actions.CampaignSave({
       campaign: campaignFixture,
