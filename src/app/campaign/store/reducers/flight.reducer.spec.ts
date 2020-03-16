@@ -1,8 +1,8 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as actions from '../actions';
-import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState } from './campaign-state.factory';
+import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
-import { docToFlight } from './campaign.models';
+import { docToFlight } from '../models';
 
 describe('Flight Reducer', () => {
   describe('unknown action', () => {

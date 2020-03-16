@@ -6,7 +6,7 @@ import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
 import * as actions from '../actions';
 import { ActionTypes } from '../actions/action.types';
-import { CampaignFormSave } from '../reducers';
+import { CampaignFormSave } from '../models';
 import { CampaignService } from '../../../core';
 
 @Injectable()

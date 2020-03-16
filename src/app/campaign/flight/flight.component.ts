@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Inventory, InventoryZone } from '../../core';
-import { Flight } from '../store/reducers';
+import { Flight } from '../store/models';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({

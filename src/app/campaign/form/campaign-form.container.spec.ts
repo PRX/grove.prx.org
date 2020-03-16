@@ -13,7 +13,7 @@ import { reducers } from '../store';
 import * as actions from '../store/actions';
 import { CampaignFormContainerComponent } from './campaign-form.container';
 import { CampaignFormComponent } from './campaign-form.component';
-import { campaignFixture } from '../store/reducers/campaign-state.factory';
+import { campaignFixture } from '../store/models/campaign-state.factory';
 
 describe('CampaignFormContainerComponent', () => {
   let component: CampaignFormContainerComponent;

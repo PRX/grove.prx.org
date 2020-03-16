@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { Availability, InventoryZone, AvailabilityAllocation } from '../../core';
-import { Flight } from '../store/reducers';
+import { Flight } from '../store/models';
 
 @Component({
   selector: 'grove-availability',

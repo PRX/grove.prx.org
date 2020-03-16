@@ -16,7 +16,7 @@ import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
 import * as actions from './store/actions';
 import { selectCampaignWithFlightsForSave, selectCampaignId } from './store/selectors';
-import { campaignDocFixture, flightFixture, flightDocFixture } from './store/reducers/campaign-state.factory';
+import { campaignDocFixture, flightFixture, flightDocFixture } from './store/models/campaign-state.factory';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';

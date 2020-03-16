@@ -11,7 +11,7 @@ import { HalHttpError, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
 import { CampaignService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { reducers } from '../';
-import { campaignFixture, flightFixture } from '../reducers/campaign-state.factory';
+import { campaignFixture, flightFixture } from '../models/campaign-state.factory';
 import * as actions from '../actions';
 import { CampaignEffects } from './campaign.effects';
 

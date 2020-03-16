@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FlightState } from '../store/reducers';
+import { FlightState } from '../store/models';
 
 @Component({
   selector: 'grove-campaign-nav',

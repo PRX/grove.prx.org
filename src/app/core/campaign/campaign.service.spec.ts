@@ -2,7 +2,7 @@ import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
 import { CampaignService } from './campaign.service';
-import { createCampaignStoreState, flightDocFixture } from '../../campaign/store/reducers/campaign-state.factory';
+import { createCampaignStoreState, flightDocFixture } from '../../campaign/store/models/campaign-state.factory';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 

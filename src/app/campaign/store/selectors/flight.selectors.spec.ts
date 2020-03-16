@@ -1,4 +1,4 @@
-import * as campaignStateFactory from '../reducers/campaign-state.factory';
+import * as campaignStateFactory from '../models/campaign-state.factory';
 import * as flightSelectors from './flight.selectors';
 import { MockHalDoc } from 'ngx-prx-styleguide';
 

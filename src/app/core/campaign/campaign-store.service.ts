@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { InventoryService } from '../inventory/inventory.service';
 import { AllocationPreviewService } from '../allocation/allocation-preview.service';
 import { CampaignState, Availability, Allocation, AllocationPreview } from './campaign.models';
-import { Flight } from '../../campaign/store/reducers';
+import { Flight } from '../../campaign/store/models';
 import { ReplaySubject, Observable, forkJoin, combineLatest } from 'rxjs';
 import { map, first, share, withLatestFrom } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';

@@ -5,7 +5,7 @@ import { InventoryService } from '../inventory/inventory.service';
 import { AllocationPreviewService } from '../allocation/allocation-preview.service';
 import { of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
-import { createCampaignStoreState, flightFixture } from '../../campaign/store/reducers/campaign-state.factory';
+import { createCampaignStoreState, flightFixture } from '../../campaign/store/models/campaign-state.factory';
 
 describe('CampaignStoreService', () => {
   let store: Store<any>;

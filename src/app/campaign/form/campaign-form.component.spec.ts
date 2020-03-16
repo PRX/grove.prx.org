@@ -3,7 +3,7 @@ import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule } fr
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CampaignFormComponent } from './campaign-form.component';
-import { Campaign } from '../store/reducers';
+import { Campaign } from '../store/models';
 import { SharedModule } from '../../shared/shared.module';
 
 describe('CampaignFormComponent', () => {

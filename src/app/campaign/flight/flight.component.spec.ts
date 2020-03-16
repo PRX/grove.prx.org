@@ -3,7 +3,7 @@ import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, Mat
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
-import { Flight } from '../store/reducers';
+import { Flight } from '../store/models';
 import { DatepickerModule } from 'ngx-prx-styleguide';
 
 describe('FlightComponent', () => {

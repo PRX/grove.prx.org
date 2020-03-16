@@ -3,8 +3,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map, switchMap, first, tap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
-import * as actions from './store/actions';
-import { FlightState } from './store/reducers';
+import { FlightState } from './store/models';
 import {
   selectError,
   selectCampaignWithFlightsForSave,

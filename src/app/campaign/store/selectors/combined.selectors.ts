@@ -1,7 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import { selectCampaign, selectCampaignLoaded, selectCampaignError } from './campaign.selectors';
 import { selectAllFlights, selectFlightEntities, selectRoutedFlightId } from './flight.selectors';
-import { CampaignState, FlightState, CampaignFormSave } from '../reducers';
+import { CampaignState, FlightState, CampaignFormSave } from '../models';
 
 export const selectCampaignWithFlightsForSave = createSelector(
   selectCampaign,

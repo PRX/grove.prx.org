@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, InventoryZone, Availability } from '../../core';
-import { Flight } from '../store/reducers';
+import { Flight } from '../store/models';
 import { map, filter, first } from 'rxjs/operators';
 import {
   selectCampaignId,

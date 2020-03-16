@@ -1,5 +1,5 @@
 import { CampaignActions, ActionTypes } from '../actions/';
-import { CampaignState, docToCampaign } from './campaign.models';
+import { CampaignState, docToCampaign } from '../models/campaign.models';
 
 export const initialState: CampaignState = {
   localCampaign: {

@@ -8,14 +8,14 @@ import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
 import { GoalFormComponent } from './goal-form.component';
 import { InventoryZone, Availability } from '../../core';
-import { Flight } from '../store/reducers';
+import { Flight } from '../store/models';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
   let fix: ComponentFixture<AvailabilityComponent>;
   let de: DebugElement;
 
-  const mockAvailabilityZone = {
+  const mockAvailabilityZone: Availability = {
     zone: 'pre_1',
     totals: {
       startDate: '2019-10-01',
@@ -29,7 +29,7 @@ describe('AvailabilityComponent', () => {
       ]
     }
   };
-  const mockFlight = {
+  const mockFlight: Flight = {
     id: 9,
     name: 'my flight name',
     startAt: new Date('2019-10-01'),
@@ -38,7 +38,7 @@ describe('AvailabilityComponent', () => {
     zones: ['pre_1'],
     set_inventory_uri: '/some/inventory'
   };
-  const mockZones = [{ id: 'pre_1', label: 'Preroll 1' }];
+  const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
   const mockAvailabilityZones = [mockAvailabilityZone];
 
   const zone = mockAvailabilityZone;

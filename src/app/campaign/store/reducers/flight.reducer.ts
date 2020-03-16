@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes, CampaignActions } from '../actions';
-import { docToFlight, Flight, FlightState } from './campaign.models';
+import { docToFlight, Flight, FlightState } from '../models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection

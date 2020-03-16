@@ -21,7 +21,7 @@ import { CustomRouterSerializer } from '../../store/router-store/custom-router-s
 import { DatepickerModule, MockHalDoc } from 'ngx-prx-styleguide';
 import { CampaignStoreService, InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
-import { flightFixture, flightDocFixture } from '../store/reducers/campaign-state.factory';
+import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
 import * as actions from '../store/actions';
 

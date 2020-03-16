@@ -1,6 +1,6 @@
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
-import { CampaignState } from './reducers/';
+import { CampaignState } from './models';
 import * as fromCampaign from './reducers/campaign.reducer';
 import * as fromFlight from './reducers/flight.reducer';
 

@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 import { ActionTypes as actionTypes } from './action.types';
-import { Campaign, Flight, CampaignFormSave } from '../reducers/';
+import { Campaign, Flight, CampaignFormSave } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export class CampaignNew implements Action {
