@@ -47,12 +47,6 @@ describe('CampaignService', () => {
     });
   });
 
-  // TODO: moved to models
-  xit('filters underscores', () => {
-    const doc = augury.mock('any:thing', { foo: 'bar', _under: 'scored' });
-    // expect(campaignService.filter(doc)).not.toHaveProperty('_under');
-  });
-
   it('creates new campaigns', done => {
     const spy = jest.spyOn(augury.root, 'create');
     campaignService.createCampaign(campaignFixture).subscribe(() => {
