@@ -1,47 +1,26 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { DebugElement, Component } from '@angular/core';
-import { ActivatedRoute, Router, Routes } from '@angular/router';
+import { DebugElement } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSidenavModule, MatListModule, MatIconModule, MatProgressSpinnerModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule, Store } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../store/router-store/custom-router-serializer';
 import { of } from 'rxjs';
 import { AccountService, AdvertiserService, AuguryService, InventoryService } from '../core';
 import { AllocationPreviewService } from '../core/allocation/allocation-preview.service';
 import { AccountServiceMock } from '../core/account/account.service.mock';
 import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
 import { ActivatedRouteStub } from '../../testing/stub.router';
-import { FancyFormModule, StatusBarModule, MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
+import { FancyFormModule, StatusBarModule, MockHalService } from 'ngx-prx-styleguide';
 import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
-import * as actions from './store/actions';
-import { selectCampaignWithFlightsForSave, selectCampaignId } from './store/selectors';
-import { campaignDocFixture, flightFixture, flightDocFixture } from './store/models/campaign-state.factory';
+import { CampaignActionService } from './store/actions/campaign-action.service';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
-
-@Component({
-  selector: 'grove-test-component',
-  template: ``
-})
-class TestComponent {}
-const campaignChildRoutes: Routes = [
-  { path: '', component: TestComponent },
-  { path: 'flight/:flightId', component: TestComponent }
-];
-const campaignRoutes: Routes = [
-  {
-    path: 'campaign/new',
-    component: TestComponent,
-    children: campaignChildRoutes
-  },
-  {
-    path: 'campaign/:id',
-    component: TestComponent,
-    children: campaignChildRoutes
-  }
-];
+import { TestComponent, campaignRoutes } from './campaign-test.component';
 
 describe('CampaignComponent', () => {
   let component: CampaignComponent;
@@ -50,13 +29,16 @@ describe('CampaignComponent', () => {
   let el: HTMLElement;
   let router: Router;
   let store: Store<any>;
-  let dispatchSpy;
+  let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes(campaignRoutes),
+        StoreModule.forRoot({ router: routerReducer }),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers),
         SharedModule,
         FancyFormModule,
         StatusBarModule,
@@ -64,9 +46,7 @@ describe('CampaignComponent', () => {
         MatIconModule,
         MatListModule,
         MatProgressSpinnerModule,
-        MatSidenavModule,
-        StoreModule.forRoot({}),
-        StoreModule.forFeature('campaignState', reducers)
+        MatSidenavModule
       ],
       declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, TestComponent],
       providers: [
@@ -89,13 +69,14 @@ describe('CampaignComponent', () => {
         {
           provide: AllocationPreviewService,
           useValue: {
-            getAllocationPreview: jest.fn(flight => of(undefined))
+            getAllocationPreview: jest.fn(() => of(undefined))
           }
         },
         {
           provide: InventoryService,
           useValue: { listInventory: jest.fn(() => of([])) }
-        }
+        },
+        CampaignActionService
       ]
     })
       .compileComponents()
@@ -108,44 +89,29 @@ describe('CampaignComponent', () => {
 
         router = TestBed.get(Router);
         store = TestBed.get(Store);
-        dispatchSpy = jest.spyOn(store, 'dispatch');
+        campaignActionService = TestBed.get(CampaignActionService);
       });
   }));
 
   it('inits the campaign state from the route', done => {
+    jest.spyOn(campaignActionService, 'loadCampaign');
     router.navigateByUrl('/campaign/123');
     route.setParamMap({ id: '123' });
     route.paramMap.subscribe(() => {
-      expect(dispatchSpy).toHaveBeenCalledWith(new actions.CampaignLoad({ id: 123 }));
+      expect(campaignActionService.loadCampaign).toHaveBeenCalledWith(123);
       done();
     });
   });
 
-  it('submits the campaign forms', done => {
-    const flightIds = [flightFixture.id, flightFixture.id + 1, flightFixture.id + 2, flightFixture.id + 3];
-    const campaignDoc = new MockHalDoc(campaignDocFixture);
-    const flightDocs = [
-      new MockHalDoc({ ...flightDocFixture, id: flightIds[0] }),
-      new MockHalDoc({ ...flightDocFixture, id: flightIds[1] }),
-      new MockHalDoc({ ...flightDocFixture, id: flightIds[2] }),
-      new MockHalDoc({ ...flightDocFixture, id: flightIds[3] })
-    ];
-    const loadAction = new actions.CampaignLoadSuccess({ campaignDoc, flightDocs });
-    store.dispatch(loadAction);
-    const goalAction = new actions.CampaignFlightSetGoal({ flightId: flightIds[0], totalGoal: 999, dailyMinimum: 9, valid: true });
-    store.dispatch(goalAction);
+  it('submits the campaign forms', () => {
+    jest.spyOn(campaignActionService, 'saveCampaignAndFlights');
     component.campaignSubmit();
-    store.select(selectCampaignWithFlightsForSave).subscribe(campaignFlights => {
-      expect(dispatchSpy).toHaveBeenLastCalledWith(new actions.CampaignSave(campaignFlights));
-      done();
-    });
+    expect(campaignActionService.saveCampaignAndFlights).toHaveBeenCalled();
   });
 
-  it('calls action to add a new flight', done => {
+  it('calls action to add a new flight', () => {
+    jest.spyOn(campaignActionService, 'addFlight');
     component.createFlight();
-    store.select(selectCampaignId).subscribe(campaignId => {
-      expect(dispatchSpy).toHaveBeenCalledWith(new actions.CampaignAddFlight({ campaignId }));
-      done();
-    });
+    expect(campaignActionService.addFlight).toHaveBeenCalled();
   });
 });

@@ -3,17 +3,15 @@ import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, InventoryZone, Availability } from '../../core';
 import { Flight } from '../store/models';
-import { map, filter, first } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import {
-  selectCampaignId,
-  selectRoutedFlight,
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
   selectRoutedFlightDailyMinimum,
   selectCurrentInventoryUri
 } from '../store/selectors';
-import { CampaignFlightSetGoal, CampaignFlightFormUpdate, CampaignDupFlight, CampaignDeleteFlight } from '../store/actions';
+import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 @Component({
   selector: 'grove-flight.container',
@@ -45,7 +43,6 @@ import { CampaignFlightSetGoal, CampaignFlightFormUpdate, CampaignDupFlight, Cam
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
-  private currentFlightId: number;
   flightLocal$: Observable<Flight>;
   softDeleted$: Observable<boolean>;
   flightChanged$: Observable<boolean>;
@@ -56,7 +53,12 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
 
-  constructor(private inventoryService: InventoryService, private campaignStoreService: CampaignStoreService, private store: Store<any>) {}
+  constructor(
+    private inventoryService: InventoryService,
+    private campaignStoreService: CampaignStoreService,
+    private store: Store<any>,
+    private campaignAction: CampaignActionService
+  ) {}
 
   ngOnInit() {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
@@ -73,7 +75,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
         return inventory ? inventory.zones : [];
       })
     );
-    this.onFlightIdChangeLoadAvailability();
   }
 
   ngOnDestroy() {
@@ -82,56 +83,12 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFlightIdChangeLoadAvailability() {
-    this.flightSub = this.flightLocal$.pipe(filter(flight => flight && this.currentFlightId !== flight.id)).subscribe(flight => {
-      this.campaignStoreService.loadAvailability(flight);
-      this.currentFlightId = flight.id;
-    });
-  }
-
   flightUpdateFromForm({ flight: formFlight, changed, valid }: { flight: Flight; changed: boolean; valid: boolean }) {
-    this.store
-      .pipe(
-        select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
-        first()
-      )
-      .subscribe(state => {
-        this.loadAvailabilityAllocationIfChanged(formFlight, state.localFlight, state.dailyMinimum);
-        this.store.dispatch(
-          new CampaignFlightFormUpdate({
-            flight: formFlight,
-            changed,
-            valid
-          })
-        );
-      });
-  }
-
-  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
-    const dateRangeValid = formFlight.startAt && formFlight.endAt && formFlight.startAt.valueOf() < formFlight.endAt.valueOf();
-    const hasAvailabilityParams =
-      formFlight.startAt && formFlight.endAt && formFlight.set_inventory_uri && formFlight.zones && formFlight.zones.length > 0;
-    const availabilityParamsChanged =
-      hasAvailabilityParams &&
-      (formFlight.startAt.getTime() !== localFlight.startAt.getTime() ||
-        formFlight.endAt.getTime() !== localFlight.endAt.getTime() ||
-        formFlight.set_inventory_uri !== localFlight.set_inventory_uri ||
-        !formFlight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
-    if (dateRangeValid && availabilityParamsChanged) {
-      this.campaignStoreService.loadAvailability(formFlight);
-      if (formFlight.totalGoal) {
-        this.campaignStoreService.loadAllocationPreview(formFlight, dailyMinimum);
-      }
-    }
+    this.campaignAction.updateFlightForm(formFlight, changed, valid);
   }
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
-    const valid = flight.totalGoal && flight.startAt.valueOf() !== flight.endAt.valueOf();
-    this.store.dispatch(new CampaignFlightSetGoal({ flightId: flight.id, totalGoal: flight.totalGoal, dailyMinimum, valid }));
-    if (valid) {
-      this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum);
-    }
+    this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
   }
 
   get allocationPreviewError() {
@@ -139,18 +96,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   }
 
   flightDuplicate(flight: Flight) {
-    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new CampaignDupFlight({ campaignId, flight }));
-    });
+    this.campaignAction.dupFlight(flight);
   }
 
   flightDeleteToggle() {
-    this.store
-      .pipe(
-        select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
-        first()
-      )
-      .subscribe(state => this.store.dispatch(new CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
+    this.campaignAction.deleteRoutedFlightToggle();
   }
 }

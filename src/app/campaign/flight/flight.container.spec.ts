@@ -1,5 +1,5 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { DebugElement, Component } from '@angular/core';
+import { DebugElement } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
@@ -24,17 +24,14 @@ import { SharedModule } from '../../shared/shared.module';
 import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
 import * as actions from '../store/actions';
+import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 import { FlightContainerComponent } from './flight.container';
 import { FlightComponent } from './flight.component';
 import { AvailabilityComponent } from '../availability/availability.component';
 import { GoalFormComponent } from '../availability/goal-form.component';
+import { TestComponent } from '../campaign-test.component';
 
-@Component({
-  selector: 'grove-test-component',
-  template: ``
-})
-class TestComponent {}
 const campaignChildRoutes: Routes = [
   { path: '', component: FlightContainerComponent },
   { path: 'flight/:flightId', component: FlightContainerComponent }
@@ -55,6 +52,7 @@ const campaignRoutes: Routes = [
 describe('FlightContainerComponent', () => {
   const inventory: ReplaySubject<any> = new ReplaySubject(1);
   let campaignStoreService: CampaignStoreService;
+  let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
   let router: Router;
   let store: Store<any>;
@@ -108,7 +106,8 @@ describe('FlightContainerComponent', () => {
             loadAllocationPreview: jest.fn(f => of()),
             getFlightAvailabilityRollup$: jest.fn(() => of([]))
           }
-        }
+        },
+        CampaignActionService
       ]
     })
       .compileComponents()
@@ -121,6 +120,7 @@ describe('FlightContainerComponent', () => {
         campaignStoreService = TestBed.get(CampaignStoreService);
         router = TestBed.get(Router);
         store = TestBed.get(Store);
+        campaignActionService = TestBed.get(CampaignActionService);
 
         store.dispatch(
           new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc({ id: 1 }), flightDocs: [new MockHalDoc(flightDocFixture)] })
@@ -133,29 +133,18 @@ describe('FlightContainerComponent', () => {
     component.ngOnDestroy();
   });
 
-  it('loads availability from flight id change', () => {
-    expect(campaignStoreService.loadAvailability).toHaveBeenCalledWith({ MOCKS: {}, ERRORS: {}, ...flightFixture });
-  });
-
-  it('loads availability and allocation preview when flight form changes', done => {
+  it('receives availability and allocation preview updates when flight form changes', done => {
     component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: new Date() }, changed: true, valid: true });
     component.flightAvailability$.subscribe(availability => {
       expect(availability).toBeDefined();
-      expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
-      expect(campaignStoreService.loadAllocationPreview).toHaveBeenCalled();
       done();
     });
   });
 
-  it('does not load allocation preview if flight name changes', () => {
-    component.flightUpdateFromForm({ flight: { ...flightFixture, name: 'my-other-flight' }, changed: true, valid: true });
-    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
-  });
-
-  it('dispatches action to update the flight', () => {
-    jest.spyOn(store, 'dispatch');
+  it('calls action to update the flight', () => {
+    jest.spyOn(campaignActionService, 'updateFlightForm');
     component.flightUpdateFromForm({ flight, changed: true, valid: false });
-    expect(store.dispatch).toHaveBeenCalledWith(new actions.CampaignFlightFormUpdate({ flight, changed: true, valid: false }));
+    expect(campaignActionService.updateFlightForm).toHaveBeenCalledWith(flight, true, false);
   });
 
   it('generates zone options from inventory', done => {

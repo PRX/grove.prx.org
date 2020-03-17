@@ -1,22 +1,21 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { map, switchMap, first, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { FlightState } from './store/models';
 import {
   selectError,
-  selectCampaignWithFlightsForSave,
   selectCampaignLoaded,
   selectCampaignLoading,
   selectCampaignSaving,
   selectAllFlightsOrderByCreatedAt,
-  selectCampaignId,
   selectLocalCampaignName,
   selectValid,
   selectChanged
 } from './store/selectors';
 import { AdvertiserService, AccountService } from '../core';
+import { CampaignActionService } from './store/actions/campaign-action.service';
 
 @Component({
   selector: 'grove-campaign',
@@ -61,7 +60,8 @@ export class CampaignComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    public store: Store<any>,
+    private store: Store<any>,
+    private campaignAction: CampaignActionService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
@@ -69,7 +69,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeSub = this.route.paramMap
       .pipe(
-        tap(() => this.store.dispatch(new actions.CampaignLoadOptions())),
+        tap(() => this.campaignAction.loadCampaignOptions()),
         switchMap((params: ParamMap) => {
           return this.advertiserService.loadAdvertisers().pipe(map(advertisers => ({ params, advertisers })));
         }),
@@ -79,9 +79,9 @@ export class CampaignComponent implements OnInit, OnDestroy {
       )
       .subscribe(({ params, advertisers, accounts }) => {
         if (params.get('id')) {
-          this.store.dispatch(new actions.CampaignLoad({ id: +params.get('id') }));
+          this.campaignAction.loadCampaign(+params.get('id'));
         } else {
-          this.store.dispatch(new actions.CampaignNew());
+          this.campaignAction.newCampaign();
         }
       });
     this.campaignLoaded$ = this.store.pipe(select(selectCampaignLoaded));
@@ -101,16 +101,10 @@ export class CampaignComponent implements OnInit, OnDestroy {
   }
 
   campaignSubmit() {
-    this.store
-      .pipe(select(selectCampaignWithFlightsForSave), first())
-      .subscribe(({ campaign, updatedFlights, createdFlights, deletedFlights }) =>
-        this.store.dispatch(new actions.CampaignSave({ campaign, updatedFlights, createdFlights, deletedFlights }))
-      );
+    this.campaignAction.saveCampaignAndFlights();
   }
 
   createFlight() {
-    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new actions.CampaignAddFlight({ campaignId }));
-    });
+    this.campaignAction.addFlight();
   }
 }
