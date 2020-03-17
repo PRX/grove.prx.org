@@ -14,7 +14,8 @@ export class CSSPropsDirective implements OnChanges {
 
   constructor(private element: ElementRef) {}
 
-  ngOnChanges({ cssProps }) {
+  ngOnChanges(changes: SimpleChanges) {
+    const { cssProps } = changes;
     if (cssProps && cssProps.currentValue) {
       const { style } = this.element.nativeElement;
       for (const [k, v] of Object.entries(cssProps.currentValue)) {
