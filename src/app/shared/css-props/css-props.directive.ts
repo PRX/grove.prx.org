@@ -1,4 +1,4 @@
-import {Directive, ElementRef, Input} from '@angular/core';
+import { Directive, ElementRef, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 /*
  * Workaround for setting CSS custom properties:
@@ -7,20 +7,19 @@ import {Directive, ElementRef, Input} from '@angular/core';
  * Can work for any style properties.
  */
 @Directive({
-    selector: '[cssProps]',
+  selector: '[cssProps]'
 })
-export class CSSPropsDirective {
+export class CSSPropsDirective implements OnChanges {
+  @Input() cssProps: any;
 
-    @Input() cssProps: any;
+  constructor(private element: ElementRef) {}
 
-    constructor(private element: ElementRef) {}
-
-    ngOnChanges({cssProps}) {
-        if (cssProps && cssProps.currentValue) {
-            const {style} = this.element.nativeElement;
-            for (const [k, v] of Object.entries(cssProps.currentValue)) {
-                style.setProperty(k, v);
-            }
-        }
+  ngOnChanges({ cssProps }) {
+    if (cssProps && cssProps.currentValue) {
+      const { style } = this.element.nativeElement;
+      for (const [k, v] of Object.entries(cssProps.currentValue)) {
+        style.setProperty(k, v);
+      }
     }
+  }
 }
