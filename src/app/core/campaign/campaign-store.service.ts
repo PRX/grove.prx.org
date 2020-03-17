@@ -30,9 +30,12 @@ export class CampaignStoreService {
   }
 
   getFlightAvailabilityRollup$(): Observable<Availability[]> {
-    return combineLatest([this.store.pipe(select(selectRoutedFlightId)), this.state$]).pipe(
-      withLatestFrom(this.store.pipe(select(selectRoutedLocalFlightZones))),
-      map(([[flightId, state], zones]) => {
+    return combineLatest([
+      this.store.pipe(select(selectRoutedFlightId)),
+      this.store.pipe(select(selectRoutedLocalFlightZones)),
+      this.state$
+    ]).pipe(
+      map(([flightId, zones, state]) => {
         // availability of current flights
         const availabilityZones =
           zones && zones.filter(zone => state.availability[`${flightId}-${zone}`]).map(zone => state.availability[`${flightId}-${zone}`]);
