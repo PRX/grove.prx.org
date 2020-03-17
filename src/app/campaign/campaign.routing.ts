@@ -11,6 +11,7 @@ import { FlightContainerComponent } from './flight/flight.container';
 import { FlightComponent } from './flight/flight.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { GoalFormComponent } from './availability/goal-form.component';
+import { TestComponent } from './campaign-test.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
@@ -43,7 +44,9 @@ export const campaignComponents: any[] = [
   FlightContainerComponent,
   FlightComponent,
   AvailabilityComponent,
-  GoalFormComponent
+  GoalFormComponent,
+  // to make the angular compiler happy, include all components that are defined in their own files, ugh fine
+  TestComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);
