@@ -1,28 +1,5 @@
-import { CampaignActions } from '../actions/';
-import { CampaignActionTypes } from '../actions/campaign.action.types';
-import { HalDoc } from 'ngx-prx-styleguide';
-import { docToCampaign } from './haldoc-to-model.utils';
-export interface Campaign {
-  id?: number;
-  name: string;
-  type: string;
-  status: string;
-  repName: string;
-  notes: string;
-  set_account_uri: string;
-  set_advertiser_uri: string;
-}
-
-export interface CampaignState {
-  doc?: HalDoc;
-  localCampaign: Campaign;
-  remoteCampaign?: Campaign;
-  changed: boolean;
-  valid: boolean;
-  loading: boolean;
-  saving: boolean;
-  error?: any;
-}
+import { CampaignActions, ActionTypes } from '../actions/';
+import { CampaignState, docToCampaign } from '../models/campaign.models';
 
 export const initialState: CampaignState = {
   localCampaign: {
@@ -37,15 +14,19 @@ export const initialState: CampaignState = {
   changed: false,
   valid: false,
   loading: false,
+  loaded: false,
   saving: false
 };
 
 export function reducer(state = initialState, action: CampaignActions): CampaignState {
   switch (action.type) {
-    case CampaignActionTypes.CAMPAIGN_NEW: {
-      return initialState;
+    case ActionTypes.CAMPAIGN_LOAD_OPTIONS: {
+      return { ...state, loading: true, loaded: false };
     }
-    case CampaignActionTypes.CAMPAIGN_FORM_UPDATE: {
+    case ActionTypes.CAMPAIGN_NEW: {
+      return { ...initialState, loading: false, loaded: true };
+    }
+    case ActionTypes.CAMPAIGN_FORM_UPDATE: {
       const { campaign, changed, valid } = action.payload;
       return {
         ...state,
@@ -57,41 +38,58 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
         valid
       };
     }
-    case CampaignActionTypes.CAMPAIGN_LOAD: {
+    case ActionTypes.CAMPAIGN_SET_ADVERTISER: {
+      const { set_advertiser_uri } = action.payload;
       return {
         ...state,
-        loading: true
+        localCampaign: {
+          ...state.localCampaign,
+          set_advertiser_uri
+        },
+        changed: true
       };
     }
-    case CampaignActionTypes.CAMPAIGN_FORM_SAVE: {
+    case ActionTypes.CAMPAIGN_LOAD: {
+      return {
+        ...state,
+        loading: true,
+        loaded: false
+      };
+    }
+    case ActionTypes.CAMPAIGN_SAVE: {
       return {
         ...state,
         saving: true
       };
     }
-    case CampaignActionTypes.CAMPAIGN_LOAD_SUCCESS:
-    case CampaignActionTypes.CAMPAIGN_FORM_SAVE_SUCCESS: {
-      const { campaignDoc } = action.payload;
-      const campaign = docToCampaign(campaignDoc);
-      return {
-        ...state,
-        doc: campaignDoc,
-        localCampaign: campaign,
-        remoteCampaign: campaign,
-        changed: false,
-        valid: true,
-        saving: false,
-        loading: false
-      };
+    case ActionTypes.CAMPAIGN_LOAD_SUCCESS:
+    case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
+      if (action.payload.campaignDoc) {
+        const campaign = docToCampaign(action.payload.campaignDoc);
+        return {
+          ...state,
+          doc: action.payload.campaignDoc,
+          localCampaign: campaign,
+          remoteCampaign: campaign,
+          changed: false,
+          valid: true,
+          saving: false,
+          loading: false,
+          loaded: true,
+          error: null
+        };
+      }
+      return state;
     }
-    case CampaignActionTypes.CAMPAIGN_LOAD_FAILURE: {
+    case ActionTypes.CAMPAIGN_LOAD_FAILURE: {
       return {
         ...state,
         loading: false,
+        loaded: true,
         error: action.payload.error
       };
     }
-    case CampaignActionTypes.CAMPAIGN_FORM_SAVE_FAILURE: {
+    case ActionTypes.CAMPAIGN_SAVE_FAILURE: {
       return {
         ...state,
         saving: false,

@@ -1,64 +1,30 @@
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
 import { CampaignService } from './campaign.service';
-import { Campaign, CampaignState, Flight, FlightState } from './campaign.models';
+import { createCampaignStoreState, flightDocFixture } from '../../campaign/store/models/campaign-state.factory';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 
-// TODO: styleguide doesn't export HalHttpError class
-class Mock404Error extends Error {
-  status = 404;
-  constructor() {
-    super('');
-  }
-}
-
 describe('CampaignService', () => {
   let augury: MockHalService;
-  let campaign: CampaignService;
-  let campaignFixture: Campaign;
-  let flightFixture: Flight;
-  let campaignStateFixture: CampaignState;
-  let flightStateFixture: FlightState;
+  let campaignService: CampaignService;
+  const state = createCampaignStoreState();
+  const campaignStateFixture = state.campaign;
+  const campaignFixture = campaignStateFixture.localCampaign;
+  const flightStateFixture = state.flights.entities[state.flights.ids[0]];
+  const flightFixture = flightStateFixture.localFlight;
   let store: Store<any>;
-  let campaignDoc: MockHalDoc;
+  let campaignMock: MockHalDoc;
 
   beforeEach(() => {
-    campaignFixture = {
-      id: 1,
-      name: 'my campaign name',
-      type: 'paid',
-      status: 'draft',
-      repName: 'my rep name',
-      notes: 'my notes',
-      set_account_uri: '/some/account',
-      set_advertiser_uri: '/some/advertiser'
-    };
-    flightFixture = {
-      id: 9,
-      name: 'my flight name',
-      startAt: '2019-09-01',
-      endAt: '2019-10-01',
-      totalGoal: 999,
-      zones: [],
-      set_inventory_uri: '/some/inventory'
-    };
-    flightStateFixture = { localFlight: flightFixture, remoteFlight: flightFixture, changed: false, valid: true };
-    campaignStateFixture = {
-      localCampaign: campaignFixture,
-      remoteCampaign: campaignFixture,
-      changed: false,
-      valid: true,
-      flights: { 9: flightStateFixture }
-    };
     augury = new MockHalService();
-    campaignDoc = augury.mock('prx:campaign', campaignFixture);
-    store = of({ campaignState: { ...campaignStateFixture, doc: campaignDoc } }) as any;
-    campaign = new CampaignService(new AuguryService(augury as any), store);
-    campaign.campaignDoc$ = of(campaignDoc);
+    campaignMock = augury.mock('prx:campaign', campaignFixture);
+    store = of({ campaignState: createCampaignStoreState() }) as any;
+    campaignService = new CampaignService(new AuguryService(augury as any), store);
   });
 
-  it('gets a campaign + flights', done => {
+  it('loads a campaign with zoomed flights', done => {
     const { set_account_uri, set_advertiser_uri, ...campaignProperties } = campaignFixture;
     const { set_inventory_uri, ...flightProperties } = flightFixture;
     augury
@@ -72,36 +38,18 @@ describe('CampaignService', () => {
           _links: { 'prx:inventory': { href: set_inventory_uri } }
         }
       ]);
-    campaign.getCampaign(1).subscribe(camp => {
-      expect(camp.localCampaign).toMatchObject(campaignFixture);
-      expect(camp.remoteCampaign).toMatchObject(campaignFixture);
-      expect(camp.changed).toBeFalsy();
-      expect(camp.valid).toBeTruthy();
-      expect(Object.keys(camp.flights)).toEqual(['9']);
-      expect(camp.flights['9'].localFlight).toMatchObject(flightFixture);
-      expect(camp.flights['9'].remoteFlight).toMatchObject(flightFixture);
-      expect(camp.flights['9'].changed).toBeFalsy();
-      expect(camp.flights['9'].valid).toBeTruthy();
+    campaignService.loadCampaignZoomFlights(campaignFixture.id).subscribe(result => {
+      const { campaignDoc, flightDocs } = result;
+      expect(campaignDoc.id).toBe(campaignFixture.id);
+      expect(flightDocs.length).toBe(1);
+      expect(flightDocs[0].id).toBe(flightFixture.id);
       done();
     });
-  });
-
-  it('gets null for nonexistent campaign', done => {
-    augury.mockError('prx:campaign', new Mock404Error());
-    campaign.getCampaign(1).subscribe(camp => {
-      expect(camp).toBeNull();
-      done();
-    });
-  });
-
-  it('filters underscores', () => {
-    const doc = augury.mock('any:thing', { foo: 'bar', _under: 'scored' });
-    expect(campaign.filter(doc)).not.toHaveProperty('_under');
   });
 
   it('creates new campaigns', done => {
     const spy = jest.spyOn(augury.root, 'create');
-    campaign.putCampaign({ ...campaignStateFixture, remoteCampaign: null, changed: true }).subscribe(() => {
+    campaignService.createCampaign(campaignFixture).subscribe(() => {
       expect(spy).toHaveBeenCalled();
       expect(spy.mock.calls[0][0]).toEqual('prx:campaign');
       expect(spy.mock.calls[0][2]).toMatchObject(campaignFixture);
@@ -110,10 +58,9 @@ describe('CampaignService', () => {
   });
 
   it('updates existing campaigns', done => {
-    campaignDoc.mockItems('prx:flights', []);
-    const spy = jest.spyOn(campaignDoc, 'update');
-    campaign.getCampaign(1).subscribe();
-    campaign.putCampaign({ ...campaignStateFixture, changed: true }).subscribe(() => {
+    let spy;
+    campaignService.campaignDoc$.subscribe(doc => (spy = jest.spyOn(doc, 'update')));
+    campaignService.updateCampaign(campaignFixture).subscribe(() => {
       expect(spy).toHaveBeenCalled();
       const { id, ...settable } = campaignFixture;
       expect(spy.mock.calls[0][0]).toMatchObject(settable);
@@ -121,50 +68,32 @@ describe('CampaignService', () => {
     });
   });
 
-  it('ignores unchanged campaigns', done => {
-    const spy = jest.spyOn(augury.root, 'create');
-    campaign.putCampaign({ ...campaignStateFixture, remoteCampaign: null, changed: false }).subscribe(() => {
-      expect(spy).not.toHaveBeenCalled();
+  it('creates new flights', done => {
+    let spy;
+    campaignService.campaignDoc$.subscribe(doc => {
+      (doc as MockHalDoc).mockItems('prx:flights', []);
+      spy = jest.spyOn(doc, 'create');
+    });
+    campaignService.createFlight(flightFixture).subscribe(() => {
+      expect(spy).toHaveBeenCalled();
+      expect(spy.mock.calls[0][0]).toEqual('prx:flights');
+      expect(spy.mock.calls[0][2]).toMatchObject(flightFixture);
       done();
     });
   });
 
-  describe('with an existing campaign', () => {
-    let doc: MockHalDoc;
-    beforeEach(() => {
-      doc = augury.mock('prx:campaign', {});
-      doc.mockItems('prx:flights', []);
-      campaign.getCampaign(1).subscribe();
-    });
-
-    it('creates new flights', done => {
-      const spy = jest.spyOn(campaignDoc, 'create');
-      campaign.putFlight({ ...flightStateFixture, remoteFlight: null, changed: true }).subscribe(() => {
-        expect(spy).toHaveBeenCalled();
-        expect(spy.mock.calls[0][0]).toEqual('prx:flights');
-        expect(spy.mock.calls[0][2]).toMatchObject(flightFixture);
-        done();
+  it('updates existing flights', done => {
+    let spy;
+    campaignService.campaignDoc$
+      .pipe(withLatestFrom(campaignService.getFlightDocById(flightFixture.id)))
+      .subscribe(([campaignDoc, flightDoc]) => {
+        (campaignDoc as MockHalDoc).mockItems('prx:flights', [flightDocFixture]);
+        spy = jest.spyOn(flightDoc, 'update');
       });
-    });
-
-    it('updates existing flights', done => {
-      const { set_inventory_uri, ...flightProperties } = flightFixture;
-      const flights = doc.mockItems('prx:flights', [{ ...flightProperties, _links: { 'prx:inventory': { href: set_inventory_uri } } }]);
-      campaign.getCampaign(1).subscribe();
-      const spy = jest.spyOn(flights[0], 'update');
-      campaign.putFlight({ ...flightStateFixture, changed: true }).subscribe(() => {
-        expect(spy).toHaveBeenCalled();
-        expect(spy.mock.calls[0][0]).toMatchObject(flightFixture);
-        done();
-      });
-    });
-
-    it('ignores unchanged flights', done => {
-      const spy = jest.spyOn(doc, 'create');
-      campaign.putFlight({ ...flightStateFixture, remoteFlight: null, changed: false }).subscribe(() => {
-        expect(spy).not.toHaveBeenCalled();
-        done();
-      });
+    campaignService.updateFlight(flightFixture).subscribe(() => {
+      expect(spy).toHaveBeenCalled();
+      expect(spy.mock.calls[0][0]).toMatchObject(flightFixture);
+      done();
     });
   });
 });

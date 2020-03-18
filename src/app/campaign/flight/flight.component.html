@@ -5,8 +5,20 @@
       <input matInput placeholder="Flight Name" formControlName="name" required />
     </mat-form-field>
     <div class="flight-dates">
-      <prx-datepicker class="flight-form-field" [date]="startAt" [maxDate]="endAt" UTC="true" (dateChange)="onDateRangeChange({ startAt: $event })"></prx-datepicker>
-      <prx-datepicker class="flight-form-field" [date]="endAt" [minDate]="startAt" UTC="true" (dateChange)="onDateRangeChange({ endAt: $event })"></prx-datepicker>
+      <prx-datepicker
+        class="flight-form-field"
+        [date]="flight?.startAt"
+        [maxDate]="flight?.endAt"
+        UTC="true"
+        (dateChange)="onDateRangeChange({ startAt: $event })"
+      ></prx-datepicker>
+      <prx-datepicker
+        class="flight-form-field"
+        [date]="flight?.endAt"
+        [minDate]="flight?.startAt"
+        UTC="true"
+        (dateChange)="onDateRangeChange({ endAt: $event })"
+      ></prx-datepicker>
     </div>
     <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Series</mat-label>

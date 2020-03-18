@@ -1,9 +1,9 @@
-import * as campaignStateFactory from '../reducers/campaign-state.factory';
+import * as campaignStateFactory from '../models/campaign-state.factory';
 import * as campaignSelectors from './campaign.selectors';
 
 describe('Campaign Selectors', () => {
   it('should select campaign state', () => {
-    const state = campaignStateFactory.createState();
+    const state = campaignStateFactory.createCampaignStoreState();
     expect(campaignSelectors.selectCampaign.projector(state)).toBeDefined();
   });
 

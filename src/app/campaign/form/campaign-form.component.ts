@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Campaign, Account, Advertiser } from '../../core';
+import { Account, Advertiser } from '../../core';
+import { Campaign } from '../store/models';
 
 @Component({
   selector: 'grove-campaign-form',

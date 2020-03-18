@@ -17,6 +17,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import * as fromCampaignState from './store';
 import { CampaignEffects } from './store/effects/campaign.effects';
+import { CampaignActionService } from './store/actions/campaign-action.service';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -39,6 +40,7 @@ import { CampaignEffects } from './store/effects/campaign.effects';
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
     EffectsModule.forFeature([CampaignEffects])
-  ]
+  ],
+  providers: [CampaignActionService]
 })
 export class CampaignModule {}

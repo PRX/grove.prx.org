@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AccountService, Account, Advertiser, AdvertiserService, CampaignStoreService, Campaign } from '../../core';
+import { AccountService, Account, Advertiser, AdvertiserService } from '../../core';
+import { Campaign } from '../store/models';
 import { selectLocalCampaign } from '../store/selectors';
-import { withLatestFrom } from 'rxjs/operators';
-import { CampaignFormUpdate } from '../store/actions';
+import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 @Component({
   selector: 'grove-campaign-form.container',
@@ -25,8 +25,8 @@ export class CampaignFormContainerComponent implements OnInit {
   advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
 
   constructor(
-    public campaignStoreService: CampaignStoreService,
-    public store: Store<any>,
+    private store: Store<any>,
+    private campaignActions: CampaignActionService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
@@ -35,23 +35,17 @@ export class CampaignFormContainerComponent implements OnInit {
     this.campaign$ = this.store.pipe(select(selectLocalCampaign));
   }
 
-  campaignUpdateFromForm(newState: { campaign: Campaign; changed: boolean; valid: boolean }) {
-    const { campaign, changed, valid } = newState;
-    this.campaignStoreService.setCampaign({ localCampaign: campaign, changed, valid });
-    this.store.dispatch(new CampaignFormUpdate({ campaign, changed, valid }));
+  campaignUpdateFromForm({ campaign, changed, valid }: { campaign: Campaign; changed: boolean; valid: boolean }) {
+    this.campaignActions.updateCampaignForm(campaign, changed, valid);
   }
 
   onAddAdvertiser(name: string) {
     const post = this.advertiserService.addAdvertiser(name);
 
-    post.pipe(withLatestFrom(this.campaign$)).subscribe(([result, campaign]) => {
+    post.subscribe(result => {
+      this.campaignActions.setCampaignAdvertiser(result.set_advertiser_uri);
       // TODO: how are we notifying in this app, material or the ol' toast?
       // this.toastr.success('Advertiser added');
-      this.campaignStoreService.setCampaign({
-        localCampaign: { ...campaign, set_advertiser_uri: result.set_advertiser_uri },
-        changed: true,
-        valid: true
-      });
     });
   }
 }

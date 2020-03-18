@@ -19,53 +19,52 @@ export class UserService {
     return this._userDoc.asObservable();
   }
 
-  constructor(private authService: AuthService,
-              private userinfoService: UserinfoService) {
+  constructor(private authService: AuthService, private userinfoService: UserinfoService) {
     this.loadUser();
   }
 
   loadUser() {
     this.userinfoService.config(this.authHost);
-    this.authService.token.pipe(
-      first(),
-      concatMap(token => {
-        if (token) {
-          return combineLatest(of(token), this.userinfoService.getUserinfo());
-        } else {
-          return of([]);
-        }
-      }),
-      concatMap(([token, userinfo]) => {
-        if (token) {
-          this.loggedIn = true;
-          this.authorized = this.authService.parseToken(token);
-        } else {
-          this.loggedIn = false;
-        }
-        if (userinfo) {
-          this.userinfo = userinfo;
-          return this.userinfoService.getUserDoc(userinfo);
-        } else {
-          return of();
-        }
-      })
-    ).subscribe(doc => {
-      this._userDoc.next(doc);
-    });
+    this.authService.token
+      .pipe(
+        first(),
+        concatMap(token => {
+          if (token) {
+            return combineLatest([of(token), this.userinfoService.getUserinfo()]);
+          } else {
+            return of([]);
+          }
+        }),
+        concatMap(([token, userinfo]) => {
+          if (token) {
+            this.loggedIn = true;
+            this.authorized = this.authService.parseToken(token);
+          } else {
+            this.loggedIn = false;
+          }
+          if (userinfo) {
+            this.userinfo = userinfo;
+            return this.userinfoService.getUserDoc(userinfo);
+          } else {
+            return of();
+          }
+        })
+      )
+      .subscribe(doc => {
+        this._userDoc.next(doc);
+      });
   }
 
   get accounts(): Observable<HalDoc[]> {
     return this.userDoc.pipe(
       concatMap(doc => {
         const per = doc && doc['_links']['prx:accounts']['count'];
-        return doc ? doc.followItems('prx:accounts', {per}) : of([]);
+        return doc ? doc.followItems('prx:accounts', { per }) : of([]);
       })
     );
   }
 
   get defaultAccount(): Observable<HalDoc> {
-    return this.userDoc.pipe(
-      concatMap(doc => doc ? doc.follow('prx:default-account') : of())
-    );
+    return this.userDoc.pipe(concatMap(doc => (doc ? doc.follow('prx:default-account') : of(null))));
   }
 }

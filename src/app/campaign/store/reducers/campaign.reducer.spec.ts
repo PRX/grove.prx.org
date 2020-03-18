@@ -1,7 +1,13 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { reducer, initialState } from './campaign.reducer';
-import * as ACTIONS from '../actions';
-import { campaignFixture, flightFixture } from './campaign-state.factory';
+import * as actions from '../actions';
+import {
+  campaignFixture,
+  campaignDocFixture,
+  flightDocFixture,
+  createCampaignState,
+  flightFixture
+} from '../models/campaign-state.factory';
 
 describe('Campaign Reducer', () => {
   describe('an unknown action', () => {
@@ -14,24 +20,15 @@ describe('Campaign Reducer', () => {
     });
   });
 
-  it('should reset to initial state for a new campaign', () => {
-    const result = reducer(
-      {
-        localCampaign: campaignFixture,
-        changed: true,
-        valid: true,
-        saving: false,
-        loading: false
-      },
-      new ACTIONS.CampaignNew()
-    );
-    expect(result).toMatchObject(initialState);
+  it('should setup for a new campaign', () => {
+    const result = reducer(createCampaignState().campaign, new actions.CampaignNew());
+    expect(result).toMatchObject({ ...initialState, loaded: true, loading: false });
   });
 
   it('should update local campaign with campaign form changes', () => {
     let result = reducer(
       initialState,
-      new ACTIONS.CampaignFormUpdate({
+      new actions.CampaignFormUpdate({
         campaign: campaignFixture,
         changed: true,
         valid: true
@@ -40,7 +37,7 @@ describe('Campaign Reducer', () => {
     expect(result.localCampaign).toMatchObject(campaignFixture);
     result = reducer(
       result,
-      new ACTIONS.CampaignFormUpdate({
+      new actions.CampaignFormUpdate({
         campaign: { name: 'new name' } as any,
         changed: true,
         valid: true
@@ -51,25 +48,41 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign loading', () => {
-    let result = reducer(initialState, new ACTIONS.CampaignLoad({ id: campaignFixture.id }));
-    expect(result.loading).toBe(true);
-    result = reducer(initialState, new ACTIONS.CampaignLoadFailure({ error: 'something bad happened' }));
-    expect(result.loading).toBe(false);
+    const newResult = reducer(initialState, new actions.CampaignNew());
+    expect(newResult.loading).toBe(false);
+
+    let loadResult = reducer(initialState, new actions.CampaignLoadOptions());
+    expect(loadResult.loading).toBe(true);
+    loadResult = reducer(loadResult, new actions.CampaignLoad({ id: campaignFixture.id }));
+    expect(loadResult.loading).toBe(true);
+    loadResult = reducer(loadResult, new actions.CampaignLoadFailure({ error: 'something bad happened' }));
+    expect(loadResult.loading).toBe(false);
+    loadResult = reducer(
+      loadResult,
+      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+    );
+    expect(loadResult.loading).toBe(false);
+  });
+
+  it('should set campaign loaded', () => {
+    let result = reducer(initialState, new actions.CampaignLoad({ id: campaignFixture.id }));
+    expect(result.loaded).toBe(false);
+    result = reducer(initialState, new actions.CampaignLoadFailure({ error: 'something bad happened' }));
+    expect(result.loaded).toBe(true);
     result = reducer(
       initialState,
-      new ACTIONS.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignFixture), flightDocs: [new MockHalDoc(flightFixture)] })
+      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
     );
-    expect(result.loading).toBe(false);
+    expect(result.loaded).toBe(true);
   });
 
   it('should set campaign from campaign load success', () => {
     const result = reducer(
       initialState,
-      new ACTIONS.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignFixture), flightDocs: [new MockHalDoc(flightFixture)] })
+      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
     );
-    const { _links, ...campaign } = campaignFixture;
-    expect(result.localCampaign).toMatchObject(campaign);
-    expect(result.remoteCampaign).toMatchObject(campaign);
+    expect(result.localCampaign).toMatchObject(campaignFixture);
+    expect(result.remoteCampaign).toMatchObject(campaignFixture);
     expect(result.changed).toBe(false);
     expect(result.valid).toBe(true);
     expect(result.loading).toBe(false);
@@ -77,22 +90,50 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign saving', () => {
-    let result = reducer(initialState, new ACTIONS.CampaignFormSave({ campaign: campaignFixture }));
+    let result = reducer(
+      initialState,
+      new actions.CampaignSave({ campaign: campaignFixture, deletedFlights: [], updatedFlights: [flightFixture], createdFlights: [] })
+    );
     expect(result.saving).toBe(true);
-    result = reducer(initialState, new ACTIONS.CampaignFormSaveFailure({ error: 'something bad happened' }));
+    result = reducer(result, new actions.CampaignSaveFailure({ error: 'something bad happened' }));
     expect(result.saving).toBe(false);
-    result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaignDoc: new MockHalDoc(campaignFixture) }));
+    result = reducer(
+      result,
+      new actions.CampaignSaveSuccess({
+        campaignDoc: new MockHalDoc(campaignFixture),
+        deletedFlightDocs: undefined,
+        updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
+        createdFlightDocs: undefined
+      })
+    );
     expect(result.saving).toBe(false);
   });
 
   it('should set campaign from campaign form save success', () => {
-    const result = reducer(initialState, new ACTIONS.CampaignFormSaveSuccess({ campaignDoc: new MockHalDoc(campaignFixture) }));
-    const { _links, ...campaign } = campaignFixture;
-    expect(result.localCampaign).toMatchObject(campaign);
-    expect(result.remoteCampaign).toMatchObject(campaign);
+    const result = reducer(
+      initialState,
+      new actions.CampaignSaveSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        deletedFlightDocs: undefined,
+        updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
+        createdFlightDocs: undefined
+      })
+    );
+    expect(result.localCampaign).toMatchObject(campaignFixture);
+    expect(result.remoteCampaign).toMatchObject(campaignFixture);
     expect(result.changed).toBe(false);
     expect(result.valid).toBe(true);
     expect(result.loading).toBe(false);
     expect(result.saving).toBe(false);
+  });
+
+  it('should set campaign advertiser', () => {
+    const result = reducer(
+      initialState,
+      new actions.CampaignSetAdvertiser({
+        set_advertiser_uri: '/some/uri'
+      })
+    );
+    expect(result.localCampaign.set_advertiser_uri).toBe('/some/uri');
   });
 });

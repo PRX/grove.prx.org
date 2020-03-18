@@ -1,62 +1,30 @@
 import { Injectable } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable, of } from 'rxjs';
-import { map, switchMap, catchError, find } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, switchMap, mergeMap, filter, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { CampaignState, Campaign, Flight, FlightState } from './campaign.models';
-import { selectCampaignDoc } from '../../campaign/store/selectors';
+import { Campaign, Flight } from '../../campaign/store/models';
+import { selectCampaignDoc, selectFlightDocById } from '../../campaign/store/selectors';
 
 @Injectable()
 export class CampaignService {
-  campaignDoc$: Observable<HalDoc>;
-  private flightDocs: { [id: number]: HalDoc } = {};
+  constructor(private augury: AuguryService, private store: Store<any>) {}
 
-  constructor(private augury: AuguryService, private store: Store<any>) {
-    this.campaignDoc$ = this.store.pipe(
+  get campaignDoc$(): Observable<HalDoc> {
+    return this.store.pipe(
       select(selectCampaignDoc),
-      // wait for campaign doc to be defined (on new campaign)
-      find(doc => !!doc)
+      filter(doc => !!doc),
+      first()
     );
   }
 
-  getCampaign(id: number | string): Observable<CampaignState> {
-    return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
-      switchMap(doc => doc.follow('prx:flights').pipe(map(flights => ({ doc, flights })))),
-      switchMap(({ doc, flights }: { doc: HalDoc; flights: HalDoc }) => {
-        // if total is greater than count, request all flights
-        let params: any;
-        if (+flights['total'] > +flights['count']) {
-          params = { per: +flights['total'] };
-        }
-        return doc.followItems('prx:flights', params).pipe(map(flightDocs => ({ doc, flightDocs })));
-      }),
-      map(({ doc, flightDocs }) => {
-        this.flightDocs = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: flight }), {});
-        const campaign = this.docToCampaignState(doc);
-        const flights = flightDocs.reduce((accum, flight) => ({ ...accum, [flight.id]: this.docToFlightState(flight) }), {});
-        return { ...campaign, flights };
-      }),
-      catchError(this.handleError)
+  getFlightDocById(id): Observable<HalDoc> {
+    return this.store.pipe(
+      select(selectFlightDocById, { id }),
+      filter(doc => !!doc),
+      first()
     );
-  }
-
-  putCampaign(state: CampaignState): Observable<CampaignState> {
-    if (!state.changed) {
-      return of(state);
-    } else if (state.remoteCampaign) {
-      return this.campaignDoc$.pipe(
-        switchMap(doc => doc.update(state.localCampaign)),
-        map(doc => this.docToCampaignState(doc))
-      );
-    } else {
-      return this.augury.root.pipe(
-        switchMap(rootDoc => rootDoc.create('prx:campaign', {}, state.localCampaign)),
-        map(doc => {
-          return this.docToCampaignState(doc);
-        })
-      );
-    }
   }
 
   loadCampaignZoomFlights(id: number): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[] }> {
@@ -69,85 +37,27 @@ export class CampaignService {
           params = { per: +flightDocs['total'] };
         }
         return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
-      }),
-      catchError(this.handleError)
+      })
     );
   }
 
-  updateCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
-    return this.campaignDoc$.pipe(
-      switchMap(doc => doc.update(campaign)),
-      map(updatedDoc => ({ campaignDoc: updatedDoc }))
-    );
+  updateCampaign(campaign: Campaign): Observable<HalDoc> {
+    return this.campaignDoc$.pipe(switchMap(doc => doc.update(campaign)));
   }
 
-  createCampaign(campaign: Campaign): Observable<{ campaignDoc: HalDoc }> {
-    return this.augury.root.pipe(
-      switchMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)),
-      map(doc => ({ campaignDoc: doc }))
-    );
+  createCampaign(campaign: Campaign): Observable<HalDoc> {
+    return this.augury.root.pipe(switchMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)));
   }
 
-  putFlight(state: FlightState): Observable<FlightState> {
-    if (!state.changed) {
-      return of(state);
-    } else if (state.remoteFlight) {
-      return this.flightDocs[state.remoteFlight.id].update(state.localFlight).pipe(
-        map(doc => {
-          this.flightDocs[doc.id] = doc;
-          return this.docToFlightState(doc);
-        })
-      );
-    } else {
-      return this.campaignDoc$.pipe(
-        switchMap(doc => doc.create('prx:flights', {}, state.localFlight)),
-        map(doc => {
-          this.flightDocs[doc.id] = doc;
-          return this.docToFlightState(doc);
-        })
-      );
-    }
+  createFlight(flight: Flight): Observable<HalDoc> {
+    return this.campaignDoc$.pipe(switchMap(doc => doc.create('prx:flights', {}, flight)));
+  }
+
+  updateFlight(flight: Flight): Observable<HalDoc> {
+    return this.getFlightDocById(flight.id).pipe(mergeMap((doc: HalDoc) => doc.update(flight)));
   }
 
   deleteFlight(flightId): Observable<HalDoc> {
-    return this.flightDocs[flightId].destroy();
-  }
-
-  docToCampaignState(doc: HalDoc): CampaignState {
-    const campaign = this.filter(doc) as Campaign;
-    campaign.set_advertiser_uri = doc.expand('prx:advertiser');
-    campaign.set_account_uri = doc.expand('prx:account');
-    return {
-      remoteCampaign: campaign,
-      localCampaign: campaign,
-      flights: {},
-      changed: false,
-      valid: true
-    };
-  }
-
-  docToFlightState(doc: HalDoc): FlightState {
-    const flight = this.filter(doc) as Flight;
-    flight.set_inventory_uri = doc.expand('prx:inventory');
-    return {
-      remoteFlight: flight,
-      localFlight: flight,
-      changed: false,
-      valid: true
-    };
-  }
-
-  filter(doc: HalDoc): {} {
-    return Object.keys(doc.asJSON())
-      .filter(key => !key.startsWith('_'))
-      .reduce((obj, key) => ({ ...obj, [key]: doc[key] }), {});
-  }
-
-  handleError(err: any) {
-    if (err.status === 404) {
-      return of(null);
-    } else {
-      throw err;
-    }
+    return this.getFlightDocById(flightId).pipe(mergeMap((doc: HalDoc) => doc.destroy()));
   }
 }

@@ -3,17 +3,19 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard, DeactivateGuard } from 'ngx-prx-styleguide';
 
 import { CampaignComponent } from './campaign.component';
-import { CampaignFormComponent } from './form/campaign-form.component';
+import { CampaignNavComponent } from './nav/campaign-nav.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
+import { CampaignFormComponent } from './form/campaign-form.component';
 import { FlightContainerComponent } from './flight/flight.container';
 import { FlightComponent } from './flight/flight.component';
 import { AvailabilityComponent } from './availability/availability.component';
 import { GoalFormComponent } from './availability/goal-form.component';
+import { TestComponent } from './campaign-test.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
-  { path: 'flight/:flightid', component: FlightContainerComponent }
+  { path: 'flight/:flightId', component: FlightContainerComponent }
 ];
 
 export const campaignRoutes: Routes = [
@@ -37,11 +39,14 @@ export const campaignComponents: any[] = [
   CampaignComponent,
   CampaignFormContainerComponent,
   CampaignFormComponent,
+  CampaignNavComponent,
   CampaignStatusComponent,
   FlightContainerComponent,
   FlightComponent,
   AvailabilityComponent,
-  GoalFormComponent
+  GoalFormComponent,
+  // to make the angular compiler happy, include all components that are defined in their own files, ugh fine
+  TestComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);

@@ -1,181 +1,157 @@
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  MatButtonModule,
+  MatCardModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatSelectModule
+} from '@angular/material';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, ReplaySubject } from 'rxjs';
+import { ActivatedRoute, Router, Routes } from '@angular/router';
+import { ActivatedRouteStub } from '../../../testing/stub.router';
+import { Store, StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { DatepickerModule, MockHalDoc } from 'ngx-prx-styleguide';
 import { CampaignStoreService, InventoryService } from '../../core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { map, first } from 'rxjs/operators';
+import { SharedModule } from '../../shared/shared.module';
+import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
+import { reducers } from '../store';
+import * as actions from '../store/actions';
+import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 import { FlightContainerComponent } from './flight.container';
+import { FlightComponent } from './flight.component';
+import { AvailabilityComponent } from '../availability/availability.component';
+import { GoalFormComponent } from '../availability/goal-form.component';
+import { TestComponent } from '../campaign-test.component';
+
+const campaignChildRoutes: Routes = [
+  { path: '', component: FlightContainerComponent },
+  { path: 'flight/:flightId', component: FlightContainerComponent }
+];
+const campaignRoutes: Routes = [
+  {
+    path: 'campaign/new',
+    component: TestComponent,
+    children: campaignChildRoutes
+  },
+  {
+    path: 'campaign/:id',
+    component: TestComponent,
+    children: campaignChildRoutes
+  }
+];
 
 describe('FlightContainerComponent', () => {
-  let campaign: ReplaySubject<any>;
+  const inventory: ReplaySubject<any> = new ReplaySubject(1);
   let campaignStoreService: CampaignStoreService;
-  let inventory: ReplaySubject<any>;
-  let inventoryService: InventoryService;
-  let routeId: ReplaySubject<string>;
-  let route: ActivatedRoute;
+  let campaignActionService: CampaignActionService;
+  const route: ActivatedRouteStub = new ActivatedRouteStub();
   let router: Router;
+  let store: Store<any>;
   let component: FlightContainerComponent;
+  let fix: ComponentFixture<FlightContainerComponent>;
+  let de: DebugElement;
+  let el: HTMLElement;
+  const flight = {
+    id: 123,
+    name: 'my-flight',
+    startAt: new Date('2019-10-01'),
+    endAt: new Date('2019-11-01'),
+    set_inventory_uri: '/some/url',
+    zones: ['pre_1'],
+    totalGoal: 999
+  };
 
-  beforeEach(() => {
-    campaign = new ReplaySubject(1);
-    campaignStoreService = {
-      campaign$: campaign,
-      campaignFirst$: campaign.pipe(first()),
-      setFlight: jest.fn(() => of({})),
-      setCurrentFlightId: jest.fn(id => {}),
-      loadAvailability: jest.fn(f => of({})),
-      loadAllocationPreview: jest.fn(f => of()),
-      getFlightAvailabilityRollup$: jest.fn(id => of([])),
-      getFlightDailyMin$: jest.fn(id => of(0))
-    } as any;
-    inventory = new ReplaySubject(1);
-    inventoryService = { listInventory: jest.fn(() => inventory) } as any;
-    routeId = new ReplaySubject(1);
-    route = { paramMap: routeId.pipe(map(id => ({ get: jest.fn(() => id) }))) } as any;
-    router = { navigate: jest.fn() } as any;
-    component = new FlightContainerComponent(route, inventoryService, campaignStoreService, router);
-    component.ngOnInit();
-  });
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule.withRoutes(campaignRoutes),
+        SharedModule,
+        DatepickerModule,
+        ReactiveFormsModule,
+        NoopAnimationsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatListModule,
+        MatSelectModule,
+        StoreModule.forRoot({ router: routerReducer }),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
+      ],
+      declarations: [FlightContainerComponent, FlightComponent, AvailabilityComponent, GoalFormComponent, TestComponent],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: route
+        },
+        {
+          provide: InventoryService,
+          useValue: { listInventory: jest.fn(() => inventory) }
+        },
+        {
+          provide: CampaignStoreService,
+          useValue: {
+            loadAvailability: jest.fn(f => of({})),
+            loadAllocationPreview: jest.fn(f => of()),
+            getFlightAvailabilityRollup$: jest.fn(() => of([]))
+          }
+        },
+        CampaignActionService
+      ]
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(FlightContainerComponent);
+        component = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        fix.detectChanges();
+        campaignStoreService = TestBed.get(CampaignStoreService);
+        router = TestBed.get(Router);
+        store = TestBed.get(Store);
+        campaignActionService = TestBed.get(CampaignActionService);
+
+        store.dispatch(
+          new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc({ id: 1 }), flightDocs: [new MockHalDoc(flightDocFixture)] })
+        );
+        router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`);
+      });
+  }));
 
   afterEach(() => {
     component.ngOnDestroy();
   });
 
-  it('sets the flight id from the route', () => {
-    const spy = jest.spyOn(component, 'setFlightId');
-    campaign.next({});
-    routeId.next('123');
-    expect(spy).toHaveBeenCalledWith('123', {});
-  });
-
-  it('loads an existing flight', done => {
-    component.flightState$.subscribe(state => {
-      expect(state).toEqual({ name: 'my-flight' });
-      done();
-    });
-    campaign.next({ flights: { 123: { name: 'my-flight' } } });
-    routeId.next('123');
-  });
-
-  it('loads inventory availability', done => {
-    routeId.next('321');
-    campaign.next({ flights: { 123: { name: 'my-flight' }, 321: { name: 'my-other-flight' } }, availability: {} });
+  it('receives availability and allocation preview updates when flight form changes', done => {
+    component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: new Date() }, changed: true, valid: true });
     component.flightAvailability$.subscribe(availability => {
       expect(availability).toBeDefined();
-      expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
-      done();
-    });
-    routeId.next('123');
-  });
-
-  it('loads availability and allocation preview when flight changes', done => {
-    const flight = {
-      name: 'my-flight',
-      totalGoal: 999,
-      startAt: '2019-10-01',
-      endAt: '2019-11-01',
-      set_inventory_uri: '/some/url',
-      zones: ['pre_1']
-    };
-    campaign.next({
-      flights: {
-        123: {
-          localFlight: flight
-        }
-      },
-      availability: {}
-    });
-    routeId.next('123');
-    component.flightUpdateFromForm({ flight: { ...flight, startAt: '2019-10-15' }, changed: true, valid: true });
-    component.flightAvailability$.subscribe(availability => {
-      expect(availability).toBeDefined();
-      expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
-      expect(campaignStoreService.loadAllocationPreview).toHaveBeenCalled();
       done();
     });
   });
 
-  it('does not load allocation preview if flight name changes', () => {
-    const flight = {
-      id: 123,
-      name: 'my-flight'
-    };
-    campaign.next({
-      flights: {
-        123: {
-          localFlight: flight
-        }
-      },
-      availability: {}
-    });
-    routeId.next('123');
-    component.flightUpdateFromForm({ flight: { ...flight, name: 'my-other-flight' }, changed: true, valid: true });
-    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
-  });
-
-  it('does not load allocation preview if id does not match flight in state', () => {
-    const flight = {
-      id: 123,
-      name: 'my-flight'
-    };
-    campaign.next({
-      flights: {
-        123: {
-          localFlight: flight
-        }
-      },
-      availability: {}
-    });
-    routeId.next('123');
-    component.flightUpdateFromForm({ flight: { id: 124, name: 'New Flight 124' }, changed: true, valid: true });
-    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
-  });
-
-  // TODO: no longer does this because it caused a premature navigation bug, should we create a better way to detect it?
-  xit('redirects to campaign if the flight does not exist', () => {
-    campaign.next({ flights: { 123: { name: 'my-flight' } } });
-    routeId.next('456');
-    expect(router.navigate).toHaveBeenCalledWith(['/campaign', 'new']);
-  });
-
-  it('toggles soft deletion of flights in state', () => {
-    campaign.next({ flights: { 123: { name: 'my-flight' } } });
-    routeId.next('123');
-    component.flightDeleteToggle();
-    campaign.next({ flights: { 123: { name: 'my-flight', softDeleted: true } } });
-    component.flightDeleteToggle();
-    expect(campaignStoreService.setFlight).toHaveBeenNthCalledWith(1, expect.objectContaining({ softDeleted: true }), '123');
-    expect(campaignStoreService.setFlight).toHaveBeenNthCalledWith(2, expect.objectContaining({ softDeleted: false }), '123');
-  });
-
-  it('sets the flight', () => {
-    const flight = {
-      id: 123,
-      name: 'my flight name',
-      set_inventory_uri: '/some/inventory'
-    };
-    const changed = true;
-    const valid = false;
-
-    campaign.next({ flights: { 123: flight } });
-    routeId.next('123');
-
-    component.flightUpdateFromForm({ flight, changed, valid });
-    expect(campaignStoreService.setFlight).toHaveBeenCalledWith({ localFlight: flight, changed, valid }, '123');
+  it('calls action to update the flight', () => {
+    jest.spyOn(campaignActionService, 'updateFlightForm');
+    component.flightUpdateFromForm({ flight, changed: true, valid: false });
+    expect(campaignActionService.updateFlightForm).toHaveBeenCalledWith(flight, true, false);
   });
 
   it('generates zone options from inventory', done => {
+    inventory.next([{ self_uri: flightFixture.set_inventory_uri, zones: flightFixture.zones }]);
     component.zoneOptions$.subscribe(opts => {
-      expect(opts).toEqual(['z2', 'z22']);
+      expect(opts).toEqual(flightFixture.zones);
       done();
     });
-
-    const flight = { set_inventory_uri: '/inv/2' };
-    campaign.next({ flights: { 123: { localFlight: flight } } });
-    routeId.next('123');
-    inventory.next([
-      { self_uri: '/inv/1', zones: ['z1'] },
-      { self_uri: '/inv/2', zones: ['z2', 'z22'] },
-      { self_uri: '/inv/3', zones: ['z3'] }
-    ]);
   });
 });

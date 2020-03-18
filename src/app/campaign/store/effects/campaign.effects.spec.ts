@@ -7,12 +7,12 @@ import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
+import { HalHttpError, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
 import { CampaignService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { reducers } from '../';
-import { campaignFixture, flightFixture } from '../reducers/campaign-state.factory';
-import * as ACTIONS from '../actions';
+import { campaignFixture, flightFixture } from '../models/campaign-state.factory';
+import * as actions from '../actions';
 import { CampaignEffects } from './campaign.effects';
 
 @Component({
@@ -22,7 +22,7 @@ import { CampaignEffects } from './campaign.effects';
 class TestComponent {}
 const campaignChildRoutes: Routes = [
   { path: '', component: TestComponent },
-  { path: 'flight/:flightid', component: TestComponent }
+  { path: 'flight/:flightId', component: TestComponent }
 ];
 const routes: Routes = [
   {
@@ -42,6 +42,7 @@ describe('CampaignEffects', () => {
   let actions$: TestActions;
   let campaignService: CampaignService;
   let router: Router;
+  const toastrService: ToastrService = { success: jest.fn() } as any;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -50,11 +51,16 @@ describe('CampaignEffects', () => {
       providers: [
         CampaignEffects,
         {
+          provide: ToastrService,
+          useValue: toastrService
+        },
+        {
           provide: CampaignService,
           useValue: {
             loadCampaignZoomFlights: jest.fn(),
             createCampaign: jest.fn(),
-            updateCampaign: jest.fn()
+            updateCampaign: jest.fn(),
+            createFlight: jest.fn()
           }
         },
         { provide: Actions, useFactory: getActions }
@@ -71,8 +77,8 @@ describe('CampaignEffects', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const flightDocs = [new MockHalDoc(flightFixture)];
     campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
-    const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const success = new ACTIONS.CampaignLoadSuccess({ campaignDoc, flightDocs });
+    const action = new actions.CampaignLoad({ id: 1 });
+    const success = new actions.CampaignLoadSuccess({ campaignDoc, flightDocs });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -84,8 +90,8 @@ describe('CampaignEffects', () => {
     const errorResponse = cold('-#|', {}, halError);
     campaignService.loadCampaignZoomFlights = jest.fn(() => errorResponse);
 
-    const action = new ACTIONS.CampaignLoad({ id: 1 });
-    const outcome = new ACTIONS.CampaignLoadFailure({ error: halError });
+    const action = new actions.CampaignLoad({ id: 1 });
+    const outcome = new actions.CampaignLoadFailure({ error: halError });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('--b', { b: outcome });
@@ -94,12 +100,27 @@ describe('CampaignEffects', () => {
 
   it('should create or update campaign from campaign form save', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
-    campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
-    campaignService.updateCampaign = jest.fn(campaign => of({ campaignDoc }));
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
     const { id, ...createCampaign } = campaignFixture;
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
+    const createAction = new actions.CampaignSave({
+      campaign: createCampaign,
+      updatedFlights: [],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const updateAction = new actions.CampaignSave({
+      campaign: campaignFixture,
+      updatedFlights: [],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const success = new actions.CampaignSaveSuccess({
+      campaignDoc,
+      deletedFlightDocs: undefined,
+      updatedFlightDocs: undefined,
+      createdFlightDocs: undefined
+    });
 
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('-r-r', { r: success });
@@ -113,23 +134,144 @@ describe('CampaignEffects', () => {
     campaignService.updateCampaign = jest.fn(() => errorResponse);
 
     const { id, ...createCampaign } = campaignFixture;
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const updateAction = new ACTIONS.CampaignFormSave({ campaign: campaignFixture });
-    const outcome = new ACTIONS.CampaignFormSaveFailure({ error: halError });
+    const createAction = new actions.CampaignSave({
+      campaign: createCampaign,
+      updatedFlights: [],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const updateAction = new actions.CampaignSave({
+      campaign: campaignFixture,
+      updatedFlights: [],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const outcome = new actions.CampaignSaveFailure({ error: halError });
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('--r-r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);
   });
 
-  it('redirects to a new campaign', () => {
+  it('should redirect to a new campaign', () => {
     const campaignDoc = new MockHalDoc(campaignFixture);
     const { id, ...createCampaign } = campaignFixture;
-    campaignService.createCampaign = jest.fn(campaign => of({ campaignDoc }));
-    const createAction = new ACTIONS.CampaignFormSave({ campaign: createCampaign });
-    const success = new ACTIONS.CampaignFormSaveSuccess({ campaignDoc });
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    const createAction = new actions.CampaignSave({
+      campaign: createCampaign,
+      updatedFlights: [],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const success = new actions.CampaignSaveSuccess({
+      campaignDoc,
+      deletedFlightDocs: undefined,
+      updatedFlightDocs: undefined,
+      createdFlightDocs: undefined
+    });
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
+  });
+
+  it('should redirect to a new campaign and flight', done => {
+    const campaignDoc = new MockHalDoc(campaignFixture);
+    const flightDoc = new MockHalDoc(flightFixture);
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.createFlight = jest.fn(() => of(flightDoc));
+
+    const { id, ...newCampaign } = campaignFixture;
+    const flightId = new Date().valueOf();
+    const flight = { ...flightFixture, id: flightId };
+    router.navigateByUrl(`/campaign/new/flight/${flightId}`).then(() => {
+      const createAction = new actions.CampaignSave({
+        campaign: newCampaign,
+        updatedFlights: [],
+        createdFlights: [flight],
+        deletedFlights: []
+      });
+      const success = new actions.CampaignSaveSuccess({
+        campaignDoc,
+        deletedFlightDocs: undefined,
+        updatedFlightDocs: undefined,
+        createdFlightDocs: { [flightId]: flightDoc }
+      });
+      actions$.stream = hot('-a', { a: createAction });
+      const expected = cold('-r', { r: success });
+      expect(effects.campaignFormSave$).toBeObservable(expected);
+      expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id, 'flight', flightFixture.id]);
+      done();
+    });
+  });
+
+  it('should redirect away from a deleted flight to the campaign', done => {
+    const campaignDoc = new MockHalDoc(campaignFixture);
+    const flightDoc = new MockHalDoc(flightFixture);
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.deleteFlight = jest.fn(() => of(flightDoc));
+    router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
+      const deleteAction = new actions.CampaignSave({
+        campaign: campaignFixture,
+        updatedFlights: [],
+        createdFlights: [],
+        deletedFlights: [flightFixture]
+      });
+      const success = new actions.CampaignSaveSuccess({
+        campaignDoc,
+        deletedFlightDocs: { [flightFixture.id]: flightDoc },
+        updatedFlightDocs: undefined,
+        createdFlightDocs: undefined
+      });
+      actions$.stream = hot('-a', { a: deleteAction });
+      const expected = cold('-r', { r: success });
+      expect(effects.campaignFormSave$).toBeObservable(expected);
+      expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id]);
+      done();
+    });
+  });
+
+  it('should update an existing flight', () => {
+    const campaignDoc = new MockHalDoc(campaignFixture);
+    const flightDoc = new MockHalDoc(flightFixture);
+    campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
+    campaignService.updateFlight = jest.fn(() => of(flightDoc));
+
+    const updateAction = new actions.CampaignSave({
+      campaign: campaignFixture,
+      updatedFlights: [flightFixture],
+      createdFlights: [],
+      deletedFlights: []
+    });
+    const success = new actions.CampaignSaveSuccess({
+      campaignDoc,
+      deletedFlightDocs: undefined,
+      updatedFlightDocs: { [flightFixture.id]: flightDoc },
+      createdFlightDocs: undefined
+    });
+    actions$.stream = hot('-a', { a: updateAction });
+    const expected = cold('-r', { r: success });
+    expect(effects.campaignFormSave$).toBeObservable(expected);
+  });
+
+  it('should dispatch action to add a flight with a temporary id', () => {
+    const date = new Date();
+    global.Date.now = jest.fn(() => date.getTime());
+    const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
+    const action = new actions.CampaignAddFlight({ campaignId: 1 });
+    const success = new actions.CampaignAddFlightWithTempId({ flightId: date.valueOf(), startAt, endAt });
+    actions$.stream = hot('a', { a: action });
+    const expected = cold('r', { r: success });
+    expect(effects.addFlight$).toBeObservable(expected);
+  });
+
+  it('should dispatch action to duplicate flight with a temporary id', () => {
+    const flightId = Date.now();
+    global.Date.now = jest.fn(() => flightId);
+    const action = new actions.CampaignDupFlight({ campaignId: 1, flight: flightFixture });
+    const success = new actions.CampaignDupFlightWithTempId({ flightId, flight: flightFixture });
+    actions$.stream = hot('a', { a: action });
+    const expected = cold('r', { r: success });
+    expect(effects.dupFlight$).toBeObservable(expected);
   });
 });

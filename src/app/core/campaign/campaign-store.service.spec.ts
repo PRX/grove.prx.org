@@ -1,58 +1,31 @@
+import { Store } from '@ngrx/store';
 import { CampaignStoreService } from './campaign-store.service';
-import { Campaign, CampaignState, Flight, FlightState, Availability, Allocation, AllocationPreview } from './campaign.models';
-import { CampaignService } from './campaign.service';
+import { Availability, Allocation, AllocationPreview } from './campaign.models';
 import { InventoryService } from '../inventory/inventory.service';
 import { AllocationPreviewService } from '../allocation/allocation-preview.service';
 import { of } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
+import { createCampaignStoreState, flightFixture } from '../../campaign/store/models/campaign-state.factory';
 
 describe('CampaignStoreService', () => {
-  let store: CampaignStoreService;
-  let campaignService;
+  let store: Store<any>;
+  let campaignStoreService: CampaignStoreService;
   let inventoryService: InventoryService;
   let allocationPreviewService: AllocationPreviewService;
-  let campaignFixture: Campaign;
-  let flightFixture: Flight;
-  let campaignStateFixture: CampaignState;
-  let flightStateFixture: FlightState;
   let availabilityFixture: Availability;
   let allocationPreviewFixture: AllocationPreview;
 
   beforeEach(() => {
-    campaignService = {
-      getCampaign: jest.fn(id => of(campaignStateFixture)),
-      putCampaign: jest.fn(state => of({ ...campaignStateFixture, flights: {} })),
-      putFlight: jest.fn(state => of(flightStateFixture)),
-      deleteFlight: jest.fn(id => of({ id }))
-    } as any;
     inventoryService = {
       getInventoryAvailability: jest.fn(flight => of(availabilityFixture))
     } as any;
     allocationPreviewService = {
       getAllocationPreview: jest.fn(flight => of(allocationPreviewFixture))
     } as any;
+    store = of({ router: { state: { params: { flightId: flightFixture.id } } }, campaignState: createCampaignStoreState() }) as any;
 
-    store = new CampaignStoreService(campaignService, inventoryService, allocationPreviewService);
-    campaignFixture = {
-      id: 1,
-      name: 'my campaign name',
-      type: 'paid',
-      status: 'draft',
-      repName: 'my rep name',
-      notes: 'my notes',
-      set_account_uri: '/some/account',
-      set_advertiser_uri: '/some/advertiser'
-    };
-    flightFixture = {
-      id: 9,
-      name: 'my flight name',
-      startAt: '2019-09-01',
-      endAt: '2019-10-01',
-      totalGoal: 999,
-      zones: ['pre_1'],
-      set_inventory_uri: '/some/inventory'
-    };
-    flightStateFixture = { localFlight: flightFixture, remoteFlight: flightFixture, changed: false, valid: true };
+    campaignStoreService = new CampaignStoreService(store, inventoryService, allocationPreviewService);
+
     availabilityFixture = {
       zone: 'pre_1',
       totals: {
@@ -134,160 +107,10 @@ describe('CampaignStoreService', () => {
         { goalCount: 1, inventoryDayId: 6763, date: '2019-10-31', zoneName: 'pre_1' }
       ]
     };
-    campaignStateFixture = {
-      localCampaign: campaignFixture,
-      remoteCampaign: campaignFixture,
-      changed: false,
-      valid: true,
-      flights: { 9: flightStateFixture },
-      availability: { '9-pre_1': availabilityFixture }
-    };
-  });
-
-  it('creates a new campaign', done => {
-    store.campaign$.subscribe(camp => {
-      expect(camp.remoteCampaign).toBeFalsy();
-      expect(camp.localCampaign).toMatchObject({ name: null });
-      expect(camp.flights).toEqual({});
-      expect(camp.changed).toBeFalsy();
-      expect(camp.valid).toBeFalsy();
-      done();
-    });
-    store.load(null);
-  });
-
-  it('loads an existing campaign', done => {
-    store.campaign$.subscribe(camp => {
-      expect(camp).toMatchObject(campaignStateFixture);
-      done();
-    });
-    store.load(1);
-  });
-
-  it('stores a campaign', done => {
-    store.storeCampaign().subscribe(changes => {
-      expect(changes).toEqual([{ id: 1, prevId: 1, flights: { 9: 9 } }, []]);
-      done();
-    });
-    store.load(1);
-  });
-
-  it('returns changes for new campaigns and flights', done => {
-    const newState: CampaignState = {
-      ...campaignStateFixture,
-      remoteCampaign: null,
-      flights: { 'unsaved-id': { localFlight: flightFixture, remoteFlight: null, changed: true, valid: true } }
-    };
-    campaignService.getCampaign = jest.fn(id => of(newState)) as any;
-    store.storeCampaign().subscribe(([changes, deletedDocs]) => {
-      expect(changes).toEqual({ id: 1, prevId: null, flights: { 'unsaved-id': 9 } });
-      done();
-    });
-    store.load(1);
-  });
-
-  it('returns deletion docs for deleted flights', done => {
-    const deletedId = 'deleted-id';
-    store.setCampaign(campaignStateFixture);
-    store.setFlight(
-      {
-        ...flightStateFixture,
-        ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: (deletedId as any) as number } },
-        softDeleted: true
-      },
-      deletedId
-    );
-    store.storeCampaign().subscribe(([changes, deletedDocs]) => {
-      expect(campaignService.deleteFlight).toHaveBeenCalledWith(deletedId);
-      expect(deletedDocs).toMatchObject([{ id: deletedId }]);
-      done();
-    });
-    store.load(1);
-  });
-
-  it('removes and deletes flights marked for deletion when storing a campaign', done => {
-    const softDeletedId = 'deletion-id';
-    store.setCampaign(campaignStateFixture);
-    store.setFlight(
-      {
-        ...flightStateFixture,
-        ...{ remoteFlight: { ...flightStateFixture.remoteFlight, id: (softDeletedId as any) as number } },
-        softDeleted: true
-      },
-      softDeletedId
-    );
-    const removeFlightSpy = jest.spyOn(store, 'removeFlight');
-    store.storeCampaign().subscribe(changes => {
-      expect(removeFlightSpy).toHaveBeenCalledWith(softDeletedId);
-      expect(campaignService.deleteFlight).toHaveBeenCalledWith(softDeletedId);
-      done();
-    });
-    store.load(1);
-  });
-
-  it('updates campaigns', done => {
-    const updateCampaign = { localCampaign: { ...campaignFixture, name: 'foo' }, changed: true, valid: false };
-    store.load(1);
-    store.setCampaign(updateCampaign);
-    store.campaign$.subscribe(camp => {
-      expect(camp).toMatchObject({ ...campaignStateFixture, ...updateCampaign });
-      done();
-    });
-  });
-
-  it('adds new flights', done => {
-    const newFlight: FlightState = { localFlight: flightFixture, changed: true, valid: false };
-    store.load(1);
-    store.setFlight(newFlight, 9999);
-    store.campaign$.subscribe(camp => {
-      expect(camp.flights['9999']).toEqual(newFlight);
-      done();
-    });
-  });
-
-  it('removes flights', done => {
-    const [retainId, deleteId] = [1, 2];
-    const retainFlight: FlightState = { localFlight: { ...flightFixture, id: retainId }, changed: true, valid: false };
-    const deleteFlight: FlightState = { localFlight: { ...flightFixture, id: deleteId }, changed: true, valid: false };
-    store.load(1);
-
-    store.setFlight(retainFlight, retainId);
-    store.setFlight(deleteFlight, deleteId);
-    store.campaign$
-      .subscribe(camp => {
-        expect(Object.keys(camp.flights).length).toEqual(3);
-      })
-      .unsubscribe();
-    store.removeFlight(deleteId);
-    store.campaign$.subscribe(camp => {
-      expect(Object.keys(camp.flights).length).toEqual(2);
-      expect(camp.flights[retainId].localFlight.id).toEqual(retainId);
-      done();
-    });
-  });
-
-  it('updates existing flights', done => {
-    const existingFlight: FlightState = { localFlight: { ...flightFixture, name: 'foo' }, changed: true, valid: false };
-    store.load(1);
-    store.setFlight(existingFlight, 9);
-    store.campaign$.subscribe(camp => {
-      expect(camp.flights['9']).toMatchObject({ ...flightStateFixture, ...existingFlight });
-      done();
-    });
-  });
-
-  it('handles putting flights correctly when no flights exist', done => {
-    campaignService.getCampaign = jest.fn(() => of({ ...campaignStateFixture, flights: {} }));
-    store.load(1);
-    store.putFlights().subscribe(res => {
-      expect(res).toMatchObject([]);
-      done();
-    });
   });
 
   it('loads availability', done => {
-    store.load(1);
-    store.loadAvailability(flightFixture).subscribe(availabilty => {
+    campaignStoreService.loadAvailability(flightFixture).subscribe(availabilty => {
       expect(availabilty.length).toEqual(flightFixture.zones.length);
       expect(availabilty[0].zone).toEqual(flightFixture.zones[0]);
       expect(availabilty[0].totals.groups.length).toEqual(availabilityFixture.totals.groups.length);
@@ -296,10 +119,9 @@ describe('CampaignStoreService', () => {
   });
 
   it('loads allocation preview and transforms it into state entities keyed by flight id', done => {
-    store.load(1);
-    store
-      .loadAllocationPreview(flightFixture, flightFixture.id, 90)
-      .pipe(withLatestFrom(store.campaign$))
+    campaignStoreService
+      .loadAllocationPreview(flightFixture, 90)
+      .pipe(withLatestFrom(campaignStoreService.state$))
       .subscribe(([allocationPreview, state]) => {
         expect(allocationPreview.dailyMinimum).toEqual(90);
         expect(state.allocationPreview[flightFixture.id]).toBeDefined();
@@ -312,25 +134,12 @@ describe('CampaignStoreService', () => {
       });
   });
 
-  it('saves dailyMinimum in state', done => {
-    store.load(1);
-    store
-      .loadAllocationPreview(flightFixture, flightFixture.id, 90)
-      .pipe(withLatestFrom(store.campaign$))
-      .subscribe(([allocationPreview, state]) => {
-        expect(allocationPreview.dailyMinimum).toEqual(90);
-        expect(state.dailyMinimum[flightFixture.id]).toEqual(90);
-        done();
-      });
-  });
-
   it('rolls up into weekly availability and includes allocation preview', done => {
-    store.load(1);
-    store
+    campaignStoreService
       .loadAvailability(flightFixture)
       .pipe(
-        withLatestFrom(store.loadAllocationPreview(flightFixture, flightFixture.id, 90)),
-        withLatestFrom(store.getFlightAvailabilityRollup$(flightFixture.id))
+        withLatestFrom(campaignStoreService.loadAllocationPreview(flightFixture, 90)),
+        withLatestFrom(campaignStoreService.getFlightAvailabilityRollup$())
       )
       .subscribe(([_, rollup]) => {
         expect(rollup.length).toEqual(flightFixture.zones.length);
@@ -344,9 +153,8 @@ describe('CampaignStoreService', () => {
   });
 
   it('gets flight availability weekly rollup', done => {
-    store.load(1);
-    store.loadAvailability(flightFixture);
-    store.getFlightAvailabilityRollup$(flightFixture.id.toString()).subscribe(rollup => {
+    campaignStoreService.loadAvailability(flightFixture);
+    campaignStoreService.getFlightAvailabilityRollup$().subscribe(rollup => {
       expect(rollup.length).toEqual(flightFixture.zones.length);
       expect(rollup[0].zone).toEqual(flightFixture.zones[0]);
       expect(rollup[0].totals.startDate).toEqual(availabilityFixture.totals.startDate);

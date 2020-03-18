@@ -3,7 +3,7 @@ import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, Mat
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
-import { Flight } from '../../core';
+import { Flight } from '../store/models';
 import { DatepickerModule } from 'ngx-prx-styleguide';
 
 describe('FlightComponent', () => {
@@ -34,8 +34,8 @@ describe('FlightComponent', () => {
     const endAt = new Date(Date.UTC(today.getFullYear(), today.getMonth() + 1, today.getDate()));
     flightFixture = {
       name: 'my-flight',
-      startAt: startAt.toUTCString(),
-      endAt: endAt.toUTCString(),
+      startAt,
+      endAt,
       totalGoal: 123,
       zones: [],
       set_inventory_uri: '/some/inventory'
@@ -46,13 +46,9 @@ describe('FlightComponent', () => {
   });
 
   it('updates the flight form', () => {
-    const { totalGoal, ...flightFields } = flightFixture;
+    const { totalGoal, ...formFields } = flightFixture;
     component.flight = flightFixture;
-    expect(component.flightForm.value).toMatchObject({
-      ...flightFields,
-      startAt: new Date(flightFixture.startAt),
-      endAt: new Date(flightFixture.endAt)
-    });
+    expect(component.flightForm.value).toMatchObject(formFields);
   });
 
   it('emits form changes', done => {

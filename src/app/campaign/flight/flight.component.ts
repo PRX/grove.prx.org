@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Flight, Inventory, InventoryZone } from '../../core';
+import { Inventory, InventoryZone } from '../../core';
+import { Flight } from '../store/models';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
@@ -80,6 +81,7 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
+      // preserving id on the flight because doesn't exist in form fields
       this.formStatusChanged({ ...cmp, id: this.flight.id });
     });
   }
@@ -93,20 +95,12 @@ export class FlightComponent implements OnInit {
     });
   }
 
-  get startAt() {
-    return this.flight && new Date(this.flight.startAt);
-  }
-
-  get endAt() {
-    return this.flight && new Date(this.flight.endAt);
-  }
-
   onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
     this.flightUpdate.emit({
       flight: {
         ...this.flight,
-        ...(startAt && { startAt: startAt.toUTCString() }),
-        ...(endAt && { endAt: endAt.toUTCString() }),
+        ...(startAt && { startAt }),
+        ...(endAt && { endAt }),
         totalGoal: this.flight.totalGoal
       },
       changed: true,
@@ -115,8 +109,8 @@ export class FlightComponent implements OnInit {
   }
 
   // updates the form from @Input() set flight
-  updateFlightForm({ startAt, endAt, ...restOfFlight }: Flight) {
-    this.flightForm.reset({ startAt: new Date(startAt), endAt: new Date(endAt), ...restOfFlight }, { emitEvent: false });
+  updateFlightForm(flight: Flight) {
+    this.flightForm.reset(flight, { emitEvent: false });
   }
 
   onFlightDuplicate() {

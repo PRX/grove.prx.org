@@ -53,8 +53,8 @@ export interface Facets {
 export interface Flight {
   id: number;
   name: string;
-  status: string,
-  statusOk: boolean,
+  status: string;
+  statusOk: boolean;
   startAt: Date;
   endAt: Date;
   zones: string[];
@@ -189,7 +189,7 @@ export class DashboardService {
           // campaigns state is mapped from a list of ids from the current request/filter params
           this._currentCampaignIds = campaignDocs.map(c => c['id']);
           return campaignDocs.map(doc => {
-            return combineLatest(of(doc), doc.follow('prx:advertiser'), doc.followItems('prx:flights'));
+            return combineLatest([of(doc), doc.follow('prx:advertiser'), doc.followItems('prx:flights')]);
           });
         }),
         concatAll(),
@@ -258,7 +258,7 @@ export class DashboardService {
           this.flightTotal = total;
           this.flightCount = count;
           this._currentFlightIds = flightDocs.map(c => c['id']);
-          return flightDocs.map(doc => combineLatest(of(doc), doc.follow('prx:campaign'), doc.follow('prx:advertiser')));
+          return flightDocs.map(doc => combineLatest([of(doc), doc.follow('prx:campaign'), doc.follow('prx:advertiser')]));
         }),
         concatAll(),
         withLatestFrom(this._flights, this._flightFacets),
@@ -327,10 +327,10 @@ export class DashboardService {
       })
       .pipe(
         switchMap(result => {
-          return combineLatest(
+          return combineLatest([
             of({ count: +result['count'], total: +result['total'], facets: result['facets'] }),
             result.followList('prx:items')
-          );
+          ]);
         })
       );
   }
