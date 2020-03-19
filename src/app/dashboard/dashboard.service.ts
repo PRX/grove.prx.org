@@ -62,6 +62,7 @@ export interface Flight {
   targets?: Target[];
   podcast?: string;
   parent?: Campaign;
+  actualCount?: number;
 }
 
 export interface Campaign {
@@ -163,6 +164,18 @@ export class DashboardService {
     );
   }
 
+  get actualsTotal(): Observable<number> {
+    return this.flights.pipe(
+      map((flights: Flight[]) => flights.reduce((acc, { actualCount }: Flight) => acc + actualCount, 0))
+    );
+  }
+
+  get goalsTotal(): Observable<number> {
+    return this.flights.pipe(
+      map((flights: Flight[]) => flights.reduce((acc, { totalGoal }: Flight) => acc + totalGoal, 0))
+    );
+  }
+
   get campaignFacets(): Observable<Facets> {
     return this._campaignFacets.asObservable();
   }
@@ -226,7 +239,8 @@ export class DashboardService {
               zones: doc['zones'].map(zoneId => {
                 const zoneFacet = campaignFacets && campaignFacets.zone && campaignFacets.zone.find(facet => facet.id === zoneId);
                 return (zoneFacet && zoneFacet.label) || zoneId;
-              })
+              }),
+              actualCount: doc['actualCount']
               // TODO: no targets yet?
               // targets: Target[];
             }))
@@ -277,6 +291,7 @@ export class DashboardService {
             statusOk: flightDoc['status'] === 'ok',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
             endAt: flightDoc['endAt'] && new Date(flightDoc['endAt']),
+            actualCount: flightDoc['actualCount'],
             totalGoal: flightDoc['totalGoal'] || 0,
             // map zonesId from facets
             zones: flightDoc['zones'].map(zoneId => {

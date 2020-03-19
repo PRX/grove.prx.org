@@ -8,6 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 
 import { MockHalService } from 'ngx-prx-styleguide';
 
+import { SharedModule } from '../../shared/shared.module';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock } from '../dashboard.service.mock';
 
@@ -24,7 +25,7 @@ describe('FlightTableComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MatPaginatorModule, MatSortModule, MatTableModule, NoopAnimationsModule, RouterTestingModule],
+      imports: [MatPaginatorModule, MatSortModule, MatTableModule, NoopAnimationsModule, RouterTestingModule, SharedModule],
       declarations: [FlightTableComponent],
       providers: [
         {
