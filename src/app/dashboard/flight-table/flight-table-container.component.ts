@@ -13,7 +13,11 @@ import { DashboardService } from '../dashboard.service';
         <mat-spinner></mat-spinner>
       </div>
       <ng-template #flightTable>
-        <grove-flight-table [routedParams]="routedParams$ | async"></grove-flight-table>
+        <grove-flight-table
+          [routedParams]="routedParams$ | async"
+          [totalActuals]="totalActuals$ | async"
+          [totalGoals]="totalGoals$ | async"
+        ></grove-flight-table>
       </ng-template>
     </ng-template>
   `,
@@ -21,6 +25,8 @@ import { DashboardService } from '../dashboard.service';
 })
 export class FlightTableContainerComponent implements OnInit, OnDestroy {
   routedParams$ = this.dashboardService.params;
+  totalActuals$ = this.dashboardService.actualsTotal;
+  totalGoals$ = this.dashboardService.goalsTotal;
   routeSub: Subscription;
 
   constructor(private dashboardService: DashboardService, private route: ActivatedRoute) {}

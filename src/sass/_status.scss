@@ -5,6 +5,7 @@
   color: mat-color($prx-blue-palette, lighter-contrast);
   background-color: mat-color($prx-blue-palette, lighter);
 }
+.ok,
 .approved {
   color: mat-color($prx-green-palette, default-contrast);
   background-color: mat-color($prx-green-palette, default);
@@ -13,6 +14,7 @@
   color: mat-color($prx-yellow-palette, default-contrast);
   background-color: mat-color($prx-yellow-palette, default);
 }
+.error,
 .canceled {
   color: mat-color($prx-red-palette, default-contrast);
   background-color: mat-color($prx-red-palette, default);

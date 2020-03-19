@@ -12,6 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 
 import { MockHalService } from 'ngx-prx-styleguide';
 
+import { SharedModule } from '../../shared/shared.module';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock } from '../dashboard.service.mock';
 
@@ -37,7 +38,8 @@ describe('FlightTableContainerComponent', () => {
         MatProgressSpinnerModule,
         MatTableModule,
         NoopAnimationsModule,
-        RouterTestingModule
+        RouterTestingModule,
+        SharedModule
       ],
       declarations: [FlightTableContainerComponent, FlightTableComponent],
       providers: [

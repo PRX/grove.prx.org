@@ -23,9 +23,11 @@ $cell-padding: $cell-padding-v $cell-padding-h;
 }
 
 .mat-table-sticky:first-child {
+  width: 124px;
   border-right: 1px solid prx-theme-foreground(divider);
 }
 
+.mat-footer-cell,
 .mat-header-cell {
   background: prx-theme-background(table-header);
   border: white;
@@ -67,6 +69,12 @@ $cell-padding: $cell-padding-v $cell-padding-h;
   }
 }
 
+.mat-footer-cell {
+  @extend .mat-cell;
+
+  font-weight: bold;
+}
+
 .mat-sort-header-container,
 .mat-sort-header-button {
   flex-direction: column;
@@ -86,4 +94,28 @@ $cell-padding: $cell-padding-v $cell-padding-h;
 .paginator {
   position: sticky;
   left: 0;
+}
+
+@mixin matColumn ($column-name) {
+  .mat-header-#{$column-name},
+  .mat-column-#{$column-name},
+  .mat-footer-#{$column-name} {
+    @content;
+  }
+}
+
+@include matColumn('actualCount') {
+  text-align: right;
+}
+
+@include matColumn('total_goal') {
+  text-align: right;
+}
+
+@include matColumn('status') {
+  text-align: center;
+}
+
+@include matColumn('campaign_status') {
+  text-align: center;
 }
