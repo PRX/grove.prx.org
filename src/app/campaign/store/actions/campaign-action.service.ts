@@ -6,13 +6,18 @@ import * as actions from './campaign-action.creator';
 import { Campaign, Flight } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 import { CampaignStoreService } from '../../../core';
+import { AllocationPreviewActionService } from './allocation-preview-action.service';
 
 @Injectable()
 export class CampaignActionService implements OnDestroy {
   private flightSub: Subscription;
   private currentFlightId: number;
 
-  constructor(private store: Store<any>, private campaignStoreService: CampaignStoreService) {
+  constructor(
+    private store: Store<any>,
+    private campaignStoreService: CampaignStoreService,
+    private allocationPreviewActionService: AllocationPreviewActionService
+  ) {
     this.loadAvailabilityOnFlightIdChange();
   }
 
@@ -46,6 +51,16 @@ export class CampaignActionService implements OnDestroy {
       this.campaignStoreService.loadAvailability(formFlight);
       if (formFlight.totalGoal) {
         this.campaignStoreService.loadAllocationPreview(formFlight, dailyMinimum);
+        this.allocationPreviewActionService.loadAllocationPreview(
+          formFlight.id,
+          formFlight.set_inventory_uri,
+          formFlight.name,
+          formFlight.startAt,
+          formFlight.endAt,
+          formFlight.totalGoal,
+          dailyMinimum,
+          formFlight.zones
+        );
       }
     }
   }
@@ -118,11 +133,21 @@ export class CampaignActionService implements OnDestroy {
       this.store
         .pipe(
           select(selectRoutedLocalFlight),
-          filter(state => !!(state && state.id)),
+          filter(state => !!state),
           first()
         )
         .subscribe(flight => {
           this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum);
+          this.allocationPreviewActionService.loadAllocationPreview(
+            flight.createdAt && flightId,
+            flight.set_inventory_uri,
+            flight.name,
+            flight.startAt,
+            flight.endAt,
+            flight.totalGoal,
+            dailyMinimum,
+            flight.zones
+          );
         });
     }
   }

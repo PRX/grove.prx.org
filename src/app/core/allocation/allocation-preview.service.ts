@@ -11,7 +11,7 @@ export class AllocationPreviewService {
 
   constructor(private augury: AuguryService) {}
 
-  getAllocationPreview({ id, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones }): Observable<AllocationPreview> {
+  getAllocationPreview({ id, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones }): Observable<HalDoc> {
     let preview: HalObservable<HalDoc>;
     if (id) {
       preview = this.augury.follow('prx:flight', { id }).pipe(
@@ -41,7 +41,6 @@ export class AllocationPreviewService {
     return preview.pipe(
       // clear error on new request
       tap(() => (this.error = null)),
-      map(docs => this.docToAllocationPreview(docs)),
       catchError(err => this.handleError(err))
     );
   }
@@ -68,10 +67,10 @@ export class AllocationPreviewService {
     // augury puts reason in error message but
     // HalRemote sticks a different message in the HalHttpError
     this.error = err;
-    if (err.status === 422 || err.status === 500) {
-      return of(null);
-    } else {
-      throw err;
-    }
+    // if (err.status === 422 || err.status === 500) {
+    //   return of(null);
+    // } else {
+    throw err;
+    // }
   }
 }

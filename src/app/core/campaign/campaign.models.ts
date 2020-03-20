@@ -18,7 +18,7 @@ export interface Availability {
 }
 
 export interface Allocation {
-  date: string;
+  date: Date;
   goalCount: number;
   inventoryDayId: number;
   zoneName: string;
@@ -26,8 +26,8 @@ export interface Allocation {
 
 export interface AllocationPreview {
   dailyMinimum: number;
-  startAt: string;
-  endAt: string;
+  startAt: Date;
+  endAt: Date;
   name: string;
   totalGoal: number;
   zones: string[];

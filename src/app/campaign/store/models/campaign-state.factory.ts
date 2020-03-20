@@ -79,8 +79,10 @@ export const createRouterState = () => ({
 
 export const createCampaignStoreState = ({
   campaignState = createCampaignState(),
-  flightsState = createFlightsState(campaignState.campaign.doc)
+  flightsState = createFlightsState(campaignState.campaign.doc),
+  allocationPreview = null
 } = {}): CampaignStoreState => ({
   ...campaignState,
-  ...flightsState
+  ...flightsState,
+  ...allocationPreview
 });
