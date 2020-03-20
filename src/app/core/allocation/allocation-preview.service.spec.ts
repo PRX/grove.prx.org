@@ -47,7 +47,7 @@ describe('AllocationPreviewService', () => {
       { goalCount: 1, inventoryDayId: 6763, date: '2019-10-31', zoneName: 'pre_1' }
     ]
   };
-  const allocationPreview = allocationPreviewService.docToAllocationPreview(new MockHalDoc(allocationPreviewFixture));
+  const allocationPreview = new MockHalDoc(allocationPreviewFixture);
 
   beforeEach(() => {
     augury.mock('prx:flight-allocation-preview', allocationPreviewFixture);
@@ -67,7 +67,7 @@ describe('AllocationPreviewService', () => {
         dailyMinimum: 90
       })
       .subscribe(alloc => {
-        const { startAt, endAt, dailyMinimum, totalGoal, zones } = allocationPreview;
+        const { startAt, endAt, dailyMinimum, totalGoal, zones } = allocationPreview as any;
         expect(alloc).toMatchObject({ startAt, endAt, dailyMinimum, totalGoal, zones });
         done();
       });

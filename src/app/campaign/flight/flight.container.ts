@@ -94,10 +94,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
   }
 
-  get allocationPreviewError() {
-    return this.campaignStoreService.allocationPreviewError;
-  }
-
   flightDuplicate(flight: Flight) {
     this.campaignAction.dupFlight(flight);
   }

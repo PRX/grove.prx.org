@@ -1,13 +1,13 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 
-export interface Allocation {
+export interface AllocationPreview {
   date: Date;
   goalCount: number;
   inventoryDayId: number;
   zone: string;
 }
 
-export const docToAllocationPreview = (doc: HalDoc) => ({
+export const docToAllocationPreviewParams = (doc: HalDoc) => ({
   flightId: doc['id'],
   dailyMinimum: doc['dailyMinimum'],
   startAt: new Date(doc['startAt']),
@@ -17,15 +17,12 @@ export const docToAllocationPreview = (doc: HalDoc) => ({
   zones: doc['zones']
 });
 
-export const docToAllocations = (allocations: any[]): Allocation[] =>
-  allocations.map(
-    (allocation): Allocation => {
-      const date = new Date(allocation.date);
-      return {
-        date,
-        goalCount: allocation.goalCount,
-        inventoryDayId: allocation.inventoryDayId,
-        zone: allocation.zoneName
-      };
-    }
-  );
+export const docToAllocationPreview = (allocation: any): AllocationPreview => {
+  const date = new Date(allocation.date);
+  return {
+    date,
+    goalCount: allocation.goalCount,
+    inventoryDayId: allocation.inventoryDayId,
+    zone: allocation.zoneName
+  };
+};

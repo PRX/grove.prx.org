@@ -25,6 +25,7 @@ import { flightFixture, flightDocFixture } from '../store/models/campaign-state.
 import { reducers } from '../store';
 import * as actions from '../store/actions';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
+import { AllocationPreviewActionService } from '../store/actions/allocation-preview-action.service';
 
 import { FlightContainerComponent } from './flight.container';
 import { FlightComponent } from './flight.component';
@@ -107,6 +108,7 @@ describe('FlightContainerComponent', () => {
             getFlightAvailabilityRollup$: jest.fn(() => of([]))
           }
         },
+        AllocationPreviewActionService,
         CampaignActionService
       ]
     })

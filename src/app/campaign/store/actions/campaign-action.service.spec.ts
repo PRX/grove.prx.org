@@ -12,11 +12,13 @@ import { campaignFixture, campaignDocFixture, flightFixture, flightDocFixture } 
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { TestComponent, campaignRoutes } from '../../campaign-test.component';
 import { CampaignActionService } from './campaign-action.service';
+import { AllocationPreviewActionService } from './allocation-preview-action.service';
 
 describe('CampaignActionService', () => {
   let router: Router;
   let store: Store<any>;
   let campaignStoreService: CampaignStoreService;
+  let allocationPreviewActionService: AllocationPreviewActionService;
   let service: CampaignActionService;
   let dispatchSpy;
 
@@ -30,17 +32,18 @@ describe('CampaignActionService', () => {
         StoreModule.forFeature('campaignState', reducers)
       ],
       providers: [
+        AllocationPreviewActionService,
         CampaignActionService,
         {
           provide: CampaignStoreService,
           useValue: {
-            loadAvailability: jest.fn(() => {}),
-            loadAllocationPreview: jest.fn(() => {})
+            loadAvailability: jest.fn(() => {})
           }
         }
       ]
     });
     service = TestBed.get(CampaignActionService);
+    allocationPreviewActionService = TestBed.get(AllocationPreviewActionService);
     campaignStoreService = TestBed.get(CampaignStoreService);
     router = TestBed.get(Router);
     store = TestBed.get(Store);
@@ -61,6 +64,7 @@ describe('CampaignActionService', () => {
     store.dispatch(goalAction);
 
     dispatchSpy = jest.spyOn(store, 'dispatch');
+    jest.spyOn(allocationPreviewActionService, 'loadAllocationPreview');
   });
 
   it('should load availability from flight id change', () => {
@@ -70,13 +74,13 @@ describe('CampaignActionService', () => {
   it('should load availability and allocation preview when flight form is updated', () => {
     service.updateFlightForm({ ...flightFixture, endAt: new Date() }, true, true);
     expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
-    expect(campaignStoreService.loadAllocationPreview).toHaveBeenCalled();
+    expect(allocationPreviewActionService.loadAllocationPreview).toHaveBeenCalled();
   });
 
   it('should not load allocation preview if flight name changes', () => {
     const flight = { ...flightFixture, name: 'new name' };
     service.updateFlightForm(flight, true, false);
-    expect(campaignStoreService.loadAllocationPreview).not.toHaveBeenCalled();
+    expect(allocationPreviewActionService.loadAllocationPreview).not.toHaveBeenCalled();
   });
 
   it('should dispatch action to load campaign options', () => {
@@ -154,7 +158,7 @@ describe('CampaignActionService', () => {
     const totalGoal = 1000;
     const dailyMinimum = 10;
     service.setFlightGoal(flightId, totalGoal, dailyMinimum);
-    expect(campaignStoreService.loadAllocationPreview).toHaveBeenCalled();
+    expect(allocationPreviewActionService.loadAllocationPreview).toHaveBeenCalled();
   });
 
   it('should dispatch action to save campaign and flights', done => {

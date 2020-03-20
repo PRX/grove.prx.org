@@ -17,6 +17,7 @@ import { FancyFormModule, StatusBarModule, MockHalService } from 'ngx-prx-styleg
 import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
 import { CampaignActionService } from './store/actions/campaign-action.service';
+import { AllocationPreviewActionService } from './store/actions/allocation-preview-action.service';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
@@ -76,6 +77,7 @@ describe('CampaignComponent', () => {
           provide: InventoryService,
           useValue: { listInventory: jest.fn(() => of([])) }
         },
+        AllocationPreviewActionService,
         CampaignActionService
       ]
     })

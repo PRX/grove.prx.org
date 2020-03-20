@@ -1,8 +1,8 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes, AllocationPreviewActions } from '../actions';
-import { docToAllocationPreview, docToAllocations, Allocation } from '../models';
+import { docToAllocationPreviewParams, docToAllocationPreview, AllocationPreview } from '../models';
 
-export interface State extends EntityState<Allocation> {
+export interface State extends EntityState<AllocationPreview> {
   // additional entities state properties for the collection
   flightId?: number;
   dailyMinimum: number;
@@ -14,8 +14,9 @@ export interface State extends EntityState<Allocation> {
   error?: any;
 }
 
-export const adapter: EntityAdapter<Allocation> = createEntityAdapter<Allocation>({
-  selectId: allocation => allocation.zone + '_' + allocation.date.toISOString().slice(0, 10)
+export const selectId = allocationPreview => allocationPreview.zone + '_' + allocationPreview.date.toISOString().slice(0, 10);
+export const adapter: EntityAdapter<AllocationPreview> = createEntityAdapter<AllocationPreview>({
+  selectId
 });
 
 export const initialState: State = adapter.getInitialState({
@@ -31,8 +32,8 @@ export const initialState: State = adapter.getInitialState({
 export function reducer(state = initialState, action: AllocationPreviewActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD_SUCCESS: {
-      const allocations = docToAllocations(action.payload.allocationPreviewDoc['allocations']);
-      return adapter.addAll(allocations, { ...state, ...docToAllocationPreview(action.payload.allocationPreviewDoc), error: null });
+      const allocations = action.payload.allocationPreviewDoc['allocations'].map(allocation => docToAllocationPreview(allocation));
+      return adapter.addAll(allocations, { ...state, ...docToAllocationPreviewParams(action.payload.allocationPreviewDoc), error: null });
     }
     case ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD_FAILURE: {
       return { ...state, error: action.payload.error };

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HalDoc } from 'ngx-prx-styleguide';
 import { InventoryService } from '../inventory/inventory.service';
-import { AllocationPreviewService } from '../allocation/allocation-preview.service';
-import { CampaignState, Availability, Allocation, AllocationPreview } from './campaign.models';
+import { CampaignState, Availability } from './campaign.models';
 import { Flight } from '../../campaign/store/models';
 import { ReplaySubject, Observable, forkJoin, combineLatest } from 'rxjs';
 import { map, first, share, withLatestFrom } from 'rxjs/operators';
@@ -20,8 +18,7 @@ export class CampaignStoreService {
 
   constructor(
     private store: Store<any>,
-    private inventoryService: InventoryService,
-    private allocationPreviewService: AllocationPreviewService
+    private inventoryService: InventoryService
   ) {
     this.init();
   }
@@ -161,89 +158,5 @@ export class CampaignStoreService {
       });
       return loading;
     }
-  }
-
-  get allocationPreviewError() {
-    return this.allocationPreviewService.error;
-  }
-
-  // the flight.id parameter here will be the temp id in the case the flight has not yet been created
-  loadAllocationPreview(flight: Flight, dailyMinimum: number): Observable<AllocationPreview> {
-    const { id, set_inventory_uri, name, startAt, endAt, totalGoal, zones, createdAt } = flight;
-    const loading = this.allocationPreviewService
-      .getAllocationPreview({
-        ...(createdAt && { id }),
-        set_inventory_uri,
-        name,
-        startAt: startAt.toISOString().slice(0, 10),
-        endAt: endAt.toISOString().slice(0, 10),
-        totalGoal,
-        dailyMinimum: dailyMinimum || 0,
-        zones
-      })
-      .pipe(
-        map(doc => this.docToAllocationPreview(doc)),
-        share()
-      );
-    loading.pipe(first(), withLatestFrom(this._state$)).subscribe(([result, state]) => {
-      let updatedState: CampaignState;
-      if (result && result.zones) {
-        updatedState = {
-          ...state,
-          allocationPreview: {
-            ...state.allocationPreview,
-            [`${id}`]: result.zones.reduce(
-              (previewByZone, zone) => ({
-                ...previewByZone,
-                [`${zone}`]: {
-                  ...result,
-                  allocations: (result.allocations as Allocation[])
-                    .filter(a => a.zoneName === zone)
-                    .reduce(
-                      (allocationsByDate, allocation) => ({
-                        ...allocationsByDate,
-                        [allocation.date.toISOString().slice(0, 10)]: allocation
-                      }),
-                      {}
-                    ),
-                  zones: [zone]
-                }
-              }),
-              {}
-            )
-          }
-        };
-      } else {
-        // if no result clear allocationPreview for flight
-        updatedState = {
-          ...state,
-          allocationPreview: {
-            ...state.allocationPreview,
-            [`${id}`]: null
-          }
-        };
-      }
-      this._state$.next(updatedState);
-    });
-    return loading;
-  }
-
-  docToAllocationPreview(doc: HalDoc): AllocationPreview {
-    return {
-      dailyMinimum: doc['dailyMinimum'],
-      startAt: new Date(doc['startAt']),
-      endAt: new Date(doc['endAt']),
-      name: doc['name'],
-      totalGoal: doc['totalGoal'],
-      zones: doc['zones'],
-      allocations: doc['allocations'].map(
-        (allocation): Allocation => ({
-          date: new Date(allocation.date),
-          goalCount: allocation.goalCount,
-          inventoryDayId: allocation.inventoryDayId,
-          zoneName: allocation.zoneName
-        })
-      )
-    };
   }
 }

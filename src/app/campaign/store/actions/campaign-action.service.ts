@@ -50,7 +50,6 @@ export class CampaignActionService implements OnDestroy {
     if (dateRangeValid && availabilityParamsChanged) {
       this.campaignStoreService.loadAvailability(formFlight);
       if (formFlight.totalGoal) {
-        this.campaignStoreService.loadAllocationPreview(formFlight, dailyMinimum);
         this.allocationPreviewActionService.loadAllocationPreview(
           formFlight.id,
           formFlight.set_inventory_uri,
@@ -137,7 +136,6 @@ export class CampaignActionService implements OnDestroy {
           first()
         )
         .subscribe(flight => {
-          this.campaignStoreService.loadAllocationPreview(flight, dailyMinimum);
           this.allocationPreviewActionService.loadAllocationPreview(
             flight.createdAt && flightId,
             flight.set_inventory_uri,
