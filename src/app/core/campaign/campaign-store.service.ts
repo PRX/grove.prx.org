@@ -77,10 +77,12 @@ export class CampaignStoreService {
                   // accumulate values onto week
                   const weekTotals = acc.totals.groups[weekBeginString];
                   acc.totals.groups[weekBeginString] = {
+                    // allocated and availability will be null rather than undefined, null + 0 === 0
                     allocated: weekTotals.allocated ? weekTotals.allocated + day.allocated : day.allocated,
                     availability: weekTotals.availability ? weekTotals.availability + day.availability : day.availability,
                     allocationPreview: weekTotals.allocationPreview
-                      ? weekTotals.allocationPreview + day.allocationPreview
+                      ? // allocationPreview can be undefined, undefined + 0 === NaN
+                        weekTotals.allocationPreview + (day.allocationPreview || 0)
                       : day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
