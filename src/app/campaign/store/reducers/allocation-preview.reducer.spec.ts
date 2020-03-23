@@ -31,8 +31,8 @@ describe('Allocation Preview Reducer', () => {
   it('should set the allocation preview error on load failure', () => {
     const result = reducer(
       initialState,
-      new actions.AllocationPreviewLoadFailure({ error: { status: 422, message: 'no allocatable days' } })
+      new actions.AllocationPreviewLoadFailure({ error: { body: { status: 422, message: 'no allocatable days' } } })
     );
-    expect(result.error.message).toEqual('no allocatable days');
+    expect(result.error.body.message).toEqual('no allocatable days');
   });
 });

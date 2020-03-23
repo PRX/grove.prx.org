@@ -20,8 +20,8 @@ describe('Allocation Preview Selectors', () => {
 
   it('should select allocation preview error', () => {
     const error = allocationPreviewSelectors.selectAllocationPreviewError.projector({
-      error: { status: 422, message: 'no allocatable days' }
+      error: { body: { status: 422, message: 'no allocatable days' } }
     });
-    expect(error.status).toEqual(422);
+    expect(error.body.status).toEqual(422);
   });
 });

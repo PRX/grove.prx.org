@@ -96,8 +96,8 @@ export class AvailabilityComponent {
 
     // Check for allocation preview error.
     // TODO: Updated with discussed "nice_message" when available.
-    if (this.allocationPreviewError) {
-      errors.push(`Got error ${this.allocationPreviewError.status} from allocation preview.`);
+    if (this.allocationPreviewError && this.allocationPreviewError.body) {
+      errors.push(this.allocationPreviewError.body.message);
     }
 
     // Check for flight status message, which should only exist when there was an error.
