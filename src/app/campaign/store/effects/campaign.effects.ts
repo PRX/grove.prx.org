@@ -15,12 +15,9 @@ export class CampaignEffects {
   campaignLoad$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_LOAD),
     map((action: actions.CampaignLoad) => action.payload),
-    mergeMap(payload =>
-      this.campaignService.loadCampaignZoomFlights(payload.id).pipe(
-        map(({ campaignDoc, flightDocs }) => new actions.CampaignLoadSuccess({ campaignDoc, flightDocs })),
-        catchError(error => of(new actions.CampaignLoadFailure({ error })))
-      )
-    )
+    mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
+    map(({ campaignDoc, flightDocs }) => new actions.CampaignLoadSuccess({ campaignDoc, flightDocs })),
+    catchError(error => of(new actions.CampaignLoadFailure({ error })))
   );
 
   @Effect()

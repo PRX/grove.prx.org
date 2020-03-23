@@ -3,7 +3,7 @@ import { TestBed, async } from '@angular/core/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
 import { AllocationPreviewService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
@@ -50,7 +50,7 @@ describe('AllocationPreviewEffects', () => {
 
   it('should return allocation preview load failure action on error', () => {
     const halError = new HalHttpError(422, 'no allocatable days for flight');
-    // # throws an error in the stream
+    // '#' throws this error in the stream instead of emitting a response
     const errorResponse = cold('#', {}, halError);
     allocationPreviewService.getAllocationPreview = jest.fn(() => errorResponse);
 
@@ -62,10 +62,10 @@ describe('AllocationPreviewEffects', () => {
     // expected failure action to be emitted by effect upon catchError
     const outcome = new actions.AllocationPreviewLoadFailure({ error: halError });
 
-    // skip a frame and emit the load action
+    // emit the load action
     actions$.stream = hot('-a', { a: action });
-    // expect to skip a frame and see the error action
-    const expected = cold('-b', { b: outcome });
+    // expect to see the error action
+    const expected = cold('-(b|)', { b: outcome });
     // subscribe to the stream to process the load action, call the AllocationPreviewService, and get the result
     expect(effects.loadAllocationPreview$).toBeObservable(expected);
   });
