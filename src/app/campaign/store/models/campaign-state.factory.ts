@@ -82,7 +82,7 @@ export const allocationPreviewParamsFixture = {
   totalGoal: flightFixture.totalGoal
 };
 
-export const allocationPreviewFixture: AllocationPreview[] = [
+export const allocationPreviewData: any[] = [
   { goalCount: 28, inventoryDayId: 6553, date: '2019-10-01', zoneName: 'pre_1' },
   { goalCount: 16, inventoryDayId: 6560, date: '2019-10-02', zoneName: 'pre_1' },
   { goalCount: 8, inventoryDayId: 6567, date: '2019-10-03', zoneName: 'pre_1' },
@@ -114,7 +114,8 @@ export const allocationPreviewFixture: AllocationPreview[] = [
   { goalCount: 7, inventoryDayId: 6749, date: '2019-10-29', zoneName: 'pre_1' },
   { goalCount: 3, inventoryDayId: 6756, date: '2019-10-30', zoneName: 'pre_1' },
   { goalCount: 1, inventoryDayId: 6763, date: '2019-10-31', zoneName: 'pre_1' }
-].map(allocation => docToAllocationPreview(allocation));
+];
+export const allocationPreviewFixture: AllocationPreview[] = allocationPreviewData.map(allocation => docToAllocationPreview(allocation));
 export const allocationPreviewEntities = allocationPreviewFixture.reduce(
   (acc, allocation) => ({ ...acc, [selectAllocationPreviewId(allocation)]: allocation }),
   {}

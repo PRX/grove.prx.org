@@ -31,7 +31,7 @@ import { FlightContainerComponent } from './flight.container';
 import { FlightComponent } from './flight.component';
 import { AvailabilityComponent } from '../availability/availability.component';
 import { GoalFormComponent } from '../availability/goal-form.component';
-import { TestComponent } from '../campaign-test.component';
+import { TestComponent } from '../../../testing/test.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: FlightContainerComponent },

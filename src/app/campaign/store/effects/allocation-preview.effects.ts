@@ -17,19 +17,26 @@ export class AllocationPreviewEffects {
       const { flightId, set_inventory_uri, name, startAt: startAtDate, endAt: endAtDate, totalGoal, dailyMinimum, zones } = payload;
       const startAt = startAtDate.toISOString().slice(0, 10);
       const endAt = endAtDate.toISOString().slice(0, 10);
-      return this.allocationPreviewService.getAllocationPreview({
-        ...(flightId && { id: flightId }),
-        set_inventory_uri,
-        name,
-        startAt,
-        endAt,
-        totalGoal,
-        dailyMinimum: dailyMinimum || 0,
-        zones
-      });
-    }),
-    map((allocationPreviewDoc: HalDoc) => new actions.AllocationPreviewLoadSuccess({ allocationPreviewDoc })),
-    catchError(error => of(new actions.AllocationPreviewLoadFailure({ error })))
+      return (
+        this.allocationPreviewService
+          .getAllocationPreview({
+            ...(flightId && { id: flightId }),
+            set_inventory_uri,
+            name,
+            startAt,
+            endAt,
+            totalGoal,
+            dailyMinimum: dailyMinimum || 0,
+            zones
+          })
+          // should be able to pipe these after the switchMap and not use inner pipe,
+          //  but I can't get the failure test case to pass that way. annoying, meh
+          .pipe(
+            map((allocationPreviewDoc: HalDoc) => new actions.AllocationPreviewLoadSuccess({ allocationPreviewDoc })),
+            catchError(error => of(new actions.AllocationPreviewLoadFailure({ error })))
+          )
+      );
+    })
   );
 
   constructor(private actions$: Actions, private allocationPreviewService: AllocationPreviewService) {}

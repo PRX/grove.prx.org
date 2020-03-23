@@ -1,7 +1,6 @@
 import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
-import { Component } from '@angular/core';
-import { Routes, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
@@ -10,32 +9,11 @@ import { of } from 'rxjs';
 import { HalHttpError, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
 import { CampaignService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
+import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { reducers } from '../';
 import { campaignFixture, flightFixture } from '../models/campaign-state.factory';
 import * as actions from '../actions';
 import { CampaignEffects } from './campaign.effects';
-
-@Component({
-  selector: 'grove-test-component',
-  template: ``
-})
-class TestComponent {}
-const campaignChildRoutes: Routes = [
-  { path: '', component: TestComponent },
-  { path: 'flight/:flightId', component: TestComponent }
-];
-const routes: Routes = [
-  {
-    path: 'campaign/new',
-    component: TestComponent,
-    children: campaignChildRoutes
-  },
-  {
-    path: 'campaign/:id',
-    component: TestComponent,
-    children: campaignChildRoutes
-  }
-];
 
 describe('CampaignEffects', () => {
   let effects: CampaignEffects;
@@ -47,7 +25,11 @@ describe('CampaignEffects', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [TestComponent],
-      imports: [StoreModule.forRoot({ ...reducers }), EffectsModule.forRoot([CampaignEffects]), RouterTestingModule.withRoutes(routes)],
+      imports: [
+        StoreModule.forRoot({ ...reducers }),
+        EffectsModule.forRoot([CampaignEffects]),
+        RouterTestingModule.withRoutes(campaignRoutes)
+      ],
       providers: [
         CampaignEffects,
         {
@@ -87,14 +69,14 @@ describe('CampaignEffects', () => {
 
   it('should return campaign load failure action on error', () => {
     const halError = new HalHttpError(500, 'something bad happened');
-    const errorResponse = cold('-#|', {}, halError);
+    const errorResponse = cold('#', {}, halError);
     campaignService.loadCampaignZoomFlights = jest.fn(() => errorResponse);
 
     const action = new actions.CampaignLoad({ id: 1 });
     const outcome = new actions.CampaignLoadFailure({ error: halError });
 
     actions$.stream = hot('-a', { a: action });
-    const expected = cold('--b', { b: outcome });
+    const expected = cold('-b', { b: outcome });
     expect(effects.campaignLoad$).toBeObservable(expected);
   });
 

@@ -21,7 +21,7 @@ import { AllocationPreviewActionService } from './store/actions/allocation-previ
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
-import { TestComponent, campaignRoutes } from './campaign-test.component';
+import { TestComponent, campaignRoutes } from '../../testing/test.component';
 
 describe('CampaignComponent', () => {
   let component: CampaignComponent;

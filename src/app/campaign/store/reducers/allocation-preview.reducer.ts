@@ -38,6 +38,9 @@ export function reducer(state = initialState, action: AllocationPreviewActions):
     case ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD_FAILURE: {
       return { ...state, error: action.payload.error };
     }
+    default: {
+      return state;
+    }
   }
 }
 

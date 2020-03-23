@@ -10,7 +10,7 @@ import * as actions from './campaign-action.creator';
 import { selectCampaignId, selectCampaignWithFlightsForSave } from '../selectors';
 import { campaignFixture, campaignDocFixture, flightFixture, flightDocFixture } from '../models/campaign-state.factory';
 import { MockHalDoc } from 'ngx-prx-styleguide';
-import { TestComponent, campaignRoutes } from '../../campaign-test.component';
+import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { CampaignActionService } from './campaign-action.service';
 import { AllocationPreviewActionService } from './allocation-preview-action.service';
 
