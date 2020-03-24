@@ -66,8 +66,19 @@ export function reducer(state = initialState, action: CampaignActions): State {
       return adapter.updateOne({ id, changes: { softDeleted } }, state);
     }
     case ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE: {
-      const { flight: localFlight, changed, valid } = action.payload;
-      return adapter.updateOne({ id: localFlight.id, changes: { localFlight, changed, valid } }, state);
+      const { flight, changed, valid } = action.payload;
+      const localFlight = { ...(state.entities[flight.id] && state.entities[flight.id].localFlight), ...flight };
+      return adapter.updateOne(
+        {
+          id: flight.id,
+          changes: {
+            localFlight,
+            changed,
+            valid
+          }
+        },
+        state
+      );
     }
     case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
       const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;

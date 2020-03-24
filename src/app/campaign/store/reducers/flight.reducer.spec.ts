@@ -2,7 +2,7 @@ import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as actions from '../actions';
 import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
-import { docToFlight } from '../models';
+import { docToFlight, Flight } from '../models';
 
 describe('Flight Reducer', () => {
   describe('unknown action', () => {
@@ -70,6 +70,25 @@ describe('Flight Reducer', () => {
     const flight = selectEntities(result)[flightFixture.id];
     expect(flight.localFlight.name).toBe('This is a flight name');
     expect(flight.remoteFlight.name).toBe(flightFixture.name);
+  });
+
+  it('should retain flight values not in the form update', () => {
+    let result = reducer(
+      initialState,
+      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+    );
+    result = reducer(
+      result,
+      new actions.CampaignFlightFormUpdate({
+        // update only contains name
+        flight: { id: flightFixture.id, name: 'This is a flight name' } as Flight,
+        changed: true,
+        valid: true
+      })
+    );
+    const flight = selectEntities(result)[flightFixture.id];
+    expect(flight.localFlight.name).toBe('This is a flight name');
+    expect(flight.localFlight.set_inventory_uri).toBe(flightFixture.set_inventory_uri);
   });
 
   it('should set the goal', () => {
