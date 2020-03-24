@@ -14,11 +14,21 @@ export class AllocationPreviewEffects {
     ofType(ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD),
     map((action: allocationPreviewActions.AllocationPreviewLoad) => action.payload),
     switchMap(payload => {
-      const { flightId, set_inventory_uri, name, startAt: startAtDate, endAt: endAtDate, totalGoal, dailyMinimum, zones } = payload;
+      const {
+        flightId,
+        createdAt,
+        set_inventory_uri,
+        name,
+        startAt: startAtDate,
+        endAt: endAtDate,
+        totalGoal,
+        dailyMinimum,
+        zones
+      } = payload;
       const startAt = startAtDate.toISOString().slice(0, 10);
       const endAt = endAtDate.toISOString().slice(0, 10);
       return this.allocationPreviewService.getAllocationPreview({
-        ...(flightId && { id: flightId }),
+        ...(createdAt && { id: flightId }),
         set_inventory_uri,
         name,
         startAt,

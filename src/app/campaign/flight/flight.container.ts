@@ -10,7 +10,7 @@ import {
   selectRoutedFlightChanged,
   selectRoutedFlightDailyMinimum,
   selectCurrentInventoryUri,
-  selectAllocationPreviewError
+  selectRoutedFlightAllocationPreviewError
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -68,7 +68,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
     this.flightDailyMin$ = this.store.pipe(select(selectRoutedFlightDailyMinimum));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
-    this.allocationPreviewError$ = this.store.pipe(select(selectAllocationPreviewError));
+    this.allocationPreviewError$ = this.store.pipe(select(selectRoutedFlightAllocationPreviewError));
     this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$();
 
     this.inventoryOptions$ = this.inventoryService.listInventory();

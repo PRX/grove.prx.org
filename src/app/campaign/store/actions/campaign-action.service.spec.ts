@@ -87,12 +87,13 @@ describe('CampaignActionService', () => {
   });
 
   it('should dispatch action to load allocation preview', () => {
-    const { flightId, name, startAt, endAt, totalGoal, dailyMinimum, zones } = allocationPreviewParamsFixture;
-    const { set_inventory_uri } = flightFixture;
-    service.loadAllocationPreview(flightId, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones);
+    const { flightId, name, startAt, endAt, totalGoal, dailyMinimum, set_inventory_uri, zones } = allocationPreviewParamsFixture;
+    const createdAt = new Date();
+    service.loadAllocationPreview(flightId, createdAt, set_inventory_uri, name, startAt, endAt, totalGoal, dailyMinimum, zones);
     expect(dispatchSpy).toHaveBeenCalledWith(
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,
+        createdAt,
         set_inventory_uri,
         name,
         startAt,

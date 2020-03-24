@@ -8,6 +8,7 @@ export class AllocationPreviewLoad implements Action {
   constructor(
     public payload: {
       flightId: number;
+      createdAt: Date;
       set_inventory_uri: string;
       name: string;
       startAt: Date;

@@ -5,7 +5,11 @@ import { Flight } from '../../campaign/store/models';
 import { ReplaySubject, Observable, forkJoin, combineLatest } from 'rxjs';
 import { map, first, share, withLatestFrom } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
-import { selectRoutedFlightId, selectRoutedLocalFlightZones, selectAllocationPreviewEntities } from '../../campaign/store/selectors';
+import {
+  selectRoutedFlightId,
+  selectRoutedLocalFlightZones,
+  selectRoutedFlightAllocationPreviewEntities
+} from '../../campaign/store/selectors';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -16,10 +20,7 @@ export class CampaignStoreService {
     return this._state$.asObservable();
   }
 
-  constructor(
-    private store: Store<any>,
-    private inventoryService: InventoryService
-  ) {
+  constructor(private store: Store<any>, private inventoryService: InventoryService) {
     this.init();
   }
 
@@ -31,7 +32,7 @@ export class CampaignStoreService {
     return combineLatest([
       this.store.pipe(select(selectRoutedFlightId)),
       this.store.pipe(select(selectRoutedLocalFlightZones)),
-      this.store.pipe(select(selectAllocationPreviewEntities)),
+      this.store.pipe(select(selectRoutedFlightAllocationPreviewEntities)),
       this.state$
     ]).pipe(
       map(([flightId, zones, allocationPreviewEntities, state]) => {

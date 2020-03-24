@@ -48,6 +48,7 @@ export class CampaignActionService implements OnDestroy {
       if (formFlight.totalGoal) {
         this.loadAllocationPreview(
           formFlight.id,
+          localFlight.createdAt,
           formFlight.set_inventory_uri,
           formFlight.name,
           formFlight.startAt,
@@ -74,6 +75,7 @@ export class CampaignActionService implements OnDestroy {
 
   loadAllocationPreview(
     flightId: number,
+    createdAt: Date,
     // tslint:disable-next-line: variable-name
     set_inventory_uri: string,
     name: string,
@@ -86,6 +88,7 @@ export class CampaignActionService implements OnDestroy {
     this.store.dispatch(
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,
+        createdAt,
         set_inventory_uri,
         name,
         startAt,
@@ -158,7 +161,8 @@ export class CampaignActionService implements OnDestroy {
         )
         .subscribe(flight => {
           this.loadAllocationPreview(
-            flight.createdAt && flightId,
+            flightId,
+            flight.createdAt,
             flight.set_inventory_uri,
             flight.name,
             flight.startAt,

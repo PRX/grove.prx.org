@@ -17,6 +17,13 @@ describe('AllocationPreviewEffects', () => {
   let allocationPreviewService: AllocationPreviewService;
   const allocationPreviewDoc = new MockHalDoc({ ...allocationPreviewParamsFixture, allocations: allocationPreviewFixture });
 
+  // load action received by the effect
+  const loadAction = new allocationPreviewActions.AllocationPreviewLoad({
+    ...allocationPreviewParamsFixture,
+    createdAt: new Date(),
+    set_inventory_uri: flightFixture.set_inventory_uri
+  });
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [StoreModule.forRoot({}), EffectsModule.forRoot([AllocationPreviewEffects])],
@@ -37,13 +44,9 @@ describe('AllocationPreviewEffects', () => {
   }));
 
   it('should load allocation preview', () => {
-    const action = new allocationPreviewActions.AllocationPreviewLoad({
-      ...allocationPreviewParamsFixture,
-      set_inventory_uri: flightFixture.set_inventory_uri
-    });
     const success = new allocationPreviewActions.AllocationPreviewLoadSuccess({ allocationPreviewDoc });
 
-    actions$.stream = hot('-a', { a: action });
+    actions$.stream = hot('-a', { a: loadAction });
     const expected = cold('-r', { r: success });
     expect(effects.loadAllocationPreview$).toBeObservable(expected);
   });
@@ -54,16 +57,11 @@ describe('AllocationPreviewEffects', () => {
     const errorResponse = cold('#', {}, halError);
     allocationPreviewService.getAllocationPreview = jest.fn(() => errorResponse);
 
-    // load action received by the effect
-    const action = new allocationPreviewActions.AllocationPreviewLoad({
-      ...allocationPreviewParamsFixture,
-      set_inventory_uri: flightFixture.set_inventory_uri
-    });
     // expected failure action to be emitted by effect upon catchError
     const outcome = new allocationPreviewActions.AllocationPreviewLoadFailure({ error: halError });
 
     // emit the load action
-    actions$.stream = hot('-a', { a: action });
+    actions$.stream = hot('-a', { a: loadAction });
     // expect to see the error action
     const expected = cold('-(b|)', { b: outcome });
     // subscribe to the stream to process the load action, call the AllocationPreviewService, and get the result

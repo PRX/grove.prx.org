@@ -1,6 +1,11 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as allocationPreviewActions from '../actions/allocation-preview-action.creator';
-import { allocationPreviewParamsFixture, allocationPreviewFixture, allocationPreviewData } from '../models/campaign-state.factory';
+import {
+  flightFixture,
+  allocationPreviewParamsFixture,
+  allocationPreviewFixture,
+  allocationPreviewData
+} from '../models/campaign-state.factory';
 import { reducer, initialState, selectId, selectIds } from './allocation-preview.reducer';
 
 describe('Allocation Preview Reducer', () => {
@@ -12,6 +17,28 @@ describe('Allocation Preview Reducer', () => {
 
       expect(result).toBe(initialState);
     });
+  });
+
+  it('should remove prior entries and set allocation preview flightId and set_inventory_uri on allocation preview load', () => {
+    const { id: flightId, set_inventory_uri, name, startAt, endAt, totalGoal, zones } = flightFixture;
+    const result = reducer(
+      initialState,
+      new allocationPreviewActions.AllocationPreviewLoad({
+        flightId,
+        createdAt: new Date(),
+        set_inventory_uri,
+        name,
+        startAt,
+        endAt,
+        totalGoal,
+        dailyMinimum: 12,
+        zones
+      })
+    );
+    expect(result.flightId).toEqual(flightId);
+    expect(result.set_inventory_uri).toEqual(set_inventory_uri);
+    expect(result.ids.length).toEqual(0);
+    expect(Object.keys(result.entities).length).toEqual(0);
   });
 
   it('should set allocation preview from allocation preview load success', () => {
