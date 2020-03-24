@@ -8,7 +8,7 @@ export interface AllocationPreview {
 }
 
 export const docToAllocationPreviewParams = (doc: HalDoc) => ({
-  flightId: doc['id'],
+  ...(doc['id'] && { flightId: doc['id'] }),
   dailyMinimum: doc['dailyMinimum'],
   startAt: new Date(doc['startAt']),
   endAt: new Date(doc['endAt']),

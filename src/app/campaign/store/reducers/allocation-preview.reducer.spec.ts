@@ -41,6 +41,29 @@ describe('Allocation Preview Reducer', () => {
     expect(Object.keys(result.entities).length).toEqual(0);
   });
 
+  it('should not clear flightId on load when results do not contain flight id (temp flight id, flight not yet created)', () => {
+    const { flightId: notTheFlightId, ...paramsMinusFlightId } = allocationPreviewParamsFixture;
+    const flightId = Date.now();
+    let state = reducer(
+      initialState,
+      new allocationPreviewActions.AllocationPreviewLoad({
+        flightId,
+        createdAt: undefined,
+        ...paramsMinusFlightId
+      })
+    );
+    state = reducer(
+      state,
+      new allocationPreviewActions.AllocationPreviewLoadSuccess({
+        allocationPreviewDoc: new MockHalDoc({
+          ...paramsMinusFlightId,
+          allocations: allocationPreviewData
+        })
+      })
+    );
+    expect(state.flightId).toEqual(flightId);
+  });
+
   it('should set allocation preview from allocation preview load success', () => {
     const result = reducer(
       initialState,
