@@ -49,10 +49,13 @@ export class CampaignStoreService {
             return availability.totals.groups.reduce(
               (acc, day) => {
                 // get the day's allocationPreview from the allocationPreview state
-                day.allocationPreview =
+                if (
                   allocationPreviewEntities &&
                   allocationPreviewEntities[`${availability.zone}_${day.startDate}`] &&
-                  allocationPreviewEntities[`${availability.zone}_${day.startDate}`].goalCount;
+                  allocationPreviewEntities[`${availability.zone}_${day.startDate}`]
+                ) {
+                  day.allocationPreview = allocationPreviewEntities[`${availability.zone}_${day.startDate}`].goalCount;
+                }
 
                 const dayDate = new Date(day.startDate + ' 0:0:0');
                 // if dayDate has passed into the next week (past prior weekEnd)
