@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AllocationPreviewService } from '../../../core';
-import * as actions from '../actions';
+import * as allocationPreviewActions from '../actions/allocation-preview-action.creator';
 import { ActionTypes } from '../actions/action.types';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AllocationPreviewEffects {
   @Effect()
   loadAllocationPreview$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD),
-    map((action: actions.AllocationPreviewLoad) => action.payload),
+    map((action: allocationPreviewActions.AllocationPreviewLoad) => action.payload),
     switchMap(payload => {
       const { flightId, set_inventory_uri, name, startAt: startAtDate, endAt: endAtDate, totalGoal, dailyMinimum, zones } = payload;
       const startAt = startAtDate.toISOString().slice(0, 10);
@@ -28,8 +28,8 @@ export class AllocationPreviewEffects {
         zones
       });
     }),
-    map((allocationPreviewDoc: HalDoc) => new actions.AllocationPreviewLoadSuccess({ allocationPreviewDoc })),
-    catchError(error => of(new actions.AllocationPreviewLoadFailure({ error })))
+    map((allocationPreviewDoc: HalDoc) => new allocationPreviewActions.AllocationPreviewLoadSuccess({ allocationPreviewDoc })),
+    catchError(error => of(new allocationPreviewActions.AllocationPreviewLoadFailure({ error })))
   );
 
   constructor(private actions$: Actions, private allocationPreviewService: AllocationPreviewService) {}

@@ -1,5 +1,5 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
-import * as actions from '../actions';
+import * as campaignActions from '../actions/campaign-action.creator';
 import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
 import { docToFlight } from '../models';
@@ -16,14 +16,17 @@ describe('Flight Reducer', () => {
   });
 
   it('should remove flight entries for a new campaign', () => {
-    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, new actions.CampaignNew());
+    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, new campaignActions.CampaignNew());
     expect(result).toMatchObject({ ids: [], entities: {} });
   });
 
   it('should set flights from campaign load success', () => {
     const result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     expect(selectIds(result).length).toBe(1);
     expect(result.entities[flightFixture.id].localFlight).toMatchObject(flightFixture);
@@ -33,13 +36,13 @@ describe('Flight Reducer', () => {
     const date = new Date();
     const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
-    const result = reducer(initialState, new actions.CampaignAddFlightWithTempId({ flightId: date.getTime(), startAt, endAt }));
+    const result = reducer(initialState, new campaignActions.CampaignAddFlightWithTempId({ flightId: date.getTime(), startAt, endAt }));
     const newFlight = selectAll(result).find(flight => !flight.remoteFlight);
     expect(newFlight.localFlight.name).toContain('New Flight');
   });
 
   it('should duplicate a flight', () => {
-    const result = reducer(initialState, new actions.CampaignDupFlightWithTempId({ flightId: Date.now(), flight: flightFixture }));
+    const result = reducer(initialState, new campaignActions.CampaignDupFlightWithTempId({ flightId: Date.now(), flight: flightFixture }));
     const dupFlight = selectAll(result).find(flight => flight.localFlight.name.indexOf('(Copy)') > -1);
     expect(dupFlight.localFlight.zones).toBe(flightFixture.zones);
   });
@@ -47,9 +50,12 @@ describe('Flight Reducer', () => {
   it('should soft delete a flight', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
-    result = reducer(result, new actions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
+    result = reducer(result, new campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
     const flight = selectEntities(result)[flightFixture.id];
     expect(flight.softDeleted).toBe(true);
   });
@@ -57,11 +63,14 @@ describe('Flight Reducer', () => {
   it('should update flight from form', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     result = reducer(
       result,
-      new actions.CampaignFlightFormUpdate({
+      new campaignActions.CampaignFlightFormUpdate({
         flight: { ...flightFixture, name: 'This is a flight name' },
         changed: true,
         valid: true
@@ -75,11 +84,14 @@ describe('Flight Reducer', () => {
   it('should set the goal', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     result = reducer(
       result,
-      new actions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal: 999, dailyMinimum: 99, valid: true })
+      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal: 999, dailyMinimum: 99, valid: true })
     );
     expect(result.entities[flightFixture.id].localFlight.totalGoal).toBe(999);
     expect(result.entities[flightFixture.id].dailyMinimum).toBe(99);
@@ -105,12 +117,12 @@ describe('Flight Reducer', () => {
       new MockHalDoc({ ...flightDocFixture, id: createdFlightIds[1], startAt, endAt })
     ];
 
-    let result = reducer(initialState, new actions.CampaignLoadSuccess({ campaignDoc, flightDocs }));
-    result = reducer(result, new actions.CampaignAddFlightWithTempId({ flightId: newFlightIds[0], startAt, endAt }));
-    result = reducer(result, new actions.CampaignAddFlightWithTempId({ flightId: newFlightIds[1], startAt, endAt }));
+    let result = reducer(initialState, new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs }));
+    result = reducer(result, new campaignActions.CampaignAddFlightWithTempId({ flightId: newFlightIds[0], startAt, endAt }));
+    result = reducer(result, new campaignActions.CampaignAddFlightWithTempId({ flightId: newFlightIds[1], startAt, endAt }));
     result = reducer(
       result,
-      new actions.CampaignSaveSuccess({
+      new campaignActions.CampaignSaveSuccess({
         campaignDoc,
         deletedFlightDocs: { [deletedFlightIds[0]]: flightDocs[0], [deletedFlightIds[1]]: flightDocs[1] },
         updatedFlightDocs: { [updatedFlightIds[0]]: flightDocs[2], [updatedFlightIds[1]]: flightDocs[3] },

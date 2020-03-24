@@ -23,9 +23,8 @@ import { CampaignStoreService, InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
 import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
-import * as actions from '../store/actions';
+import * as campaignActions from '../store/actions/campaign-action.creator';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
-import { AllocationPreviewActionService } from '../store/actions/allocation-preview-action.service';
 
 import { FlightContainerComponent } from './flight.container';
 import { FlightComponent } from './flight.component';
@@ -108,7 +107,6 @@ describe('FlightContainerComponent', () => {
             getFlightAvailabilityRollup$: jest.fn(() => of([]))
           }
         },
-        AllocationPreviewActionService,
         CampaignActionService
       ]
     })
@@ -125,7 +123,10 @@ describe('FlightContainerComponent', () => {
         campaignActionService = TestBed.get(CampaignActionService);
 
         store.dispatch(
-          new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc({ id: 1 }), flightDocs: [new MockHalDoc(flightDocFixture)] })
+          new campaignActions.CampaignLoadSuccess({
+            campaignDoc: new MockHalDoc({ id: 1 }),
+            flightDocs: [new MockHalDoc(flightDocFixture)]
+          })
         );
         router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`);
       });

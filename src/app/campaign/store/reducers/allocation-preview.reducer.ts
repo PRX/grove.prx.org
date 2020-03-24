@@ -1,5 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { ActionTypes, AllocationPreviewActions } from '../actions';
+import { ActionTypes } from '../actions/action.types';
+import { AllocationPreviewActions } from '../actions/allocation-preview-action.creator';
 import { docToAllocationPreviewParams, docToAllocationPreview, AllocationPreview } from '../models';
 
 export interface State extends EntityState<AllocationPreview> {

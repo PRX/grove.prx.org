@@ -3,11 +3,11 @@ import { TestBed, async } from '@angular/core/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
 import { AllocationPreviewService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
-import * as actions from '../actions';
+import * as allocationPreviewActions from '../actions/allocation-preview-action.creator';
 import { AllocationPreviewEffects } from './allocation-preview.effects';
 import { allocationPreviewParamsFixture, allocationPreviewFixture, flightFixture } from '../models/campaign-state.factory';
 
@@ -37,11 +37,11 @@ describe('AllocationPreviewEffects', () => {
   }));
 
   it('should load allocation preview', () => {
-    const action = new actions.AllocationPreviewLoad({
+    const action = new allocationPreviewActions.AllocationPreviewLoad({
       ...allocationPreviewParamsFixture,
       set_inventory_uri: flightFixture.set_inventory_uri
     });
-    const success = new actions.AllocationPreviewLoadSuccess({ allocationPreviewDoc });
+    const success = new allocationPreviewActions.AllocationPreviewLoadSuccess({ allocationPreviewDoc });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -55,12 +55,12 @@ describe('AllocationPreviewEffects', () => {
     allocationPreviewService.getAllocationPreview = jest.fn(() => errorResponse);
 
     // load action received by the effect
-    const action = new actions.AllocationPreviewLoad({
+    const action = new allocationPreviewActions.AllocationPreviewLoad({
       ...allocationPreviewParamsFixture,
       set_inventory_uri: flightFixture.set_inventory_uri
     });
     // expected failure action to be emitted by effect upon catchError
-    const outcome = new actions.AllocationPreviewLoadFailure({ error: halError });
+    const outcome = new allocationPreviewActions.AllocationPreviewLoadFailure({ error: halError });
 
     // emit the load action
     actions$.stream = hot('-a', { a: action });
