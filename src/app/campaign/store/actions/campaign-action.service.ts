@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Campaign, Flight } from '../models';
+import { Flight } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 import { CampaignStoreService } from '../../../core';
 
@@ -33,80 +33,34 @@ export class CampaignActionService implements OnDestroy {
       });
   }
 
-  private loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
-    const dateRangeValid = formFlight.startAt && formFlight.endAt && formFlight.startAt.valueOf() < formFlight.endAt.valueOf();
-    const hasAvailabilityParams =
-      formFlight.startAt && formFlight.endAt && formFlight.set_inventory_uri && formFlight.zones && formFlight.zones.length > 0;
+  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
+    const { set_inventory_uri, name, startAt, endAt, zones, totalGoal } = formFlight;
+    const dateRangeValid = startAt && endAt && startAt.valueOf() < endAt.valueOf();
+    const hasAvailabilityParams = startAt && endAt && set_inventory_uri && zones && zones.length > 0;
     const availabilityParamsChanged =
       hasAvailabilityParams &&
-      (formFlight.startAt.getTime() !== localFlight.startAt.getTime() ||
-        formFlight.endAt.getTime() !== localFlight.endAt.getTime() ||
-        formFlight.set_inventory_uri !== localFlight.set_inventory_uri ||
-        !formFlight.zones.every(zone => localFlight.zones.indexOf(zone) > -1));
+      (startAt.getTime() !== localFlight.startAt.getTime() ||
+        endAt.getTime() !== localFlight.endAt.getTime() ||
+        set_inventory_uri !== localFlight.set_inventory_uri ||
+        !zones.every(zone => localFlight.zones.indexOf(zone) > -1));
     if (dateRangeValid && availabilityParamsChanged) {
       this.campaignStoreService.loadAvailability(formFlight);
       if (formFlight.totalGoal) {
-        this.loadAllocationPreview(
-          formFlight.id,
-          localFlight.createdAt,
-          formFlight.set_inventory_uri,
-          formFlight.name,
-          formFlight.startAt,
-          formFlight.endAt,
-          formFlight.totalGoal,
-          dailyMinimum,
-          formFlight.zones
+        this.store.dispatch(
+          new allocationPreviewActions.AllocationPreviewLoad({
+            flightId: localFlight.id,
+            createdAt: localFlight.createdAt,
+            set_inventory_uri,
+            name,
+            startAt,
+            endAt,
+            totalGoal,
+            dailyMinimum,
+            zones
+          })
         );
       }
     }
-  }
-
-  loadCampaignOptions() {
-    this.store.dispatch(new campaignActions.CampaignLoadOptions());
-  }
-
-  newCampaign() {
-    this.store.dispatch(new campaignActions.CampaignNew());
-  }
-
-  loadCampaign(id: number) {
-    this.store.dispatch(new campaignActions.CampaignLoad({ id }));
-  }
-
-  loadAllocationPreview(
-    flightId: number,
-    createdAt: Date,
-    // tslint:disable-next-line: variable-name
-    set_inventory_uri: string,
-    name: string,
-    startAt: Date,
-    endAt: Date,
-    totalGoal: number,
-    dailyMinimum: number,
-    zones: string[]
-  ) {
-    this.store.dispatch(
-      new allocationPreviewActions.AllocationPreviewLoad({
-        flightId,
-        createdAt,
-        set_inventory_uri,
-        name,
-        startAt,
-        endAt,
-        totalGoal,
-        dailyMinimum,
-        zones
-      })
-    );
-  }
-
-  updateCampaignForm(campaign: Campaign, changed: boolean, valid: boolean) {
-    this.store.dispatch(new campaignActions.CampaignFormUpdate({ campaign, changed, valid }));
-  }
-
-  // tslint:disable-next-line: variable-name
-  setCampaignAdvertiser(set_advertiser_uri: string) {
-    this.store.dispatch(new campaignActions.CampaignSetAdvertiser({ set_advertiser_uri }));
   }
 
   addFlight() {
@@ -152,6 +106,7 @@ export class CampaignActionService implements OnDestroy {
 
   setFlightGoal(flightId: number, totalGoal: number, dailyMinimum: number) {
     this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId, totalGoal, dailyMinimum, valid: !!totalGoal }));
+    // if totalGoal, get flight info to load allocation preview
     if (totalGoal) {
       this.store
         .pipe(
@@ -160,16 +115,19 @@ export class CampaignActionService implements OnDestroy {
           first()
         )
         .subscribe(flight => {
-          this.loadAllocationPreview(
-            flightId,
-            flight.createdAt,
-            flight.set_inventory_uri,
-            flight.name,
-            flight.startAt,
-            flight.endAt,
-            flight.totalGoal,
-            dailyMinimum,
-            flight.zones
+          const { createdAt, set_inventory_uri, name, startAt, endAt, zones } = flight;
+          this.store.dispatch(
+            new allocationPreviewActions.AllocationPreviewLoad({
+              flightId,
+              createdAt,
+              set_inventory_uri,
+              name,
+              startAt,
+              endAt,
+              totalGoal,
+              dailyMinimum,
+              zones
+            })
           );
         });
     }
