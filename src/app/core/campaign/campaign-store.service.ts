@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { InventoryService } from '../inventory/inventory.service';
-import { AllocationPreviewService } from '../allocation/allocation-preview.service';
-import { CampaignState, Availability, Allocation, AllocationPreview } from './campaign.models';
+import { CampaignState, Availability } from './campaign.models';
 import { Flight } from '../../campaign/store/models';
 import { ReplaySubject, Observable, forkJoin, combineLatest } from 'rxjs';
 import { map, first, share, withLatestFrom } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
-import { selectRoutedFlightId, selectRoutedLocalFlightZones } from '../../campaign/store/selectors';
+import {
+  selectRoutedFlightId,
+  selectRoutedLocalFlightZones,
+  selectRoutedFlightAllocationPreviewEntities
+} from '../../campaign/store/selectors';
 
 @Injectable({ providedIn: 'root' })
 export class CampaignStoreService {
@@ -17,11 +20,7 @@ export class CampaignStoreService {
     return this._state$.asObservable();
   }
 
-  constructor(
-    private store: Store<any>,
-    private inventoryService: InventoryService,
-    private allocationPreviewService: AllocationPreviewService
-  ) {
+  constructor(private store: Store<any>, private inventoryService: InventoryService) {
     this.init();
   }
 
@@ -33,9 +32,10 @@ export class CampaignStoreService {
     return combineLatest([
       this.store.pipe(select(selectRoutedFlightId)),
       this.store.pipe(select(selectRoutedLocalFlightZones)),
+      this.store.pipe(select(selectRoutedFlightAllocationPreviewEntities)),
       this.state$
     ]).pipe(
-      map(([flightId, zones, state]) => {
+      map(([flightId, zones, allocationPreviewEntities, state]) => {
         // availability of current flights
         const availabilityZones =
           zones && zones.filter(zone => state.availability[`${flightId}-${zone}`]).map(zone => state.availability[`${flightId}-${zone}`]);
@@ -49,13 +49,13 @@ export class CampaignStoreService {
             return availability.totals.groups.reduce(
               (acc, day) => {
                 // get the day's allocationPreview from the allocationPreview state
-                day.allocationPreview =
-                  state.allocationPreview &&
-                  state.allocationPreview[`${flightId}`] &&
-                  state.allocationPreview[`${flightId}`][availability.zone] &&
-                  state.allocationPreview[`${flightId}`][availability.zone].allocations &&
-                  state.allocationPreview[`${flightId}`][availability.zone].allocations[day.startDate] &&
-                  state.allocationPreview[`${flightId}`][availability.zone].allocations[day.startDate].goalCount;
+                if (
+                  allocationPreviewEntities &&
+                  allocationPreviewEntities[`${availability.zone}_${day.startDate}`] &&
+                  allocationPreviewEntities[`${availability.zone}_${day.startDate}`]
+                ) {
+                  day.allocationPreview = allocationPreviewEntities[`${availability.zone}_${day.startDate}`].goalCount;
+                }
 
                 const dayDate = new Date(day.startDate + ' 0:0:0');
                 // if dayDate has passed into the next week (past prior weekEnd)
@@ -77,10 +77,12 @@ export class CampaignStoreService {
                   // accumulate values onto week
                   const weekTotals = acc.totals.groups[weekBeginString];
                   acc.totals.groups[weekBeginString] = {
+                    // allocated and availability will be null rather than undefined, null + 0 === 0
                     allocated: weekTotals.allocated ? weekTotals.allocated + day.allocated : day.allocated,
                     availability: weekTotals.availability ? weekTotals.availability + day.availability : day.availability,
                     allocationPreview: weekTotals.allocationPreview
-                      ? weekTotals.allocationPreview + day.allocationPreview
+                      ? // allocationPreview can be undefined, undefined + 0 === NaN
+                        weekTotals.allocationPreview + (day.allocationPreview || 0)
                       : day.allocationPreview,
                     startDate: weekBeginString,
                     endDate: weekEnd.toISOString().slice(0, 10),
@@ -160,64 +162,5 @@ export class CampaignStoreService {
       });
       return loading;
     }
-  }
-
-  get allocationPreviewError() {
-    return this.allocationPreviewService.error;
-  }
-
-  // the flight.id parameter here will be the temp id in the case the flight has not yet been created
-  loadAllocationPreview(flight: Flight, dailyMinimum: number): Observable<AllocationPreview> {
-    const { id, set_inventory_uri, name, totalGoal, zones, createdAt } = flight;
-    // dates come back as Date but typed string, use YYYY-MM-DD formatted string
-    const startAt = flight.startAt.toISOString().slice(0, 10);
-    const endAt = flight.endAt.toISOString().slice(0, 10);
-    const loading = this.allocationPreviewService
-      .getAllocationPreview({
-        ...(createdAt && { id }),
-        set_inventory_uri,
-        name,
-        startAt,
-        endAt,
-        totalGoal,
-        dailyMinimum: dailyMinimum || 0,
-        zones
-      })
-      .pipe(share());
-    loading.pipe(first(), withLatestFrom(this._state$)).subscribe(([result, state]) => {
-      let updatedState: CampaignState;
-      if (result && result.zones) {
-        updatedState = {
-          ...state,
-          allocationPreview: {
-            ...state.allocationPreview,
-            [`${id}`]: result.zones.reduce(
-              (previewByZone, zone) => ({
-                ...previewByZone,
-                [`${zone}`]: {
-                  ...result,
-                  allocations: (result.allocations as Allocation[])
-                    .filter(a => a.zoneName === zone)
-                    .reduce((allocationsByDate, allocation) => ({ ...allocationsByDate, [allocation.date]: allocation }), {}),
-                  zones: [zone]
-                }
-              }),
-              {}
-            )
-          }
-        };
-      } else {
-        // if no result clear allocationPreview for flight
-        updatedState = {
-          ...state,
-          allocationPreview: {
-            ...state.allocationPreview,
-            [`${id}`]: null
-          }
-        };
-      }
-      this._state$.next(updatedState);
-    });
-    return loading;
   }
 }

@@ -1,4 +1,5 @@
-import { CampaignActions, ActionTypes } from '../actions/';
+import { ActionTypes } from '../actions/action.types';
+import { CampaignActions } from '../actions/campaign-action.creator';
 import { CampaignState, docToCampaign } from '../models/campaign.models';
 
 export const initialState: CampaignState = {

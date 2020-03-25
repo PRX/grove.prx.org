@@ -14,6 +14,7 @@ import {
   selectValid,
   selectChanged
 } from './store/selectors';
+import * as campaignActions from './store/actions/campaign-action.creator';
 import { AdvertiserService, AccountService } from '../core';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 
@@ -61,7 +62,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private store: Store<any>,
-    private campaignAction: CampaignActionService,
+    private campaignActionService: CampaignActionService,
     private accountService: AccountService,
     private advertiserService: AdvertiserService
   ) {}
@@ -69,7 +70,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeSub = this.route.paramMap
       .pipe(
-        tap(() => this.campaignAction.loadCampaignOptions()),
+        tap(() => this.store.dispatch(new campaignActions.CampaignLoadOptions())),
         switchMap((params: ParamMap) => {
           return this.advertiserService.loadAdvertisers().pipe(map(advertisers => ({ params, advertisers })));
         }),
@@ -79,9 +80,10 @@ export class CampaignComponent implements OnInit, OnDestroy {
       )
       .subscribe(({ params, advertisers, accounts }) => {
         if (params.get('id')) {
-          this.campaignAction.loadCampaign(+params.get('id'));
+          const id = +params.get('id');
+          this.store.dispatch(new campaignActions.CampaignLoad({ id }));
         } else {
-          this.campaignAction.newCampaign();
+          this.store.dispatch(new campaignActions.CampaignNew());
         }
       });
     this.campaignLoaded$ = this.store.pipe(select(selectCampaignLoaded));
@@ -101,10 +103,10 @@ export class CampaignComponent implements OnInit, OnDestroy {
   }
 
   campaignSubmit() {
-    this.campaignAction.saveCampaignAndFlights();
+    this.campaignActionService.saveCampaignAndFlights();
   }
 
   createFlight() {
-    this.campaignAction.addFlight();
+    this.campaignActionService.addFlight();
   }
 }

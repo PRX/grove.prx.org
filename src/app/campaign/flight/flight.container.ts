@@ -9,7 +9,8 @@ import {
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
   selectRoutedFlightDailyMinimum,
-  selectCurrentInventoryUri
+  selectCurrentInventoryUri,
+  selectRoutedFlightAllocationPreviewError
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -32,7 +33,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         [changed]="flightChanged$ | async"
         [zones]="zoneOpts"
         [availabilityZones]="flightAvailability$ | async"
-        [allocationPreviewError]="allocationPreviewError"
+        [allocationPreviewError]="allocationPreviewError$ | async"
         [dailyMinimum]="flightDailyMin$ | async"
         (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
       >
@@ -49,6 +50,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightAvailability$: Observable<Availability[]>;
   flightDailyMin$: Observable<number>;
   currentInventoryUri$: Observable<string>;
+  allocationPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
@@ -66,6 +68,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
     this.flightDailyMin$ = this.store.pipe(select(selectRoutedFlightDailyMinimum));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
+    this.allocationPreviewError$ = this.store.pipe(select(selectRoutedFlightAllocationPreviewError));
     this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$();
 
     this.inventoryOptions$ = this.inventoryService.listInventory();
@@ -89,10 +92,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
     this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
-  }
-
-  get allocationPreviewError() {
-    return this.campaignStoreService.allocationPreviewError;
   }
 
   flightDuplicate(flight: Flight) {

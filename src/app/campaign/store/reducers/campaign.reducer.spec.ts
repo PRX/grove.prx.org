@@ -1,6 +1,6 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { reducer, initialState } from './campaign.reducer';
-import * as actions from '../actions';
+import * as campaignActions from '../actions/campaign-action.creator';
 import {
   campaignFixture,
   campaignDocFixture,
@@ -21,14 +21,14 @@ describe('Campaign Reducer', () => {
   });
 
   it('should setup for a new campaign', () => {
-    const result = reducer(createCampaignState().campaign, new actions.CampaignNew());
+    const result = reducer(createCampaignState().campaign, new campaignActions.CampaignNew());
     expect(result).toMatchObject({ ...initialState, loaded: true, loading: false });
   });
 
   it('should update local campaign with campaign form changes', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignFormUpdate({
+      new campaignActions.CampaignFormUpdate({
         campaign: campaignFixture,
         changed: true,
         valid: true
@@ -37,7 +37,7 @@ describe('Campaign Reducer', () => {
     expect(result.localCampaign).toMatchObject(campaignFixture);
     result = reducer(
       result,
-      new actions.CampaignFormUpdate({
+      new campaignActions.CampaignFormUpdate({
         campaign: { name: 'new name' } as any,
         changed: true,
         valid: true
@@ -48,30 +48,36 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign loading', () => {
-    const newResult = reducer(initialState, new actions.CampaignNew());
+    const newResult = reducer(initialState, new campaignActions.CampaignNew());
     expect(newResult.loading).toBe(false);
 
-    let loadResult = reducer(initialState, new actions.CampaignLoadOptions());
+    let loadResult = reducer(initialState, new campaignActions.CampaignLoadOptions());
     expect(loadResult.loading).toBe(true);
-    loadResult = reducer(loadResult, new actions.CampaignLoad({ id: campaignFixture.id }));
+    loadResult = reducer(loadResult, new campaignActions.CampaignLoad({ id: campaignFixture.id }));
     expect(loadResult.loading).toBe(true);
-    loadResult = reducer(loadResult, new actions.CampaignLoadFailure({ error: 'something bad happened' }));
+    loadResult = reducer(loadResult, new campaignActions.CampaignLoadFailure({ error: 'something bad happened' }));
     expect(loadResult.loading).toBe(false);
     loadResult = reducer(
       loadResult,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     expect(loadResult.loading).toBe(false);
   });
 
   it('should set campaign loaded', () => {
-    let result = reducer(initialState, new actions.CampaignLoad({ id: campaignFixture.id }));
+    let result = reducer(initialState, new campaignActions.CampaignLoad({ id: campaignFixture.id }));
     expect(result.loaded).toBe(false);
-    result = reducer(initialState, new actions.CampaignLoadFailure({ error: 'something bad happened' }));
+    result = reducer(initialState, new campaignActions.CampaignLoadFailure({ error: 'something bad happened' }));
     expect(result.loaded).toBe(true);
     result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     expect(result.loaded).toBe(true);
   });
@@ -79,7 +85,10 @@ describe('Campaign Reducer', () => {
   it('should set campaign from campaign load success', () => {
     const result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     expect(result.localCampaign).toMatchObject(campaignFixture);
     expect(result.remoteCampaign).toMatchObject(campaignFixture);
@@ -92,14 +101,19 @@ describe('Campaign Reducer', () => {
   it('should set campaign saving', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignSave({ campaign: campaignFixture, deletedFlights: [], updatedFlights: [flightFixture], createdFlights: [] })
+      new campaignActions.CampaignSave({
+        campaign: campaignFixture,
+        deletedFlights: [],
+        updatedFlights: [flightFixture],
+        createdFlights: []
+      })
     );
     expect(result.saving).toBe(true);
-    result = reducer(result, new actions.CampaignSaveFailure({ error: 'something bad happened' }));
+    result = reducer(result, new campaignActions.CampaignSaveFailure({ error: 'something bad happened' }));
     expect(result.saving).toBe(false);
     result = reducer(
       result,
-      new actions.CampaignSaveSuccess({
+      new campaignActions.CampaignSaveSuccess({
         campaignDoc: new MockHalDoc(campaignFixture),
         deletedFlightDocs: undefined,
         updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
@@ -112,7 +126,7 @@ describe('Campaign Reducer', () => {
   it('should set campaign from campaign form save success', () => {
     const result = reducer(
       initialState,
-      new actions.CampaignSaveSuccess({
+      new campaignActions.CampaignSaveSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         deletedFlightDocs: undefined,
         updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
@@ -130,7 +144,7 @@ describe('Campaign Reducer', () => {
   it('should set campaign advertiser', () => {
     const result = reducer(
       initialState,
-      new actions.CampaignSetAdvertiser({
+      new campaignActions.CampaignSetAdvertiser({
         set_advertiser_uri: '/some/uri'
       })
     );

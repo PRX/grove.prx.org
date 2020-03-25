@@ -4,7 +4,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, forkJoin, Observable } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
-import * as actions from '../actions';
+import * as campaignActions from '../actions/campaign-action.creator';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignFormSave } from '../models';
 import { CampaignService } from '../../../core';
@@ -14,19 +14,16 @@ export class CampaignEffects {
   @Effect()
   campaignLoad$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_LOAD),
-    map((action: actions.CampaignLoad) => action.payload),
-    mergeMap(payload =>
-      this.campaignService.loadCampaignZoomFlights(payload.id).pipe(
-        map(({ campaignDoc, flightDocs }) => new actions.CampaignLoadSuccess({ campaignDoc, flightDocs })),
-        catchError(error => of(new actions.CampaignLoadFailure({ error })))
-      )
-    )
+    map((action: campaignActions.CampaignLoad) => action.payload),
+    mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
+    map(({ campaignDoc, flightDocs }) => new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs })),
+    catchError(error => of(new campaignActions.CampaignLoadFailure({ error })))
   );
 
   @Effect()
   campaignFormSave$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_SAVE),
-    map((action: actions.CampaignSave) => action.payload),
+    map((action: campaignActions.CampaignSave) => action.payload),
     mergeMap((payload: CampaignFormSave) => {
       let campaignSaveResult: Observable<HalDoc>;
       if (payload.campaign.id) {
@@ -113,9 +110,9 @@ export class CampaignEffects {
             deletedFlightDocs: { [id: number]: HalDoc };
             updatedFlightDocs: { [id: number]: HalDoc };
             createdFlightDocs: { [id: number]: HalDoc };
-          }) => new actions.CampaignSaveSuccess({ campaignDoc, deletedFlightDocs, updatedFlightDocs, createdFlightDocs })
+          }) => new campaignActions.CampaignSaveSuccess({ campaignDoc, deletedFlightDocs, updatedFlightDocs, createdFlightDocs })
         ),
-        catchError(error => of(new actions.CampaignSaveFailure({ error })))
+        catchError(error => of(new campaignActions.CampaignSaveFailure({ error })))
       );
     })
   );
@@ -123,24 +120,24 @@ export class CampaignEffects {
   @Effect()
   addFlight$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_ADD_FLIGHT),
-    map((action: actions.CampaignAddFlight) => {
+    map((action: campaignActions.CampaignAddFlight) => {
       const date = new Date(Date.now());
       const flightId = date.getTime();
       const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
       const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
       this.router.navigate(['/campaign', action.payload.campaignId, 'flight', flightId]);
-      return new actions.CampaignAddFlightWithTempId({ flightId, startAt, endAt });
+      return new campaignActions.CampaignAddFlightWithTempId({ flightId, startAt, endAt });
     })
   );
 
   @Effect()
   dupFlight$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_DUP_FLIGHT),
-    map((action: actions.CampaignDupFlight) => {
+    map((action: campaignActions.CampaignDupFlight) => {
       const { campaignId, flight } = action.payload;
       const flightId = Date.now();
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-      return new actions.CampaignDupFlightWithTempId({ flightId, flight });
+      return new campaignActions.CampaignDupFlightWithTempId({ flightId, flight });
     })
   );
 

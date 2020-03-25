@@ -17,10 +17,11 @@ import { FancyFormModule, StatusBarModule, MockHalService } from 'ngx-prx-styleg
 import { SharedModule } from '../shared/shared.module';
 import { reducers } from './store';
 import { CampaignActionService } from './store/actions/campaign-action.service';
+import * as campaignActions from './store/actions/campaign-action.creator';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
-import { TestComponent, campaignRoutes } from './campaign-test.component';
+import { TestComponent, campaignRoutes } from '../../testing/test.component';
 
 describe('CampaignComponent', () => {
   let component: CampaignComponent;
@@ -94,11 +95,11 @@ describe('CampaignComponent', () => {
   }));
 
   it('inits the campaign state from the route', done => {
-    jest.spyOn(campaignActionService, 'loadCampaign');
+    jest.spyOn(store, 'dispatch');
     router.navigateByUrl('/campaign/123');
     route.setParamMap({ id: '123' });
     route.paramMap.subscribe(() => {
-      expect(campaignActionService.loadCampaign).toHaveBeenCalledWith(123);
+      expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
       done();
     });
   });
