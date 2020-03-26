@@ -84,11 +84,14 @@ describe('Flight Reducer', () => {
   it('should retain flight values not in the form update', () => {
     let result = reducer(
       initialState,
-      new actions.CampaignLoadSuccess({ campaignDoc: new MockHalDoc(campaignDocFixture), flightDocs: [new MockHalDoc(flightDocFixture)] })
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
     );
     result = reducer(
       result,
-      new actions.CampaignFlightFormUpdate({
+      new campaignActions.CampaignFlightFormUpdate({
         // update only contains name
         flight: { id: flightFixture.id, name: 'This is a flight name' } as Flight,
         changed: true,
