@@ -1,5 +1,5 @@
 import { InventoryService, Inventory } from './inventory.service';
-import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
+import { MockHalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 
 describe('InventoryService', () => {
@@ -48,7 +48,6 @@ describe('InventoryService', () => {
       { allocated: 0, availability: 91, date: '2019-10-31' }
     ]
   };
-  const availability = inventory.docToAvailability('pre_1', new MockHalDoc(availabilityFixture));
 
   beforeEach(() => {
     augury.mock('prx:inventory', inventoryFixture).mock('prx:availability', availabilityFixture);
@@ -57,17 +56,16 @@ describe('InventoryService', () => {
   it('gets inventory availability', done => {
     inventory
       .getInventoryAvailability({
-        id: 1,
+        id: '1',
         startDate: '2019-10-01',
         endDate: '2019-11;01',
         zone: 'pre_1',
         flightId: 1
       })
       .subscribe(avail => {
-        expect(avail.totals.startDate).toEqual(availabilityFixture.startDate);
-        expect(avail.totals.endDate).toEqual(availabilityFixture.endDate);
-        expect(avail.totals.groups.length).toEqual(availability.totals.groups.length);
-        expect(avail.totals.groups[0].startDate).toEqual(availabilityFixture.days[0].date);
+        expect(avail['days'].length).toEqual(availabilityFixture.days.length);
+        expect(avail['startDate']).toEqual(availabilityFixture.startDate);
+        expect(avail['endDate']).toEqual(availabilityFixture.endDate);
         done();
       });
   });

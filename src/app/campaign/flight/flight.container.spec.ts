@@ -19,7 +19,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
 import { DatepickerModule, MockHalDoc } from 'ngx-prx-styleguide';
-import { CampaignStoreService, InventoryService } from '../../core';
+import { InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
 import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
@@ -51,7 +51,6 @@ const campaignRoutes: Routes = [
 
 describe('FlightContainerComponent', () => {
   const inventory: ReplaySubject<any> = new ReplaySubject(1);
-  let campaignStoreService: CampaignStoreService;
   let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
   let router: Router;
@@ -99,14 +98,6 @@ describe('FlightContainerComponent', () => {
           provide: InventoryService,
           useValue: { listInventory: jest.fn(() => inventory) }
         },
-        {
-          provide: CampaignStoreService,
-          useValue: {
-            loadAvailability: jest.fn(f => of({})),
-            loadAllocationPreview: jest.fn(f => of()),
-            getFlightAvailabilityRollup$: jest.fn(() => of([]))
-          }
-        },
         CampaignActionService
       ]
     })
@@ -117,7 +108,6 @@ describe('FlightContainerComponent', () => {
         de = fix.debugElement;
         el = de.nativeElement;
         fix.detectChanges();
-        campaignStoreService = TestBed.get(CampaignStoreService);
         router = TestBed.get(Router);
         store = TestBed.get(Store);
         campaignActionService = TestBed.get(CampaignActionService);
@@ -138,7 +128,7 @@ describe('FlightContainerComponent', () => {
 
   it('receives availability and allocation preview updates when flight form changes', done => {
     component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: new Date() }, changed: true, valid: true });
-    component.flightAvailability$.subscribe(availability => {
+    component.flightAvailabilityRollup$.subscribe(availability => {
       expect(availability).toBeDefined();
       done();
     });
