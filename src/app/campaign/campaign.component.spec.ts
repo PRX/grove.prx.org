@@ -96,11 +96,13 @@ describe('CampaignComponent', () => {
 
   it('inits the campaign state from the route', done => {
     jest.spyOn(store, 'dispatch');
-    router.navigateByUrl('/campaign/123');
-    route.setParamMap({ id: '123' });
-    route.paramMap.subscribe(() => {
-      expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
-      done();
+    fix.ngZone.run(() => {
+      router.navigateByUrl('/campaign/123');
+      route.setParamMap({ id: '123' });
+      route.paramMap.subscribe(() => {
+        expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
+        done();
+      });
     });
   });
 

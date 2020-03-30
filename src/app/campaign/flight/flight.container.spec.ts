@@ -12,7 +12,7 @@ import {
   MatSelectModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, ReplaySubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { ActivatedRouteStub } from '../../../testing/stub.router';
 import { Store, StoreModule } from '@ngrx/store';
@@ -118,7 +118,7 @@ describe('FlightContainerComponent', () => {
             flightDocs: [new MockHalDoc(flightDocFixture)]
           })
         );
-        router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`);
+        fix.ngZone.run(() => router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`));
       });
   }));
 
