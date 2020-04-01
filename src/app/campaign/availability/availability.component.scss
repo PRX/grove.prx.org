@@ -17,9 +17,9 @@ section {
   margin-bottom: 1rem;
 }
 .row {
-  transition: background-color 0.6s cubic-bezier(.25,.8,.25,1);
+  transition: background-color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: grid;
-  grid-template-columns: 2rem repeat(3, 1fr) 2rem;
+  grid-template-columns: 2rem repeat(4, 1fr) 2rem;
   grid-column-gap: 0.35rem;
   justify-content: space-around;
   justify-items: stretch;
@@ -65,7 +65,7 @@ section {
   align-self: center;
 
   .icon {
-    transition: opacity 0.6s cubic-bezier(.25,.8,.25,1);
+    transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 0.12;
 
     ::ng-deep {
@@ -76,7 +76,8 @@ section {
     }
   }
 
-  .expanded &, .row:hover & {
+  .expanded &,
+  .row:hover & {
     .icon {
       opacity: 1;
     }

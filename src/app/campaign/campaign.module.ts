@@ -17,6 +17,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import * as fromCampaignState from './store';
 import { AllocationPreviewEffects } from './store/effects/allocation-preview.effects';
+import { AvailabilityEffects } from './store/effects/availability.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 
@@ -40,7 +41,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     DatepickerModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
-    EffectsModule.forFeature([AllocationPreviewEffects, CampaignEffects])
+    EffectsModule.forFeature([AllocationPreviewEffects, AvailabilityEffects, CampaignEffects])
   ],
   providers: [CampaignActionService]
 })

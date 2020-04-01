@@ -1,9 +1,11 @@
+import { Dictionary } from '@ngrx/entity';
 import { CampaignStoreState } from '..';
 import { MockHalService } from 'ngx-prx-styleguide';
 import { selectId as selectAllocationPreviewId } from '../reducers/allocation-preview.reducer';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
 import { docToAllocationPreview, AllocationPreview } from './allocation-preview.models';
+import { docToAvailabilityDay, AvailabilityDay } from './availability.models';
 
 const augury = new MockHalService();
 
@@ -117,7 +119,7 @@ export const allocationPreviewData: any[] = [
   { goalCount: 1, inventoryDayId: 6763, date: '2019-10-31', zoneName: 'pre_1' }
 ];
 export const allocationPreviewFixture: AllocationPreview[] = allocationPreviewData.map(allocation => docToAllocationPreview(allocation));
-export const allocationPreviewEntities = allocationPreviewFixture.reduce(
+export const allocationPreviewEntities: Dictionary<AllocationPreview> = allocationPreviewFixture.reduce(
   (acc, allocation) => ({ ...acc, [selectAllocationPreviewId(allocation)]: allocation }),
   {}
 );
@@ -127,6 +129,61 @@ export const createAllocationPreviewState = () => ({
     ...allocationPreviewParamsFixture,
     ids: allocationPreviewFixture.map(allocation => selectAllocationPreviewId(allocation)),
     entities: allocationPreviewEntities
+  }
+});
+
+export const availabilityParamsFixture = {
+  inventoryId: flightFixture.set_inventory_uri.split('/').pop(),
+  startDate: flightFixture.startAt,
+  endDate: flightFixture.endAt,
+  zone: flightFixture.zones[0],
+  flightId: flightFixture.id
+};
+export const availabilityData = [
+  { allocated: null, availability: 1, date: '2019-10-01' },
+  { allocated: null, availability: 0, date: '2019-10-02' },
+  { allocated: 0, availability: 9858, date: '2019-10-03' },
+  { allocated: 0, availability: 5305, date: '2019-10-04' },
+  { allocated: 0, availability: 2387, date: '2019-10-05' },
+  { allocated: 0, availability: 1339, date: '2019-10-06' },
+  { allocated: 0, availability: 709, date: '2019-10-07' },
+  { allocated: 0, availability: 357, date: '2019-10-08' },
+  { allocated: 0, availability: 158, date: '2019-10-09' },
+  { allocated: 0, availability: 85, date: '2019-10-10' },
+  { allocated: 0, availability: 48, date: '2019-10-11' },
+  { allocated: 0, availability: 19, date: '2019-10-12' },
+  { allocated: 0, availability: 8, date: '2019-10-13' },
+  { allocated: 0, availability: 4, date: '2019-10-14' },
+  { allocated: 0, availability: 1, date: '2019-10-15' },
+  { allocated: 0, availability: 10812, date: '2019-10-16' },
+  { allocated: 0, availability: 5299, date: '2019-10-17' },
+  { allocated: 0, availability: 2527, date: '2019-10-18' },
+  { allocated: 0, availability: 1393, date: '2019-10-19' },
+  { allocated: 0, availability: 722, date: '2019-10-20' },
+  { allocated: 0, availability: 430, date: '2019-10-21' },
+  { allocated: 0, availability: 237, date: '2019-10-22' },
+  { allocated: 0, availability: 97, date: '2019-10-23' },
+  { allocated: 0, availability: 10333, date: '2019-10-24' },
+  { allocated: 0, availability: 6174, date: '2019-10-25' },
+  { allocated: 0, availability: 3567, date: '2019-10-26' },
+  { allocated: 0, availability: 1691, date: '2019-10-27' },
+  { allocated: 0, availability: 765, date: '2019-10-28' },
+  { allocated: 0, availability: 403, date: '2019-10-29' },
+  { allocated: 0, availability: 182, date: '2019-10-30' },
+  { allocated: 0, availability: 91, date: '2019-10-31' }
+];
+export const availabilityDaysFixture: AvailabilityDay[] = availabilityData.map(availability => docToAvailabilityDay(availability));
+export const availabilityEntities = {
+  [`${availabilityParamsFixture.flightId}_${availabilityParamsFixture.zone}`]: {
+    params: availabilityParamsFixture,
+    days: availabilityDaysFixture
+  }
+};
+export const createAvailabilityState = () => ({
+  availability: {
+    ...availabilityParamsFixture,
+    ids: [`${availabilityParamsFixture.flightId}_${availabilityParamsFixture.zone}`],
+    entities: availabilityEntities
   }
 });
 
@@ -142,9 +199,11 @@ export const createRouterState = () => ({
 export const createCampaignStoreState = ({
   campaignState = createCampaignState(),
   flightsState = createFlightsState(campaignState.campaign.doc),
-  allocationPreview = createAllocationPreviewState()
+  allocationPreview = createAllocationPreviewState(),
+  availability = createAvailabilityState()
 } = {}): CampaignStoreState => ({
   ...campaignState,
   ...flightsState,
-  ...allocationPreview
+  ...allocationPreview,
+  ...availability
 });

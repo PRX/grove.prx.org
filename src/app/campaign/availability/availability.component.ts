@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { Availability, InventoryZone, AvailabilityAllocation } from '../../core';
-import { Flight } from '../store/models';
+import { InventoryZone } from '../../core';
+import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParams, InventoryNumbers } from '../store/models';
 
 @Component({
   selector: 'grove-availability',
@@ -15,32 +15,36 @@ import { Flight } from '../store/models';
         <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{ error }}</li>
       </ul>
       <mat-divider></mat-divider>
-      <section *ngFor="let zone of availabilityZones">
-        <h3 class="title">{{ getZoneName(zone.zone) }}</h3>
+      <section *ngFor="let rollup of rollups">
+        <h3 class="title">{{ getZoneName(rollup.params.zone) }}</h3>
         <div class="row head">
           <div class="expand"></div>
           <div class="date">Week</div>
           <div class="avail">Available</div>
-          <div class="goal">Goal</div>
+          <div class="goal">Allocated</div>
+          <div class="goal">Actual</div>
           <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
         </div>
-        <ng-container *ngFor="let week of zone.totals.groups">
+        <ng-container *ngFor="let week of rollup.weeks">
           <div
             class="row week"
-            [class.row-highlight]="allocationPreviewExceedsAvailable(week)"
-            [class.expanded]="isZoneWeekExpanded(zone, week)"
+            [class.row-highlight]="allocationPreviewExceedsAvailable(week.numbers)"
+            [class.expanded]="isZoneWeekExpanded(rollup, week)"
           >
             <div class="expand">
-              <button class="btn-link" (click)="toggleZoneWeekExpanded(zone, week)">
+              <button class="btn-link" (click)="toggleZoneWeekExpanded(rollup, week)">
                 <prx-icon class="icon" name="arrows-alt-v" size="1rem" color="primary"></prx-icon>
               </button>
             </div>
             <div class="date">
-              {{ week.startDate | date: 'M/dd' }}
+              {{ week.startDate | date: 'M/dd':'+0000' }}
             </div>
-            <div class="avail">{{ getAvailable(week) | largeNumber }}</div>
-            <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(week)">
-              {{ getAllocationValue(week) | largeNumber }}
+            <div>{{ getAvailableValue(week.numbers) | largeNumber }}</div>
+            <div [class.preview]="hasAllocationPreviewAfterChange(week.numbers.allocationPreview)">
+              {{ getAllocationValue(week.numbers) | largeNumber }}
+            </div>
+            <div>
+              {{ showActualsValue(week.startDate) ? (week.numbers.actuals | largeNumber) : '&mdash;' }}
             </div>
             <div class="edit">
               <button class="btn-link" aria-label="Edit">
@@ -48,17 +52,20 @@ import { Flight } from '../store/models';
               </button>
             </div>
             <div class="days-wrapper">
-              <div class="days" [cssProps]="{ '--num-days': getDaysForWeek(week) }">
-                <div class="row day" [class.row-highlight]="allocationPreviewExceedsAvailable(day)" *ngFor="let day of week.groups">
+              <div class="days" [cssProps]="{ '--num-days': week?.days?.length }">
+                <div class="row day" [class.row-highlight]="allocationPreviewExceedsAvailable(day.numbers)" *ngFor="let day of week.days">
                   <div class="expand"></div>
                   <div class="date">
-                    <span>{{ day.startDate | date: 'M/dd' }}</span>
+                    <span>{{ day.date | date: 'M/dd':'+0000' }}</span>
                   </div>
                   <div class="avail">
-                    <span>{{ getAvailable(day) | largeNumber }}</span>
+                    <span>{{ getAvailableValue(day.numbers) | largeNumber }}</span>
                   </div>
-                  <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(day)">
-                    <span>{{ getAllocationValue(day) | largeNumber }}</span>
+                  <div class="goal" [class.preview]="hasAllocationPreviewAfterChange(day.numbers.allocationPreview)">
+                    <span>{{ getAllocationValue(day.numbers) | largeNumber }}</span>
+                  </div>
+                  <div>
+                    {{ showActualsValue(day.date) ? (day.numbers.actuals | largeNumber) : '&mdash;' }}
                   </div>
                   <div class="edit"></div>
                 </div>
@@ -66,12 +73,15 @@ import { Flight } from '../store/models';
             </div>
           </div>
         </ng-container>
-        <div class="row totals" [class.row-highlight]="allocationPreviewExceedsAvailable(zone.totals)">
+        <div class="row totals" [class.row-highlight]="allocationPreviewExceedsAvailable(rollup.totals)">
           <div class="expand"></div>
           <div class="date">TOTALS</div>
-          <div class="avail">{{ getAvailable(zone.totals) | largeNumber }}</div>
-          <div class="goal" [class.preview]="hasAllocationPrevieweAfterChange(zone.totals)">
-            {{ getAllocationValue(zone.totals) | largeNumber }}
+          <div>{{ getAvailableValue(rollup.totals) | largeNumber }}</div>
+          <div [class.preview]="hasAllocationPreviewAfterChange(rollup.totals.allocationPreview)">
+            {{ getAllocationValue(rollup.totals) | largeNumber }}
+          </div>
+          <div>
+            {{ showActualsValue(rollup.params.startDate) ? rollup.totals.actuals : '&mdash;' }}
           </div>
           <div class="edit"></div>
         </div>
@@ -85,40 +95,33 @@ export class AvailabilityComponent {
   @Input() flight: Flight;
   @Input() changed: boolean;
   @Input() zones: InventoryZone[];
-  @Input() availabilityZones: Availability[];
+  @Input() rollups: AvailabilityRollup[];
   @Input() allocationPreviewError: any;
   @Input() dailyMinimum: number;
   @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
   zoneWeekExpanded = {};
 
   get errors() {
-    const errors = [];
-
-    // Check for allocation preview error.
-    // TODO: Updated with discussed "nice_message" when available.
-    if (this.allocationPreviewError && this.allocationPreviewError.body) {
-      errors.push(this.allocationPreviewError.body.message);
-    }
-
-    // Check for flight status message, which should only exist when there was an error.
-    if (this.flight.status_message) {
-      errors.push(this.flight.status_message);
-    }
-
-    return errors;
+    return [
+      // allocation preview error
+      // TODO: Updated with discussed "nice_message" when available.
+      this.allocationPreviewError && this.allocationPreviewError.body && this.allocationPreviewError.body.message,
+      // flight status message, should only exist when there was an error
+      this.flight.status_message
+    ].filter(error => !!error);
   }
 
-  getZoneWeekKey({ zone }: Availability, { startDate }: AvailabilityAllocation): string {
-    return `${zone}-${startDate}`;
+  getZoneWeekKey({ zone }: AvailabilityParams, { startDate }: AvailabilityWeeklyRollup): string {
+    return `${zone}-${startDate.toISOString().slice(0, 10)}`;
   }
 
-  isZoneWeekExpanded(zone: Availability, week: AvailabilityAllocation): boolean {
-    const zoneWeekKey = this.getZoneWeekKey(zone, week);
+  isZoneWeekExpanded(rollup: AvailabilityRollup, week: AvailabilityWeeklyRollup): boolean {
+    const zoneWeekKey = this.getZoneWeekKey(rollup.params, week);
     return this.zoneWeekExpanded[zoneWeekKey];
   }
 
-  toggleZoneWeekExpanded(zone: Availability, week: AvailabilityAllocation) {
-    const zoneWeekKey = this.getZoneWeekKey(zone, week);
+  toggleZoneWeekExpanded(rollup: AvailabilityRollup, week: AvailabilityWeeklyRollup) {
+    const zoneWeekKey = this.getZoneWeekKey(rollup.params, week);
     this.zoneWeekExpanded[zoneWeekKey] = !this.zoneWeekExpanded[zoneWeekKey];
   }
 
@@ -132,17 +135,16 @@ export class AvailabilityComponent {
     );
   }
 
-  hasAllocationPrevieweAfterChange({ allocationPreview }: AvailabilityAllocation): boolean {
+  hasAllocationPreviewAfterChange(allocationPreview: number): boolean {
     return !!this.changed && allocationPreview >= 0;
   }
 
-  getAllocationValue(period: AvailabilityAllocation): number {
-    const { allocated, allocationPreview } = period;
-    return this.hasAllocationPrevieweAfterChange(period) ? allocationPreview : allocated;
+  getAllocationValue({ allocated, allocationPreview }: InventoryNumbers): number {
+    return this.hasAllocationPreviewAfterChange(allocationPreview) ? allocationPreview : allocated;
   }
 
-  getDaysForWeek({ groups }: AvailabilityAllocation): number {
-    return groups ? groups.length : 0;
+  showActualsValue(date: Date): boolean {
+    return date.valueOf() < Date.now();
   }
 
   getZoneName(zoneId: string): string {
@@ -150,12 +152,12 @@ export class AvailabilityComponent {
     return zone && zone.label;
   }
 
-  getAvailable({ allocated, availability }: AvailabilityAllocation): number {
+  getAvailableValue({ allocated, availability }: InventoryNumbers): number {
     return allocated + availability;
   }
 
-  allocationPreviewExceedsAvailable(period: AvailabilityAllocation): boolean {
-    const { allocationPreview } = period;
-    return this.getAvailable(period) < allocationPreview;
+  allocationPreviewExceedsAvailable(numbers: InventoryNumbers): boolean {
+    const { allocationPreview } = numbers;
+    return this.getAvailableValue(numbers) < allocationPreview;
   }
 }

@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
-import { Inventory, InventoryService, CampaignStoreService, InventoryZone, Availability } from '../../core';
-import { Flight, FlightZone } from '../store/models';
+import { Inventory, InventoryService, InventoryZone } from '../../core';
+import { Flight, FlightZone, AvailabilityRollup } from '../store/models';
 import { map } from 'rxjs/operators';
 import {
   selectRoutedLocalFlight,
@@ -10,7 +10,8 @@ import {
   selectRoutedFlightChanged,
   selectRoutedFlightDailyMinimum,
   selectCurrentInventoryUri,
-  selectRoutedFlightAllocationPreviewError
+  selectRoutedFlightAllocationPreviewError,
+  selectAvailabilityRollup
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -30,11 +31,10 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         (flightDuplicate)="flightDuplicate($event)"
       ></grove-flight>
       <grove-availability
-        *ngIf="flightAvailability$"
         [flight]="flightLocal$ | async"
         [changed]="flightChanged$ | async"
         [zones]="zoneOpts"
-        [availabilityZones]="flightAvailability$ | async"
+        [rollups]="flightAvailabilityRollup$ | async"
         [allocationPreviewError]="allocationPreviewError$ | async"
         [dailyMinimum]="flightDailyMin$ | async"
         (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
@@ -49,7 +49,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightLocal$: Observable<Flight>;
   softDeleted$: Observable<boolean>;
   flightChanged$: Observable<boolean>;
-  flightAvailability$: Observable<Availability[]>;
+  flightAvailabilityRollup$: Observable<AvailabilityRollup[]>;
   flightDailyMin$: Observable<number>;
   currentInventoryUri$: Observable<string>;
   allocationPreviewError$: Observable<any>;
@@ -57,12 +57,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
 
-  constructor(
-    private inventoryService: InventoryService,
-    private campaignStoreService: CampaignStoreService,
-    private store: Store<any>,
-    private campaignAction: CampaignActionService
-  ) {}
+  constructor(private inventoryService: InventoryService, private store: Store<any>, private campaignAction: CampaignActionService) {}
 
   ngOnInit() {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
@@ -71,7 +66,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightDailyMin$ = this.store.pipe(select(selectRoutedFlightDailyMinimum));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
     this.allocationPreviewError$ = this.store.pipe(select(selectRoutedFlightAllocationPreviewError));
-    this.flightAvailability$ = this.campaignStoreService.getFlightAvailabilityRollup$();
+    this.flightAvailabilityRollup$ = this.store.pipe(select(selectAvailabilityRollup));
 
     this.inventoryOptions$ = this.inventoryService.listInventory();
     this.zoneOptions$ = combineLatest([this.inventoryOptions$, this.currentInventoryUri$]).pipe(
