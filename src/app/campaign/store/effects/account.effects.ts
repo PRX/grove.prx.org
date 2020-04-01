@@ -9,11 +9,11 @@ import { ActionTypes } from '../actions/action.types';
 @Injectable()
 export class AccountEffects {
   @Effect()
-  loadAllocationPreview$ = this.actions$.pipe(
+  loadAccounts$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_ACCOUNTS_LOAD),
     switchMap(() => this.user.accounts),
     withLatestFrom(this.user.defaultAccount),
-    map(([accounts, defaultAccount]) => [defaultAccount].concat(accounts)),
+    map(([accounts, defaultAccount]) => new accountActions.AccountsLoadSuccess({ docs: [defaultAccount].concat(accounts) })),
     catchError(error => of(new accountActions.AccountsLoadFailure({ error })))
   );
 
