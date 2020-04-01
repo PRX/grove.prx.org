@@ -1,13 +1,21 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
 
+export interface FlightZone {
+  id: string;
+  label: string;
+  url?: string;
+  fileSize?: number;
+  mimeType?: string;
+}
+
 export interface Flight {
   id?: number;
   name: string;
   startAt: Date;
   endAt: Date;
   totalGoal: number;
-  zones: string[];
+  zones: FlightZone[];
   status?: string;
   status_message?: string;
   createdAt?: Date;
