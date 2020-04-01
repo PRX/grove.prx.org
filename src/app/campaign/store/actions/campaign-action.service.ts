@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight } from '../models';
+import { Flight, FlightZone } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 import { CampaignStoreService } from '../../../core';
 
@@ -67,6 +67,26 @@ export class CampaignActionService implements OnDestroy {
     this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
       this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
     });
+  }
+
+  addZone(zone: FlightZone) {
+    this.store
+      .pipe(
+        select(selectRoutedFlight),
+        filter(state => !!(state && state.id)),
+        first()
+      )
+      .subscribe(state => this.store.dispatch(new campaignActions.CampaignFlightAddZone({ flightId: state.id, zone: zone })));
+  }
+
+  removeZone(zone: FlightZone) {
+    this.store
+      .pipe(
+        select(selectRoutedFlight),
+        filter(state => !!(state && state.id)),
+        first()
+      )
+      .subscribe(state => this.store.dispatch(new campaignActions.CampaignFlightRemoveZone({ flightId: state.id, zone: zone })));
   }
 
   dupFlight(flight: Flight) {
