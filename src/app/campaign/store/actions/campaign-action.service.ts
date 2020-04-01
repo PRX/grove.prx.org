@@ -3,17 +3,20 @@ import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
+import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
 import { Flight } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
-import { CampaignStoreService } from '../../../core';
 
 @Injectable()
 export class CampaignActionService implements OnDestroy {
   private flightSub: Subscription;
+  // current flight id only to be used for checking against changed flight id to load availability on flight tab/route change
+  // for any other current/routed flight id needs, please pipe from the selectRoutedFlightId selector
+  // one reason the routed flight id selector is not used here is that is would fire on navigation before the flight is actually loaded
   private currentFlightId: number;
 
-  constructor(private store: Store<any>, private campaignStoreService: CampaignStoreService) {
+  constructor(private store: Store<any>) {
     this.loadAvailabilityOnFlightIdChange();
   }
 
@@ -28,39 +31,64 @@ export class CampaignActionService implements OnDestroy {
       .pipe(select(selectRoutedLocalFlight))
       .pipe(filter(flight => flight && this.currentFlightId !== flight.id))
       .subscribe(flight => {
-        this.campaignStoreService.loadAvailability(flight);
+        if (this.hasAvailabilityParams(flight)) {
+          this.loadAvailability(flight);
+        }
         this.currentFlightId = flight.id;
       });
   }
 
   loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
-    const { set_inventory_uri, name, startAt, endAt, zones, totalGoal } = formFlight;
-    const dateRangeValid = startAt && endAt && startAt.valueOf() < endAt.valueOf();
-    const hasAvailabilityParams = startAt && endAt && set_inventory_uri && zones && zones.length > 0;
-    const availabilityParamsChanged =
-      hasAvailabilityParams &&
-      (startAt.getTime() !== localFlight.startAt.getTime() ||
-        endAt.getTime() !== localFlight.endAt.getTime() ||
-        set_inventory_uri !== localFlight.set_inventory_uri ||
-        !zones.every(zone => localFlight.zones.indexOf(zone) > -1));
-    if (dateRangeValid && availabilityParamsChanged) {
-      this.campaignStoreService.loadAvailability(formFlight);
+    if (this.isDateRangeValid(formFlight) && this.haveAvailabilityParamsChanged(formFlight, localFlight)) {
+      this.loadAvailability({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
       if (formFlight.totalGoal) {
-        this.store.dispatch(
-          new allocationPreviewActions.AllocationPreviewLoad({
-            flightId: localFlight.id,
-            createdAt: localFlight.createdAt,
-            set_inventory_uri,
-            name,
-            startAt,
-            endAt,
-            totalGoal,
-            dailyMinimum,
-            zones
-          })
-        );
+        this.loadAllocationPreview({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt }, dailyMinimum);
       }
     }
+  }
+
+  isDateRangeValid({ startAt, endAt }: { startAt: Date; endAt: Date }) {
+    return startAt && endAt && startAt.valueOf() < endAt.valueOf();
+  }
+
+  hasAvailabilityParams(flight: Flight): boolean {
+    return flight && flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0;
+  }
+
+  haveAvailabilityParamsChanged(a: Flight, b: Flight) {
+    return (
+      this.hasAvailabilityParams(a) &&
+      (!this.hasAvailabilityParams(b) ||
+        a.startAt.getTime() !== b.startAt.getTime() ||
+        a.endAt.getTime() !== b.endAt.getTime() ||
+        a.set_inventory_uri !== b.set_inventory_uri ||
+        !a.zones.every(zone => b.zones.indexOf(zone) > -1))
+    );
+  }
+
+  loadAvailability(flight: Flight) {
+    const { id: flightId, createdAt, set_inventory_uri, startAt: startDate, endAt: endDate, zones } = flight;
+    const inventoryId = set_inventory_uri.split('/').pop();
+    zones.forEach(zone => {
+      this.store.dispatch(new availabilityActions.AvailabilityLoad({ inventoryId, startDate, endDate, zone, createdAt, flightId }));
+    });
+  }
+
+  loadAllocationPreview(flight: Flight, dailyMinimum: number) {
+    const { id: flightId, createdAt, set_inventory_uri, name, startAt, endAt, zones, totalGoal } = flight;
+    this.store.dispatch(
+      new allocationPreviewActions.AllocationPreviewLoad({
+        flightId,
+        createdAt,
+        set_inventory_uri,
+        name,
+        startAt,
+        endAt,
+        totalGoal,
+        dailyMinimum,
+        zones
+      })
+    );
   }
 
   addFlight() {

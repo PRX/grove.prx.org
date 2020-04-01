@@ -7,27 +7,50 @@ import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } f
 import { SharedModule } from '../../shared/shared.module';
 import { AvailabilityComponent } from './availability.component';
 import { GoalFormComponent } from './goal-form.component';
-import { InventoryZone, Availability } from '../../core';
-import { Flight } from '../store/models';
+import { InventoryZone } from '../../core';
+import { Flight, AvailabilityRollup } from '../store/models';
+import { availabilityParamsFixture } from '../store/models/campaign-state.factory';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
   let fix: ComponentFixture<AvailabilityComponent>;
   let de: DebugElement;
 
-  const mockAvailabilityZone: Availability = {
-    zone: 'pre_1',
-    totals: {
-      startDate: '2019-10-01',
-      endDate: '2019-11-01',
-      groups: [
-        { allocated: 1, availability: 1, allocationPreview: 3, startDate: '2019-10-01', endDate: '2019-10-05' },
-        { allocated: 9, availability: 1339, allocationPreview: 9, startDate: '2019-10-06', endDate: '2019-10-12' },
-        { allocated: 8, availability: 8, allocationPreview: 8, startDate: '2019-10-13', endDate: '2019-10-19' },
-        { allocated: 7, availability: 1393, allocationPreview: 7, startDate: '2019-10-20', endDate: '2019-10-26' },
-        { allocated: 6, availability: 722, allocationPreview: 6, startDate: '2019-10-27', endDate: '2019-10-31' }
-      ]
-    }
+  const mockRollup: AvailabilityRollup = {
+    params: availabilityParamsFixture,
+    totals: { allocated: 31, availability: 3463, actuals: 0, allocationPreview: 33 },
+    weeks: [
+      {
+        startDate: new Date('2019-10-01'),
+        endDate: new Date('2019-10-05'),
+        numbers: { allocated: 1, availability: 1, actuals: 0, allocationPreview: 3 },
+        days: []
+      },
+      {
+        startDate: new Date('2019-10-06'),
+        endDate: new Date('2019-10-12'),
+        numbers: { allocated: 9, availability: 1339, actuals: 0, allocationPreview: 9 },
+        days: []
+      },
+      {
+        startDate: new Date('2019-10-13'),
+        endDate: new Date('2019-10-19'),
+        numbers: { allocated: 8, availability: 8, actuals: 0, allocationPreview: 8 },
+        days: []
+      },
+      {
+        startDate: new Date('2019-10-20'),
+        endDate: new Date('2019-10-26'),
+        numbers: { allocated: 7, availability: 1393, actuals: 0, allocationPreview: 7 },
+        days: []
+      },
+      {
+        startDate: new Date('2019-10-27'),
+        endDate: new Date('2019-10-31'),
+        numbers: { allocated: 6, availability: 722, actuals: 0, allocationPreview: 6 },
+        days: []
+      }
+    ]
   };
   const mockFlight: Flight = {
     id: 9,
@@ -39,10 +62,10 @@ describe('AvailabilityComponent', () => {
     set_inventory_uri: '/some/inventory'
   };
   const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
-  const mockAvailabilityZones = [mockAvailabilityZone];
+  const mockRollups = [mockRollup];
 
-  const zone = mockAvailabilityZone;
-  const week = mockAvailabilityZone.totals.groups[0];
+  const rollup = mockRollup;
+  const week = mockRollup.weeks[0];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -64,7 +87,7 @@ describe('AvailabilityComponent', () => {
         de = fix.debugElement;
         comp.flight = mockFlight;
         comp.zones = mockZones;
-        comp.availabilityZones = mockAvailabilityZones;
+        comp.rollups = mockRollups;
         fix.detectChanges();
       });
   }));
@@ -74,19 +97,19 @@ describe('AvailabilityComponent', () => {
   });
 
   it('should return zone week key name', () => {
-    expect(comp.getZoneWeekKey(zone, week)).toEqual('pre_1-2019-10-01');
+    expect(comp.getZoneWeekKey(rollup.params, week)).toEqual('pre_1-2019-10-01');
   });
 
   it('toggles week expanded', () => {
     expect(comp.zoneWeekExpanded['pre_1-2019-10-01']).toBeFalsy();
-    comp.toggleZoneWeekExpanded(zone, week);
+    comp.toggleZoneWeekExpanded(rollup, week);
     expect(comp.zoneWeekExpanded['pre_1-2019-10-01']).toBeTruthy();
   });
 
   it('should check zone week expanded status', () => {
-    expect(comp.isZoneWeekExpanded(zone, week)).toBeFalsy();
-    comp.toggleZoneWeekExpanded(zone, week);
-    expect(comp.isZoneWeekExpanded(zone, week)).toBeTruthy();
+    expect(comp.isZoneWeekExpanded(rollup, week)).toBeFalsy();
+    comp.toggleZoneWeekExpanded(rollup, week);
+    expect(comp.isZoneWeekExpanded(rollup, week)).toBeTruthy();
   });
 
   it('should be truthy when flight data is incomplete or missing', () => {
@@ -132,29 +155,24 @@ describe('AvailabilityComponent', () => {
     expect(row.nativeElement.textContent).toContain('10/01');
   });
 
+  it('should return truthy when preview exceeds available', () => {
+    expect(comp.allocationPreviewExceedsAvailable(week.numbers)).toBeTruthy();
+    expect(comp.allocationPreviewExceedsAvailable({ ...week.numbers, allocated: 9 })).toBeFalsy();
+  });
+
   it('should return truthy when preview allocations exist after change', () => {
-    expect(comp.hasAllocationPrevieweAfterChange(week)).toBeFalsy();
+    expect(comp.hasAllocationPreviewAfterChange(week.numbers.allocationPreview)).toBeFalsy();
     comp.changed = true;
-    expect(comp.hasAllocationPrevieweAfterChange(week)).toBeTruthy();
+    expect(comp.hasAllocationPreviewAfterChange(week.numbers.allocationPreview)).toBeTruthy();
   });
 
   it('should return correct allocation value', () => {
-    expect(comp.getAllocationValue(week)).toEqual(1);
+    expect(comp.getAllocationValue(week.numbers)).toEqual(week.numbers.allocated);
     comp.changed = true;
-    expect(comp.getAllocationValue(week)).toEqual(3);
-  });
-
-  it('should return number of zone groups or zero', () => {
-    expect(comp.getDaysForWeek(week)).toEqual(0);
-    expect(comp.getDaysForWeek({ ...week, groups: [week] })).toEqual(1);
+    expect(comp.getAllocationValue(week.numbers)).toEqual(week.numbers.allocationPreview);
   });
 
   it('should return combined value of allocated and availability', () => {
-    expect(comp.getAvailable(week)).toEqual(2);
-  });
-
-  it('should return truthy when preview exceeds availabile', () => {
-    expect(comp.allocationPreviewExceedsAvailable(week)).toBeTruthy();
-    expect(comp.allocationPreviewExceedsAvailable({ ...week, allocated: 9 })).toBeFalsy();
+    expect(comp.getAvailableValue(week.numbers)).toEqual(week.numbers.allocated + week.numbers.availability);
   });
 });

@@ -1,8 +1,7 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule, Store, select } from '@ngrx/store';
-import { CampaignStoreService } from '../../../core';
 import { reducers } from '../';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../../../store/router-store/custom-router-serializer';
@@ -17,8 +16,8 @@ import { CampaignActionService } from './campaign-action.service';
 describe('CampaignActionService', () => {
   let router: Router;
   let store: Store<any>;
-  let campaignStoreService: CampaignStoreService;
   let service: CampaignActionService;
+  let fixture: ComponentFixture<TestComponent>;
   let dispatchSpy;
 
   beforeEach(() => {
@@ -30,18 +29,10 @@ describe('CampaignActionService', () => {
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)
       ],
-      providers: [
-        CampaignActionService,
-        {
-          provide: CampaignStoreService,
-          useValue: {
-            loadAvailability: jest.fn(() => {})
-          }
-        }
-      ]
+      providers: [CampaignActionService]
     });
+    fixture = TestBed.createComponent(TestComponent);
     service = TestBed.get(CampaignActionService);
-    campaignStoreService = TestBed.get(CampaignStoreService);
     router = TestBed.get(Router);
     store = TestBed.get(Store);
 
@@ -53,24 +44,31 @@ describe('CampaignActionService', () => {
       new MockHalDoc({ ...flightDocFixture, id: flightIds[2] }),
       new MockHalDoc({ ...flightDocFixture, id: flightIds[3] })
     ];
-    const loadAction = new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs });
-    store.dispatch(loadAction);
-    const goalAction = new campaignActions.CampaignFlightSetGoal({ flightId: flightIds[0], totalGoal: 999, dailyMinimum: 9, valid: true });
-    store.dispatch(goalAction);
+    jest.spyOn(service, 'loadAvailability');
+    fixture.ngZone.run(() => {
+      const loadAction = new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs });
+      store.dispatch(loadAction);
+      const goalAction = new campaignActions.CampaignFlightSetGoal({
+        flightId: flightIds[0],
+        totalGoal: 999,
+        dailyMinimum: 9,
+        valid: true
+      });
+      store.dispatch(goalAction);
 
-    router
-      .navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`)
-      .then(() => (dispatchSpy = jest.spyOn(store, 'dispatch')));
+      router
+        .navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`)
+        .then(() => (dispatchSpy = jest.spyOn(store, 'dispatch')));
+    });
   });
 
   it('should load availability from flight id change', () => {
-    expect(campaignStoreService.loadAvailability).toHaveBeenCalledWith({ MOCKS: {}, ERRORS: {}, ...flightFixture });
+    expect(service.loadAvailability).toHaveBeenCalledWith({ MOCKS: {}, ERRORS: {}, ...flightFixture });
   });
 
   it('should load availability and allocation preview when flight form is updated', () => {
     jest.spyOn(service, 'loadAvailabilityAllocationIfChanged');
     service.updateFlightForm({ ...flightFixture, endAt: new Date() }, true, true);
-    expect(campaignStoreService.loadAvailability).toHaveBeenCalled();
     expect(service.loadAvailabilityAllocationIfChanged).toHaveBeenCalled();
   });
 

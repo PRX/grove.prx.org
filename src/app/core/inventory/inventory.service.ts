@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { Availability } from '../campaign/campaign.models';
 
 export interface Inventory {
   id: number;
@@ -38,7 +37,19 @@ export class InventoryService {
     };
   }
 
-  getInventoryAvailability({ id, startDate, endDate, zone, flightId }): Observable<Availability> {
+  getInventoryAvailability({
+    id,
+    startDate,
+    endDate,
+    zone,
+    flightId
+  }: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    zone: string;
+    flightId: number;
+  }): Observable<HalDoc> {
     return this.augury.follow('prx:inventory', { id }).pipe(
       switchMap(inventory => {
         return inventory.follow('prx:availability', {
@@ -47,24 +58,7 @@ export class InventoryService {
           zone,
           flightId
         });
-      }),
-      map(doc => this.docToAvailability(zone, doc))
+      })
     );
-  }
-
-  docToAvailability(zone: string, doc: HalDoc): Availability {
-    return {
-      totals: {
-        startDate: doc['startDate'],
-        endDate: doc['endDate'],
-        groups: doc['days'].map(allocation => ({
-          allocated: allocation.allocated,
-          availability: allocation.availability,
-          startDate: allocation.date,
-          endDate: allocation.date
-        }))
-      },
-      zone
-    };
   }
 }

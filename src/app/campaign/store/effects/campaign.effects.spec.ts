@@ -1,5 +1,5 @@
 import { Actions } from '@ngrx/effects';
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
@@ -20,6 +20,7 @@ describe('CampaignEffects', () => {
   let actions$: TestActions;
   let campaignService: CampaignService;
   let router: Router;
+  let fixture: ComponentFixture<TestComponent>;
   const toastrService: ToastrService = { success: jest.fn() } as any;
 
   beforeEach(async(() => {
@@ -48,6 +49,7 @@ describe('CampaignEffects', () => {
         { provide: Actions, useFactory: getActions }
       ]
     });
+    fixture = TestBed.createComponent(TestComponent);
     effects = TestBed.get(CampaignEffects);
     actions$ = TestBed.get(Actions);
     campaignService = TestBed.get(CampaignService);
@@ -165,24 +167,26 @@ describe('CampaignEffects', () => {
     const { id, ...newCampaign } = campaignFixture;
     const flightId = new Date().valueOf();
     const flight = { ...flightFixture, id: flightId };
-    router.navigateByUrl(`/campaign/new/flight/${flightId}`).then(() => {
-      const createAction = new campaignActions.CampaignSave({
-        campaign: newCampaign,
-        updatedFlights: [],
-        createdFlights: [flight],
-        deletedFlights: []
+    fixture.ngZone.run(() => {
+      router.navigateByUrl(`/campaign/new/flight/${flightId}`).then(() => {
+        const createAction = new campaignActions.CampaignSave({
+          campaign: newCampaign,
+          updatedFlights: [],
+          createdFlights: [flight],
+          deletedFlights: []
+        });
+        const success = new campaignActions.CampaignSaveSuccess({
+          campaignDoc,
+          deletedFlightDocs: undefined,
+          updatedFlightDocs: undefined,
+          createdFlightDocs: { [flightId]: flightDoc }
+        });
+        actions$.stream = hot('-a', { a: createAction });
+        const expected = cold('-r', { r: success });
+        expect(effects.campaignFormSave$).toBeObservable(expected);
+        expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id, 'flight', flightFixture.id]);
+        done();
       });
-      const success = new campaignActions.CampaignSaveSuccess({
-        campaignDoc,
-        deletedFlightDocs: undefined,
-        updatedFlightDocs: undefined,
-        createdFlightDocs: { [flightId]: flightDoc }
-      });
-      actions$.stream = hot('-a', { a: createAction });
-      const expected = cold('-r', { r: success });
-      expect(effects.campaignFormSave$).toBeObservable(expected);
-      expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id, 'flight', flightFixture.id]);
-      done();
     });
   });
 
@@ -191,24 +195,26 @@ describe('CampaignEffects', () => {
     const flightDoc = new MockHalDoc(flightFixture);
     campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
     campaignService.deleteFlight = jest.fn(() => of(flightDoc));
-    router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
-      const deleteAction = new campaignActions.CampaignSave({
-        campaign: campaignFixture,
-        updatedFlights: [],
-        createdFlights: [],
-        deletedFlights: [flightFixture]
+    fixture.ngZone.run(() => {
+      router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
+        const deleteAction = new campaignActions.CampaignSave({
+          campaign: campaignFixture,
+          updatedFlights: [],
+          createdFlights: [],
+          deletedFlights: [flightFixture]
+        });
+        const success = new campaignActions.CampaignSaveSuccess({
+          campaignDoc,
+          deletedFlightDocs: { [flightFixture.id]: flightDoc },
+          updatedFlightDocs: undefined,
+          createdFlightDocs: undefined
+        });
+        actions$.stream = hot('-a', { a: deleteAction });
+        const expected = cold('-r', { r: success });
+        expect(effects.campaignFormSave$).toBeObservable(expected);
+        expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id]);
+        done();
       });
-      const success = new campaignActions.CampaignSaveSuccess({
-        campaignDoc,
-        deletedFlightDocs: { [flightFixture.id]: flightDoc },
-        updatedFlightDocs: undefined,
-        createdFlightDocs: undefined
-      });
-      actions$.stream = hot('-a', { a: deleteAction });
-      const expected = cold('-r', { r: success });
-      expect(effects.campaignFormSave$).toBeObservable(expected);
-      expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id]);
-      done();
     });
   });
 
