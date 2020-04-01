@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, CampaignStoreService, InventoryZone, Availability } from '../../core';
-import { Flight } from '../store/models';
+import { Flight, FlightZone } from '../store/models';
 import { map } from 'rxjs/operators';
 import {
   selectRoutedLocalFlight,
@@ -24,6 +24,8 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         [flight]="flightLocal$ | async"
         [softDeleted]="softDeleted$ | async"
         (flightUpdate)="flightUpdateFromForm($event)"
+        (flightAddZone)="flightAddZone($event)"
+        (flightRemoveZone)="flightRemoveZone($event)"
         (flightDeleteToggle)="flightDeleteToggle($event)"
         (flightDuplicate)="flightDuplicate($event)"
       ></grove-flight>
@@ -92,6 +94,14 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
     this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
+  }
+
+  flightAddZone(zone: FlightZone) {
+    this.campaignAction.addZone(zone);
+  }
+
+  flightRemoveZone(zone: FlightZone) {
+    this.campaignAction.removeZone(zone);
   }
 
   flightDuplicate(flight: Flight) {

@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Inventory, InventoryZone } from '../../core';
-import { Flight } from '../store/models';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Flight, FlightZone } from '../store/models';
+import { FormBuilder, Validators, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'grove-flight',
@@ -11,7 +11,10 @@ import { FormBuilder, Validators } from '@angular/forms';
 })
 export class FlightComponent implements OnInit {
   @Input() inventory: Inventory[];
+  @Input() zoneOptions: InventoryZone[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
+  @Output() flightAddZone = new EventEmitter<FlightZone>(true);
+  @Output() flightRemoveZone = new EventEmitter<FlightZone>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
 
@@ -41,40 +44,20 @@ export class FlightComponent implements OnInit {
     }
   }
 
-  // tslint:disable-next-line
-  private _zoneOptions: InventoryZone[];
-  get zoneOptions(): InventoryZone[] {
-    return this._zoneOptions;
-  }
-  @Input()
-  set zoneOptions(opts: InventoryZone[]) {
-    this._zoneOptions = opts || [];
-    if (this.zones.value) {
-      const filteredValues = this.zones.value.filter((id: string) => {
-        return this.zoneOptions.find(z => z.id === id);
-      });
-      if (filteredValues.length !== this.zones.value.length) {
-        this.zones.setValue(filteredValues);
-        this.zones.markAsDirty();
-        this.formStatusChanged(this.flightForm.value);
-      }
-    }
-  }
-
   flightForm = this.fb.group({
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
-    zones: ['', Validators.required],
+    zones: this.fb.array([this.zoneControl]),
     set_inventory_uri: ['', Validators.required]
   });
 
-  get name() {
-    return this.flightForm.get('name');
+  get zones() {
+    return this.flightForm.get('zones') as FormArray;
   }
 
-  get zones() {
-    return this.flightForm.get('zones');
+  get zoneControl() {
+    return this.fb.group({id: ['', Validators.required], url: ['']});
   }
 
   constructor(private fb: FormBuilder) {}
@@ -83,6 +66,17 @@ export class FlightComponent implements OnInit {
     this.flightForm.valueChanges.subscribe(cmp => {
       // preserving id on the flight because doesn't exist in form fields
       this.formStatusChanged({ ...cmp, id: this.flight.id });
+    });
+  }
+
+  zoneOptionsFiltered(zoneIndex?: number) {
+    const myZones = (this.flight && this.flight.zones) || [];
+    return (this.zoneOptions || myZones).filter(zone => {
+      if (myZones[zoneIndex] && myZones[zoneIndex].id === zone.id) {
+        return true;
+      } else {
+        return !myZones.find(z => z.id === zone.id);
+      }
     });
   }
 
@@ -110,7 +104,29 @@ export class FlightComponent implements OnInit {
 
   // updates the form from @Input() set flight
   updateFlightForm(flight: Flight) {
+    while (this.zones.length > (flight.zones.length || 1)) {
+      // TODO: what's with the flickering values???
+      this.zones.removeAt(this.zones.length - 1);
+    }
+
+    // NOTE: pushing a new control onto the form array apparently emits
+    // the form-changed event. so give it the correct value BEFORE pushing.
+    while (this.zones.length < flight.zones.length) {
+      const newZone = this.zoneControl;
+      newZone.reset(flight.zones[this.zones.length], { emitEvent: false });
+      this.zones.push(newZone);
+    }
+
+    // reset the form only AFTER all FormArrays match
     this.flightForm.reset(flight, { emitEvent: false });
+  }
+
+  onAddZone() {
+    this.flightAddZone.emit(this.zoneOptionsFiltered().shift());
+  }
+
+  onRemoveZone(index: number) {
+    this.flightRemoveZone.emit(this.flight.zones[index]);
   }
 
   onFlightDuplicate() {
