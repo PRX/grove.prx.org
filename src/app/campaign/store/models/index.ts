@@ -1,3 +1,4 @@
+export * from './account.models';
 export * from './allocation-preview.models';
 export * from './availability.models';
 export * from './campaign.models';

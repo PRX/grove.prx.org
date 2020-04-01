@@ -21,5 +21,8 @@ export enum ActionTypes {
   CAMPAIGN_ALLOCATION_PREVIEW_LOAD_FAILURE = '[Campaign] Allocation Preview Load Failure',
   CAMPAIGN_AVAILABILITY_LOAD = '[Campaign] Availability Load',
   CAMPAIGN_AVAILABILITY_LOAD_SUCCESS = '[Campaign] Availability Load Success',
-  CAMPAIGN_AVAILABILITY_LOAD_FAILURE = '[Campaign] Availability Load Failure'
+  CAMPAIGN_AVAILABILITY_LOAD_FAILURE = '[Campaign] Availability Load Failure',
+  CAMPAIGN_ACCOUNTS_LOAD = '[Campaign] Accounts Load',
+  CAMPAIGN_ACCOUNTS_LOAD_SUCCESS = '[Campaign] Accounts Load Success',
+  CAMPAIGN_ACCOUNTS_LOAD_FAILURE = '[Campaign] Accounts Load Failure'
 }
