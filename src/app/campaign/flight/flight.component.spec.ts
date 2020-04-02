@@ -68,4 +68,63 @@ describe('FlightComponent', () => {
     });
     component.flightForm.patchValue({ endAt: new Date() });
   });
+
+  it('filters zone options based on the current zone', () => {
+    component.flight = flightFixture;
+    component.flight.zones.push({ id: 'post_1' });
+    component.zoneOptions = [
+      { id: 'pre_1', label: 'Preroll 1' },
+      { id: 'pre_2', label: 'Preroll 2' },
+      { id: 'post_1', label: 'Postroll 1' },
+      { id: 'post_2', label: 'Postroll 2' }
+    ];
+    expect(component.zoneOptionsFiltered().map(z => z.id)).toEqual(['pre_2', 'post_2']);
+    expect(component.zoneOptionsFiltered(0).map(z => z.id)).toEqual(['pre_1', 'pre_2', 'post_2']);
+    expect(component.zoneOptionsFiltered(1).map(z => z.id)).toEqual(['pre_2', 'post_1', 'post_2']);
+  });
+
+  it('defaults zone options to the current zone', () => {
+    component.flight = flightFixture;
+    component.zoneOptions = null;
+    expect(component.zoneOptionsFiltered()).toEqual([]);
+    expect(component.zoneOptionsFiltered(0)).toEqual(flightFixture.zones);
+  });
+
+  it('updates zone controls to match the flight', () => {
+    component.flight = { ...flightFixture, zones: [{ id: 'pre_1' }, { id: 'pre_2', url: 'http://file.mp3' }] };
+    expect(component.zones.value).toEqual([{ id: 'pre_1', url: null }, { id: 'pre_2', url: 'http://file.mp3' }]);
+
+    // should keep 1 around - can't have 0 zones
+    component.flight = { ...flightFixture, zones: [] };
+    expect(component.zones.value).toEqual([{ id: null, url: null }]);
+  });
+
+  it('adds and removes zone controls', () => {
+    component.flight = flightFixture;
+    component.zoneOptions = [{ id: 'pre_1', label: 'Preroll 1' }, { id: 'pre_2', label: 'Preroll 2' }];
+    expect(component.zones.value).toEqual([{ id: 'pre_1', url: null }]);
+
+    component.onAddZone();
+    expect(component.zones.value).toEqual([{ id: 'pre_1', url: null }, { id: 'pre_2', url: null }]);
+
+    component.onRemoveZone(0);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: null }]);
+  });
+
+  it('does very basic mp3 validations', () => {
+    component.flight = flightFixture;
+
+    const urlField = component.zones.at(0).get('url');
+    urlField.setValue('');
+    expect(urlField.errors).toEqual(null);
+
+    urlField.setValue('http://this.looks/valid.mp3');
+    expect(urlField.errors).toEqual(null);
+
+    urlField.setValue('ftp://this.is/invalid.mp3');
+    expect(urlField.errors).toEqual({ invalidUrl: { value: 'ftp://this.is/invalid.mp3' } });
+
+    urlField.setValue('http://this.is/notaudio.jpg');
+    expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
+  });
 });
