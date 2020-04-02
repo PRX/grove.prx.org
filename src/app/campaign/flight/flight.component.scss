@@ -46,11 +46,10 @@ mat-card form > * {
     opacity: 0;
   }
 
-  &:hover, &:focus-within {
+  &:hover,
+  &:focus-within {
     &::before {
-      transition:
-        opacity 0.6s cubic-bezier(.25,.8,.25,1),
-        border-color 0.6s cubic-bezier(.25,.8,.25,1);
+      transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
       opacity: 1;
     }
   }
@@ -87,7 +86,7 @@ mat-card form > * {
     }
 
     prx-icon {
-      transition: color 0.6s cubic-bezier(.25,.8,.25,1);
+      transition: color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: unset;
     }
   }
@@ -123,5 +122,4 @@ mat-card form > * {
       }
     }
   }
-
 }

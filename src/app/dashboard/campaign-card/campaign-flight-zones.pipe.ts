@@ -10,8 +10,8 @@ export class CampaignFlightZonesPipe implements PipeTransform {
     const labels = [];
     const labeler = new ZoneLabelPipe();
 
-    for (const flight of (flights || [])) {
-      for (const zone of (flight.zones || [])) {
+    for (const flight of flights || []) {
+      for (const zone of flight.zones || []) {
         const label = labeler.transform(zone);
         if (label && labels.indexOf(label) === -1) {
           labels.push(label);

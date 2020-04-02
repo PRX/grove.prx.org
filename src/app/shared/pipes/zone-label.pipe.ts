@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({name: 'zoneLabel'})
+@Pipe({ name: 'zoneLabel' })
 export class ZoneLabelPipe implements PipeTransform {
   transform(value: any) {
     if (Array.isArray(value)) {

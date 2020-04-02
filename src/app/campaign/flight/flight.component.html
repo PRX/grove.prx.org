@@ -28,7 +28,7 @@
     </mat-form-field>
     <fieldset class="flight-zones" formArrayName="zones">
       <h2>Zones</h2>
-      <div *ngFor="let zone of zones.controls; let i=index" [formGroup]="zone" class="inline-fields">
+      <div *ngFor="let zone of zones.controls; let i = index" [formGroup]="zone" class="inline-fields">
         <mat-form-field class="zone-name" appearance="outline">
           <mat-label>Zone Name</mat-label>
           <mat-select formControlName="id" required>

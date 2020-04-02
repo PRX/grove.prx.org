@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, InventoryZone } from '../../core';
-import { Flight, FlightZone, AvailabilityRollup } from '../store/models';
+import { Flight, AvailabilityRollup } from '../store/models';
 import { map } from 'rxjs/operators';
 import {
   selectRoutedLocalFlight,

@@ -57,7 +57,7 @@ export class FlightComponent implements OnInit {
   }
 
   get zoneControl() {
-    return this.fb.group({id: ['', Validators.required], url: ['']});
+    return this.fb.group({ id: ['', Validators.required], url: [''] });
   }
 
   constructor(private fb: FormBuilder) {}

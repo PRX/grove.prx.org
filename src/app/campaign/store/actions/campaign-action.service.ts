@@ -5,7 +5,7 @@ import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight, FlightZone } from '../models';
+import { Flight } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class CampaignActionService implements OnDestroy {
   }
 
   private getZoneIds(zones: any[]): string[] {
-    return zones.map(z => z ? (z.id || z) : z).filter(z => z);
+    return zones.map(z => (z ? z.id || z : z)).filter(z => z);
   }
 
   loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
@@ -71,8 +71,12 @@ export class CampaignActionService implements OnDestroy {
   }
 
   haveFlightZonesChanged(a: Flight, b: Flight) {
-    const aZones = this.getZoneIds(a.zones).sort().join(',');
-    const bZones = this.getZoneIds(b.zones).sort().join(',');
+    const aZones = this.getZoneIds(a.zones)
+      .sort()
+      .join(',');
+    const bZones = this.getZoneIds(b.zones)
+      .sort()
+      .join(',');
     return aZones !== bZones;
   }
 
@@ -102,15 +106,25 @@ export class CampaignActionService implements OnDestroy {
   }
 
   addFlight() {
-    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
-    });
+    this.store
+      .pipe(
+        select(selectCampaignId),
+        first()
+      )
+      .subscribe(campaignId => {
+        this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
+      });
   }
 
   dupFlight(flight: Flight) {
-    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new campaignActions.CampaignDupFlight({ campaignId, flight }));
-    });
+    this.store
+      .pipe(
+        select(selectCampaignId),
+        first()
+      )
+      .subscribe(campaignId => {
+        this.store.dispatch(new campaignActions.CampaignDupFlight({ campaignId, flight }));
+      });
   }
 
   deleteRoutedFlightToggle() {
@@ -173,7 +187,10 @@ export class CampaignActionService implements OnDestroy {
 
   saveCampaignAndFlights() {
     this.store
-      .pipe(select(selectCampaignWithFlightsForSave), first())
+      .pipe(
+        select(selectCampaignWithFlightsForSave),
+        first()
+      )
       .subscribe(({ campaign, updatedFlights, createdFlights, deletedFlights }) =>
         this.store.dispatch(new campaignActions.CampaignSave({ campaign, updatedFlights, createdFlights, deletedFlights }))
       );
