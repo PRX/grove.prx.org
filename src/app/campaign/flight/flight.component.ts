@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Inventory, InventoryZone } from '../../core';
 import { Flight } from '../store/models';
-import { FormBuilder, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, Validators, FormArray, FormGroup, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'grove-flight',
@@ -57,7 +57,7 @@ export class FlightComponent implements OnInit {
   }
 
   get zoneControl() {
-    return this.fb.group({ id: ['', Validators.required], url: [''] });
+    return this.fb.group({ id: ['', Validators.required], url: ['', this.validateMp3] });
   }
 
   constructor(private fb: FormBuilder) {}
@@ -141,5 +141,20 @@ export class FlightComponent implements OnInit {
 
   onFlightDeleteToggle() {
     this.flightDeleteToggle.emit();
+  }
+
+  checkInvalidUrl(zone: FormGroup, type: string): boolean {
+    return zone.get('url').hasError(type);
+  }
+
+  validateMp3(control: AbstractControl): { [key: string]: any } | null {
+    if (control.value) {
+      if (!control.value.match(/^http(s)?:\/\//)) {
+        return { invalidUrl: { value: control.value } };
+      } else if (!control.value.endsWith('.mp3')) {
+        return { notMp3: { value: control.value } };
+      }
+    }
+    return null;
   }
 }
