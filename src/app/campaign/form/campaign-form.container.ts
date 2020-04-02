@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AccountService, Account, Advertiser, AdvertiserService } from '../../core';
+import { AccountService, Account, Advertiser, AdvertiserStateService } from '../../core';
 import { Campaign } from '../store/models';
 import { selectLocalCampaign } from '../store/selectors';
 import * as campaignActions from '../store/actions/campaign-action.creator';
@@ -24,7 +24,7 @@ export class CampaignFormContainerComponent implements OnInit {
   accounts$: Observable<Account[]> = this.accountService.accounts;
   advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
 
-  constructor(private store: Store<any>, private accountService: AccountService, private advertiserService: AdvertiserService) {}
+  constructor(private store: Store<any>, private accountService: AccountService, private advertiserService: AdvertiserStateService) {}
 
   ngOnInit() {
     this.campaign$ = this.store.pipe(select(selectLocalCampaign));

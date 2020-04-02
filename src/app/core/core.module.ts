@@ -4,6 +4,7 @@ import { HeaderModule, FooterModule, HalService, ModalModule, ModalService, Toas
 import { AuguryService } from './augury.service';
 import { AccountService } from './account/account.service';
 import { AdvertiserService } from './advertiser/advertiser.service';
+import { AdvertiserStateService } from './advertiser/advertiser-state.service';
 import { AllocationPreviewService } from './allocation/allocation-preview.service';
 import { CampaignService } from './campaign/campaign.service';
 import { UserService } from './user/user.service';
@@ -17,6 +18,7 @@ import { InventoryService } from './inventory/inventory.service';
     AuguryService,
     AccountService,
     AdvertiserService,
+    AdvertiserStateService,
     AllocationPreviewService,
     InventoryService,
     CampaignService,

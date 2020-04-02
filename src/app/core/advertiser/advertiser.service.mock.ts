@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { Advertiser } from './advertiser.service';
+import { Advertiser } from './advertiser-state.service';
 
 export const advertisers = [
   {

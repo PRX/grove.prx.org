@@ -6,7 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Store, StoreModule } from '@ngrx/store';
 import { of } from 'rxjs';
 import { MockHalService } from 'ngx-prx-styleguide';
-import { AccountService, AdvertiserService } from '../../core';
+import { AccountService, AdvertiserStateService } from '../../core';
 import { AdvertiserServiceMock } from '../../core/advertiser/advertiser.service.mock';
 import { SharedModule } from '../../shared/shared.module';
 import { reducers } from '../store';
@@ -43,7 +43,7 @@ describe('CampaignFormContainerComponent', () => {
           useValue: { loadAccounts: jest.fn(() => of([])) }
         },
         {
-          provide: AdvertiserService,
+          provide: AdvertiserStateService,
           useValue: advertiserService
         }
       ]

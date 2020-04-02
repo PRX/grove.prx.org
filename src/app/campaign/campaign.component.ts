@@ -15,7 +15,7 @@ import {
   selectChanged
 } from './store/selectors';
 import * as campaignActions from './store/actions/campaign-action.creator';
-import { AdvertiserService, AccountService } from '../core';
+import { AdvertiserStateService, AccountService } from '../core';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 
 @Component({
@@ -64,7 +64,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     private store: Store<any>,
     private campaignActionService: CampaignActionService,
     private accountService: AccountService,
-    private advertiserService: AdvertiserService
+    private advertiserService: AdvertiserStateService
   ) {}
 
   ngOnInit() {

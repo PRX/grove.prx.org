@@ -8,7 +8,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../store/router-store/custom-router-serializer';
 import { of } from 'rxjs';
-import { AccountService, AdvertiserService, AuguryService, InventoryService } from '../core';
+import { AccountService, AdvertiserStateService, AuguryService, InventoryService } from '../core';
 import { AllocationPreviewService } from '../core/allocation/allocation-preview.service';
 import { AccountServiceMock } from '../core/account/account.service.mock';
 import { AdvertiserServiceMock } from '../core/advertiser/advertiser.service.mock';
@@ -64,7 +64,7 @@ describe('CampaignComponent', () => {
           useValue: new AccountServiceMock()
         },
         {
-          provide: AdvertiserService,
+          provide: AdvertiserStateService,
           useValue: new AdvertiserServiceMock(new MockHalService())
         },
         {
