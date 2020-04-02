@@ -27,7 +27,7 @@ describe('Flight Selectors', () => {
 
   it('should select routed local flight zones', () => {
     const zones = flightSelectors.selectRoutedLocalFlightZones.projector(campaignStateFactory.flightFixture);
-    expect(zones).toEqual(campaignStateFactory.flightFixture.zones);
+    expect(zones).toEqual(campaignStateFactory.flightFixture.zones.map(z => z.id));
   });
 
   it('should select current/routed local flight inventory uri', () => {

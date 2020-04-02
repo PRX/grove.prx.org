@@ -3,7 +3,7 @@ import { filterUnderscores } from './haldoc.utils';
 
 export interface FlightZone {
   id: string;
-  label: string;
+  label?: string;
   url?: string;
   fileSize?: number;
   mimeType?: string;

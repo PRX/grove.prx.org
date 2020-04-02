@@ -41,13 +41,13 @@
           <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
           <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
         </mat-form-field>
-        <div *ngIf="zones.length > 1" class="remove-zone mat-form-field-wrapper">
+        <div *ngIf="zones?.length > 1" class="remove-zone mat-form-field-wrapper">
           <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
-      <div class="add-zone" *ngIf="zones.length < zoneOptions.length">
+      <div class="add-zone" *ngIf="zones?.length < zoneOptions?.length">
         <a mat-button routerLink="." (click)="onAddZone()"><mat-icon>add</mat-icon> Add a creative</a>
       </div>
     </fieldset>

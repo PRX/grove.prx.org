@@ -37,7 +37,7 @@ describe('FlightComponent', () => {
       startAt,
       endAt,
       totalGoal: 123,
-      zones: [],
+      zones: [{ id: 'pre_1' }],
       set_inventory_uri: '/some/inventory'
     };
     fixture = TestBed.createComponent(FlightComponent);
@@ -67,17 +67,5 @@ describe('FlightComponent', () => {
       done();
     });
     component.flightForm.patchValue({ endAt: new Date() });
-  });
-
-  it('filters zones to reflect available options', () => {
-    component.flight = { ...flightFixture, zones: ['pre_1', 'mid_1'] };
-    expect(component.zones.value).toEqual(['pre_1', 'mid_1']);
-    component.zoneOptions = [
-      { id: 'pre_1', label: 'Preroll 1' },
-      { id: 'post_1', label: 'Postroll 1' }
-    ];
-    expect(component.zones.value).toEqual(['pre_1']);
-    component.zoneOptions = [];
-    expect(component.zones.value).toEqual([]);
   });
 });

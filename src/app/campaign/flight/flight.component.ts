@@ -52,6 +52,10 @@ export class FlightComponent implements OnInit {
     set_inventory_uri: ['', Validators.required]
   });
 
+  get name() {
+    return this.flightForm.get('name');
+  }
+
   get zones() {
     return this.flightForm.get('zones') as FormArray;
   }
@@ -71,7 +75,8 @@ export class FlightComponent implements OnInit {
 
   zoneOptionsFiltered(zoneIndex?: number) {
     const myZones = (this.flight && this.flight.zones) || [];
-    return (this.zoneOptions || myZones).filter(zone => {
+    const options = this.zoneOptions || <InventoryZone[]>myZones;
+    return options.filter(zone => {
       if (myZones[zoneIndex] && myZones[zoneIndex].id === zone.id) {
         return true;
       } else {

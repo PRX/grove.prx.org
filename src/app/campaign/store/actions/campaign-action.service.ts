@@ -100,7 +100,7 @@ export class CampaignActionService implements OnDestroy {
         endAt,
         totalGoal,
         dailyMinimum,
-        zones: this.getZoneIds(zones)
+        zones
       })
     );
   }
@@ -178,7 +178,7 @@ export class CampaignActionService implements OnDestroy {
               endAt,
               totalGoal,
               dailyMinimum,
-              zones: this.getZoneIds(zones)
+              zones
             })
           );
         });

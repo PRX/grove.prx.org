@@ -2,7 +2,7 @@ import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
 import { selectRouterStateParams } from '../../../store/router-store/router.selectors';
-import { Flight, FlightZone, FlightState } from '../models';
+import { Flight, FlightState } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/flight.reducer';
 import { HalDoc } from 'ngx-prx-styleguide';
 

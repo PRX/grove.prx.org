@@ -14,7 +14,7 @@ export const docToAllocationPreviewParams = (doc: HalDoc) => ({
   endAt: new Date(doc['endAt']),
   name: doc['name'],
   totalGoal: doc['totalGoal'],
-  zones: doc['zones'].map((z: any) => z.id)
+  zones: doc['zones'] || []
 });
 
 export const docToAllocationPreview = (allocation: any): AllocationPreview => {

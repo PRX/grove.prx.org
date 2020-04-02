@@ -20,7 +20,7 @@ export class AllocationPreviewService {
             endAt,
             totalGoal,
             dailyMinimum,
-            zones
+            zones: this.getZoneIds(zones)
           })
         )
       ) as HalObservable<HalDoc>;
@@ -32,9 +32,13 @@ export class AllocationPreviewService {
         endAt,
         totalGoal,
         dailyMinimum,
-        zones
+        zones: this.getZoneIds(zones)
       });
     }
     return preview;
+  }
+
+  private getZoneIds(zones: any[]): string[] {
+    return zones.map(z => (z ? z.id || z : z)).filter(z => z);
   }
 }

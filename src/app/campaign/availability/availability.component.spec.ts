@@ -58,7 +58,7 @@ describe('AvailabilityComponent', () => {
     startAt: new Date('2019-10-01'),
     endAt: new Date('2019-11-01'),
     totalGoal: 999,
-    zones: ['pre_1'],
+    zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     set_inventory_uri: '/some/inventory'
   };
   const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
