@@ -88,22 +88,6 @@ export function reducer(state = initialState, action: CampaignActions): State {
         state
       );
     }
-    case ActionTypes.CAMPAIGN_FLIGHT_ADD_ZONE: {
-      const { flightId: id, zone: zone } = action.payload;
-      const zones = (state.entities[id].localFlight.zones || []).concat(zone);
-      return adapter.updateOne(
-        { id, changes: { localFlight: { ...state.entities[id].localFlight, zones }, changed: true } },
-        state
-      );
-    }
-    case ActionTypes.CAMPAIGN_FLIGHT_REMOVE_ZONE: {
-      const { flightId: id, zone: zone } = action.payload;
-      const zones = (state.entities[id].localFlight.zones || []).filter(z => z.id !== zone.id);
-      return adapter.updateOne(
-        { id, changes: { localFlight: { ...state.entities[id].localFlight, zones }, changed: true } },
-        state
-      );
-    }
     case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
       let newState = state;
       const { deletedFlightDocs, updatedFlightDocs, createdFlightDocs } = action.payload;

@@ -38,6 +38,10 @@ export class CampaignActionService implements OnDestroy {
       });
   }
 
+  private getZoneIds(zones: any[]): string[] {
+    return zones.map(z => z ? (z.id || z) : z).filter(z => z);
+  }
+
   loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
     if (this.isDateRangeValid(formFlight) && this.haveAvailabilityParamsChanged(formFlight, localFlight)) {
       this.loadAvailability({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
@@ -62,14 +66,20 @@ export class CampaignActionService implements OnDestroy {
         a.startAt.getTime() !== b.startAt.getTime() ||
         a.endAt.getTime() !== b.endAt.getTime() ||
         a.set_inventory_uri !== b.set_inventory_uri ||
-        !a.zones.every(zone => b.zones.indexOf(zone) > -1))
+        this.haveFlightZonesChanged(a, b))
     );
+  }
+
+  haveFlightZonesChanged(a: Flight, b: Flight) {
+    const aZones = this.getZoneIds(a.zones).sort().join(',');
+    const bZones = this.getZoneIds(b.zones).sort().join(',');
+    return aZones !== bZones;
   }
 
   loadAvailability(flight: Flight) {
     const { id: flightId, createdAt, set_inventory_uri, startAt: startDate, endAt: endDate, zones } = flight;
     const inventoryId = set_inventory_uri.split('/').pop();
-    zones.forEach(zone => {
+    this.getZoneIds(zones).forEach(zone => {
       this.store.dispatch(new availabilityActions.AvailabilityLoad({ inventoryId, startDate, endDate, zone, createdAt, flightId }));
     });
   }
@@ -86,7 +96,7 @@ export class CampaignActionService implements OnDestroy {
         endAt,
         totalGoal,
         dailyMinimum,
-        zones
+        zones: this.getZoneIds(zones)
       })
     );
   }
@@ -95,26 +105,6 @@ export class CampaignActionService implements OnDestroy {
     this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
       this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
     });
-  }
-
-  addZone(zone: FlightZone) {
-    this.store
-      .pipe(
-        select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
-        first()
-      )
-      .subscribe(state => this.store.dispatch(new campaignActions.CampaignFlightAddZone({ flightId: state.id, zone: zone })));
-  }
-
-  removeZone(zone: FlightZone) {
-    this.store
-      .pipe(
-        select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
-        first()
-      )
-      .subscribe(state => this.store.dispatch(new campaignActions.CampaignFlightRemoveZone({ flightId: state.id, zone: zone })));
   }
 
   dupFlight(flight: Flight) {
@@ -174,7 +164,7 @@ export class CampaignActionService implements OnDestroy {
               endAt,
               totalGoal,
               dailyMinimum,
-              zones
+              zones: this.getZoneIds(zones)
             })
           );
         });

@@ -15,8 +15,6 @@ export enum ActionTypes {
   CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID = '[Campaign] Dup Flight With Temp Id',
   CAMPAIGN_DELETE_FLIGHT = '[Campaign] Delete Flight',
   CAMPAIGN_FLIGHT_FORM_UPDATE = '[Campaign] Flight Form Update',
-  CAMPAIGN_FLIGHT_ADD_ZONE = '[Campaign] Flight Add Zone',
-  CAMPAIGN_FLIGHT_REMOVE_ZONE = '[Campaign] Flight Remove Zone',
   CAMPAIGN_FLIGHT_SET_GOAL = '[Campaign] Flight Set Goal',
   CAMPAIGN_ALLOCATION_PREVIEW_LOAD = '[Campaign] Allocation Preview Load',
   CAMPAIGN_ALLOCATION_PREVIEW_LOAD_SUCCESS = '[Campaign] Allocation Preview Load Success',

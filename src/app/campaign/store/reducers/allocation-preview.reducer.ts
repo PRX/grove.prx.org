@@ -12,7 +12,7 @@ export interface State extends EntityState<AllocationPreview> {
   name: string;
   totalGoal: number;
   set_inventory_uri: string;
-  zones: string[];
+  zones: {id: string}[];
   error?: any;
 }
 

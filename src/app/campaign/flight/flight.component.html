@@ -45,7 +45,7 @@
           </button>
         </div>
       </div>
-      <div class="add-zone">
+      <div class="add-zone" *ngIf="zones.length < zoneOptions.length">
         <a mat-button routerLink="." (click)="onAddZone()"><mat-icon>add</mat-icon> Add a creative</a>
       </div>
     </fieldset>

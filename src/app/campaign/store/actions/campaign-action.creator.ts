@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 import { ActionTypes } from './action.types';
-import { Campaign, Flight, FlightZone, CampaignFormSave } from '../models';
+import { Campaign, Flight, CampaignFormSave } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export class CampaignNew implements Action {
@@ -104,18 +104,6 @@ export class CampaignFlightSetGoal implements Action {
   constructor(public payload: { flightId: number; totalGoal: number; dailyMinimum: number; valid: boolean }) {}
 }
 
-export class CampaignFlightAddZone implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_ADD_ZONE;
-
-  constructor(public payload: { flightId: number; zone: FlightZone }) {}
-}
-
-export class CampaignFlightRemoveZone implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_REMOVE_ZONE;
-
-  constructor(public payload: { flightId: number; zone: FlightZone }) {}
-}
-
 export type CampaignActions =
   | CampaignNew
   | CampaignLoadOptions
@@ -126,8 +114,6 @@ export type CampaignActions =
   | CampaignSetAdvertiser
   | CampaignFlightFormUpdate
   | CampaignFlightSetGoal
-  | CampaignFlightAddZone
-  | CampaignFlightRemoveZone
   | CampaignAddFlight
   | CampaignAddFlightWithTempId
   | CampaignDupFlight

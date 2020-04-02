@@ -25,8 +25,6 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         [flight]="flightLocal$ | async"
         [softDeleted]="softDeleted$ | async"
         (flightUpdate)="flightUpdateFromForm($event)"
-        (flightAddZone)="flightAddZone($event)"
-        (flightRemoveZone)="flightRemoveZone($event)"
         (flightDeleteToggle)="flightDeleteToggle($event)"
         (flightDuplicate)="flightDuplicate($event)"
       ></grove-flight>
@@ -89,14 +87,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   onGoalChange(flight: Flight, dailyMinimum: number) {
     this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
-  }
-
-  flightAddZone(zone: FlightZone) {
-    this.campaignAction.addZone(zone);
-  }
-
-  flightRemoveZone(zone: FlightZone) {
-    this.campaignAction.removeZone(zone);
   }
 
   flightDuplicate(flight: Flight) {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Inventory, InventoryZone } from '../../core';
-import { Flight, FlightZone } from '../store/models';
+import { Flight } from '../store/models';
 import { FormBuilder, Validators, FormArray } from '@angular/forms';
 
 @Component({
@@ -10,11 +10,11 @@ import { FormBuilder, Validators, FormArray } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightComponent implements OnInit {
+  private emitFormUpdates = false;
+
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
-  @Output() flightAddZone = new EventEmitter<FlightZone>(true);
-  @Output() flightRemoveZone = new EventEmitter<FlightZone>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
 
@@ -48,7 +48,7 @@ export class FlightComponent implements OnInit {
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
-    zones: this.fb.array([this.zoneControl]),
+    zones: this.fb.array([]),
     set_inventory_uri: ['', Validators.required]
   });
 
@@ -82,11 +82,13 @@ export class FlightComponent implements OnInit {
 
   // emits updates when reactive form fields change
   formStatusChanged(flight?: Flight) {
-    this.flightUpdate.emit({
-      flight: { ...flight, totalGoal: this.flight.totalGoal },
-      changed: this.flightForm.dirty,
-      valid: this.flightForm.valid
-    });
+    if (this.emitFormUpdates) {
+      this.flightUpdate.emit({
+        flight: { ...flight, totalGoal: this.flight.totalGoal },
+        changed: this.flightForm.dirty,
+        valid: this.flightForm.valid
+      });
+    }
   }
 
   onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
@@ -104,29 +106,33 @@ export class FlightComponent implements OnInit {
 
   // updates the form from @Input() set flight
   updateFlightForm(flight: Flight) {
+    this.emitFormUpdates = false;
+
+    // get the correct number of zone fields
     while (this.zones.length > (flight.zones.length || 1)) {
-      // TODO: what's with the flickering values???
       this.zones.removeAt(this.zones.length - 1);
+      this.zones.markAsPristine();
+    }
+    while (this.zones.length < (flight.zones.length || 1)) {
+      this.zones.push(this.zoneControl);
+      this.zones.markAsPristine();
     }
 
-    // NOTE: pushing a new control onto the form array apparently emits
-    // the form-changed event. so give it the correct value BEFORE pushing.
-    while (this.zones.length < flight.zones.length) {
-      const newZone = this.zoneControl;
-      newZone.reset(flight.zones[this.zones.length], { emitEvent: false });
-      this.zones.push(newZone);
-    }
-
-    // reset the form only AFTER all FormArrays match
+    // reset the form, then re-enable emiting
     this.flightForm.reset(flight, { emitEvent: false });
+    this.emitFormUpdates = true;
   }
 
   onAddZone() {
-    this.flightAddZone.emit(this.zoneOptionsFiltered().shift());
+    const newZone = this.zoneControl;
+    newZone.reset(this.zoneOptionsFiltered().shift());
+    this.zones.markAsDirty();
+    this.zones.push(newZone);
   }
 
   onRemoveZone(index: number) {
-    this.flightRemoveZone.emit(this.flight.zones[index]);
+    this.zones.markAsDirty();
+    this.zones.removeAt(index);
   }
 
   onFlightDuplicate() {

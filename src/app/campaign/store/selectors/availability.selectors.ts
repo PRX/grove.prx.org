@@ -20,7 +20,7 @@ export const selectRoutedFlightAvailabilityEntities = createSelector(
     entities &&
     flight &&
     flight.zones.reduce(
-      (acc, zone) => ({ ...acc, ...(entities[`${flight.id}_${zone}`] && { [`${flight.id}_${zone}`]: entities[`${flight.id}_${zone}`] }) }),
+      (acc, zone) => ({ ...acc, ...(entities[`${flight.id}_${zone.id}`] && { [`${flight.id}_${zone.id}`]: entities[`${flight.id}_${zone.id}`] }) }),
       {}
     )
 );
