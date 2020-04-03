@@ -10,9 +10,10 @@ import * as campaignActions from '../store/actions/campaign-action.creator';
   selector: 'grove-campaign-form.container',
   template: `
     <grove-campaign-form
-      [campaign]="campaign$ | async"
-      [accounts]="accounts$ | async"
-      [advertisers]="advertisers$ | async"
+      *ngIf="{ campaigns: campaign$ | async, accounts: accounts$ | async, advertisers: advertisers$ | async } as data"
+      [campaign]="data.campaigns"
+      [accounts]="data.accounts"
+      [advertisers]="data.advertisers"
       (campaignUpdate)="campaignUpdateFromForm($event)"
       (addAdvertiser)="onAddAdvertiser($event)"
     ></grove-campaign-form>
