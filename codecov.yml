@@ -16,7 +16,9 @@ coverage:
     patch: true
     project: true
 ignore:
+  - 'src/jestGlobalMocks.ts'
   - '*.factory.ts'
+
 parsers:
   gcov:
     branch_detection:

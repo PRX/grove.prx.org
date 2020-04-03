@@ -154,7 +154,7 @@ export class FlightComponent implements OnInit {
     this.flightDeleteToggle.emit();
   }
 
-  checkInvalidUrl(zone: FormGroup, type: string): boolean {
+  checkInvalidUrl(zone: AbstractControl, type: string): boolean {
     return zone.get('url').hasError(type);
   }
 

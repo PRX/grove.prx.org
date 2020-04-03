@@ -60,6 +60,39 @@ describe('FlightComponent', () => {
     component.name.setValue('brand new name');
   });
 
+  it('emits date range changes', done => {
+    const startAt = new Date('2019-10-20');
+    component.flight = flightFixture;
+    component.flightUpdate.subscribe(updates => {
+      expect(updates).toMatchObject({ flight: { ...flightFixture, startAt }, changed: true });
+      done();
+    });
+    component.onDateRangeChange({ startAt });
+  });
+
+  it('emits flight duplicate', done => {
+    component.flight = flightFixture;
+    component.flightDuplicate.subscribe(toDup => {
+      expect(toDup).toMatchObject(flightFixture);
+      done();
+    });
+    component.onFlightDuplicate();
+  });
+
+  it('emits flight delete toggle', done => {
+    component.flightDeleteToggle.subscribe(() => done());
+    component.onFlightDeleteToggle();
+  });
+
+  it('disables controls on soft delete', done => {
+    component.flight = flightFixture;
+    expect(component.name.disabled).toEqual(false);
+    component.softDeleted = true;
+    expect(component.name.disabled).toEqual(true);
+    component.softDeleted = false;
+    expect(component.name.disabled).toEqual(false);
+  });
+
   it('preserves totalGoal when emitting form changes', done => {
     component.flight = flightFixture;
     component.flightUpdate.subscribe(flightUpdate => {
@@ -123,17 +156,23 @@ describe('FlightComponent', () => {
   it('does very basic mp3 validations', () => {
     component.flight = flightFixture;
 
-    const urlField = component.zones.at(0).get('url');
+    const zone = component.zones.at(0);
+    const urlField = zone.get('url');
+
     urlField.setValue('');
     expect(urlField.errors).toEqual(null);
 
     urlField.setValue('http://this.looks/valid.mp3');
     expect(urlField.errors).toEqual(null);
+    expect(component.checkInvalidUrl(zone, 'invalidUrl')).toEqual(false);
+    expect(component.checkInvalidUrl(zone, 'notMp3')).toEqual(false);
 
     urlField.setValue('ftp://this.is/invalid.mp3');
     expect(urlField.errors).toEqual({ invalidUrl: { value: 'ftp://this.is/invalid.mp3' } });
+    expect(component.checkInvalidUrl(zone, 'invalidUrl')).toEqual(true);
 
     urlField.setValue('http://this.is/notaudio.jpg');
     expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
+    expect(component.checkInvalidUrl(zone, 'notMp3')).toEqual(true);
   });
 });
