@@ -97,16 +97,18 @@ export class FlightComponent implements OnInit {
   }
 
   onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
-    this.flightUpdate.emit({
-      flight: {
-        ...this.flight,
-        ...(startAt && { startAt }),
-        ...(endAt && { endAt }),
-        totalGoal: this.flight.totalGoal
-      },
-      changed: true,
-      valid: this.flightForm.valid
-    });
+    if (this.emitFormUpdates) {
+      this.flightUpdate.emit({
+        flight: {
+          ...this.flight,
+          ...(startAt && { startAt }),
+          ...(endAt && { endAt }),
+          totalGoal: this.flight.totalGoal
+        },
+        changed: true,
+        valid: this.flightForm.valid
+      });
+    }
   }
 
   // updates the form from @Input() set flight
