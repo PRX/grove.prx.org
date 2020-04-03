@@ -10,7 +10,7 @@ import { ActionTypes } from '../actions/action.types';
 export class AdvertiserEffects {
   @Effect()
   loadAdvertisers$ = this.actions$.pipe(
-    ofType(ActionTypes.CAMPAIGN_ACCOUNTS_LOAD),
+    ofType(ActionTypes.CAMPAIGN_ADVERTISERS_LOAD),
     switchMap(() => this.advertiserService.loadAdvertisers()),
     map(docs => new advertiserActions.AdvertisersLoadSuccess({ docs })),
     catchError(error => of(new advertiserActions.AdvertisersLoadFailure({ error })))

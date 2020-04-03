@@ -1,4 +1,5 @@
 import { HalDoc } from 'ngx-prx-styleguide';
+import { filterUnderscores } from './haldoc.utils';
 
 export interface Advertiser {
   id: number;
@@ -7,7 +8,7 @@ export interface Advertiser {
 }
 
 export const docToAdvertiser = (doc: HalDoc): Advertiser => {
-  const advertiser = doc.asJSON() as Advertiser;
+  const advertiser = filterUnderscores(doc) as Advertiser;
   advertiser.set_advertiser_uri = doc.expand('self');
   return advertiser;
 };

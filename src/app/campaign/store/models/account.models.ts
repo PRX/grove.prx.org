@@ -1,4 +1,5 @@
 import { HalDoc } from 'ngx-prx-styleguide';
+import { filterUnderscores } from './haldoc.utils';
 
 export interface Account {
   id: number;
@@ -7,7 +8,7 @@ export interface Account {
 }
 
 export const docToAccount = (doc: HalDoc): Account => {
-  const account = doc.asJSON() as Account;
+  const account = filterUnderscores(doc) as Account;
   account.self_uri = doc.expand('self');
   return account;
 };

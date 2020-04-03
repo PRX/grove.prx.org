@@ -4,12 +4,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Store, StoreModule } from '@ngrx/store';
-import { of } from 'rxjs';
-import { MockHalService } from 'ngx-prx-styleguide';
-import { AccountService, AdvertiserStateService } from '../../core';
-import { AdvertiserServiceMock } from '../../core/advertiser/advertiser.service.mock';
 import { SharedModule } from '../../shared/shared.module';
 import { reducers } from '../store';
+import * as advertiserActions from '../store/actions/advertiser-action.creator';
 import * as campaignActions from '../store/actions/campaign-action.creator';
 import { CampaignFormContainerComponent } from './campaign-form.container';
 import { CampaignFormComponent } from './campaign-form.component';
@@ -21,7 +18,6 @@ describe('CampaignFormContainerComponent', () => {
   let de: DebugElement;
   let el: HTMLElement;
   let store: Store<any>;
-  const advertiserService = new AdvertiserServiceMock(new MockHalService());
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -36,17 +32,7 @@ describe('CampaignFormContainerComponent', () => {
         StoreModule.forRoot({}),
         StoreModule.forFeature('campaignState', reducers)
       ],
-      declarations: [CampaignFormContainerComponent, CampaignFormComponent],
-      providers: [
-        {
-          provide: AccountService,
-          useValue: { loadAccounts: jest.fn(() => of([])) }
-        },
-        {
-          provide: AdvertiserStateService,
-          useValue: advertiserService
-        }
-      ]
+      declarations: [CampaignFormContainerComponent, CampaignFormComponent]
     })
       .compileComponents()
       .then(() => {
@@ -68,12 +54,8 @@ describe('CampaignFormContainerComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignFormUpdate({ campaign: campaignFixture, changed, valid }));
   });
 
-  it('sets the campaign after adding a new advertiser', done => {
+  it('dispatches action to add a new advertiser', () => {
     component.onAddAdvertiser('Squarespace');
-    advertiserService.advertisers.subscribe(advertisers => {
-      const { set_advertiser_uri } = advertisers[advertisers.length - 1];
-      expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignSetAdvertiser({ set_advertiser_uri }));
-      done();
-    });
+    expect(store.dispatch).toHaveBeenCalledWith(new advertiserActions.AddAdvertiser({ name: 'Squarespace' }));
   });
 });

@@ -1,5 +1,7 @@
 import { ActionTypes } from '../actions/action.types';
+import { AdvertiserActions } from '../actions/advertiser-action.creator';
 import { CampaignActions } from '../actions/campaign-action.creator';
+import { docToAdvertiser } from '../models/advertiser.models';
 import { CampaignState, docToCampaign } from '../models/campaign.models';
 
 export const initialState: CampaignState = {
@@ -19,11 +21,8 @@ export const initialState: CampaignState = {
   saving: false
 };
 
-export function reducer(state = initialState, action: CampaignActions): CampaignState {
+export function reducer(state = initialState, action: CampaignActions | AdvertiserActions): CampaignState {
   switch (action.type) {
-    case ActionTypes.CAMPAIGN_LOAD_OPTIONS: {
-      return { ...state, loading: true, loaded: false };
-    }
     case ActionTypes.CAMPAIGN_NEW: {
       return { ...initialState, loading: false, loaded: true };
     }
@@ -39,17 +38,19 @@ export function reducer(state = initialState, action: CampaignActions): Campaign
         valid
       };
     }
-    case ActionTypes.CAMPAIGN_SET_ADVERTISER: {
-      const { set_advertiser_uri } = action.payload;
+    case ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS: {
+      const { set_advertiser_uri } = docToAdvertiser(action.payload.doc);
       return {
         ...state,
         localCampaign: {
           ...state.localCampaign,
           set_advertiser_uri
         },
-        changed: true
+        changed: true,
+        valid: true
       };
     }
+    case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD:
     case ActionTypes.CAMPAIGN_LOAD: {
       return {
         ...state,

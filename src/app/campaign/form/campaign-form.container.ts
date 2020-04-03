@@ -1,10 +1,11 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { AccountService, Account, Advertiser, AdvertiserStateService } from '../../core';
+import { Account, Advertiser } from '../store/models';
 import { Campaign } from '../store/models';
-import { selectLocalCampaign } from '../store/selectors';
+import { selectLocalCampaign, selectAllAccounts, selectAllAdvertisers } from '../store/selectors';
 import * as campaignActions from '../store/actions/campaign-action.creator';
+import * as advertiserActions from '../store/actions/advertiser-action.creator';
 
 @Component({
   selector: 'grove-campaign-form.container',
@@ -21,13 +22,15 @@ import * as campaignActions from '../store/actions/campaign-action.creator';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignFormContainerComponent implements OnInit {
+  accounts$: Observable<Account[]>;
+  advertisers$: Observable<Advertiser[]>;
   campaign$: Observable<Campaign>;
-  accounts$: Observable<Account[]> = this.accountService.accounts;
-  advertisers$: Observable<Advertiser[]> = this.advertiserService.advertisers;
 
-  constructor(private store: Store<any>, private accountService: AccountService, private advertiserService: AdvertiserStateService) {}
+  constructor(private store: Store<any>) {}
 
   ngOnInit() {
+    this.accounts$ = this.store.pipe(select(selectAllAccounts));
+    this.advertisers$ = this.store.pipe(select(selectAllAdvertisers));
     this.campaign$ = this.store.pipe(select(selectLocalCampaign));
   }
 
@@ -36,12 +39,6 @@ export class CampaignFormContainerComponent implements OnInit {
   }
 
   onAddAdvertiser(name: string) {
-    const post = this.advertiserService.addAdvertiser(name);
-
-    post.subscribe(result => {
-      this.store.dispatch(new campaignActions.CampaignSetAdvertiser({ set_advertiser_uri: result.set_advertiser_uri }));
-      // TODO: how are we notifying in this app, material or the ol' toast?
-      // this.toastr.success('Advertiser added');
-    });
+    this.store.dispatch(new advertiserActions.AddAdvertiser({ name }));
   }
 }

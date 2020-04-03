@@ -7,10 +7,6 @@ export class CampaignNew implements Action {
   readonly type = ActionTypes.CAMPAIGN_NEW;
 }
 
-export class CampaignLoadOptions implements Action {
-  readonly type = ActionTypes.CAMPAIGN_LOAD_OPTIONS;
-}
-
 export class CampaignLoad implements Action {
   readonly type = ActionTypes.CAMPAIGN_LOAD;
 
@@ -31,12 +27,6 @@ export class CampaignFormUpdate implements Action {
   readonly type = ActionTypes.CAMPAIGN_FORM_UPDATE;
 
   constructor(public payload: { campaign: Campaign; changed: boolean; valid: boolean }) {}
-}
-
-export class CampaignSetAdvertiser implements Action {
-  readonly type = ActionTypes.CAMPAIGN_SET_ADVERTISER;
-
-  constructor(public payload: { set_advertiser_uri }) {}
 }
 
 export class CampaignSave implements Action {
@@ -106,12 +96,10 @@ export class CampaignFlightSetGoal implements Action {
 
 export type CampaignActions =
   | CampaignNew
-  | CampaignLoadOptions
   | CampaignLoad
   | CampaignLoadSuccess
   | CampaignLoadFailure
   | CampaignFormUpdate
-  | CampaignSetAdvertiser
   | CampaignFlightFormUpdate
   | CampaignFlightSetGoal
   | CampaignAddFlight

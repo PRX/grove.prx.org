@@ -21,6 +21,7 @@ export function reducer(state = initialState, action: AdvertiserActions): State 
     case ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS: {
       return { ...adapter.addOne(docToAdvertiser(action.payload.doc), state) };
     }
+    case ActionTypes.CAMPAIGN_ADD_ADVERTISER_FAILURE:
     case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_FAILURE: {
       return { ...state, error: action.payload.error };
     }

@@ -52,7 +52,7 @@ describe('AvailabilityEffects', () => {
     inventoryService = TestBed.get(InventoryService);
   }));
 
-  it('should load allocation preview', () => {
+  it('should load availability', () => {
     const success = new availabilityActions.AvailabilityLoadSuccess({ doc, params: availabilityParamsFixture });
 
     actions$.stream = hot('-a', { a: loadAction });
@@ -60,7 +60,7 @@ describe('AvailabilityEffects', () => {
     expect(effects.loadAvailability$).toBeObservable(expected);
   });
 
-  it('should return allocation preview load failure action on error', () => {
+  it('should return availability load failure action on error', () => {
     const halError = new HalHttpError(500, 'error occurred');
     // '#' throws this error in the stream instead of emitting a response
     const errorResponse = cold('#', {}, halError);

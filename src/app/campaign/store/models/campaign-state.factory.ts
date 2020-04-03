@@ -3,10 +3,11 @@ import { CampaignStoreState } from '..';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { selectId as selectAllocationPreviewId } from '../reducers/allocation-preview.reducer';
 import { Account, docToAccount } from './account.models';
+import { Advertiser } from './advertiser.models';
 import { AllocationPreview, docToAllocationPreview } from './allocation-preview.models';
+import { AvailabilityDay, docToAvailabilityDay } from './availability.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
-import { docToAvailabilityDay, AvailabilityDay } from './availability.models';
 
 const augury = new MockHalService();
 
@@ -27,6 +28,32 @@ export const createAccountState = () => ({
   account: {
     ids: accountsFixture.map(account => account.id),
     entities: accountsFixture.reduce((acc, account) => ({ ...acc, [account.id]: account }), {})
+  }
+});
+
+export const advertisersFixture: Advertiser[] = [
+  {
+    id: 1,
+    set_advertiser_uri: '/some/uri/1',
+    name: 'Adidas'
+  },
+  {
+    id: 2,
+    set_advertiser_uri: '/some/uri/2',
+    name: 'Griddy'
+  },
+  {
+    id: 3,
+    set_advertiser_uri: '/some/uri/3',
+    name: 'Toyota'
+  }
+];
+export const advertiserDocsFixture = advertisersFixture.map(a => ({ ...a, _links: { self: { href: a.set_advertiser_uri } } }));
+
+export const createAdvertiserState = () => ({
+  advertiser: {
+    ids: advertisersFixture.map(advertiser => advertiser.id),
+    entities: advertisersFixture.reduce((acc, advertiser) => ({ ...acc, [advertiser.id]: advertiser }), {})
   }
 });
 
@@ -219,12 +246,14 @@ export const createRouterState = () => ({
 
 export const createCampaignStoreState = ({
   account = createAccountState(),
+  advertiser = createAdvertiserState(),
   allocationPreview = createAllocationPreviewState(),
   availability = createAvailabilityState(),
   campaignState = createCampaignState(),
   flightsState = createFlightsState(campaignState.campaign.doc)
 } = {}): CampaignStoreState => ({
   ...account,
+  ...advertiser,
   ...allocationPreview,
   ...availability,
   ...campaignState,
