@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, AbstractControl, Validators, ValidatorFn } from '@angular/forms';
 import { Account, Advertiser } from '../../core';
 import { Campaign } from '../store/models';
 
@@ -50,7 +50,7 @@ export class CampaignFormComponent implements OnInit {
     status: ['', Validators.required],
     repName: ['', Validators.required],
     notes: [''],
-    set_advertiser_uri: ['', Validators.required]
+    set_advertiser_uri: ['', [Validators.required, this.advertiserInvalid.bind(this)]]
   });
 
   get set_account_uri() {
@@ -120,5 +120,12 @@ export class CampaignFormComponent implements OnInit {
 
   onAddAdvertiser(name: string) {
     this.addAdvertiser.emit(name);
+  }
+
+  advertiserInvalid({ value }: AbstractControl) {
+    const valid = this.advertisers && !!this.advertisers.find(advertiser => advertiser.set_advertiser_uri === value);
+    // valid: returns null
+    // invalid: returns { advertiserInvalid: true } when advertiser entry does not exist (name was entered but not yet added)
+    return !valid ? { advertiserInvalid: !valid } : null;
   }
 }
