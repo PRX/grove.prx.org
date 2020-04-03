@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Inventory, InventoryZone } from '../../core';
 import { Flight } from '../store/models';
-import { FormBuilder, Validators, FormArray, FormGroup, AbstractControl } from '@angular/forms';
+import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 
 @Component({
   selector: 'grove-flight',
