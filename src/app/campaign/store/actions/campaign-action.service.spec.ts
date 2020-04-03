@@ -18,7 +18,7 @@ describe('CampaignActionService', () => {
   let store: Store<any>;
   let service: CampaignActionService;
   let fixture: ComponentFixture<TestComponent>;
-  let dispatchSpy: any;
+  let dispatchSpy;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

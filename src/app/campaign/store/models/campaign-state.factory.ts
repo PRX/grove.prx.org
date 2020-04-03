@@ -56,7 +56,7 @@ export const flightDocFixture = {
   }
 };
 
-export const createFlightsState = (campaignDoc: any) => ({
+export const createFlightsState = campaignDoc => ({
   flights: {
     ids: [flightFixture.id],
     entities: {

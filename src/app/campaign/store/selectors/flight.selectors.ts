@@ -6,32 +6,16 @@ import { Flight, FlightState } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/flight.reducer';
 import { HalDoc } from 'ngx-prx-styleguide';
 
-export const selectFlightsState = createSelector(
-  selectCampaignStoreState,
-  (state: CampaignStoreState) => state && state.flights
-);
-export const selectFlightIds = createSelector(
-  selectFlightsState,
-  selectIds
-);
-export const selectFlightEntities = createSelector(
-  selectFlightsState,
-  selectEntities
-);
-export const selectAllFlights = createSelector(
-  selectFlightsState,
-  selectAll
+export const selectFlightsState = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.flights);
+export const selectFlightIds = createSelector(selectFlightsState, selectIds);
+export const selectFlightEntities = createSelector(selectFlightsState, selectEntities);
+export const selectAllFlights = createSelector(selectFlightsState, selectAll);
+
+export const selectAllFlightsOrderByCreatedAt = createSelector(selectAllFlights, flights =>
+  flights.sort((a, b) => (a.localFlight.createdAt || a.id).valueOf() - (b.localFlight.createdAt || b.id).valueOf())
 );
 
-export const selectAllFlightsOrderByCreatedAt = createSelector(
-  selectAllFlights,
-  flights => flights.sort((a, b) => (a.localFlight.createdAt || a.id).valueOf() - (b.localFlight.createdAt || b.id).valueOf())
-);
-
-export const selectRoutedFlightId = createSelector(
-  selectRouterStateParams,
-  (params): number => params && +params.flightId
-);
+export const selectRoutedFlightId = createSelector(selectRouterStateParams, (params): number => params && +params.flightId);
 export const selectRoutedFlight = createSelector(
   selectFlightEntities,
   selectRoutedFlightId,

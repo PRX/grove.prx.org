@@ -106,25 +106,15 @@ export class CampaignActionService implements OnDestroy {
   }
 
   addFlight() {
-    this.store
-      .pipe(
-        select(selectCampaignId),
-        first()
-      )
-      .subscribe(campaignId => {
-        this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
-      });
+    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
+      this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
+    });
   }
 
   dupFlight(flight: Flight) {
-    this.store
-      .pipe(
-        select(selectCampaignId),
-        first()
-      )
-      .subscribe(campaignId => {
-        this.store.dispatch(new campaignActions.CampaignDupFlight({ campaignId, flight }));
-      });
+    this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
+      this.store.dispatch(new campaignActions.CampaignDupFlight({ campaignId, flight }));
+    });
   }
 
   deleteRoutedFlightToggle() {
@@ -187,10 +177,7 @@ export class CampaignActionService implements OnDestroy {
 
   saveCampaignAndFlights() {
     this.store
-      .pipe(
-        select(selectCampaignWithFlightsForSave),
-        first()
-      )
+      .pipe(select(selectCampaignWithFlightsForSave), first())
       .subscribe(({ campaign, updatedFlights, createdFlights, deletedFlights }) =>
         this.store.dispatch(new campaignActions.CampaignSave({ campaign, updatedFlights, createdFlights, deletedFlights }))
       );

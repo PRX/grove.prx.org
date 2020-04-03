@@ -4,7 +4,10 @@ describe('ZoneLabelPipe', () => {
   const pipe = new ZoneLabelPipe();
 
   it('displays zone labels', () => {
-    const zones = [{ id: '1', label: 'One' }, { id: '2', label: 'Two' }];
+    const zones = [
+      { id: '1', label: 'One' },
+      { id: '2', label: 'Two' }
+    ];
     expect(pipe.transform(zones)).toMatch('One, Two');
   });
 
@@ -14,7 +17,10 @@ describe('ZoneLabelPipe', () => {
   });
 
   it('also allows the deprecated zone-name key', () => {
-    const zones = [{ id: '1', name: 'One' }, { id: '2', zoneName: 'Two' }];
+    const zones = [
+      { id: '1', name: 'One' },
+      { id: '2', zoneName: 'Two' }
+    ];
     expect(pipe.transform(zones)).toMatch('One, Two');
   });
 
