@@ -73,8 +73,12 @@ export class FlightComponent implements OnInit {
     });
   }
 
+  // zone options to the control at an index (include currently selected zone
+  // name, but remove zones selected by other controls)
   zoneOptionsFiltered(zoneIndex?: number) {
     const myZones = (this.flight && this.flight.zones) || [];
+
+    // if zoneOptions hasn't loaded yet, use flight.zones as options
     const options = this.zoneOptions || <InventoryZone[]>myZones;
     return options.filter(zone => {
       if (myZones[zoneIndex] && myZones[zoneIndex].id === zone.id) {
