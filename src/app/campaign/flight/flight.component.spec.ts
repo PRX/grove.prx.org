@@ -84,7 +84,7 @@ describe('FlightComponent', () => {
     component.onFlightDeleteToggle();
   });
 
-  it('disables controls on soft delete', done => {
+  it('disables controls on soft delete', () => {
     component.flight = flightFixture;
     expect(component.name.disabled).toEqual(false);
     component.softDeleted = true;
