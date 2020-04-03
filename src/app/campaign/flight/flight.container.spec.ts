@@ -65,7 +65,7 @@ describe('FlightContainerComponent', () => {
     startAt: new Date('2019-10-01'),
     endAt: new Date('2019-11-01'),
     set_inventory_uri: '/some/url',
-    zones: ['pre_1'],
+    zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     totalGoal: 999
   };
 

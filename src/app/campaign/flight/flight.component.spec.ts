@@ -37,7 +37,7 @@ describe('FlightComponent', () => {
       startAt,
       endAt,
       totalGoal: 123,
-      zones: [],
+      zones: [{ id: 'pre_1' }],
       set_inventory_uri: '/some/inventory'
     };
     fixture = TestBed.createComponent(FlightComponent);
@@ -60,6 +60,39 @@ describe('FlightComponent', () => {
     component.name.setValue('brand new name');
   });
 
+  it('emits date range changes', done => {
+    const startAt = new Date('2019-10-20');
+    component.flight = flightFixture;
+    component.flightUpdate.subscribe(updates => {
+      expect(updates).toMatchObject({ flight: { ...flightFixture, startAt }, changed: true });
+      done();
+    });
+    component.onDateRangeChange({ startAt });
+  });
+
+  it('emits flight duplicate', done => {
+    component.flight = flightFixture;
+    component.flightDuplicate.subscribe(toDup => {
+      expect(toDup).toMatchObject(flightFixture);
+      done();
+    });
+    component.onFlightDuplicate();
+  });
+
+  it('emits flight delete toggle', done => {
+    component.flightDeleteToggle.subscribe(() => done());
+    component.onFlightDeleteToggle();
+  });
+
+  it('disables controls on soft delete', () => {
+    component.flight = flightFixture;
+    expect(component.name.disabled).toEqual(false);
+    component.softDeleted = true;
+    expect(component.name.disabled).toEqual(true);
+    component.softDeleted = false;
+    expect(component.name.disabled).toEqual(false);
+  });
+
   it('preserves totalGoal when emitting form changes', done => {
     component.flight = flightFixture;
     component.flightUpdate.subscribe(flightUpdate => {
@@ -69,15 +102,77 @@ describe('FlightComponent', () => {
     component.flightForm.patchValue({ endAt: new Date() });
   });
 
-  it('filters zones to reflect available options', () => {
-    component.flight = { ...flightFixture, zones: ['pre_1', 'mid_1'] };
-    expect(component.zones.value).toEqual(['pre_1', 'mid_1']);
+  it('filters zone options based on the current zone', () => {
+    component.flight = flightFixture;
+    component.flight.zones.push({ id: 'post_1' });
     component.zoneOptions = [
       { id: 'pre_1', label: 'Preroll 1' },
-      { id: 'post_1', label: 'Postroll 1' }
+      { id: 'pre_2', label: 'Preroll 2' },
+      { id: 'post_1', label: 'Postroll 1' },
+      { id: 'post_2', label: 'Postroll 2' }
     ];
-    expect(component.zones.value).toEqual(['pre_1']);
-    component.zoneOptions = [];
-    expect(component.zones.value).toEqual([]);
+    expect(component.zoneOptionsFiltered().map(z => z.id)).toEqual(['pre_2', 'post_2']);
+    expect(component.zoneOptionsFiltered(0).map(z => z.id)).toEqual(['pre_1', 'pre_2', 'post_2']);
+    expect(component.zoneOptionsFiltered(1).map(z => z.id)).toEqual(['pre_2', 'post_1', 'post_2']);
+  });
+
+  it('defaults zone options to the current zone', () => {
+    component.flight = flightFixture;
+    component.zoneOptions = null;
+    expect(component.zoneOptionsFiltered()).toEqual([]);
+    expect(component.zoneOptionsFiltered(0)).toEqual(flightFixture.zones);
+  });
+
+  it('updates zone controls to match the flight', () => {
+    component.flight = { ...flightFixture, zones: [{ id: 'pre_1' }, { id: 'pre_2', url: 'http://file.mp3' }] };
+    expect(component.zones.value).toEqual([
+      { id: 'pre_1', url: null },
+      { id: 'pre_2', url: 'http://file.mp3' }
+    ]);
+
+    // should keep 1 around - can't have 0 zones
+    component.flight = { ...flightFixture, zones: [] };
+    expect(component.zones.value).toEqual([{ id: null, url: null }]);
+  });
+
+  it('adds and removes zone controls', () => {
+    component.flight = flightFixture;
+    component.zoneOptions = [
+      { id: 'pre_1', label: 'Preroll 1' },
+      { id: 'pre_2', label: 'Preroll 2' }
+    ];
+    expect(component.zones.value).toEqual([{ id: 'pre_1', url: null }]);
+
+    component.onAddZone();
+    expect(component.zones.value).toEqual([
+      { id: 'pre_1', url: null },
+      { id: 'pre_2', url: null }
+    ]);
+
+    component.onRemoveZone(0);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: null }]);
+  });
+
+  it('does very basic mp3 validations', () => {
+    component.flight = flightFixture;
+
+    const zone = component.zones.at(0);
+    const urlField = zone.get('url');
+
+    urlField.setValue('');
+    expect(urlField.errors).toEqual(null);
+
+    urlField.setValue('http://this.looks/valid.mp3');
+    expect(urlField.errors).toEqual(null);
+    expect(component.checkInvalidUrl(zone, 'invalidUrl')).toEqual(false);
+    expect(component.checkInvalidUrl(zone, 'notMp3')).toEqual(false);
+
+    urlField.setValue('ftp://this.is/invalid.mp3');
+    expect(urlField.errors).toEqual({ invalidUrl: { value: 'ftp://this.is/invalid.mp3' } });
+    expect(component.checkInvalidUrl(zone, 'invalidUrl')).toEqual(true);
+
+    urlField.setValue('http://this.is/notaudio.jpg');
+    expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
+    expect(component.checkInvalidUrl(zone, 'notMp3')).toEqual(true);
   });
 });

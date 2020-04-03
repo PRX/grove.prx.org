@@ -5,7 +5,7 @@ import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight } from '../models';
+import { Flight, getFlightZoneIds } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 
 @Injectable()
@@ -62,14 +62,24 @@ export class CampaignActionService implements OnDestroy {
         a.startAt.getTime() !== b.startAt.getTime() ||
         a.endAt.getTime() !== b.endAt.getTime() ||
         a.set_inventory_uri !== b.set_inventory_uri ||
-        !a.zones.every(zone => b.zones.indexOf(zone) > -1))
+        this.haveFlightZonesChanged(a, b))
     );
+  }
+
+  haveFlightZonesChanged(a: Flight, b: Flight) {
+    const aZones = getFlightZoneIds(a.zones)
+      .sort()
+      .join(',');
+    const bZones = getFlightZoneIds(b.zones)
+      .sort()
+      .join(',');
+    return aZones !== bZones;
   }
 
   loadAvailability(flight: Flight) {
     const { id: flightId, createdAt, set_inventory_uri, startAt: startDate, endAt: endDate, zones } = flight;
     const inventoryId = set_inventory_uri.split('/').pop();
-    zones.forEach(zone => {
+    getFlightZoneIds(zones).forEach(zone => {
       this.store.dispatch(new availabilityActions.AvailabilityLoad({ inventoryId, startDate, endDate, zone, createdAt, flightId }));
     });
   }

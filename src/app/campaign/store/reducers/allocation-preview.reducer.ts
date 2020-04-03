@@ -12,11 +12,12 @@ export interface State extends EntityState<AllocationPreview> {
   name: string;
   totalGoal: number;
   set_inventory_uri: string;
-  zones: string[];
+  zones: { id: string }[];
   error?: any;
 }
 
-export const selectId = allocationPreview => allocationPreview.zone + '_' + allocationPreview.date.toISOString().slice(0, 10);
+export const selectId = (allocationPreview: AllocationPreview) =>
+  allocationPreview.zone + '_' + allocationPreview.date.toISOString().slice(0, 10);
 export const adapter: EntityAdapter<AllocationPreview> = createEntityAdapter<AllocationPreview>({
   selectId
 });
@@ -40,7 +41,7 @@ export function reducer(state = initialState, action: AllocationPreviewActions):
       return adapter.removeAll({ ...state, flightId, set_inventory_uri, error: null });
     }
     case ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD_SUCCESS: {
-      const allocations = action.payload.allocationPreviewDoc['allocations'].map(allocation => docToAllocationPreview(allocation));
+      const allocations = action.payload.allocationPreviewDoc['allocations'].map((allocation: any) => docToAllocationPreview(allocation));
       return adapter.addAll(allocations, { ...state, ...docToAllocationPreviewParams(action.payload.allocationPreviewDoc) });
     }
     case ActionTypes.CAMPAIGN_ALLOCATION_PREVIEW_LOAD_FAILURE: {

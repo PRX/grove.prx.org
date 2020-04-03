@@ -27,7 +27,7 @@ describe('AvailabilityEffects', () => {
     inventoryId: flightFixture.set_inventory_uri.split('/').pop(),
     startDate: flightFixture.startAt,
     endDate: flightFixture.endAt,
-    zone: flightFixture.zones[0],
+    zone: flightFixture.zones[0].id,
     flightId: flightFixture.id,
     createdAt: new Date()
   });
