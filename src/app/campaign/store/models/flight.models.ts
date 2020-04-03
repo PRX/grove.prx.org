@@ -41,3 +41,7 @@ export const docToFlight = (doc: HalDoc): Flight => {
   flight.set_inventory_uri = doc.expand('prx:inventory');
   return flight;
 };
+
+export const getFlightZoneIds = (zones: any[]): string[] => {
+  return zones.filter(z => z).map(z => z.id || z);
+};

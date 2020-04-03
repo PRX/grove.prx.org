@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { HalObservable, HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
+import { getFlightZoneIds } from '../../campaign/store/models';
 
 @Injectable()
 export class AllocationPreviewService {
@@ -20,7 +21,7 @@ export class AllocationPreviewService {
             endAt,
             totalGoal,
             dailyMinimum,
-            zones: this.getZoneIds(zones)
+            zones: getFlightZoneIds(zones)
           })
         )
       ) as HalObservable<HalDoc>;
@@ -32,13 +33,9 @@ export class AllocationPreviewService {
         endAt,
         totalGoal,
         dailyMinimum,
-        zones: this.getZoneIds(zones)
+        zones: getFlightZoneIds(zones)
       });
     }
     return preview;
-  }
-
-  private getZoneIds(zones: any[]): string[] {
-    return zones.map(z => (z ? z.id || z : z)).filter(z => z);
   }
 }

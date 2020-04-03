@@ -5,7 +5,7 @@ import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight } from '../models';
+import { Flight, getFlightZoneIds } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
 
 @Injectable()
@@ -38,10 +38,6 @@ export class CampaignActionService implements OnDestroy {
       });
   }
 
-  private getZoneIds(zones: any[]): string[] {
-    return zones.map(z => (z ? z.id || z : z)).filter(z => z);
-  }
-
   loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
     if (this.isDateRangeValid(formFlight) && this.haveAvailabilityParamsChanged(formFlight, localFlight)) {
       this.loadAvailability({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
@@ -71,10 +67,10 @@ export class CampaignActionService implements OnDestroy {
   }
 
   haveFlightZonesChanged(a: Flight, b: Flight) {
-    const aZones = this.getZoneIds(a.zones)
+    const aZones = getFlightZoneIds(a.zones)
       .sort()
       .join(',');
-    const bZones = this.getZoneIds(b.zones)
+    const bZones = getFlightZoneIds(b.zones)
       .sort()
       .join(',');
     return aZones !== bZones;
@@ -83,7 +79,7 @@ export class CampaignActionService implements OnDestroy {
   loadAvailability(flight: Flight) {
     const { id: flightId, createdAt, set_inventory_uri, startAt: startDate, endAt: endDate, zones } = flight;
     const inventoryId = set_inventory_uri.split('/').pop();
-    this.getZoneIds(zones).forEach(zone => {
+    getFlightZoneIds(zones).forEach(zone => {
       this.store.dispatch(new availabilityActions.AvailabilityLoad({ inventoryId, startDate, endDate, zone, createdAt, flightId }));
     });
   }
