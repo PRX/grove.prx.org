@@ -26,7 +26,10 @@ export const selectRoutedLocalFlight = createSelector(
   selectRoutedFlight,
   (flightState: FlightState): Flight => flightState && flightState.localFlight
 );
-export const selectRoutedLocalFlightZones = createSelector(selectRoutedLocalFlight, (flight: Flight): string[] => flight && flight.zones);
+export const selectRoutedLocalFlightZones = createSelector(
+  selectRoutedLocalFlight,
+  (flight: Flight): string[] => flight && flight.zones && flight.zones.map(z => z.id)
+);
 export const selectCurrentInventoryUri = createSelector(
   selectRoutedLocalFlight,
   (flight: Flight): string => flight && flight.set_inventory_uri

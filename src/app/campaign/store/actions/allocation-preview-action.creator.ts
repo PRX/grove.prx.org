@@ -15,7 +15,7 @@ export class AllocationPreviewLoad implements Action {
       endAt: Date;
       totalGoal: number;
       dailyMinimum: number;
-      zones: string[];
+      zones: { id: string }[];
     }
   ) {}
 }

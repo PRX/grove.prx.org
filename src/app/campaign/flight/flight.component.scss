@@ -1,4 +1,5 @@
 @import '~src/sass/variables';
+@import '~src/sass/colors';
 
 mat-card {
   min-height: 400px;
@@ -21,12 +22,12 @@ mat-card form > * {
   padding-bottom: 1.1em;
 }
 
-.flight-dates {
+.inline-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-column-gap: 0.5rem;
 }
-.flight-dates > prx-datepicker {
+.inline-fields > prx-datepicker {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 3rem;
@@ -45,11 +46,10 @@ mat-card form > * {
     opacity: 0;
   }
 
-  &:hover, &:focus-within {
+  &:hover,
+  &:focus-within {
     &::before {
-      transition:
-        opacity 0.6s cubic-bezier(.25,.8,.25,1),
-        border-color 0.6s cubic-bezier(.25,.8,.25,1);
+      transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
       opacity: 1;
     }
   }
@@ -86,7 +86,7 @@ mat-card form > * {
     }
 
     prx-icon {
-      transition: color 0.6s cubic-bezier(.25,.8,.25,1);
+      transition: color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: unset;
     }
   }
@@ -98,5 +98,28 @@ mat-card form > * {
   .mat-fab {
     flex: none;
     margin-left: 1em;
+  }
+}
+
+.flight-zones {
+  h2 {
+    margin-bottom: 0.5em;
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .inline-fields {
+    grid-template-columns: 1fr 3fr 40px;
+  }
+  .remove-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    button {
+      color: mat-color($prx-gray, 300);
+      &:hover {
+        background-color: transparent;
+        color: mat-color($prx-gray, 600);
+      }
+    }
   }
 }

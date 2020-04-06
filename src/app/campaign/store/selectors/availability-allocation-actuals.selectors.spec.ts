@@ -14,7 +14,7 @@ describe('Availability-Allocation-Actuals Combination Selectors', () => {
       campaignStateFactory.availabilityEntities,
       entities,
       campaignStateFactory.flightFixture.id,
-      campaignStateFactory.flightFixture.zones
+      campaignStateFactory.flightFixture.zones.map(z => z.id)
     );
     const firstSaturday = withMissingData.findIndex(day => day.date.getUTCDay() === 6);
     expect(rollups[0].weeks[0].numbers.allocationPreview).toEqual(
@@ -27,7 +27,7 @@ describe('Availability-Allocation-Actuals Combination Selectors', () => {
       campaignStateFactory.availabilityEntities,
       campaignStateFactory.allocationPreviewEntities,
       campaignStateFactory.flightFixture.id,
-      campaignStateFactory.flightFixture.zones
+      campaignStateFactory.flightFixture.zones.map(z => z.id)
     );
     expect(rollups.length).toEqual(campaignStateFactory.flightFixture.zones.length);
     expect(rollups[0].params).toEqual(campaignStateFactory.availabilityParamsFixture);

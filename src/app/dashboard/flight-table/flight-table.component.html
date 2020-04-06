@@ -24,7 +24,7 @@
         Actuals
       </th>
       <td mat-cell *matCellDef="let element">{{ element.actualCount | largeNumber }}</td>
-      <td mat-footer-cell *matFooterCellDef> {{totalActuals | largeNumber}} </td>
+      <td mat-footer-cell *matFooterCellDef>{{ totalActuals | largeNumber }}</td>
     </ng-container>
 
     <ng-container matColumnDef="total_goal" cssClassFriendlyName>
@@ -32,7 +32,7 @@
         Goal
       </th>
       <td mat-cell *matCellDef="let element">{{ element.totalGoal | largeNumber }}</td>
-      <td mat-footer-cell *matFooterCellDef> {{totalGoals | largeNumber}} </td>
+      <td mat-footer-cell *matFooterCellDef>{{ totalGoals | largeNumber }}</td>
     </ng-container>
 
     <ng-container matColumnDef="status" cssClassFriendlyName>
@@ -73,7 +73,7 @@
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Zone
       </th>
-      <td mat-cell *matCellDef="let element">{{ element?.zones.join(', ') }}</td>
+      <td mat-cell *matCellDef="let element">{{ element?.zones | zoneLabel }}</td>
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>
 
