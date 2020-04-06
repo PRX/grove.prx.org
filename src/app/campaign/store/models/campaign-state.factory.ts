@@ -128,7 +128,7 @@ export const allocationPreviewParamsFixture = {
   endAt: flightFixture.endAt,
   name: flightFixture.name,
   set_inventory_uri: flightFixture.set_inventory_uri,
-  zones: flightFixture.zones,
+  zones: flightFixture.zones.map(zone => ({ id: zone.id })),
   dailyMinimum: 90,
   totalGoal: flightFixture.totalGoal
 };
