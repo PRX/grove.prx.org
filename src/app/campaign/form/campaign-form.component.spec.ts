@@ -1,10 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { CampaignFormComponent } from './campaign-form.component';
 import { Campaign } from '../store/models';
 import { SharedModule } from '../../shared/shared.module';
+import { advertisersFixture } from '../store/models/campaign-state.factory';
 
 describe('CampaignFormComponent', () => {
   let component: CampaignFormComponent;
@@ -81,5 +82,10 @@ describe('CampaignFormComponent', () => {
     );
     component.updateCampaignForm({ set_advertiser_uri: null } as Campaign);
     expect(component.campaignForm.patchValue).toHaveBeenCalledWith({ set_advertiser_uri: null }, { emitEvent: false, onlySelf: true });
+  });
+
+  it('validates the advertiser has been added', () => {
+    component.advertisers = advertisersFixture;
+    expect(component.validateAdvertiser(new FormControl({ value: 'nope' }))).toEqual({ advertiserInvalid: true });
   });
 });

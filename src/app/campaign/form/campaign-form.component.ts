@@ -50,7 +50,7 @@ export class CampaignFormComponent implements OnInit {
     status: ['', Validators.required],
     repName: ['', Validators.required],
     notes: [''],
-    set_advertiser_uri: ['', [Validators.required, this.advertiserInvalid.bind(this)]]
+    set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]]
   });
 
   get set_account_uri() {
@@ -122,10 +122,11 @@ export class CampaignFormComponent implements OnInit {
     this.addAdvertiser.emit(name);
   }
 
-  advertiserInvalid({ value }: AbstractControl) {
-    const valid = this.advertisers && !!this.advertisers.find(advertiser => advertiser.set_advertiser_uri === value);
-    // valid: returns null
-    // invalid: returns { advertiserInvalid: true } when advertiser entry does not exist (name was entered but not yet added)
-    return !valid ? { advertiserInvalid: !valid } : null;
+  validateAdvertiser({ value }: AbstractControl) {
+    // valid: advertiser exists in advertiser list
+    if (value && this.advertisers && !!this.advertisers.find(advertiser => advertiser.set_advertiser_uri === value)) {
+      return null;
+    }
+    return { advertiserInvalid: true };
   }
 }
