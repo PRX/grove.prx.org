@@ -153,21 +153,7 @@ export class CampaignActionService implements OnDestroy {
           first()
         )
         .subscribe(flight => {
-          const { createdAt, set_inventory_uri, name, startAt, endAt, zones } = flight;
-          // TODO s/b calling load method for action
-          this.store.dispatch(
-            new allocationPreviewActions.AllocationPreviewLoad({
-              flightId,
-              createdAt,
-              set_inventory_uri,
-              name,
-              startAt,
-              endAt,
-              totalGoal,
-              dailyMinimum,
-              zones
-            })
-          );
+          this.loadAllocationPreview(flight, dailyMinimum);
         });
     }
   }
