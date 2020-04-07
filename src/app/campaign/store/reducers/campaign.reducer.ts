@@ -46,8 +46,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
           ...state.localCampaign,
           set_advertiser_uri
         },
-        changed: true,
-        valid: true
+        changed: true
       };
     }
     case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD:
