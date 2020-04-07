@@ -1,13 +1,61 @@
 import { Dictionary } from '@ngrx/entity';
 import { CampaignStoreState } from '..';
-import { MockHalService } from 'ngx-prx-styleguide';
+import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
 import { selectId as selectAllocationPreviewId } from '../reducers/allocation-preview.reducer';
+import { Account, docToAccount } from './account.models';
+import { Advertiser } from './advertiser.models';
+import { AllocationPreview, docToAllocationPreview } from './allocation-preview.models';
+import { AvailabilityDay, docToAvailabilityDay } from './availability.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
-import { docToAllocationPreview, AllocationPreview } from './allocation-preview.models';
-import { docToAvailabilityDay, AvailabilityDay } from './availability.models';
 
 const augury = new MockHalService();
+
+export const accountsData = [
+  {
+    id: 1,
+    name: 'Person',
+    self_uri: '/api/v1/accounts/1'
+  },
+  {
+    id: 28,
+    name: 'A Group Account',
+    self_uri: '/api/v1/accounts/28'
+  }
+];
+export const accountsFixture: Account[] = accountsData.map(doc => docToAccount(new MockHalDoc(doc)));
+export const createAccountState = () => ({
+  account: {
+    ids: accountsFixture.map(account => account.id),
+    entities: accountsFixture.reduce((acc, account) => ({ ...acc, [account.id]: account }), {})
+  }
+});
+
+export const advertisersFixture: Advertiser[] = [
+  {
+    id: 1,
+    set_advertiser_uri: '/some/uri/1',
+    name: 'Adidas'
+  },
+  {
+    id: 2,
+    set_advertiser_uri: '/some/uri/2',
+    name: 'Griddy'
+  },
+  {
+    id: 3,
+    set_advertiser_uri: '/some/uri/3',
+    name: 'Toyota'
+  }
+];
+export const advertiserDocsFixture = advertisersFixture.map(a => ({ ...a, _links: { self: { href: a.set_advertiser_uri } } }));
+
+export const createAdvertiserState = () => ({
+  advertiser: {
+    ids: advertisersFixture.map(advertiser => advertiser.id),
+    entities: advertisersFixture.reduce((acc, advertiser) => ({ ...acc, [advertiser.id]: advertiser }), {})
+  }
+});
 
 export const campaignFixture: Campaign = {
   id: 1,
@@ -80,7 +128,7 @@ export const allocationPreviewParamsFixture = {
   endAt: flightFixture.endAt,
   name: flightFixture.name,
   set_inventory_uri: flightFixture.set_inventory_uri,
-  zones: flightFixture.zones,
+  zones: flightFixture.zones.map(zone => ({ id: zone.id })),
   dailyMinimum: 90,
   totalGoal: flightFixture.totalGoal
 };
@@ -197,13 +245,17 @@ export const createRouterState = () => ({
 });
 
 export const createCampaignStoreState = ({
-  campaignState = createCampaignState(),
-  flightsState = createFlightsState(campaignState.campaign.doc),
+  account = createAccountState(),
+  advertiser = createAdvertiserState(),
   allocationPreview = createAllocationPreviewState(),
-  availability = createAvailabilityState()
+  availability = createAvailabilityState(),
+  campaignState = createCampaignState(),
+  flightsState = createFlightsState(campaignState.campaign.doc)
 } = {}): CampaignStoreState => ({
-  ...campaignState,
-  ...flightsState,
+  ...account,
+  ...advertiser,
   ...allocationPreview,
-  ...availability
+  ...availability,
+  ...campaignState,
+  ...flightsState
 });

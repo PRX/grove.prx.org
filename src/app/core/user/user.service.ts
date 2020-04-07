@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { of, combineLatest, Observable, BehaviorSubject } from 'rxjs';
-import { concatMap, first } from 'rxjs/operators';
+import { of, combineLatest, Observable, ReplaySubject } from 'rxjs';
+import { concatMap, first, filter } from 'rxjs/operators';
 import { AuthService, UserinfoService, Userinfo, HalDoc } from 'ngx-prx-styleguide';
 import { Env } from '../core.env';
 
@@ -14,7 +14,7 @@ export class UserService {
   userinfo: Userinfo;
 
   // tslint:disable-next-line: variable-name
-  private _userDoc = new BehaviorSubject(null);
+  private _userDoc = new ReplaySubject<HalDoc>(1);
   get userDoc(): Observable<HalDoc> {
     return this._userDoc.asObservable();
   }
@@ -35,20 +35,22 @@ export class UserService {
             return of([]);
           }
         }),
-        concatMap(([token, userinfo]) => {
-          if (token) {
-            this.loggedIn = true;
-            this.authorized = this.authService.parseToken(token);
-          } else {
-            this.loggedIn = false;
+        concatMap(
+          ([token, userinfo]): Observable<HalDoc> => {
+            if (token) {
+              this.loggedIn = true;
+              this.authorized = this.authService.parseToken(token);
+            } else {
+              this.loggedIn = false;
+            }
+            if (userinfo) {
+              this.userinfo = userinfo;
+              return this.userinfoService.getUserDoc(userinfo);
+            } else {
+              return of();
+            }
           }
-          if (userinfo) {
-            this.userinfo = userinfo;
-            return this.userinfoService.getUserDoc(userinfo);
-          } else {
-            return of();
-          }
-        })
+        )
       )
       .subscribe(doc => {
         this._userDoc.next(doc);
@@ -65,6 +67,9 @@ export class UserService {
   }
 
   get defaultAccount(): Observable<HalDoc> {
-    return this.userDoc.pipe(concatMap(doc => (doc ? doc.follow('prx:default-account') : of(null))));
+    return this.userDoc.pipe(
+      filter(doc => !!doc),
+      concatMap(doc => doc.follow('prx:default-account'))
+    );
   }
 }

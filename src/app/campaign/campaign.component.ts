@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { FlightState } from './store/models';
 import {
@@ -14,8 +13,9 @@ import {
   selectValid,
   selectChanged
 } from './store/selectors';
+import * as accountActions from './store/actions/account-action.creator';
+import * as advertiserActions from './store/actions/advertiser-action.creator';
 import * as campaignActions from './store/actions/campaign-action.creator';
-import { AdvertiserService, AccountService } from '../core';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 
 @Component({
@@ -59,33 +59,19 @@ export class CampaignComponent implements OnInit, OnDestroy {
   campaignName$: Observable<string>;
   routeSub: Subscription;
 
-  constructor(
-    private route: ActivatedRoute,
-    private store: Store<any>,
-    private campaignActionService: CampaignActionService,
-    private accountService: AccountService,
-    private advertiserService: AdvertiserService
-  ) {}
+  constructor(private route: ActivatedRoute, private store: Store<any>, private campaignActionService: CampaignActionService) {}
 
   ngOnInit() {
-    this.routeSub = this.route.paramMap
-      .pipe(
-        tap(() => this.store.dispatch(new campaignActions.CampaignLoadOptions())),
-        switchMap((params: ParamMap) => {
-          return this.advertiserService.loadAdvertisers().pipe(map(advertisers => ({ params, advertisers })));
-        }),
-        switchMap(({ params, advertisers }) => {
-          return this.accountService.loadAccounts().pipe(map(accounts => ({ params, advertisers, accounts })));
-        })
-      )
-      .subscribe(({ params, advertisers, accounts }) => {
-        if (params.get('id')) {
-          const id = +params.get('id');
-          this.store.dispatch(new campaignActions.CampaignLoad({ id }));
-        } else {
-          this.store.dispatch(new campaignActions.CampaignNew());
-        }
-      });
+    this.store.dispatch(new accountActions.AccountsLoad({}));
+    this.store.dispatch(new advertiserActions.AdvertisersLoad({}));
+    this.routeSub = this.route.paramMap.subscribe(params => {
+      if (params.get('id')) {
+        const id = +params.get('id');
+        this.store.dispatch(new campaignActions.CampaignLoad({ id }));
+      } else {
+        this.store.dispatch(new campaignActions.CampaignNew());
+      }
+    });
     this.campaignLoaded$ = this.store.pipe(select(selectCampaignLoaded));
     this.campaignLoading$ = this.store.pipe(select(selectCampaignLoading));
     this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));

@@ -1,5 +1,6 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { reducer, initialState } from './campaign.reducer';
+import * as advertiserActions from '../actions/advertiser-action.creator';
 import * as campaignActions from '../actions/campaign-action.creator';
 import {
   campaignFixture,
@@ -51,7 +52,7 @@ describe('Campaign Reducer', () => {
     const newResult = reducer(initialState, new campaignActions.CampaignNew());
     expect(newResult.loading).toBe(false);
 
-    let loadResult = reducer(initialState, new campaignActions.CampaignLoadOptions());
+    let loadResult = reducer(initialState, new advertiserActions.AdvertisersLoad({}));
     expect(loadResult.loading).toBe(true);
     loadResult = reducer(loadResult, new campaignActions.CampaignLoad({ id: campaignFixture.id }));
     expect(loadResult.loading).toBe(true);
@@ -141,11 +142,11 @@ describe('Campaign Reducer', () => {
     expect(result.saving).toBe(false);
   });
 
-  it('should set campaign advertiser', () => {
+  it('should set campaign advertiser after adding new advertiser', () => {
     const result = reducer(
       initialState,
-      new campaignActions.CampaignSetAdvertiser({
-        set_advertiser_uri: '/some/uri'
+      new advertiserActions.AddAdvertiserSuccess({
+        doc: new MockHalDoc({ _links: { self: { href: '/some/uri' } } })
       })
     );
     expect(result.localCampaign.set_advertiser_uri).toBe('/some/uri');

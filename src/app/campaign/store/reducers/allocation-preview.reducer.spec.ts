@@ -32,7 +32,7 @@ describe('Allocation Preview Reducer', () => {
         endAt,
         totalGoal,
         dailyMinimum: 12,
-        zones
+        zones: zones.map(zone => ({ id: zone.id }))
       })
     );
     expect(result.flightId).toEqual(flightId);
@@ -49,7 +49,8 @@ describe('Allocation Preview Reducer', () => {
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,
         createdAt: undefined,
-        ...paramsMinusFlightId
+        ...paramsMinusFlightId,
+        zones: paramsMinusFlightId.zones.map(zone => ({ id: zone.id }))
       })
     );
     state = reducer(

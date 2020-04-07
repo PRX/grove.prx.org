@@ -1,11 +1,9 @@
 export enum ActionTypes {
   CAMPAIGN_NEW = '[Campaign] Campaign New',
-  CAMPAIGN_LOAD_OPTIONS = '[Campaign] Campaign Load Options',
   CAMPAIGN_LOAD = '[Campaign] Campaign Load',
   CAMPAIGN_LOAD_SUCCESS = '[Campaign] Campaign Load Success',
   CAMPAIGN_LOAD_FAILURE = '[Campaign] Campaign Load Failure',
   CAMPAIGN_FORM_UPDATE = '[Campaign] Campaign Form Update',
-  CAMPAIGN_SET_ADVERTISER = '[Campaign] Campaign Set Advertiser',
   CAMPAIGN_SAVE = '[Campaign] Form Save',
   CAMPAIGN_SAVE_SUCCESS = '[Campaign] Form Save Success',
   CAMPAIGN_SAVE_FAILURE = '[Campaign] Form Save Failure',
@@ -21,5 +19,14 @@ export enum ActionTypes {
   CAMPAIGN_ALLOCATION_PREVIEW_LOAD_FAILURE = '[Campaign] Allocation Preview Load Failure',
   CAMPAIGN_AVAILABILITY_LOAD = '[Campaign] Availability Load',
   CAMPAIGN_AVAILABILITY_LOAD_SUCCESS = '[Campaign] Availability Load Success',
-  CAMPAIGN_AVAILABILITY_LOAD_FAILURE = '[Campaign] Availability Load Failure'
+  CAMPAIGN_AVAILABILITY_LOAD_FAILURE = '[Campaign] Availability Load Failure',
+  CAMPAIGN_ACCOUNTS_LOAD = '[Campaign] Accounts Load',
+  CAMPAIGN_ACCOUNTS_LOAD_SUCCESS = '[Campaign] Accounts Load Success',
+  CAMPAIGN_ACCOUNTS_LOAD_FAILURE = '[Campaign] Accounts Load Failure',
+  CAMPAIGN_ADVERTISERS_LOAD = '[Campaign] Advertisers Load',
+  CAMPAIGN_ADVERTISERS_LOAD_SUCCESS = '[Campaign] Advertisers Load Success',
+  CAMPAIGN_ADVERTISERS_LOAD_FAILURE = '[Campaign] Advertisers Load Failure',
+  CAMPAIGN_ADD_ADVERTISER = '[Campaign] Add Advertiser',
+  CAMPAIGN_ADD_ADVERTISER_SUCCESS = '[Campaign] Add Advertiser Success',
+  CAMPAIGN_ADD_ADVERTISER_FAILURE = '[Campaign] Add Advertiser Failure'
 }

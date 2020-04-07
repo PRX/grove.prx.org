@@ -1,7 +1,7 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as availabilityActions from '../actions/availability-action.creator';
-import { flightFixture, availabilityParamsFixture, availabilityDaysFixture, availabilityData } from '../models/campaign-state.factory';
-import { reducer, initialState, selectId, selectIds } from './availability.reducer';
+import { availabilityParamsFixture, availabilityDaysFixture, availabilityData } from '../models/campaign-state.factory';
+import { reducer, initialState } from './availability.reducer';
 
 describe('Availability Reducer', () => {
   describe('unknown action', () => {
