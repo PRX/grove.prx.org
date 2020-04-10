@@ -76,6 +76,8 @@ export interface Campaign {
   notes: string;
   flights?: Flight[];
   loading?: boolean;
+  totalGoal?: number;
+  actualCount?: number;
 }
 
 @Injectable({
@@ -165,15 +167,11 @@ export class DashboardService {
   }
 
   get actualsTotal(): Observable<number> {
-    return this.flights.pipe(
-      map((flights: Flight[]) => flights.reduce((acc, { actualCount }: Flight) => acc + actualCount, 0))
-    );
+    return this.flights.pipe(map((flights: Flight[]) => flights.reduce((acc, { actualCount }: Flight) => acc + actualCount, 0)));
   }
 
   get goalsTotal(): Observable<number> {
-    return this.flights.pipe(
-      map((flights: Flight[]) => flights.reduce((acc, { totalGoal }: Flight) => acc + totalGoal, 0))
-    );
+    return this.flights.pipe(map((flights: Flight[]) => flights.reduce((acc, { totalGoal }: Flight) => acc + totalGoal, 0)));
   }
 
   get campaignFacets(): Observable<Facets> {
@@ -226,6 +224,8 @@ export class DashboardService {
             status: campaignDoc['status'],
             repName: campaignDoc['repName'],
             notes: campaignDoc['notes'],
+            actualCount: campaignDoc['actualCount'],
+            totalGoal: campaignDoc['totalGoal'],
             loading: false,
             advertiser: { id: advertiserDoc['id'], label: advertiserDoc['name'] },
             flights: flightDocs.map(doc => ({

@@ -4,23 +4,29 @@ import { Campaign } from '../dashboard.service';
 @Component({
   selector: 'grove-campaign-card',
   template: `
-    <div class="header {{ campaign?.status }}"></div>
-    <section *ngIf="campaign">
-      <div>{{ campaign.flights | campaignFlightDates }}</div>
-      <h3>
-        <a routerLink="{{ '/campaign/' + campaign.id }}">
-          {{ campaign.advertiser && campaign.advertiser.label }}
-        </a>
-      </h3>
-      <div>
-        <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
-        {{ campaign.type | titlecase }}
+    <section class="{{ campaign?.status }}" *ngIf="campaign">
+      <header>{{ campaign.flights | campaignFlightDates }}</header>
+      <div class="content">
+        <h3>
+          <a routerLink="{{ '/campaign/' + campaign.id }}">
+            {{ campaign.advertiser && campaign.advertiser.label }}
+          </a>
+        </h3>
+        <div>
+          <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
+          {{ campaign.type | titlecase }}
+        </div>
+        <div *ngIf="campaign.flights | campaignFlightTargets as targets">
+          <prx-icon size="1em" name="globe-americas"></prx-icon>
+          {{ targets }}
+        </div>
+        <div>{{ campaign.flights | campaignFlightZones }}</div>
       </div>
-      <div *ngIf="campaign.flights | campaignFlightTargets as targets">
-        <prx-icon size="1em" name="globe-americas"></prx-icon>
-        {{ targets }}
-      </div>
-      <div>{{ campaign.flights | campaignFlightZones }}</div>
+      <footer>
+        <div class="progress-ind" [style.width]="progressPercent"></div>
+        <p class="progress">{{ campaign.actualCount | largeNumber }} / {{ campaign.totalGoal | campaignCardAbbrevNumber }}</p>
+        <p>Inventory Served</p>
+      </footer>
     </section>
     <section class="loading" *ngIf="!campaign">
       <prx-spinner></prx-spinner>
@@ -31,4 +37,8 @@ import { Campaign } from '../dashboard.service';
 })
 export class CampaignCardComponent {
   @Input() campaign: Campaign;
+
+  get progressPercent() {
+    return Math.min(1, this.campaign.actualCount / this.campaign.totalGoal) * 100 + '%';
+  }
 }

@@ -2,13 +2,9 @@
 
 ul {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   grid-auto-rows: 1fr;
   grid-gap: 20px;
-}
-
-grove-campaign-card {
-  height: 100%;
 }
 
 prx-paging {
@@ -36,16 +32,4 @@ prx-paging {
   text-align: center;
   color: prx-theme-foreground(text);
   font-style: italic;
-}
-
-@media (min-width: 768px) {
-  ul {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  ul {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }

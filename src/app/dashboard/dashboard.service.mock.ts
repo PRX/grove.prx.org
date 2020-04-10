@@ -48,7 +48,9 @@ export const campaigns: Campaign[] = [
     repName: 'John',
     notes: '',
     flights,
-    loading: false
+    loading: false,
+    actualCount: 10000,
+    totalGoal: 100000
   },
   {
     id: 2,
@@ -60,7 +62,9 @@ export const campaigns: Campaign[] = [
     repName: 'Jacob',
     notes: '',
     flights,
-    loading: false
+    loading: false,
+    actualCount: 60000,
+    totalGoal: 100000
   },
   {
     id: 3,
@@ -72,7 +76,9 @@ export const campaigns: Campaign[] = [
     repName: 'Jingleheimer',
     notes: '',
     flights,
-    loading: false
+    loading: false,
+    actualCount: 125000,
+    totalGoal: 100000
   }
 ];
 
