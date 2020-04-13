@@ -1,17 +1,74 @@
 @import '~src/sass/variables';
-@import '~src/sass/status';
 
 :host {
   display: block;
+  height: 100%;
   background-color: prx-theme-background(card);
   color: prx-theme-foreground(text);
 }
-.header {
-  height: 3px;
-}
 section {
-  padding: 10px;
-  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-top: 3px solid transparent;
+
+  header {
+    padding: 10px 10px 0 10px;
+  }
+
+  .content {
+    flex-grow: 1;
+    padding: 10px;
+  }
+
+  footer {
+    position: relative;
+    padding: 1rem;
+    border-top: 1px solid prx-theme-foreground(divider);
+
+    text-align: center;
+
+    & > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress {
+      font-size: 1.3rem;
+      letter-spacing: 0.05rem;
+    }
+
+    .progress-ind {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 0;
+      background-color: mat-color($prx-green-palette, default);
+      opacity: 0.1;
+    }
+  }
+
+  &.draft {
+    border-color: mat-color($prx-blue-palette, lighter);
+  }
+  &.ok,
+  &.approved {
+    border-color: mat-color($prx-green-palette, default);
+  }
+  &.paused {
+    border-color: mat-color($prx-yellow-palette, default);
+  }
+  &.error,
+  &.canceled {
+    border-color: mat-color($prx-red-palette, default);
+  }
+  &.hold {
+    border-color: mat-color($prx-orange-palette, default);
+  }
+  &.sold {
+    border-color: mat-color($prx-aqua-palette, default);
+  }
 }
 section.loading {
   position: relative;

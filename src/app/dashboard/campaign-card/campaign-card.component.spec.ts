@@ -6,7 +6,13 @@ import { By } from '@angular/platform-browser';
 import { SharedModule } from '../../shared/shared.module';
 
 import { campaigns as campaignsFixture } from '../dashboard.service.mock';
-import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe } from '.';
+import {
+  CampaignCardComponent,
+  CampaignCardAbbreviateNumberPipe,
+  CampaignFlightDatesPipe,
+  CampaignFlightTargetsPipe,
+  CampaignFlightZonesPipe
+} from '.';
 
 describe('CampaignCardComponent', () => {
   let comp: CampaignCardComponent;
@@ -17,7 +23,13 @@ describe('CampaignCardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, SharedModule],
-      declarations: [CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe]
+      declarations: [
+        CampaignCardComponent,
+        CampaignCardAbbreviateNumberPipe,
+        CampaignFlightDatesPipe,
+        CampaignFlightTargetsPipe,
+        CampaignFlightZonesPipe
+      ]
     })
       .compileComponents()
       .then(() => {
@@ -39,5 +51,17 @@ describe('CampaignCardComponent', () => {
 
   it('should show campaign status', () => {
     expect(de.query(By.css('span.status')).nativeElement.textContent.toLowerCase()).toMatch(comp.campaign.status);
+  });
+
+  it('should return formatted campaign progress percentage', () => {
+    comp.campaign = campaignsFixture[0];
+    fix.detectChanges();
+    expect(comp.progressPercent).toBe('10%');
+    comp.campaign = campaignsFixture[1];
+    fix.detectChanges();
+    expect(comp.progressPercent).toBe('60%');
+    comp.campaign = campaignsFixture[2];
+    fix.detectChanges();
+    expect(comp.progressPercent).toBe('100%');
   });
 });

@@ -12,7 +12,13 @@ import { SharedModule } from '../../shared/shared.module';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock, campaigns as campaignsFixture } from '../dashboard.service.mock';
 import { CampaignListComponent, CampaignListTotalPagesPipe } from './';
-import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignFlightTargetsPipe, CampaignFlightZonesPipe } from '../campaign-card';
+import {
+  CampaignCardComponent,
+  CampaignCardAbbreviateNumberPipe,
+  CampaignFlightDatesPipe,
+  CampaignFlightTargetsPipe,
+  CampaignFlightZonesPipe
+} from '../campaign-card';
 
 describe('CampaignListComponent', () => {
   let comp: CampaignListComponent;
@@ -29,6 +35,7 @@ describe('CampaignListComponent', () => {
       imports: [RouterTestingModule, MatProgressSpinnerModule, NoopAnimationsModule, PagingModule, SharedModule],
       declarations: [
         CampaignCardComponent,
+        CampaignCardAbbreviateNumberPipe,
         CampaignFlightDatesPipe,
         CampaignFlightTargetsPipe,
         CampaignFlightZonesPipe,
