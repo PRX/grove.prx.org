@@ -14,6 +14,9 @@ section {
 
   header {
     padding: 10px 10px 0 10px;
+    display: grid;
+    grid-template-columns: auto min-content;
+    grid-column-gap: 0.25rem;
   }
 
   .content {

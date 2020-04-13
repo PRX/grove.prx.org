@@ -2,9 +2,10 @@ import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { FlightState } from './store/models';
+import { FlightState, Campaign } from './store/models';
 import {
   selectError,
+  selectLocalCampaign,
   selectCampaignLoaded,
   selectCampaignLoading,
   selectCampaignSaving,
@@ -30,7 +31,14 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     ></grove-campaign-status>
     <mat-drawer-container autosize>
       <mat-drawer role="navigation" mode="side" opened disableClose>
-        <grove-campaign-nav [flights]="flights$ | async" (createFlight)="createFlight()"></grove-campaign-nav>
+        <grove-campaign-nav
+          [campaign]="campaign$ | async"
+          [flights]="flights$ | async"
+          [valid]="valid$ | async"
+          [changed]="changed$ | async"
+          [isSaving]="campaignSaving$ | async"
+          (createFlight)="createFlight()"
+        ></grove-campaign-nav>
       </mat-drawer>
       <mat-drawer-content role="main">
         <ng-container *ngIf="campaignLoaded$ | async; else loading">
@@ -49,6 +57,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignComponent implements OnInit, OnDestroy {
+  campaign$: Observable<Campaign>;
   flights$: Observable<FlightState[]>;
   campaignLoaded$: Observable<boolean>;
   campaignLoading$: Observable<boolean>;
@@ -69,9 +78,17 @@ export class CampaignComponent implements OnInit, OnDestroy {
         const id = +params.get('id');
         this.store.dispatch(new campaignActions.CampaignLoad({ id }));
       } else {
-        this.store.dispatch(new campaignActions.CampaignNew());
+        const { state } = window.history;
+        if (state.campaign) {
+          this.store.dispatch(new campaignActions.CampaignDupFromForm({ campaign: state.campaign, flights: state.flights }));
+        } else if (state.id) {
+          this.store.dispatch(new campaignActions.CampaignDupById({ id: state.id }));
+        } else {
+          this.store.dispatch(new campaignActions.CampaignNew({}));
+        }
       }
     });
+    this.campaign$ = this.store.pipe(select(selectLocalCampaign));
     this.campaignLoaded$ = this.store.pipe(select(selectCampaignLoaded));
     this.campaignLoading$ = this.store.pipe(select(selectCampaignLoading));
     this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));

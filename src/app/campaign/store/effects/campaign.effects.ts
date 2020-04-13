@@ -6,7 +6,7 @@ import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
 import { ActionTypes } from '../actions/action.types';
-import { CampaignFormSave } from '../models';
+import { CampaignFormSave, Flight } from '../models';
 import { CampaignService } from '../../../core';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class CampaignEffects {
     mergeMap((payload: CampaignFormSave) => {
       let campaignSaveResult: Observable<HalDoc>;
       if (payload.campaign.id) {
-        campaignSaveResult = this.campaignService.updateCampaign(payload.campaign);
+        campaignSaveResult = this.campaignService.updateCampaign(payload.campaignDoc, payload.campaign);
       } else {
         campaignSaveResult = this.campaignService.createCampaign(payload.campaign);
       }
@@ -61,7 +61,7 @@ export class CampaignEffects {
             deletedFlightDocs: { [id: number]: HalDoc };
           }) => {
             const createdFlights: { [id: number]: Observable<HalDoc> } = payload.createdFlights.reduce(
-              (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.createFlight(flight) }),
+              (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.createFlight(campaignDoc, flight) }),
               {}
             );
             return payload.createdFlights.length
@@ -139,6 +139,15 @@ export class CampaignEffects {
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
       return new campaignActions.CampaignDupFlightWithTempId({ flightId, flight });
     })
+  );
+
+  @Effect()
+  dupCampaignById$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_DUP_BY_ID),
+    map((action: campaignActions.CampaignDupById) => action.payload),
+    mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
+    map(({ campaignDoc, flightDocs }) => new campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs })),
+    catchError(error => of(new campaignActions.CampaignDupByIdFailure({ error })))
   );
 
   constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router, private toastr: ToastrService) {}

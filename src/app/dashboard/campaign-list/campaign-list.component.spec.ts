@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatProgressSpinnerModule } from '@angular/material';
+import { MatProgressSpinnerModule, MatIconModule } from '@angular/material';
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -32,7 +32,7 @@ describe('CampaignListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, MatProgressSpinnerModule, NoopAnimationsModule, PagingModule, SharedModule],
+      imports: [RouterTestingModule, MatIconModule, MatProgressSpinnerModule, NoopAnimationsModule, PagingModule, SharedModule],
       declarations: [
         CampaignCardComponent,
         CampaignCardAbbreviateNumberPipe,
