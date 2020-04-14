@@ -22,7 +22,12 @@ import { Campaign, Flight, FlightState } from '../store/models';
       </a>
     </mat-nav-list>
     <a class="secondary-link" routerLink="" (click)="createFlight.emit()"><mat-icon>add</mat-icon> Add a Flight</a>
-    <a class="secondary-link" routerLink="/campaign/new" [state]="dupCampaignState"><mat-icon>file_copy</mat-icon>Duplicate Campaign</a>
+    <ng-container *ngIf="valid && !changed && !isSaving; else disabledDuplicate">
+      <a class="secondary-link" routerLink="/campaign/new" [state]="dupCampaignState"><mat-icon>file_copy</mat-icon>Duplicate Campaign</a>
+    </ng-container>
+    <ng-template #disabledDuplicate>
+      <a class="secondary-link disabled"><mat-icon>file_copy</mat-icon>Duplicate Campaign</a>
+    </ng-template>
   `,
   styleUrls: ['./campaign-nav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

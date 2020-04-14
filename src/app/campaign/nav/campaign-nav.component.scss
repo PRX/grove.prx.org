@@ -55,4 +55,7 @@
   &:hover {
     background-color: prx-theme-background(selected-tab);
   }
+  &.disabled {
+    color: prx-theme-foreground(disabled);
+  }
 }
