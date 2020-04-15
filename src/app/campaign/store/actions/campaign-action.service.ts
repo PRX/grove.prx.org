@@ -118,17 +118,19 @@ export class CampaignActionService implements OnDestroy {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
+        filter(state => !!(state && state.localFlight)),
         first()
       )
-      .subscribe(state => this.store.dispatch(new campaignActions.CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
+      .subscribe(state =>
+        this.store.dispatch(new campaignActions.CampaignDeleteFlight({ id: state.localFlight.id, softDeleted: !state.softDeleted }))
+      );
   }
 
   updateFlightForm(formFlight: Flight, changed: boolean, valid: boolean) {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
+        filter(state => !!(state && state.localFlight)),
         first()
       )
       .subscribe(state => {

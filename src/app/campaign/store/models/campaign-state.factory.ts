@@ -109,7 +109,6 @@ export const createFlightsState = campaignDoc => ({
     ids: [flightFixture.id],
     entities: {
       [flightFixture.id]: {
-        id: flightFixture.id,
         localFlight: flightFixture,
         remoteFlight: flightFixture,
         dailyMinimum: 99,

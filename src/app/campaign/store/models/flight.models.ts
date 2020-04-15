@@ -23,7 +23,6 @@ export interface Flight {
 }
 
 export interface FlightState {
-  id: number;
   doc?: HalDoc;
   localFlight: Flight;
   remoteFlight?: Flight;
@@ -51,4 +50,8 @@ export const duplicateFlight = (flight: Flight, tempId: number): Flight => {
   const { createdAt, startAt, endAt, ...dupFlight } = flight;
   dupFlight.id = tempId;
   return dupFlight as Flight;
+};
+
+export const getFlightId = (state: FlightState) => {
+  return state.localFlight && state.localFlight.id;
 };
