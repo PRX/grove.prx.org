@@ -97,7 +97,7 @@ export class AvailabilityComponent {
   @Input() zones: InventoryZone[];
   @Input() rollups: AvailabilityRollup[];
   @Input() allocationPreviewError: any;
-  @Output() goalChange = new EventEmitter<{ flight: Flight }>();
+  @Output() goalChange = new EventEmitter<Flight>();
   zoneWeekExpanded = {};
 
   get errors() {

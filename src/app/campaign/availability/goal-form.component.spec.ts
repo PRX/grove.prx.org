@@ -44,7 +44,7 @@ describe('GoalFormComponent', () => {
   it('emits form changes', done => {
     comp.flight = flight;
     comp.goalChange.subscribe(change => {
-      expect(change).toMatchObject({ dailyMinimum: 90, flight });
+      expect(change).toMatchObject({ ...flight, dailyMinimum: 90 });
       done();
     });
     comp.goalForm.get('dailyMinimum').setValue(90);

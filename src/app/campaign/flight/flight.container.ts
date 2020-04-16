@@ -33,7 +33,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         [zones]="zoneOpts"
         [rollups]="flightAvailabilityRollup$ | async"
         [allocationPreviewError]="allocationPreviewError$ | async"
-        (goalChange)="onGoalChange($event.flight)"
+        (goalChange)="onGoalChange($event)"
       >
       </grove-availability>
     </ng-container>
