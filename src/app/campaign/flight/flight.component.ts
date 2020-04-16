@@ -69,7 +69,7 @@ export class FlightComponent implements OnInit {
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(cmp => {
       // preserving id on the flight because doesn't exist in form fields
-      this.formStatusChanged({ ...cmp, id: this.flight.id });
+      this.formStatusChanged({ ...cmp, id: this.flight.id }, this.flightForm.dirty);
     });
   }
 
@@ -79,7 +79,7 @@ export class FlightComponent implements OnInit {
     const myZones = (this.flight && this.flight.zones) || [];
 
     // if zoneOptions hasn't loaded yet, use flight.zones as options
-    const options = this.zoneOptions || <InventoryZone[]>myZones;
+    const options = this.zoneOptions || (myZones as InventoryZone[]);
     return options.filter(zone => {
       if (myZones[zoneIndex] && myZones[zoneIndex].id === zone.id) {
         return true;
@@ -90,29 +90,34 @@ export class FlightComponent implements OnInit {
   }
 
   // emits updates when reactive form fields change
-  formStatusChanged(flight?: Flight) {
+  formStatusChanged(flight: Flight, changed?: boolean) {
     if (this.emitFormUpdates) {
       this.flightUpdate.emit({
         flight: { ...flight, totalGoal: this.flight.totalGoal },
-        changed: this.flightForm.dirty,
+        changed,
         valid: this.flightForm.valid
       });
     }
   }
 
   onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
-    if (this.emitFormUpdates) {
-      this.flightUpdate.emit({
-        flight: {
-          ...this.flight,
-          ...(startAt && { startAt }),
-          ...(endAt && { endAt }),
-          totalGoal: this.flight.totalGoal
-        },
-        changed: true,
-        valid: this.flightForm.valid
-      });
+    // these dates pickers are not actually connected to the reactive form
+    // so in order for the flightForm to be valid on emit, these values must be set on the form
+    if (startAt) {
+      this.flightForm.get('startAt').setValue(startAt, { emitEvent: false });
     }
+    if (endAt) {
+      this.flightForm.get('endAt').setValue(endAt, { emitEvent: false });
+    }
+    this.formStatusChanged(
+      {
+        ...this.flight,
+        ...(startAt && { startAt }),
+        ...(endAt && { endAt }),
+        totalGoal: this.flight.totalGoal
+      },
+      true
+    );
   }
 
   // updates the form from @Input() set flight

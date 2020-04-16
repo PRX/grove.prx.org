@@ -41,19 +41,21 @@
   }
 }
 
-.add-flight {
+.secondary-link {
   transition: background-color 100ms linear 0ms;
   display: grid;
   grid-template-columns: min-content auto;
   grid-column-gap: 0.25rem;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   margin: 0.5rem;
   padding: 0.5rem;
   border: 1px dashed prx-theme-foreground(divider);
-  text-align: center;
 
   &:hover {
     background-color: prx-theme-background(selected-tab);
+  }
+  &.disabled {
+    color: prx-theme-foreground(disabled);
   }
 }

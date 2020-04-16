@@ -5,7 +5,10 @@ import { Campaign } from '../dashboard.service';
   selector: 'grove-campaign-card',
   template: `
     <section class="{{ campaign?.status }}" *ngIf="campaign">
-      <header>{{ campaign.flights | campaignFlightDates }}</header>
+      <header>
+        {{ campaign.flights | campaignFlightDates }}
+        <a routerLink="/campaign/new" [state]="duplicateCampaignState" title="Dupicate Campaign"><mat-icon>file_copy</mat-icon></a>
+      </header>
       <div class="content">
         <h3>
           <a routerLink="{{ '/campaign/' + campaign.id }}">
@@ -40,5 +43,9 @@ export class CampaignCardComponent {
 
   get progressPercent() {
     return Math.min(1, this.campaign.actualCount / this.campaign.totalGoal) * 100 + '%';
+  }
+
+  get duplicateCampaignState(): { id: number } {
+    return { id: this.campaign.id };
   }
 }

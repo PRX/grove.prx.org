@@ -8,6 +8,7 @@ export const selectCampaignWithFlightsForSave = createSelector(
   selectAllFlights,
   (campaign: CampaignState, flights: FlightState[]): CampaignFormSave => ({
     campaign: campaign.localCampaign,
+    campaignDoc: campaign.doc,
     updatedFlights: flights
       .filter(flight => !flight.softDeleted && flight.changed && flight.remoteFlight)
       .map(flight => flight.localFlight),

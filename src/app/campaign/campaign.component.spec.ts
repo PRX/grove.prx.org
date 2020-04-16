@@ -8,6 +8,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../store/router-store/custom-router-serializer';
 import { of } from 'rxjs';
+import { first } from 'rxjs/operators';
 import { AuguryService, InventoryService } from '../core';
 import { AllocationPreviewService } from '../core/allocation/allocation-preview.service';
 import { ActivatedRouteStub } from '../../testing/stub.router';
@@ -20,6 +21,7 @@ import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
 import { TestComponent, campaignRoutes } from '../../testing/test.component';
+import { campaignFixture, flightFixture } from './store/models/campaign-state.factory';
 
 describe('CampaignComponent', () => {
   let component: CampaignComponent;
@@ -30,6 +32,9 @@ describe('CampaignComponent', () => {
   let store: Store<any>;
   let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
+  // workaround to set the window.history.state readonly property
+  // Angular sets it from a routerLink state
+  Object.defineProperty(window.history, 'state', { writable: true, value: {} });
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -89,8 +94,40 @@ describe('CampaignComponent', () => {
     fix.ngZone.run(() => {
       router.navigateByUrl('/campaign/123');
       route.setParamMap({ id: '123' });
-      route.paramMap.subscribe(() => {
-        expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
+      route.paramMap.pipe(first()).subscribe(() => {
+        expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
+        done();
+      });
+    });
+  });
+
+  it('calls action to duplicate a campaign by id', done => {
+    jest.spyOn(store, 'dispatch');
+    // id is passed through the /camp[aign/new router link state
+    Object.defineProperty(window.history, 'state', { writable: true, value: { id: 123 } });
+    fix.ngZone.run(() => {
+      router.navigateByUrl('/campaign/new');
+      route.setParamMap({});
+      route.paramMap.pipe(first()).subscribe(() => {
+        expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignDupById({ id: 123 }));
+        done();
+      });
+    });
+  });
+
+  it('calls action to duplicate a campaign from form', done => {
+    jest.spyOn(store, 'dispatch');
+    // mock the flight tempId
+    Date.now = jest.fn(() => 12345);
+    // campaign and flights are passed through the /capaign/new router link state
+    Object.defineProperty(window.history, 'state', { writable: true, value: { campaign: campaignFixture, flights: [flightFixture] } });
+    fix.ngZone.run(() => {
+      router.navigateByUrl('/campaign/new');
+      route.setParamMap({});
+      route.paramMap.pipe(first()).subscribe(() => {
+        expect(store.dispatch).toHaveBeenLastCalledWith(
+          new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture] })
+        );
         done();
       });
     });

@@ -22,7 +22,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should setup for a new campaign', () => {
-    const result = reducer(createCampaignState().campaign, new campaignActions.CampaignNew());
+    const result = reducer(createCampaignState().campaign, new campaignActions.CampaignNew({}));
     expect(result).toMatchObject({ ...initialState, loaded: true, loading: false });
   });
 
@@ -49,7 +49,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign loading', () => {
-    const newResult = reducer(initialState, new campaignActions.CampaignNew());
+    const newResult = reducer(initialState, new campaignActions.CampaignNew({}));
     expect(newResult.loading).toBe(false);
 
     let loadResult = reducer(initialState, new advertiserActions.AdvertisersLoad({}));
@@ -104,6 +104,7 @@ describe('Campaign Reducer', () => {
       initialState,
       new campaignActions.CampaignSave({
         campaign: campaignFixture,
+        campaignDoc: new MockHalDoc(campaignDocFixture),
         deletedFlights: [],
         updatedFlights: [flightFixture],
         createdFlights: []
@@ -124,7 +125,7 @@ describe('Campaign Reducer', () => {
     expect(result.saving).toBe(false);
   });
 
-  it('should set campaign from campaign form save success', () => {
+  it('should set campaign state from campaign form save success', () => {
     const result = reducer(
       initialState,
       new campaignActions.CampaignSaveSuccess({
@@ -150,5 +151,32 @@ describe('Campaign Reducer', () => {
       })
     );
     expect(result.localCampaign.set_advertiser_uri).toBe('/some/uri');
+  });
+
+  it('should set campaign state for campaign duplicated from form', () => {
+    let result = reducer(
+      initialState,
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
+    );
+    result = reducer(result, new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture] }));
+    expect(result.localCampaign).not.toMatchObject(campaignFixture);
+    expect(result.localCampaign.id).toBeUndefined();
+    expect(result.localCampaign.name).toEqual(campaignFixture.name);
+  });
+
+  it('should set campaign state for campaign duplicated by id', () => {
+    const result = reducer(
+      initialState,
+      new campaignActions.CampaignDupByIdSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
+    );
+    expect(result.localCampaign).not.toMatchObject(campaignFixture);
+    expect(result.localCampaign.id).toBeUndefined();
+    expect(result.localCampaign.name).toEqual(campaignFixture.name);
   });
 });

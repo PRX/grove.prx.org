@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignActions } from '../actions/campaign-action.creator';
-import { docToFlight, Flight, FlightState } from '../models';
+import { docToFlight, Flight, FlightState, duplicateFlight } from '../models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection
@@ -18,6 +18,32 @@ export function reducer(state = initialState, action: CampaignActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_NEW: {
       return { ...adapter.removeAll(state), campaignId: undefined };
+    }
+    case ActionTypes.CAMPAIGN_DUP_FROM_FORM: {
+      return adapter.addAll(
+        action.payload.flights.map((flight, i) => {
+          const tempId = action.payload.timestamp + i;
+          return {
+            id: tempId,
+            localFlight: duplicateFlight(flight, tempId),
+            changed: true,
+            valid: false
+          };
+        }),
+        state
+      );
+    }
+    case ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS: {
+      const flights = action.payload.flightDocs.map((doc, i) => {
+        const tempId = action.payload.timestamp + i;
+        return {
+          id: tempId,
+          localFlight: duplicateFlight(docToFlight(doc), tempId),
+          changed: true,
+          valid: false
+        };
+      });
+      return adapter.addAll(flights, state);
     }
     case ActionTypes.CAMPAIGN_LOAD: {
       return {

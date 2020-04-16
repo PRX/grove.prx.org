@@ -45,3 +45,10 @@ export const docToFlight = (doc: HalDoc): Flight => {
 export const getFlightZoneIds = (zones: any[]): string[] => {
   return zones.filter(z => z).map(z => z.id || z);
 };
+
+export const duplicateFlight = (flight: Flight, tempId: number): Flight => {
+  // remove createdAt, startAt, endAt and set temp id
+  const { createdAt, startAt, endAt, ...dupFlight } = flight;
+  dupFlight.id = tempId;
+  return dupFlight as Flight;
+};

@@ -1,5 +1,9 @@
 export enum ActionTypes {
   CAMPAIGN_NEW = '[Campaign] Campaign New',
+  CAMPAIGN_DUP_FROM_FORM = '[Campaign] Campaign Dup From Form',
+  CAMPAIGN_DUP_BY_ID = '[Campaign] Campaign Dup By Id',
+  CAMPAIGN_DUP_BY_ID_SUCCESS = '[Campaign] Campaign Dup By Id Success',
+  CAMPAIGN_DUP_BY_ID_FAILURE = '[Campaign] Campaign Dup By Id Failure',
   CAMPAIGN_LOAD = '[Campaign] Campaign Load',
   CAMPAIGN_LOAD_SUCCESS = '[Campaign] Campaign Load Success',
   CAMPAIGN_LOAD_FAILURE = '[Campaign] Campaign Load Failure',

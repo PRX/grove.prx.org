@@ -11,14 +11,6 @@ import { selectCampaignDoc, selectFlightDocById } from '../../campaign/store/sel
 export class CampaignService {
   constructor(private augury: AuguryService, private store: Store<any>) {}
 
-  get campaignDoc$(): Observable<HalDoc> {
-    return this.store.pipe(
-      select(selectCampaignDoc),
-      filter(doc => !!doc),
-      first()
-    );
-  }
-
   getFlightDocById(id): Observable<HalDoc> {
     return this.store.pipe(
       select(selectFlightDocById, { id }),
@@ -41,16 +33,16 @@ export class CampaignService {
     );
   }
 
-  updateCampaign(campaign: Campaign): Observable<HalDoc> {
-    return this.campaignDoc$.pipe(switchMap(doc => doc.update(campaign)));
+  updateCampaign(doc: HalDoc, campaign: Campaign): Observable<HalDoc> {
+    return doc.update(campaign);
   }
 
   createCampaign(campaign: Campaign): Observable<HalDoc> {
-    return this.augury.root.pipe(switchMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)));
+    return this.augury.root.pipe(mergeMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)));
   }
 
-  createFlight(flight: Flight): Observable<HalDoc> {
-    return this.campaignDoc$.pipe(switchMap(doc => doc.create('prx:flights', {}, flight)));
+  createFlight(campaignDoc: HalDoc, flight: Flight): Observable<HalDoc> {
+    return campaignDoc.create('prx:flights', {}, flight);
   }
 
   updateFlight(flight: Flight): Observable<HalDoc> {

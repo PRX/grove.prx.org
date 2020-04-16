@@ -32,3 +32,10 @@ export const docToCampaign = (doc: HalDoc): Campaign => {
   campaign.set_account_uri = doc.expand('prx:account');
   return campaign;
 };
+
+export const duplicateCampaign = (campaign: Campaign): Campaign => {
+  // remove id from dup campaign and set to Draft
+  const { id, ...dupCampaign } = campaign;
+  campaign.status = 'draft';
+  return dupCampaign;
+};

@@ -5,6 +5,36 @@ import { HalDoc } from 'ngx-prx-styleguide';
 
 export class CampaignNew implements Action {
   readonly type = ActionTypes.CAMPAIGN_NEW;
+
+  constructor(public payload: {}) {}
+}
+
+export class CampaignDupFromForm implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DUP_FROM_FORM;
+
+  constructor(public payload: { campaign: Campaign; flights: Flight[]; timestamp?: number }) {
+    this.payload.timestamp = payload.timestamp || Date.now();
+  }
+}
+
+export class CampaignDupById implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID;
+
+  constructor(public payload: { id: number }) {}
+}
+
+export class CampaignDupByIdSuccess implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS;
+
+  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[]; timestamp?: number }) {
+    this.payload.timestamp = payload.timestamp || Date.now();
+  }
+}
+
+export class CampaignDupByIdFailure implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID_FAILURE;
+
+  constructor(public payload: { error: any }) {}
 }
 
 export class CampaignLoad implements Action {
@@ -96,6 +126,10 @@ export class CampaignFlightSetGoal implements Action {
 
 export type CampaignActions =
   | CampaignNew
+  | CampaignDupFromForm
+  | CampaignDupById
+  | CampaignDupByIdSuccess
+  | CampaignDupByIdFailure
   | CampaignLoad
   | CampaignLoadSuccess
   | CampaignLoadFailure

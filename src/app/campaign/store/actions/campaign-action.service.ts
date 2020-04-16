@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
@@ -161,8 +162,8 @@ export class CampaignActionService implements OnDestroy {
   saveCampaignAndFlights() {
     this.store
       .pipe(select(selectCampaignWithFlightsForSave), first())
-      .subscribe(({ campaign, updatedFlights, createdFlights, deletedFlights }) =>
-        this.store.dispatch(new campaignActions.CampaignSave({ campaign, updatedFlights, createdFlights, deletedFlights }))
+      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights }) =>
+        this.store.dispatch(new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights }))
       );
   }
 }

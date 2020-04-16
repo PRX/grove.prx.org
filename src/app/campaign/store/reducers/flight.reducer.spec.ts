@@ -1,6 +1,6 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
-import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState } from '../models/campaign-state.factory';
+import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState, campaignFixture } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
 import { docToFlight, Flight } from '../models';
 
@@ -16,7 +16,7 @@ describe('Flight Reducer', () => {
   });
 
   it('should remove flight entries for a new campaign', () => {
-    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, new campaignActions.CampaignNew());
+    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, new campaignActions.CampaignNew({}));
     expect(result).toMatchObject({ ids: [], entities: {} });
   });
 
@@ -162,5 +162,51 @@ describe('Flight Reducer', () => {
     expect(result.entities[newFlightIds[1]]).toBeUndefined();
     expect(result.entities[createdFlightIds[0]].localFlight).toMatchObject(docToFlight(createdFlightDocs[0]));
     expect(result.entities[createdFlightIds[1]].localFlight).toMatchObject(docToFlight(createdFlightDocs[1]));
+  });
+
+  it('should set flight state from campaign duplicate from form', () => {
+    const timestamp = Date.now();
+    // load a flight into the flight form state
+    let state = reducer(
+      initialState,
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)]
+      })
+    );
+    // duplicate that flight
+    state = reducer(
+      state,
+      new campaignActions.CampaignDupFromForm({
+        campaign: campaignFixture,
+        flights: [flightFixture],
+        timestamp
+      })
+    );
+    expect(state.campaignId).toBeUndefined();
+    expect(state.ids.length).toEqual(1);
+    expect(state.entities[flightFixture.id]).toBeUndefined();
+    expect(state.entities[timestamp]).toBeDefined();
+    expect(state.entities[timestamp].localFlight.id).toEqual(timestamp);
+    expect(state.entities[timestamp].localFlight.createdAt).toBeUndefined();
+  });
+
+  it('should update flight state from campaign duplicate by id', () => {
+    const timestamp = Date.now();
+    // starting from intialState, duplicate a flight by id where the campaign and flights are provided by an effect success action
+    const state = reducer(
+      initialState,
+      new campaignActions.CampaignDupByIdSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        timestamp
+      })
+    );
+    expect(state.campaignId).toBeUndefined();
+    expect(state.ids.length).toEqual(1);
+    expect(state.entities[flightFixture.id]).toBeUndefined();
+    expect(state.entities[timestamp]).toBeDefined();
+    expect(state.entities[timestamp].localFlight.id).toEqual(timestamp);
+    expect(state.entities[timestamp].localFlight.createdAt).toBeUndefined();
   });
 });

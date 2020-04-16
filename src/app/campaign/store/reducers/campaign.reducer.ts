@@ -2,7 +2,7 @@ import { ActionTypes } from '../actions/action.types';
 import { AdvertiserActions } from '../actions/advertiser-action.creator';
 import { CampaignActions } from '../actions/campaign-action.creator';
 import { docToAdvertiser } from '../models/advertiser.models';
-import { CampaignState, docToCampaign } from '../models/campaign.models';
+import { CampaignState, docToCampaign, duplicateCampaign } from '../models/campaign.models';
 
 export const initialState: CampaignState = {
   localCampaign: {
@@ -25,6 +25,26 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
   switch (action.type) {
     case ActionTypes.CAMPAIGN_NEW: {
       return { ...initialState, loading: false, loaded: true };
+    }
+    case ActionTypes.CAMPAIGN_DUP_FROM_FORM: {
+      return {
+        localCampaign: duplicateCampaign(action.payload.campaign),
+        changed: true,
+        valid: true,
+        loading: false,
+        loaded: true,
+        saving: false
+      };
+    }
+    case ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS: {
+      return {
+        localCampaign: duplicateCampaign(docToCampaign(action.payload.campaignDoc)),
+        changed: true,
+        valid: true,
+        loading: false,
+        loaded: true,
+        saving: false
+      };
     }
     case ActionTypes.CAMPAIGN_FORM_UPDATE: {
       const { campaign, changed, valid } = action.payload;
@@ -82,9 +102,10 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
       }
       return state;
     }
+    case ActionTypes.CAMPAIGN_DUP_BY_ID_FAILURE:
     case ActionTypes.CAMPAIGN_LOAD_FAILURE: {
       return {
-        ...state,
+        ...initialState,
         loading: false,
         loaded: true,
         error: action.payload.error
