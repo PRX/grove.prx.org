@@ -68,6 +68,7 @@ export function reducer(state = initialState, action: CampaignActions): State {
       const { flightId: id, startAt, endAt } = action.payload;
       const initialFlightState: FlightState = {
         localFlight: {
+          id,
           name: 'New Flight ' + (state.ids.length + 1),
           startAt,
           endAt,
