@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { Account, Advertiser } from '../store/models';
 import { Campaign } from '../store/models';
-import { selectLocalCampaign, selectAllAccounts, selectAllAdvertisers } from '../store/selectors';
+import { selectLocalCampaign, selectAllAccounts, selectAllAdvertisersOrderByName } from '../store/selectors';
 import * as campaignActions from '../store/actions/campaign-action.creator';
 import * as advertiserActions from '../store/actions/advertiser-action.creator';
 
@@ -30,7 +30,7 @@ export class CampaignFormContainerComponent implements OnInit {
 
   ngOnInit() {
     this.accounts$ = this.store.pipe(select(selectAllAccounts));
-    this.advertisers$ = this.store.pipe(select(selectAllAdvertisers));
+    this.advertisers$ = this.store.pipe(select(selectAllAdvertisersOrderByName));
     this.campaign$ = this.store.pipe(select(selectLocalCampaign));
   }
 

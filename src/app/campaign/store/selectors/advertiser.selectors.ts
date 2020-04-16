@@ -8,3 +8,8 @@ export const selectAdvertiserState = createSelector(selectCampaignStoreState, (s
 export const selectAdvertiserIds = createSelector(selectAdvertiserState, selectIds);
 export const selectAdvertiserEntities = createSelector(selectAdvertiserState, selectEntities);
 export const selectAllAdvertisers = createSelector(selectAdvertiserState, selectAll);
+
+export const selectAllAdvertisersOrderByName = createSelector(
+  selectAllAdvertisers,
+  advertisers => advertisers && advertisers.sort((a, b) => a.name.localeCompare(b.name))
+);
