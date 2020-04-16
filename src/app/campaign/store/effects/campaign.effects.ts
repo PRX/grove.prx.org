@@ -147,7 +147,14 @@ export class CampaignEffects {
     map((action: campaignActions.CampaignDupById) => action.payload),
     mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
     map(({ campaignDoc, flightDocs }) => new campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs })),
+    tap(() => this.toastr.success('Campaign duplicated')),
     catchError(error => of(new campaignActions.CampaignDupByIdFailure({ error })))
+  );
+
+  @Effect({ dispatch: false })
+  dupCampaignFromForm$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_DUP_FROM_FORM),
+    tap(() => this.toastr.success('Campaign duplicated'))
   );
 
   constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router, private toastr: ToastrService) {}
