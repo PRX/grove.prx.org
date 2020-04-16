@@ -116,7 +116,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal: 999, dailyMinimum: 99, valid: true })
     );
     expect(result.entities[flightFixture.id].localFlight.totalGoal).toBe(999);
-    expect(result.entities[flightFixture.id].dailyMinimum).toBe(99);
+    expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBe(99);
   });
 
   it('should update flights from campaign save action', () => {

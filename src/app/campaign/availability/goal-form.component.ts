@@ -31,20 +31,10 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   set flight(flight: Flight) {
     if (flight) {
       this._flight = flight;
-      this.updateGoalForm({ totalGoal: this._flight.totalGoal });
+      this.updateGoalForm({ totalGoal: this._flight.totalGoal, dailyMinimum: this._flight.dailyMinimum });
     }
   }
-  // tslint:disable-next-line
-  private _dailyMinimum: number;
-  get dailyMinimum(): number {
-    return this._dailyMinimum;
-  }
-  @Input()
-  set dailyMinimum(dailyMinimum: number) {
-    this._dailyMinimum = dailyMinimum;
-    this.updateGoalForm({ dailyMinimum });
-  }
-  @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
+  @Output() goalChange = new EventEmitter<{ flight: Flight }>();
   goalForm = this.fb.group({
     totalGoal: ['', Validators.required],
     dailyMinimum: ['']
@@ -76,8 +66,7 @@ export class GoalFormComponent implements OnInit, OnDestroy {
     const totalGoal = formFields.totalGoal && +formFields.totalGoal;
     const dailyMinimum = formFields.dailyMinimum && +formFields.dailyMinimum;
     this.goalChange.emit({
-      flight: { ...this.flight, totalGoal },
-      dailyMinimum
+      flight: { ...this.flight, totalGoal, dailyMinimum }
     });
   }
 

@@ -42,10 +42,6 @@ export const selectRoutedFlightChanged = createSelector(
   selectRoutedFlight,
   (flightState: FlightState): boolean => flightState && flightState.changed
 );
-export const selectRoutedFlightDailyMinimum = createSelector(
-  selectRoutedFlight,
-  (flightState: FlightState): number => flightState && flightState.dailyMinimum
-);
 export const selectFlightDocById = createSelector(
   selectFlightEntities,
   (flights: { [id: number]: FlightState }, props: { id: number }): HalDoc => flights && flights[props.id].doc

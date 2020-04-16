@@ -14,19 +14,19 @@ export interface Flight {
   name: string;
   startAt: Date;
   endAt: Date;
-  totalGoal: number;
+  set_inventory_uri: string;
   zones: FlightZone[];
+  totalGoal: number;
+  dailyMinimum?: number;
   status?: string;
   status_message?: string;
   createdAt?: Date;
-  set_inventory_uri: string;
 }
 
 export interface FlightState {
   doc?: HalDoc;
   localFlight: Flight;
   remoteFlight?: Flight;
-  dailyMinimum?: number;
   changed: boolean;
   valid: boolean;
   softDeleted?: boolean;

@@ -93,8 +93,8 @@ export class FlightComponent implements OnInit {
   formStatusChanged(flight: Flight, changed?: boolean) {
     if (this.emitFormUpdates) {
       this.flightUpdate.emit({
-        flight: { ...flight, totalGoal: this.flight.totalGoal },
-        changed,
+        flight: { ...flight, totalGoal: this.flight.totalGoal, dailyMinimum: this.flight.dailyMinimum },
+        changed: this.flightForm.dirty,
         valid: this.flightForm.valid
       });
     }
@@ -113,8 +113,7 @@ export class FlightComponent implements OnInit {
       {
         ...this.flight,
         ...(startAt && { startAt }),
-        ...(endAt && { endAt }),
-        totalGoal: this.flight.totalGoal
+        ...(endAt && { endAt })
       },
       true
     );

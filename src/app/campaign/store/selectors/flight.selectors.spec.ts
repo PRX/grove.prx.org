@@ -51,14 +51,6 @@ describe('Flight Selectors', () => {
     expect(changed).toEqual(flightState.changed);
   });
 
-  it('should select routed flight daily minimum', () => {
-    const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
-      campaignStateFactory.flightFixture.id
-    ];
-    const dailyMinimum = flightSelectors.selectRoutedFlightDailyMinimum.projector(flightState);
-    expect(dailyMinimum).toEqual(flightState.dailyMinimum);
-  });
-
   it('should select flight doc by id', () => {
     const state = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture));
     const doc = flightSelectors.selectFlightDocById.projector(state.flights.entities, { id: campaignStateFactory.flightFixture.id });

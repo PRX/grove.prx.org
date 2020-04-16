@@ -8,7 +8,6 @@ import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
-  selectRoutedFlightDailyMinimum,
   selectCurrentInventoryUri,
   selectRoutedFlightAllocationPreviewError,
   selectAvailabilityRollup
@@ -34,8 +33,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         [zones]="zoneOpts"
         [rollups]="flightAvailabilityRollup$ | async"
         [allocationPreviewError]="allocationPreviewError$ | async"
-        [dailyMinimum]="flightDailyMin$ | async"
-        (goalChange)="onGoalChange($event.flight, $event.dailyMinimum)"
+        (goalChange)="onGoalChange($event.flight)"
       >
       </grove-availability>
     </ng-container>
@@ -48,7 +46,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   softDeleted$: Observable<boolean>;
   flightChanged$: Observable<boolean>;
   flightAvailabilityRollup$: Observable<AvailabilityRollup[]>;
-  flightDailyMin$: Observable<number>;
   currentInventoryUri$: Observable<string>;
   allocationPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
@@ -61,7 +58,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
     this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
-    this.flightDailyMin$ = this.store.pipe(select(selectRoutedFlightDailyMinimum));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
     this.allocationPreviewError$ = this.store.pipe(select(selectRoutedFlightAllocationPreviewError));
     this.flightAvailabilityRollup$ = this.store.pipe(select(selectAvailabilityRollup));
@@ -85,8 +81,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.campaignAction.updateFlightForm(formFlight, changed, valid);
   }
 
-  onGoalChange(flight: Flight, dailyMinimum: number) {
-    this.campaignAction.setFlightGoal(flight.id, flight.totalGoal, dailyMinimum);
+  onGoalChange(flight: Flight) {
+    this.campaignAction.setFlightGoal(flight);
   }
 
   flightDuplicate(flight: Flight) {

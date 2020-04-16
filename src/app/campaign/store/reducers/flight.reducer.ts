@@ -1,7 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignActions } from '../actions/campaign-action.creator';
-import { docToFlight, Flight, FlightState, duplicateFlight } from '../models';
 import { docToFlight, duplicateFlight, Flight, FlightState, getFlightId } from '../models';
 
 export interface State extends EntityState<FlightState> {
@@ -108,7 +107,7 @@ export function reducer(state = initialState, action: CampaignActions): State {
     case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
       const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;
       return adapter.updateOne(
-        { id, changes: { localFlight: { ...state.entities[id].localFlight, totalGoal }, dailyMinimum, changed: true, valid } },
+        { id, changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum }, changed: true, valid } },
         state
       );
     }
