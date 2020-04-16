@@ -9,7 +9,7 @@ import { Campaign, Flight, FlightState } from '../store/models';
       <a
         mat-list-item
         *ngFor="let flight of flights; let i = index"
-        [routerLink]="['flight', flight.id]"
+        [routerLink]="['flight', flight?.localFlight?.id]"
         routerLinkActive="active-link"
         [class.deleted-flight]="flight.softDeleted"
         [class.changed]="flight.changed"

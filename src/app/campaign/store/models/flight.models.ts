@@ -14,20 +14,19 @@ export interface Flight {
   name: string;
   startAt: Date;
   endAt: Date;
-  totalGoal: number;
+  set_inventory_uri: string;
   zones: FlightZone[];
+  totalGoal: number;
+  dailyMinimum?: number;
   status?: string;
   status_message?: string;
   createdAt?: Date;
-  set_inventory_uri: string;
 }
 
 export interface FlightState {
-  id: number;
   doc?: HalDoc;
   localFlight: Flight;
   remoteFlight?: Flight;
-  dailyMinimum?: number;
   changed: boolean;
   valid: boolean;
   softDeleted?: boolean;
@@ -51,4 +50,8 @@ export const duplicateFlight = (flight: Flight, tempId: number): Flight => {
   const { createdAt, startAt, endAt, ...dupFlight } = flight;
   dupFlight.id = tempId;
   return dupFlight as Flight;
+};
+
+export const getFlightId = (state: FlightState) => {
+  return state.localFlight && state.localFlight.id;
 };

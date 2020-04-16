@@ -12,7 +12,7 @@ export const selectFlightEntities = createSelector(selectFlightsState, selectEnt
 export const selectAllFlights = createSelector(selectFlightsState, selectAll);
 
 export const selectAllFlightsOrderByCreatedAt = createSelector(selectAllFlights, flights =>
-  flights.sort((a, b) => (a.localFlight.createdAt || a.id).valueOf() - (b.localFlight.createdAt || b.id).valueOf())
+  flights.sort((a, b) => (a.localFlight.createdAt || a.localFlight.id).valueOf() - (b.localFlight.createdAt || b.localFlight.id).valueOf())
 );
 
 export const selectRoutedFlightId = createSelector(selectRouterStateParams, (params): number => params && +params.flightId);
@@ -41,10 +41,6 @@ export const selectRoutedFlightDeleted = createSelector(
 export const selectRoutedFlightChanged = createSelector(
   selectRoutedFlight,
   (flightState: FlightState): boolean => flightState && flightState.changed
-);
-export const selectRoutedFlightDailyMinimum = createSelector(
-  selectRoutedFlight,
-  (flightState: FlightState): number => flightState && flightState.dailyMinimum
 );
 export const selectFlightDocById = createSelector(
   selectFlightEntities,

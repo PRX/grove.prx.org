@@ -10,7 +10,7 @@ import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParam
       Please select Start and End Dates, Series, and Zones to view inventory.
     </p>
     <ng-template #inventory>
-      <grove-goal-form [flight]="flight" [dailyMinimum]="dailyMinimum" (goalChange)="goalChange.emit($event)"></grove-goal-form>
+      <grove-goal-form [flight]="flight" (goalChange)="goalChange.emit($event)"></grove-goal-form>
       <ul class="errors" *ngIf="errors as flightErrors">
         <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{ error }}</li>
       </ul>
@@ -97,8 +97,7 @@ export class AvailabilityComponent {
   @Input() zones: InventoryZone[];
   @Input() rollups: AvailabilityRollup[];
   @Input() allocationPreviewError: any;
-  @Input() dailyMinimum: number;
-  @Output() goalChange = new EventEmitter<{ flight: Flight; dailyMinimum: number }>();
+  @Output() goalChange = new EventEmitter<Flight>();
   zoneWeekExpanded = {};
 
   get errors() {

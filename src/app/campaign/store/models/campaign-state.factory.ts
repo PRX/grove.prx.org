@@ -94,6 +94,7 @@ export const flightFixture: Flight = {
   startAt: new Date('2019-10-01'),
   endAt: new Date('2019-11-01'),
   totalGoal: 999,
+  dailyMinimum: 99,
   zones: [{ id: 'pre_1', label: 'Preroll 1' }],
   set_inventory_uri: '/some/inventory'
 };
@@ -109,10 +110,8 @@ export const createFlightsState = campaignDoc => ({
     ids: [flightFixture.id],
     entities: {
       [flightFixture.id]: {
-        id: flightFixture.id,
         localFlight: flightFixture,
         remoteFlight: flightFixture,
-        dailyMinimum: 99,
         changed: false,
         valid: true,
         softDeleted: false,

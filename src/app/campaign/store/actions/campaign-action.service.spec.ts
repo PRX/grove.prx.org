@@ -48,13 +48,6 @@ describe('CampaignActionService', () => {
     fixture.ngZone.run(() => {
       const loadAction = new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs });
       store.dispatch(loadAction);
-      const goalAction = new campaignActions.CampaignFlightSetGoal({
-        flightId: flightIds[0],
-        totalGoal: 999,
-        dailyMinimum: 9,
-        valid: true
-      });
-      store.dispatch(goalAction);
 
       router
         .navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`)
@@ -73,16 +66,15 @@ describe('CampaignActionService', () => {
   });
 
   it('should dispatch action to load allocation preview', () => {
-    const { id: flightId, name, startAt, totalGoal, set_inventory_uri, zones } = flightFixture;
+    const { id: flightId, name, startAt, totalGoal, dailyMinimum, set_inventory_uri, zones } = flightFixture;
     const endAt = new Date();
     const createdAt = new Date();
-    const dailyMinimum = 100;
 
     const formFlight = { ...flightFixture, endAt };
     const localFlight = { ...flightFixture, createdAt };
-    service.loadAvailabilityAllocationIfChanged(formFlight, localFlight, 100);
+    service.loadAvailabilityAllocationIfChanged(formFlight, localFlight);
 
-    expect(dispatchSpy).toHaveBeenCalledWith(
+    expect(dispatchSpy).toHaveBeenLastCalledWith(
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,
         createdAt,
@@ -99,7 +91,7 @@ describe('CampaignActionService', () => {
 
   it('should not load allocation preview if just the flight name changes', () => {
     const changedFlight = { ...flightFixture, name: 'new name' };
-    service.loadAvailabilityAllocationIfChanged(changedFlight, flightFixture, 100);
+    service.loadAvailabilityAllocationIfChanged(changedFlight, flightFixture);
     expect(store.dispatch).not.toHaveBeenCalled();
   });
 
@@ -137,17 +129,17 @@ describe('CampaignActionService', () => {
   });
 
   it('should dispatch action to set flight goal', () => {
-    const flightId = flightFixture.id;
     const totalGoal = 1000;
     const dailyMinimum = 10;
-    service.setFlightGoal(flightId, totalGoal, dailyMinimum);
-    expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignFlightSetGoal({ flightId, totalGoal, dailyMinimum, valid: true }));
+    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum });
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, valid: true })
+    );
   });
 
   it('should load allocation preview when total goal is changed', () => {
-    const { id: flightId, createdAt, name, startAt, endAt, set_inventory_uri, zones, totalGoal } = flightFixture;
-    const dailyMinimum = 10;
-    service.setFlightGoal(flightId, totalGoal, dailyMinimum);
+    const { id: flightId, createdAt, name, startAt, endAt, set_inventory_uri, zones, totalGoal, dailyMinimum } = flightFixture;
+    service.setFlightGoal(flightFixture);
     expect(dispatchSpy).toHaveBeenLastCalledWith(
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,

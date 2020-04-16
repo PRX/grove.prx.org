@@ -39,11 +39,11 @@ export class CampaignActionService implements OnDestroy {
       });
   }
 
-  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight, dailyMinimum: number) {
+  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight) {
     if (this.isDateRangeValid(formFlight) && this.haveAvailabilityParamsChanged(formFlight, localFlight)) {
       this.loadAvailability({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
       if (formFlight.totalGoal) {
-        this.loadAllocationPreview({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt }, dailyMinimum);
+        this.loadAllocationPreview({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
       }
     }
   }
@@ -85,8 +85,8 @@ export class CampaignActionService implements OnDestroy {
     });
   }
 
-  loadAllocationPreview(flight: Flight, dailyMinimum: number) {
-    const { id: flightId, createdAt, set_inventory_uri, name, startAt, endAt, zones, totalGoal } = flight;
+  loadAllocationPreview(flight: Flight) {
+    const { id: flightId, createdAt, set_inventory_uri, name, startAt, endAt, zones, totalGoal, dailyMinimum } = flight;
     this.store.dispatch(
       new allocationPreviewActions.AllocationPreviewLoad({
         flightId,
@@ -118,21 +118,23 @@ export class CampaignActionService implements OnDestroy {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
+        filter(state => !!(state && state.localFlight)),
         first()
       )
-      .subscribe(state => this.store.dispatch(new campaignActions.CampaignDeleteFlight({ id: state.id, softDeleted: !state.softDeleted })));
+      .subscribe(state =>
+        this.store.dispatch(new campaignActions.CampaignDeleteFlight({ id: state.localFlight.id, softDeleted: !state.softDeleted }))
+      );
   }
 
   updateFlightForm(formFlight: Flight, changed: boolean, valid: boolean) {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.id)),
+        filter(state => !!(state && state.localFlight)),
         first()
       )
       .subscribe(state => {
-        this.loadAvailabilityAllocationIfChanged(formFlight, state.localFlight, state.dailyMinimum);
+        this.loadAvailabilityAllocationIfChanged(formFlight, state.localFlight);
         this.store.dispatch(
           new campaignActions.CampaignFlightFormUpdate({
             flight: formFlight,
@@ -143,19 +145,12 @@ export class CampaignActionService implements OnDestroy {
       });
   }
 
-  setFlightGoal(flightId: number, totalGoal: number, dailyMinimum: number) {
-    this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId, totalGoal, dailyMinimum, valid: !!totalGoal }));
-    // if totalGoal, get flight info to load allocation preview
+  setFlightGoal(flight: Flight) {
+    const { id, totalGoal, dailyMinimum } = flight;
+    this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, valid: !!totalGoal }));
+    // if totalGoal, load allocation preview
     if (totalGoal) {
-      this.store
-        .pipe(
-          select(selectRoutedLocalFlight),
-          filter(state => !!state),
-          first()
-        )
-        .subscribe(flight => {
-          this.loadAllocationPreview(flight, dailyMinimum);
-        });
+      this.loadAllocationPreview(flight);
     }
   }
 

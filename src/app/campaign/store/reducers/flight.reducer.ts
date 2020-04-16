@@ -1,14 +1,14 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignActions } from '../actions/campaign-action.creator';
-import { docToFlight, Flight, FlightState, duplicateFlight } from '../models';
+import { docToFlight, duplicateFlight, Flight, FlightState, getFlightId } from '../models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection
   campaignId?: number;
 }
 
-export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>();
+export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>({ selectId: getFlightId });
 
 export const initialState: State = adapter.getInitialState({
   // additional entity state properties
@@ -55,7 +55,6 @@ export function reducer(state = initialState, action: CampaignActions): State {
       const flights = action.payload.flightDocs.map(doc => {
         const flight = docToFlight(doc);
         return {
-          id: doc.id,
           doc,
           localFlight: flight,
           remoteFlight: flight,
@@ -68,7 +67,6 @@ export function reducer(state = initialState, action: CampaignActions): State {
     case ActionTypes.CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID: {
       const { flightId: id, startAt, endAt } = action.payload;
       const initialFlightState: FlightState = {
-        id,
         localFlight: {
           id,
           name: 'New Flight ' + (state.ids.length + 1),
@@ -86,7 +84,7 @@ export function reducer(state = initialState, action: CampaignActions): State {
     case ActionTypes.CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID: {
       const { flight, flightId: id } = action.payload;
       const localFlight: Flight = { ...flight, id, name: `${flight.name} (Copy)` };
-      return adapter.addOne({ id, localFlight, changed: true, valid: true }, state);
+      return adapter.addOne({ localFlight, changed: true, valid: true }, state);
     }
     case ActionTypes.CAMPAIGN_DELETE_FLIGHT: {
       const { id, softDeleted } = action.payload;
@@ -110,7 +108,10 @@ export function reducer(state = initialState, action: CampaignActions): State {
     case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
       const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;
       return adapter.updateOne(
-        { id, changes: { localFlight: { ...state.entities[id].localFlight, totalGoal }, dailyMinimum, changed: true, valid } },
+        {
+          id,
+          changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0 }, changed: true, valid }
+        },
         state
       );
     }
@@ -124,8 +125,8 @@ export function reducer(state = initialState, action: CampaignActions): State {
         const updatedFlightIds = Object.keys(updatedFlightDocs);
         newState = adapter.updateMany(
           updatedFlightIds.map(id => {
-            const doc = docToFlight(updatedFlightDocs[id]);
-            return { id, changes: { localFlight: doc, remoteFlight: doc, changed: false } };
+            const flight = docToFlight(updatedFlightDocs[id]);
+            return { id, changes: { localFlight: flight, remoteFlight: flight, changed: false } };
           }),
           newState
         );
@@ -135,8 +136,8 @@ export function reducer(state = initialState, action: CampaignActions): State {
         newState = adapter.removeMany(newFlightIds, newState);
         newState = adapter.addMany(
           newFlightIds.map(newId => {
-            const doc = docToFlight(createdFlightDocs[newId]);
-            return { id: createdFlightDocs[newId].id, localFlight: doc, remoteFlight: doc, changed: false, valid: true };
+            const flight = docToFlight(createdFlightDocs[newId]);
+            return { localFlight: flight, remoteFlight: flight, changed: false, valid: true };
           }),
           newState
         );
