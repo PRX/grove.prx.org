@@ -10,8 +10,6 @@ import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/fo
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightComponent implements OnInit {
-  private emitFormUpdates = false;
-
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
@@ -45,6 +43,7 @@ export class FlightComponent implements OnInit {
   }
 
   flightForm = this.fb.group({
+    id: [],
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
@@ -67,9 +66,8 @@ export class FlightComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
-    this.flightForm.valueChanges.subscribe(cmp => {
-      // preserving id on the flight because doesn't exist in form fields
-      this.formStatusChanged({ ...cmp, id: this.flight.id }, this.flightForm.dirty);
+    this.flightForm.valueChanges.subscribe(flightFormModel => {
+      this.formStatusChanged(flightFormModel, this.flightForm.dirty);
     });
   }
 
@@ -91,13 +89,11 @@ export class FlightComponent implements OnInit {
 
   // emits updates when reactive form fields change
   formStatusChanged(flight: Flight, changed?: boolean) {
-    if (this.emitFormUpdates) {
-      this.flightUpdate.emit({
-        flight: { ...flight, totalGoal: this.flight.totalGoal, dailyMinimum: this.flight.dailyMinimum },
-        changed: this.flightForm.dirty,
-        valid: this.flightForm.valid
-      });
-    }
+    this.flightUpdate.emit({
+      flight: { ...flight, totalGoal: this.flight.totalGoal, dailyMinimum: this.flight.dailyMinimum },
+      changed,
+      valid: this.flightForm.valid
+    });
   }
 
   onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
@@ -121,8 +117,6 @@ export class FlightComponent implements OnInit {
 
   // updates the form from @Input() set flight
   updateFlightForm(flight: Flight) {
-    this.emitFormUpdates = false;
-
     // get the correct number of zone fields
     while (this.zones.length > (flight.zones.length || 1)) {
       this.zones.removeAt(this.zones.length - 1);
@@ -135,7 +129,6 @@ export class FlightComponent implements OnInit {
 
     // reset the form, then re-enable emiting
     this.flightForm.reset(flight, { emitEvent: false });
-    this.emitFormUpdates = true;
   }
 
   onAddZone() {
