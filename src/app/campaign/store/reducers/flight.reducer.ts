@@ -108,7 +108,10 @@ export function reducer(state = initialState, action: CampaignActions): State {
     case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
       const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;
       return adapter.updateOne(
-        { id, changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum }, changed: true, valid } },
+        {
+          id,
+          changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0 }, changed: true, valid }
+        },
         state
       );
     }
