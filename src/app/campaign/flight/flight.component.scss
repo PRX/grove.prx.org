@@ -27,6 +27,7 @@ mat-card form > * {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-column-gap: 0.5rem;
 }
+/*
 .inline-fields > prx-datepicker {
   position: relative;
   display: grid;
@@ -91,7 +92,7 @@ mat-card form > * {
     }
   }
 }
-
+*/
 .flight-controls-container {
   display: flex;
   justify-content: flex-end;

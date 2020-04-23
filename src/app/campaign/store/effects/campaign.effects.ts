@@ -6,7 +6,7 @@ import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
 import { ActionTypes } from '../actions/action.types';
-import { CampaignFormSave, Flight } from '../models';
+import { CampaignFormSave } from '../models';
 import { CampaignService } from '../../../core';
 
 @Injectable()
@@ -117,27 +117,20 @@ export class CampaignEffects {
     })
   );
 
-  @Effect()
+  @Effect({ dispatch: false })
   addFlight$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_ADD_FLIGHT),
     map((action: campaignActions.CampaignAddFlight) => {
-      const date = new Date(Date.now());
-      const flightId = date.getTime();
-      const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-      const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
-      this.router.navigate(['/campaign', action.payload.campaignId, 'flight', flightId]);
-      return new campaignActions.CampaignAddFlightWithTempId({ flightId, startAt, endAt });
+      this.router.navigate(['/campaign', action.payload.campaignId, 'flight', action.payload.flightId]);
     })
   );
 
-  @Effect()
+  @Effect({ dispatch: false })
   dupFlight$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_DUP_FLIGHT),
     map((action: campaignActions.CampaignDupFlight) => {
-      const { campaignId, flight } = action.payload;
-      const flightId = Date.now();
+      const { campaignId, flightId } = action.payload;
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-      return new campaignActions.CampaignDupFlightWithTempId({ flightId, flight });
     })
   );
 
@@ -145,8 +138,15 @@ export class CampaignEffects {
   dupCampaignById$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_DUP_BY_ID),
     map((action: campaignActions.CampaignDupById) => action.payload),
-    mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
-    map(({ campaignDoc, flightDocs }) => new campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs })),
+    mergeMap(payload =>
+      this.campaignService
+        .loadCampaignZoomFlights(payload.id)
+        .pipe(map(({ campaignDoc, flightDocs }) => ({ payload, campaignDoc, flightDocs })))
+    ),
+    map(
+      ({ payload, campaignDoc, flightDocs }) =>
+        new campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs, timestamp: payload.timestamp })
+    ),
     tap(() => this.toastr.success('Campaign duplicated')),
     catchError(error => of(new campaignActions.CampaignDupByIdFailure({ error })))
   );

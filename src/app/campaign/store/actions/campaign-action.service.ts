@@ -1,13 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
 import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight, getFlightZoneIds } from '../models';
+import { Flight, getFlightZoneIds, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
 import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
+import { Moment } from 'moment';
 
 @Injectable()
 export class CampaignActionService implements OnDestroy {
@@ -48,7 +48,7 @@ export class CampaignActionService implements OnDestroy {
     }
   }
 
-  isDateRangeValid({ startAt, endAt }: { startAt: Date; endAt: Date }) {
+  isDateRangeValid({ startAt, endAt }: { startAt: Moment; endAt: Moment }) {
     return startAt && endAt && startAt.valueOf() < endAt.valueOf();
   }
 
@@ -58,30 +58,24 @@ export class CampaignActionService implements OnDestroy {
 
   haveAvailabilityParamsChanged(a: Flight, b: Flight) {
     return (
-      this.hasAvailabilityParams(a) &&
-      (!this.hasAvailabilityParams(b) ||
-        a.startAt.getTime() !== b.startAt.getTime() ||
-        a.endAt.getTime() !== b.endAt.getTime() ||
-        a.set_inventory_uri !== b.set_inventory_uri ||
-        this.haveFlightZonesChanged(a, b))
+      this.hasAvailabilityParams(a) && (isStartAtChanged(a, b) || isEndAtChanged(a, b) || isInventoryChanged(a, b) || isZonesChanged(a, b))
     );
   }
 
-  haveFlightZonesChanged(a: Flight, b: Flight) {
-    const aZones = getFlightZoneIds(a.zones)
-      .sort()
-      .join(',');
-    const bZones = getFlightZoneIds(b.zones)
-      .sort()
-      .join(',');
-    return aZones !== bZones;
-  }
-
   loadAvailability(flight: Flight) {
-    const { id: flightId, createdAt, set_inventory_uri, startAt: startDate, endAt: endDate, zones } = flight;
+    const { id: flightId, createdAt, set_inventory_uri, startAt, endAt, zones } = flight;
     const inventoryId = set_inventory_uri.split('/').pop();
     getFlightZoneIds(zones).forEach(zone => {
-      this.store.dispatch(new availabilityActions.AvailabilityLoad({ inventoryId, startDate, endDate, zone, createdAt, flightId }));
+      this.store.dispatch(
+        new availabilityActions.AvailabilityLoad({
+          inventoryId,
+          startDate: startAt.toDate(),
+          endDate: endAt.toDate(),
+          zone,
+          createdAt,
+          flightId
+        })
+      );
     });
   }
 
@@ -93,8 +87,8 @@ export class CampaignActionService implements OnDestroy {
         createdAt,
         set_inventory_uri,
         name,
-        startAt,
-        endAt,
+        startAt: startAt.toDate(),
+        endAt: endAt.toDate(),
         totalGoal,
         dailyMinimum,
         zones

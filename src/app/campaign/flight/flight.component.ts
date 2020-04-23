@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Inventory, InventoryZone } from '../../core';
-import { Flight } from '../store/models';
 import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { Inventory, InventoryZone } from '../../core';
+import { Flight, isNameChanged, isInventoryChanged, isStartAtChanged, isEndAtChanged, isZonesChanged } from '../store/models';
 
 @Component({
   selector: 'grove-flight',
@@ -48,7 +48,8 @@ export class FlightComponent implements OnInit {
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
     zones: this.fb.array([]),
-    set_inventory_uri: ['', Validators.required]
+    set_inventory_uri: ['', Validators.required],
+    totalGoal: [0, Validators.required]
   });
 
   get name() {
@@ -67,7 +68,7 @@ export class FlightComponent implements OnInit {
 
   ngOnInit() {
     this.flightForm.valueChanges.subscribe(flightFormModel => {
-      this.formStatusChanged(flightFormModel, this.flightForm.dirty);
+      this.formStatusChanged(flightFormModel);
     });
   }
 
@@ -87,32 +88,25 @@ export class FlightComponent implements OnInit {
     });
   }
 
-  // emits updates when reactive form fields change
-  formStatusChanged(flight: Flight, changed?: boolean) {
-    this.flightUpdate.emit({
-      flight: { ...flight, totalGoal: this.flight.totalGoal, dailyMinimum: this.flight.dailyMinimum },
-      changed,
-      valid: this.flightForm.valid
-    });
+  isFlightFormChanged(flight: Flight) {
+    return (
+      isNameChanged(flight, this.flight) ||
+      isStartAtChanged(flight, this.flight) ||
+      isEndAtChanged(flight, this.flight) ||
+      isInventoryChanged(flight, this.flight) ||
+      isZonesChanged(flight, this.flight)
+    );
   }
 
-  onDateRangeChange({ startAt, endAt }: { startAt?: Date; endAt?: Date }) {
-    // these dates pickers are not actually connected to the reactive form
-    // so in order for the flightForm to be valid on emit, these values must be set on the form
-    if (startAt) {
-      this.flightForm.get('startAt').setValue(startAt, { emitEvent: false });
+  // emits updates when reactive form fields change
+  formStatusChanged(flight: Flight) {
+    if (this.isFlightFormChanged(flight)) {
+      this.flightUpdate.emit({
+        flight,
+        changed: this.flightForm.dirty,
+        valid: this.flightForm.valid
+      });
     }
-    if (endAt) {
-      this.flightForm.get('endAt').setValue(endAt, { emitEvent: false });
-    }
-    this.formStatusChanged(
-      {
-        ...this.flight,
-        ...(startAt && { startAt }),
-        ...(endAt && { endAt })
-      },
-      true
-    );
   }
 
   // updates the form from @Input() set flight
@@ -127,8 +121,8 @@ export class FlightComponent implements OnInit {
       this.zones.markAsPristine();
     }
 
-    // reset the form, then re-enable emiting
-    this.flightForm.reset(flight, { emitEvent: false });
+    // reset the form
+    this.flightForm.patchValue(flight, { emitEvent: false });
   }
 
   onAddZone() {

@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule, MatInputModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { GoalFormComponent } from './goal-form.component';
+import * as moment from 'moment';
 
 describe('GoalFormComponent', () => {
   let comp: GoalFormComponent;
@@ -15,8 +15,8 @@ describe('GoalFormComponent', () => {
   const flight = {
     id: 9,
     name: 'my flight name',
-    startAt: new Date('2019-10-01'),
-    endAt: new Date('2019-11-01'),
+    startAt: moment.utc(),
+    endAt: moment.utc(),
     totalGoal: 999,
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     set_inventory_uri: '/some/inventory'
