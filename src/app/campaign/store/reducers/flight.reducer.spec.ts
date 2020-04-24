@@ -120,6 +120,25 @@ describe('Flight Reducer', () => {
     expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBe(99);
   });
 
+  it('should delete temporary softDeleted flights from save action', () => {
+    const flightId = Date.now();
+    let state = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId }));
+    state = reducer(state, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: flightId + 1 }));
+    state = reducer(
+      state,
+      new campaignActions.CampaignSave({
+        campaign: campaignFixture,
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        deletedFlights: [],
+        updatedFlights: [],
+        createdFlights: [],
+        tempDeletedFlights: [state.entities[flightId].localFlight]
+      })
+    );
+    expect(state.entities[flightId]).toBeUndefined();
+    expect(state.entities[flightId + 1]).toBeDefined();
+  });
+
   it('should update flights from campaign save action', () => {
     const deletedFlightIds = [flightDocFixture.id, flightDocFixture.id + 1];
     const updatedFlightIds = [flightDocFixture.id + 2, flightDocFixture.id + 3];

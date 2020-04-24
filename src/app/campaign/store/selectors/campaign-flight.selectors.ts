@@ -13,7 +13,8 @@ export const selectCampaignWithFlightsForSave = createSelector(
       .filter(flight => !flight.softDeleted && flight.changed && flight.remoteFlight)
       .map(flight => flight.localFlight),
     createdFlights: flights.filter(flight => !flight.softDeleted && !flight.remoteFlight).map(flight => flight.localFlight),
-    deletedFlights: flights.filter(flight => flight.softDeleted && flight.remoteFlight).map(flight => flight.localFlight)
+    deletedFlights: flights.filter(flight => flight.softDeleted && flight.remoteFlight).map(flight => flight.localFlight),
+    tempDeletedFlights: flights.filter(flight => flight.softDeleted && !flight.remoteFlight).map(flight => flight.localFlight)
   })
 );
 
@@ -21,7 +22,7 @@ export const selectValid = createSelector(
   selectCampaign,
   selectAllFlights,
   (campaignState: CampaignState, flightsState: FlightState[]): boolean =>
-    campaignState.valid && flightsState.every(flight => (flight.valid && !!flight.localFlight.totalGoal) || flight.softDeleted)
+    campaignState.valid && flightsState.every(flight => flight.valid || flight.softDeleted)
 );
 
 export const selectChanged = createSelector(

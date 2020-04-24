@@ -106,6 +106,7 @@ describe('Campaign Reducer', () => {
         campaign: campaignFixture,
         campaignDoc: new MockHalDoc(campaignDocFixture),
         deletedFlights: [],
+        tempDeletedFlights: [],
         updatedFlights: [flightFixture],
         createdFlights: []
       })

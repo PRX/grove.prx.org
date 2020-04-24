@@ -151,8 +151,10 @@ export class CampaignActionService implements OnDestroy {
   saveCampaignAndFlights() {
     this.store
       .pipe(select(selectCampaignWithFlightsForSave), first())
-      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights }) =>
-        this.store.dispatch(new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights }))
+      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) =>
+        this.store.dispatch(
+          new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
+        )
       );
   }
 }

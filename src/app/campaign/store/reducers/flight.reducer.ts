@@ -98,7 +98,10 @@ export function reducer(state = initialState, action: CampaignActions): State {
           id: flight.id,
           changes: {
             localFlight,
-            changed: state.entities[flight.id].changed || changed,
+            // changed _should_ always be true on form updates
+            // however, we're seeing updates emit from the form when the form is not dirty (changed: false)
+            // so changed state shall be false until true
+            changed: (state.entities[flight.id] && state.entities[flight.id].changed) || changed,
             valid
           }
         },
@@ -112,6 +115,12 @@ export function reducer(state = initialState, action: CampaignActions): State {
           id,
           changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0 }, changed: true, valid }
         },
+        state
+      );
+    }
+    case ActionTypes.CAMPAIGN_SAVE: {
+      return adapter.removeMany(
+        action.payload.tempDeletedFlights.map(flight => flight.id),
         state
       );
     }

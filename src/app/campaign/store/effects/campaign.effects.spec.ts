@@ -91,14 +91,16 @@ describe('CampaignEffects', () => {
       campaignDoc: undefined,
       updatedFlights: [],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const updateAction = new campaignActions.CampaignSave({
       campaign: campaignFixture,
       campaignDoc,
       updatedFlights: [],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const success = new campaignActions.CampaignSaveSuccess({
       campaignDoc,
@@ -124,14 +126,16 @@ describe('CampaignEffects', () => {
       campaignDoc: undefined,
       updatedFlights: [],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const updateAction = new campaignActions.CampaignSave({
       campaign: campaignFixture,
       campaignDoc,
       updatedFlights: [],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const outcome = new campaignActions.CampaignSaveFailure({ error: halError });
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
@@ -147,7 +151,8 @@ describe('CampaignEffects', () => {
       campaignDoc: undefined,
       updatedFlights: [],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const success = new campaignActions.CampaignSaveSuccess({
       campaignDoc,
@@ -175,7 +180,8 @@ describe('CampaignEffects', () => {
           campaignDoc: undefined,
           updatedFlights: [],
           createdFlights: [flight],
-          deletedFlights: []
+          deletedFlights: [],
+          tempDeletedFlights: []
         });
         const success = new campaignActions.CampaignSaveSuccess({
           campaignDoc,
@@ -202,7 +208,8 @@ describe('CampaignEffects', () => {
           campaignDoc,
           updatedFlights: [],
           createdFlights: [],
-          deletedFlights: [flightFixture]
+          deletedFlights: [flightFixture],
+          tempDeletedFlights: []
         });
         const success = new campaignActions.CampaignSaveSuccess({
           campaignDoc,
@@ -228,7 +235,8 @@ describe('CampaignEffects', () => {
       campaignDoc,
       updatedFlights: [flightFixture],
       createdFlights: [],
-      deletedFlights: []
+      deletedFlights: [],
+      tempDeletedFlights: []
     });
     const success = new campaignActions.CampaignSaveSuccess({
       campaignDoc,
