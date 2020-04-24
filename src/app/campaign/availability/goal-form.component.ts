@@ -75,6 +75,6 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   }
 
   updateGoalForm({ id, totalGoal, dailyMinimum }: Flight) {
-    this.goalForm.patchValue({ id, totalGoal, dailyMinimum }, { emitEvent: false, onlySelf: true });
+    this.goalForm.reset({ id, totalGoal, dailyMinimum }, { emitEvent: false, onlySelf: true });
   }
 }

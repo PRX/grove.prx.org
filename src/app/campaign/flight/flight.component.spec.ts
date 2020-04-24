@@ -136,13 +136,13 @@ describe('FlightComponent', () => {
   it('updates zone controls to match the flight', () => {
     component.flight = { ...flightFixture, zones: [{ id: 'pre_1' }, { id: 'pre_2', url: 'http://file.mp3' }] };
     expect(component.zones.value).toEqual([
-      { id: 'pre_1', url: '' },
+      { id: 'pre_1', url: null },
       { id: 'pre_2', url: 'http://file.mp3' }
     ]);
 
     // should keep 1 around - can't have 0 zones
     component.flight = { ...flightFixture, zones: [] };
-    expect(component.zones.value).toEqual([{ id: 'pre_1', url: '' }]);
+    expect(component.zones.value).toEqual([{ id: null, url: null }]);
   });
 
   it('adds and removes zone controls', () => {
@@ -151,11 +151,11 @@ describe('FlightComponent', () => {
       { id: 'pre_1', label: 'Preroll 1' },
       { id: 'pre_2', label: 'Preroll 2' }
     ];
-    expect(component.zones.value).toEqual([{ id: 'pre_1', url: '' }]);
+    expect(component.zones.value).toEqual([{ id: 'pre_1', url: null }]);
 
     component.onAddZone();
     expect(component.zones.value).toEqual([
-      { id: 'pre_1', url: '' },
+      { id: 'pre_1', url: null },
       { id: 'pre_2', url: null }
     ]);
 

@@ -122,7 +122,7 @@ export class FlightComponent implements OnInit {
     }
 
     // reset the form
-    this.flightForm.patchValue(flight, { emitEvent: false });
+    this.flightForm.reset(flight, { emitEvent: false });
   }
 
   onAddZone() {
