@@ -27,72 +27,19 @@ mat-card form > * {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-column-gap: 0.5rem;
 }
+
 /*
-.inline-fields > prx-datepicker {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 3rem;
-  justify-items: center;
-  align-items: center;
-  margin-bottom: 20px;
-
-  &::before {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 2px solid prx-theme-foreground(divider, 0.87);
-    border-radius: 5px;
-    opacity: 0;
-  }
-
-  &:hover,
-  &:focus-within {
-    &::before {
-      transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-      opacity: 1;
-    }
-  }
-
-  &:focus-within {
-    &::before {
-      border-color: $primary;
-    }
-    ::ng-deep {
-      prx-icon {
-        color: $primary;
-      }
-    }
-  }
-
-  ::ng-deep {
-    > * {
-      position: relative;
-      grid-row: 1;
-    }
-    input {
-      grid-column: 1 / -1;
-      width: 100%;
-      height: auto;
-      color: prx-theme-foreground(text);
-      border: 1px solid prx-theme-foreground(divider, 0.12);
-      border-radius: 5px;
-      background: none;
-      padding: 1rem 0.75rem;
-    }
-
-    > span {
-      grid-column: 2;
-    }
-
-    prx-icon {
-      transition: color 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-      position: unset;
-    }
-  }
-}
+ * override the global button styles
+ * https://github.com/PRX/styleguide.prx.org/issues/212
 */
+::ng-deep button {
+  flex: initial;
+}
+::ng-deep button:hover,
+::ng-deep button[disabled] {
+  background-color: initial;
+}
+
 .flight-controls-container {
   display: flex;
   justify-content: flex-end;
