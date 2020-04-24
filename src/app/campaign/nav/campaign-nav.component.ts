@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Campaign, Flight, FlightState } from '../store/models';
+import { Campaign, FlightState } from '../store/models';
 
 @Component({
   selector: 'grove-campaign-nav',
@@ -44,10 +44,15 @@ export class CampaignNavComponent {
     return !flight.localFlight.status || flight.localFlight.status === 'ok';
   }
 
-  get dupCampaignState(): { campaign: Campaign; flights: Flight[] } {
+  get dupCampaignState(): { campaign; flights } {
     return {
       campaign: this.campaign,
-      flights: this.flights.filter(flight => !flight.softDeleted).map(flight => flight.localFlight)
+      flights: this.flights
+        .filter(flight => !flight.softDeleted)
+        .map(flight => {
+          // NOTE: router does not want to serialize Moment, so passing thru valueOf, startAt/endAt are removed in reducer
+          return { ...flight.localFlight, startAt: flight.localFlight.startAt.valueOf(), endAt: flight.localFlight.endAt.valueOf() };
+        })
     };
   }
 }
