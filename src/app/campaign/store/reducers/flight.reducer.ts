@@ -98,7 +98,7 @@ export function reducer(state = initialState, action: CampaignActions): State {
           id: flight.id,
           changes: {
             localFlight,
-            changed,
+            changed: state.entities[flight.id].changed || changed,
             valid
           }
         },
