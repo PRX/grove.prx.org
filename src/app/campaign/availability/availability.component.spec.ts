@@ -10,6 +10,7 @@ import { GoalFormComponent } from './goal-form.component';
 import { InventoryZone } from '../../core';
 import { Flight, AvailabilityRollup } from '../store/models';
 import { availabilityParamsFixture } from '../store/models/campaign-state.factory';
+import * as moment from 'moment';
 
 describe('AvailabilityComponent', () => {
   let comp: AvailabilityComponent;
@@ -55,8 +56,8 @@ describe('AvailabilityComponent', () => {
   const mockFlight: Flight = {
     id: 9,
     name: 'my flight name',
-    startAt: new Date('2019-10-01'),
-    endAt: new Date('2019-11-01'),
+    startAt: moment.utc('2019-10-01'),
+    endAt: moment.utc('2019-11-01'),
     totalGoal: 999,
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     set_inventory_uri: '/some/inventory'

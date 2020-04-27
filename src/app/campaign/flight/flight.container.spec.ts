@@ -5,12 +5,14 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule,
   MatCardModule,
+  MatDatepickerModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
   MatListModule,
   MatSelectModule
 } from '@angular/material';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReplaySubject } from 'rxjs';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -18,7 +20,7 @@ import { ActivatedRouteStub } from '../../../testing/stub.router';
 import { Store, StoreModule } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
-import { DatepickerModule, MockHalDoc } from 'ngx-prx-styleguide';
+import { MockHalDoc } from 'ngx-prx-styleguide';
 import { InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
 import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
@@ -31,6 +33,7 @@ import { FlightComponent } from './flight.component';
 import { AvailabilityComponent } from '../availability/availability.component';
 import { GoalFormComponent } from '../availability/goal-form.component';
 import { TestComponent } from '../../../testing/test.component';
+import * as moment from 'moment';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: FlightContainerComponent },
@@ -62,8 +65,8 @@ describe('FlightContainerComponent', () => {
   const flight = {
     id: 123,
     name: 'my-flight',
-    startAt: new Date('2019-10-01'),
-    endAt: new Date('2019-11-01'),
+    startAt: moment.utc('2019-10-01'),
+    endAt: moment.utc('2019-11-01'),
     set_inventory_uri: '/some/url',
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     totalGoal: 999
@@ -74,11 +77,12 @@ describe('FlightContainerComponent', () => {
       imports: [
         RouterTestingModule.withRoutes(campaignRoutes),
         SharedModule,
-        DatepickerModule,
         ReactiveFormsModule,
         NoopAnimationsModule,
         MatButtonModule,
         MatCardModule,
+        MatDatepickerModule,
+        MatMomentDateModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
@@ -127,7 +131,7 @@ describe('FlightContainerComponent', () => {
   });
 
   it('receives availability and allocation preview updates when flight form changes', done => {
-    component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: new Date() }, changed: true, valid: true });
+    component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: moment.utc() }, changed: true, valid: true });
     component.flightAvailabilityRollup$.subscribe(availability => {
       expect(availability).toBeDefined();
       done();

@@ -101,34 +101,38 @@ describe('CampaignComponent', () => {
     });
   });
 
-  it('calls action to duplicate a campaign by id', done => {
-    jest.spyOn(store, 'dispatch');
-    // id is passed through the /camp[aign/new router link state
-    Object.defineProperty(window.history, 'state', { writable: true, value: { id: 123 } });
-    fix.ngZone.run(() => {
-      router.navigateByUrl('/campaign/new');
-      route.setParamMap({});
-      route.paramMap.pipe(first()).subscribe(() => {
-        expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignDupById({ id: 123 }));
-        done();
+  describe('temporary flightId timestamp', () => {
+    // mock the flight tempId
+    const timestamp = Date.now();
+    beforeEach(() => {
+      global.Date.now = jest.fn(() => timestamp);
+      jest.spyOn(store, 'dispatch');
+    });
+    it('calls action to duplicate a campaign by id', done => {
+      // id is passed through the /camp[aign/new router link state
+      Object.defineProperty(window.history, 'state', { writable: true, value: { id: 123 } });
+      fix.ngZone.run(() => {
+        router.navigateByUrl('/campaign/new');
+        route.setParamMap({});
+        route.paramMap.pipe(first()).subscribe(() => {
+          expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignDupById({ id: 123, timestamp }));
+          done();
+        });
       });
     });
-  });
 
-  it('calls action to duplicate a campaign from form', done => {
-    jest.spyOn(store, 'dispatch');
-    // mock the flight tempId
-    Date.now = jest.fn(() => 12345);
-    // campaign and flights are passed through the /capaign/new router link state
-    Object.defineProperty(window.history, 'state', { writable: true, value: { campaign: campaignFixture, flights: [flightFixture] } });
-    fix.ngZone.run(() => {
-      router.navigateByUrl('/campaign/new');
-      route.setParamMap({});
-      route.paramMap.pipe(first()).subscribe(() => {
-        expect(store.dispatch).toHaveBeenLastCalledWith(
-          new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture] })
-        );
-        done();
+    it('calls action to duplicate a campaign from form', done => {
+      // campaign and flights are passed through the /capaign/new router link state
+      Object.defineProperty(window.history, 'state', { writable: true, value: { campaign: campaignFixture, flights: [flightFixture] } });
+      fix.ngZone.run(() => {
+        router.navigateByUrl('/campaign/new');
+        route.setParamMap({});
+        route.paramMap.pipe(first()).subscribe(() => {
+          expect(store.dispatch).toHaveBeenLastCalledWith(
+            new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture], timestamp })
+          );
+          done();
+        });
       });
     });
   });

@@ -9,6 +9,14 @@ import { ErrorService } from './error/error.service';
 import { AppRoutingModule, routingComponents } from './app.routing.module';
 import { AppComponent } from './app.component';
 
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material';
+import {
+  MatMomentDateModule,
+  MomentDateAdapter,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+  MAT_MOMENT_DATE_FORMATS
+} from '@angular/material-moment-adapter';
+
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { CampaignModule } from './campaign/campaign.module';
@@ -34,13 +42,19 @@ import { environment } from '../environments/environment';
     CampaignModule,
     BrowserAnimationsModule,
     DashboardModule,
+    MatMomentDateModule,
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreModule.forRoot({ router: routerReducer }),
     StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : []
   ],
-  providers: [{ provide: ErrorHandler, useClass: ErrorService }],
+  providers: [
+    { provide: ErrorHandler, useClass: ErrorService },
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
+    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
+    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -28,8 +28,8 @@ describe('Allocation Preview Reducer', () => {
         createdAt: new Date(),
         set_inventory_uri,
         name,
-        startAt,
-        endAt,
+        startAt: startAt.toDate(),
+        endAt: endAt.toDate(),
         totalGoal,
         dailyMinimum: 12,
         zones: zones.map(zone => ({ id: zone.id }))

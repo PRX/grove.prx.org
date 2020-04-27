@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 import { ActionTypes } from './action.types';
 import { Campaign, Flight, CampaignFormSave } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
+import { utc, Moment } from 'moment';
 
 export class CampaignNew implements Action {
   readonly type = ActionTypes.CAMPAIGN_NEW;
@@ -20,7 +21,9 @@ export class CampaignDupFromForm implements Action {
 export class CampaignDupById implements Action {
   readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID;
 
-  constructor(public payload: { id: number }) {}
+  constructor(public payload: { id: number; timestamp?: number }) {
+    this.payload.timestamp = payload.timestamp || Date.now();
+  }
 }
 
 export class CampaignDupByIdSuccess implements Action {
@@ -85,25 +88,39 @@ export class CampaignSaveFailure implements Action {
 export class CampaignAddFlight implements Action {
   readonly type = ActionTypes.CAMPAIGN_ADD_FLIGHT;
 
-  constructor(public payload: { campaignId: number | string }) {}
-}
+  public payload: { campaignId: number | string; flightId: number; startAt: Moment; endAt: Moment };
 
-export class CampaignAddFlightWithTempId implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID;
-
-  constructor(public payload: { flightId: number; startAt: Date; endAt: Date }) {}
+  constructor(payload: { campaignId: number | string; flightId?: number; startAt?: Moment; endAt?: Moment }) {
+    const date = utc();
+    this.payload = {
+      campaignId: payload.campaignId,
+      flightId: payload.flightId || date.valueOf(),
+      startAt:
+        payload.startAt ||
+        utc(date.valueOf())
+          .hours(0)
+          .minutes(0)
+          .seconds(0)
+          .milliseconds(0),
+      endAt:
+        payload.endAt ||
+        utc(date.valueOf())
+          .month(date.month() + 1)
+          .date(1)
+          .hours(0)
+          .minutes(0)
+          .seconds(0)
+          .milliseconds(0)
+    };
+  }
 }
 
 export class CampaignDupFlight implements Action {
   readonly type = ActionTypes.CAMPAIGN_DUP_FLIGHT;
 
-  constructor(public payload: { campaignId; flight: Flight }) {}
-}
-
-export class CampaignDupFlightWithTempId implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID;
-
-  constructor(public payload: { flightId: number; flight: Flight }) {}
+  constructor(public payload: { campaignId: number | string; flight: Flight; flightId?: number }) {
+    this.payload.flightId = payload.flightId || Date.now();
+  }
 }
 
 export class CampaignDeleteFlight implements Action {
@@ -137,9 +154,7 @@ export type CampaignActions =
   | CampaignFlightFormUpdate
   | CampaignFlightSetGoal
   | CampaignAddFlight
-  | CampaignAddFlightWithTempId
   | CampaignDupFlight
-  | CampaignDupFlightWithTempId
   | CampaignDeleteFlight
   | CampaignSave
   | CampaignSaveSuccess

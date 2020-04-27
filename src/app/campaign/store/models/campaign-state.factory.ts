@@ -8,6 +8,7 @@ import { AllocationPreview, docToAllocationPreview } from './allocation-preview.
 import { AvailabilityDay, docToAvailabilityDay } from './availability.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
+import * as moment from 'moment';
 
 const augury = new MockHalService();
 
@@ -91,8 +92,8 @@ export const flightFixture: Flight = {
   id: 9,
   createdAt: new Date(),
   name: 'my flight name',
-  startAt: new Date('2019-10-01'),
-  endAt: new Date('2019-11-01'),
+  startAt: moment.utc('2019-10-01'),
+  endAt: moment.utc('2019-11-01'),
   totalGoal: 999,
   dailyMinimum: 99,
   zones: [{ id: 'pre_1', label: 'Preroll 1' }],
@@ -123,8 +124,8 @@ export const createFlightsState = campaignDoc => ({
 
 export const allocationPreviewParamsFixture = {
   flightId: flightFixture.id,
-  startAt: flightFixture.startAt,
-  endAt: flightFixture.endAt,
+  startAt: flightFixture.startAt.toDate(),
+  endAt: flightFixture.endAt.toDate(),
   name: flightFixture.name,
   set_inventory_uri: flightFixture.set_inventory_uri,
   zones: flightFixture.zones.map(zone => ({ id: zone.id })),
@@ -181,8 +182,8 @@ export const createAllocationPreviewState = () => ({
 
 export const availabilityParamsFixture = {
   inventoryId: flightFixture.set_inventory_uri.split('/').pop(),
-  startDate: flightFixture.startAt,
-  endDate: flightFixture.endAt,
+  startDate: flightFixture.startAt.toDate(),
+  endDate: flightFixture.endAt.toDate(),
   zone: flightFixture.zones[0].id,
   flightId: flightFixture.id
 };

@@ -8,4 +8,5 @@ export interface CampaignFormSave {
   updatedFlights: Flight[];
   createdFlights: Flight[];
   deletedFlights: Flight[];
+  tempDeletedFlights: Flight[];
 }

@@ -1,10 +1,27 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule } from '@angular/material';
+import {
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatSelectModule,
+  MatButtonModule,
+  MatIconModule,
+  MatDatepickerModule,
+  DateAdapter,
+  MAT_DATE_LOCALE,
+  MAT_DATE_FORMATS
+} from '@angular/material';
+import {
+  MatMomentDateModule,
+  MomentDateAdapter,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+  MAT_MOMENT_DATE_FORMATS
+} from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightComponent } from './flight.component';
 import { Flight } from '../store/models';
-import { DatepickerModule } from 'ngx-prx-styleguide';
+import * as moment from 'moment';
 
 describe('FlightComponent', () => {
   let component: FlightComponent;
@@ -20,22 +37,25 @@ describe('FlightComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
-        DatepickerModule,
+        MatDatepickerModule,
+        MatMomentDateModule,
         MatButtonModule,
         MatIconModule
       ],
-      declarations: [FlightComponent]
+      declarations: [FlightComponent],
+      providers: [
+        { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
+        { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
+        { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS }
+      ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    const today = new Date();
-    const startAt = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
-    const endAt = new Date(Date.UTC(today.getFullYear(), today.getMonth() + 1, today.getDate()));
     flightFixture = {
       name: 'my-flight',
-      startAt,
-      endAt,
+      startAt: moment.utc(),
+      endAt: moment.utc(),
       totalGoal: 123,
       zones: [{ id: 'pre_1' }],
       set_inventory_uri: '/some/inventory'
@@ -58,16 +78,6 @@ describe('FlightComponent', () => {
       done();
     });
     component.name.setValue('brand new name');
-  });
-
-  it('emits date range changes', done => {
-    const startAt = new Date('2019-10-20');
-    component.flight = flightFixture;
-    component.flightUpdate.subscribe(updates => {
-      expect(updates).toMatchObject({ flight: { ...flightFixture, startAt }, changed: true });
-      done();
-    });
-    component.onDateRangeChange({ startAt });
   });
 
   it('emits flight duplicate', done => {

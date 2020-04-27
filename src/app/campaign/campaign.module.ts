@@ -4,6 +4,7 @@ import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
@@ -12,7 +13,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { StatusBarModule, FancyFormModule, DatepickerModule } from 'ngx-prx-styleguide';
+import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import * as fromCampaignState from './store';
@@ -29,6 +30,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     SharedModule,
     MatCardModule,
     MatButtonModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -40,7 +42,6 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     ReactiveFormsModule,
     StatusBarModule,
     FancyFormModule,
-    DatepickerModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
     EffectsModule.forFeature([AccountEffects, AdvertiserEffects, AllocationPreviewEffects, AvailabilityEffects, CampaignEffects])

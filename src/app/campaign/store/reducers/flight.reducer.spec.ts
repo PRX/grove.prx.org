@@ -3,6 +3,7 @@ import * as campaignActions from '../actions/campaign-action.creator';
 import { campaignDocFixture, flightFixture, flightDocFixture, createFlightsState, campaignFixture } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
 import { docToFlight, Flight } from '../models';
+import * as moment from 'moment';
 
 describe('Flight Reducer', () => {
   describe('unknown action', () => {
@@ -33,16 +34,16 @@ describe('Flight Reducer', () => {
   });
 
   it('should create a new flight', () => {
-    const date = new Date();
-    const startAt = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const endAt = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));
-    const result = reducer(initialState, new campaignActions.CampaignAddFlightWithTempId({ flightId: date.getTime(), startAt, endAt }));
+    const result = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
     const newFlight = selectAll(result).find(flight => !flight.remoteFlight);
     expect(newFlight.localFlight.name).toContain('New Flight');
   });
 
   it('should duplicate a flight', () => {
-    const result = reducer(initialState, new campaignActions.CampaignDupFlightWithTempId({ flightId: Date.now(), flight: flightFixture }));
+    const result = reducer(
+      initialState,
+      new campaignActions.CampaignDupFlight({ campaignId: campaignFixture.id, flightId: Date.now(), flight: flightFixture })
+    );
     const dupFlight = selectAll(result).find(flight => flight.localFlight.name.indexOf('(Copy)') > -1);
     expect(dupFlight.localFlight.zones).toBe(flightFixture.zones);
   });
@@ -119,13 +120,32 @@ describe('Flight Reducer', () => {
     expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBe(99);
   });
 
+  it('should delete temporary softDeleted flights from save action', () => {
+    const flightId = Date.now();
+    let state = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId }));
+    state = reducer(state, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: flightId + 1 }));
+    state = reducer(
+      state,
+      new campaignActions.CampaignSave({
+        campaign: campaignFixture,
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        deletedFlights: [],
+        updatedFlights: [],
+        createdFlights: [],
+        tempDeletedFlights: [state.entities[flightId].localFlight]
+      })
+    );
+    expect(state.entities[flightId]).toBeUndefined();
+    expect(state.entities[flightId + 1]).toBeDefined();
+  });
+
   it('should update flights from campaign save action', () => {
     const deletedFlightIds = [flightDocFixture.id, flightDocFixture.id + 1];
     const updatedFlightIds = [flightDocFixture.id + 2, flightDocFixture.id + 3];
     const createdFlightIds = [flightDocFixture.id + 4, flightDocFixture.id + 5];
     const newFlightIds = [Date.now(), Date.now() + 1];
-    const startAt = new Date();
-    const endAt = new Date();
+    const startAt = moment.utc();
+    const endAt = moment.utc();
 
     const campaignDoc = new MockHalDoc(campaignDocFixture);
     const flightDocs = [
@@ -140,8 +160,14 @@ describe('Flight Reducer', () => {
     ];
 
     let result = reducer(initialState, new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs }));
-    result = reducer(result, new campaignActions.CampaignAddFlightWithTempId({ flightId: newFlightIds[0], startAt, endAt }));
-    result = reducer(result, new campaignActions.CampaignAddFlightWithTempId({ flightId: newFlightIds[1], startAt, endAt }));
+    result = reducer(
+      result,
+      new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[0], startAt, endAt })
+    );
+    result = reducer(
+      result,
+      new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[1], startAt, endAt })
+    );
     result = reducer(
       result,
       new campaignActions.CampaignSaveSuccess({

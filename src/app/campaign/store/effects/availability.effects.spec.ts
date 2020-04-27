@@ -25,8 +25,8 @@ describe('AvailabilityEffects', () => {
   // load action received by the effect
   const loadAction = new availabilityActions.AvailabilityLoad({
     inventoryId: flightFixture.set_inventory_uri.split('/').pop(),
-    startDate: flightFixture.startAt,
-    endDate: flightFixture.endAt,
+    startDate: flightFixture.startAt.toDate(),
+    endDate: flightFixture.endAt.toDate(),
     zone: flightFixture.zones[0].id,
     flightId: flightFixture.id,
     createdAt: new Date()

@@ -12,6 +12,7 @@ import { campaignFixture, campaignDocFixture, flightFixture, flightDocFixture } 
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { CampaignActionService } from './campaign-action.service';
+import * as moment from 'moment';
 
 describe('CampaignActionService', () => {
   let router: Router;
@@ -61,13 +62,13 @@ describe('CampaignActionService', () => {
 
   it('should load availability and allocation preview when flight form is updated', () => {
     jest.spyOn(service, 'loadAvailabilityAllocationIfChanged');
-    service.updateFlightForm({ ...flightFixture, endAt: new Date() }, true, true);
+    service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
     expect(service.loadAvailabilityAllocationIfChanged).toHaveBeenCalled();
   });
 
   it('should dispatch action to load allocation preview', () => {
     const { id: flightId, name, startAt, totalGoal, dailyMinimum, set_inventory_uri, zones } = flightFixture;
-    const endAt = new Date();
+    const endAt = moment.utc();
     const createdAt = new Date();
 
     const formFlight = { ...flightFixture, endAt };
@@ -80,8 +81,8 @@ describe('CampaignActionService', () => {
         createdAt,
         set_inventory_uri,
         name,
-        startAt,
-        endAt,
+        startAt: startAt.toDate(),
+        endAt: endAt.toDate(),
         totalGoal,
         dailyMinimum,
         zones
@@ -89,26 +90,33 @@ describe('CampaignActionService', () => {
     );
   });
 
+  describe('temporary flight id', () => {
+    const flightId = Date.now();
+    beforeEach(() => {
+      global.Date.now = jest.fn(() => flightId);
+    });
+
+    it('should dispatch action to add a new flight', done => {
+      service.addFlight();
+      store.pipe(select(selectCampaignId)).subscribe(campaignId => {
+        expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignAddFlight({ campaignId, flightId }));
+        done();
+      });
+    });
+
+    it('should dispatch action to duplicate flight', done => {
+      service.dupFlight(flightFixture);
+      store.pipe(select(selectCampaignId)).subscribe(campaignId => {
+        expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignDupFlight({ campaignId, flight: flightFixture, flightId }));
+        done();
+      });
+    });
+  });
+
   it('should not load allocation preview if just the flight name changes', () => {
     const changedFlight = { ...flightFixture, name: 'new name' };
     service.loadAvailabilityAllocationIfChanged(changedFlight, flightFixture);
     expect(store.dispatch).not.toHaveBeenCalled();
-  });
-
-  it('should dispatch action to add a new flight', done => {
-    service.addFlight();
-    store.pipe(select(selectCampaignId)).subscribe(campaignId => {
-      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignAddFlight({ campaignId }));
-      done();
-    });
-  });
-
-  it('should dispatch action to duplicate flight', done => {
-    service.dupFlight(flightFixture);
-    store.pipe(select(selectCampaignId)).subscribe(campaignId => {
-      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignDupFlight({ campaignId, flight: flightFixture }));
-      done();
-    });
   });
 
   it('should dispatch action to toggle flight deletion', () => {
@@ -146,8 +154,8 @@ describe('CampaignActionService', () => {
         createdAt,
         set_inventory_uri,
         name,
-        startAt,
-        endAt,
+        startAt: startAt.toDate(),
+        endAt: endAt.toDate(),
         totalGoal,
         dailyMinimum,
         zones

@@ -64,7 +64,7 @@ export function reducer(state = initialState, action: CampaignActions): State {
       });
       return adapter.addAll(flights, state);
     }
-    case ActionTypes.CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID: {
+    case ActionTypes.CAMPAIGN_ADD_FLIGHT: {
       const { flightId: id, startAt, endAt } = action.payload;
       const initialFlightState: FlightState = {
         localFlight: {
@@ -81,9 +81,9 @@ export function reducer(state = initialState, action: CampaignActions): State {
       };
       return adapter.addOne(initialFlightState, state);
     }
-    case ActionTypes.CAMPAIGN_DUP_FLIGHT_WITH_TEMP_ID: {
-      const { flight, flightId: id } = action.payload;
-      const localFlight: Flight = { ...flight, id, name: `${flight.name} (Copy)` };
+    case ActionTypes.CAMPAIGN_DUP_FLIGHT: {
+      const { flight, flightId } = action.payload;
+      const localFlight: Flight = duplicateFlight({ ...flight, name: `${flight.name} (Copy)` }, flightId);
       return adapter.addOne({ localFlight, changed: true, valid: true }, state);
     }
     case ActionTypes.CAMPAIGN_DELETE_FLIGHT: {
@@ -98,7 +98,10 @@ export function reducer(state = initialState, action: CampaignActions): State {
           id: flight.id,
           changes: {
             localFlight,
-            changed,
+            // changed _should_ always be true on form updates
+            // however, we're seeing updates emit from the form when the form is not dirty (changed: false)
+            // so changed state shall be false until true
+            changed: (state.entities[flight.id] && state.entities[flight.id].changed) || changed,
             valid
           }
         },
@@ -112,6 +115,12 @@ export function reducer(state = initialState, action: CampaignActions): State {
           id,
           changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0 }, changed: true, valid }
         },
+        state
+      );
+    }
+    case ActionTypes.CAMPAIGN_SAVE: {
+      return adapter.removeMany(
+        action.payload.tempDeletedFlights.map(flight => flight.id),
         state
       );
     }
