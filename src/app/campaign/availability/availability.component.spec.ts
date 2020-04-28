@@ -173,10 +173,6 @@ describe('AvailabilityComponent', () => {
     expect(comp.getAllocationValue(week.numbers)).toEqual(week.numbers.allocationPreview);
   });
 
-  it('should return combined value of allocated and availability', () => {
-    expect(comp.getAvailableValue(week.numbers)).toEqual(week.numbers.allocated + week.numbers.availability);
-  });
-
   it('should show a week as the current week when not expanded', () => {
     expect(comp.isZoneWeekExpanded(mockRollup, week)).toBeFalsy();
     expect(comp.showAsCurrentWeek(mockRollup, week)).toBeFalsy();

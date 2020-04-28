@@ -172,10 +172,6 @@ export class AvailabilityComponent {
     return zone && zone.label;
   }
 
-  getAvailableValue({ allocated, availability }: InventoryNumbers): number {
-    return allocated + availability;
-  }
-
   allocationPreviewExceedsAvailable({ availability, allocationPreview }: InventoryNumbers): boolean {
     return availability < allocationPreview;
   }
