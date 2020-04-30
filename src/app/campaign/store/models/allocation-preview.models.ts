@@ -1,4 +1,5 @@
 import { HalDoc } from 'ngx-prx-styleguide';
+import * as moment from 'moment';
 
 export interface AllocationPreview {
   date: Date;
@@ -10,15 +11,15 @@ export interface AllocationPreview {
 export const docToAllocationPreviewParams = (doc: HalDoc) => ({
   ...(doc['id'] && { flightId: doc['id'] }),
   dailyMinimum: doc['dailyMinimum'],
-  startAt: new Date(doc['startAt']),
-  endAt: new Date(doc['endAt']),
+  startAt: moment.utc(doc['startAt']).toDate(),
+  endAt: moment.utc(doc['endAt']).toDate(),
   name: doc['name'],
   totalGoal: doc['totalGoal'],
   zones: doc['zones'] || []
 });
 
 export const docToAllocationPreview = (allocation: any): AllocationPreview => {
-  const date = new Date(allocation.date);
+  const date = moment.utc(allocation.date).toDate();
   return {
     date,
     goalCount: allocation.goalCount,

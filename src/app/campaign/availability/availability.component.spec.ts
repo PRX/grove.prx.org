@@ -24,31 +24,31 @@ describe('AvailabilityComponent', () => {
       {
         startDate: new Date('2019-10-01'),
         endDate: new Date('2019-10-05'),
-        numbers: { allocated: 1, availability: 1, actuals: 0, allocationPreview: 3 },
+        numbers: { allocated: 1, availability: 2, actuals: 0, allocationPreview: 3 },
         days: []
       },
       {
         startDate: new Date('2019-10-06'),
         endDate: new Date('2019-10-12'),
-        numbers: { allocated: 9, availability: 1339, actuals: 0, allocationPreview: 9 },
+        numbers: { allocated: 9, availability: 1348, actuals: 0, allocationPreview: 9 },
         days: []
       },
       {
         startDate: new Date('2019-10-13'),
         endDate: new Date('2019-10-19'),
-        numbers: { allocated: 8, availability: 8, actuals: 0, allocationPreview: 8 },
+        numbers: { allocated: 8, availability: 16, actuals: 0, allocationPreview: 8 },
         days: []
       },
       {
         startDate: new Date('2019-10-20'),
         endDate: new Date('2019-10-26'),
-        numbers: { allocated: 7, availability: 1393, actuals: 0, allocationPreview: 7 },
+        numbers: { allocated: 7, availability: 1400, actuals: 0, allocationPreview: 7 },
         days: []
       },
       {
         startDate: new Date('2019-10-27'),
         endDate: new Date('2019-10-31'),
-        numbers: { allocated: 6, availability: 722, actuals: 0, allocationPreview: 6 },
+        numbers: { allocated: 6, availability: 728, actuals: 0, allocationPreview: 6 },
         days: []
       }
     ]
@@ -158,7 +158,7 @@ describe('AvailabilityComponent', () => {
 
   it('should return truthy when preview exceeds available', () => {
     expect(comp.allocationPreviewExceedsAvailable(week.numbers)).toBeTruthy();
-    expect(comp.allocationPreviewExceedsAvailable({ ...week.numbers, allocated: 9 })).toBeFalsy();
+    expect(comp.allocationPreviewExceedsAvailable({ ...week.numbers, allocationPreview: week.numbers.availability - 1 })).toBeFalsy();
   });
 
   it('should return truthy when preview allocations exist after change', () => {
@@ -173,7 +173,16 @@ describe('AvailabilityComponent', () => {
     expect(comp.getAllocationValue(week.numbers)).toEqual(week.numbers.allocationPreview);
   });
 
-  it('should return combined value of allocated and availability', () => {
-    expect(comp.getAvailableValue(week.numbers)).toEqual(week.numbers.allocated + week.numbers.availability);
+  it('should show a week as the current week when not expanded', () => {
+    expect(comp.isZoneWeekExpanded(mockRollup, week)).toBeFalsy();
+    expect(comp.showAsCurrentWeek(mockRollup, week)).toBeFalsy();
+  });
+
+  it('should show a date in the past', () => {
+    expect(comp.showAsPastDate(new Date('2019-12-31'))).toBeTruthy();
+  });
+
+  it('should show a date as the current date', () => {
+    expect(comp.showAsCurrentDate(new Date())).toBeTruthy();
   });
 });

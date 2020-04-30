@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { InventoryZone } from '../../core';
 import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParams, InventoryNumbers } from '../store/models';
+import { getMidnightUTC } from '../store/selectors';
 
 @Component({
   selector: 'grove-availability',
@@ -30,6 +31,8 @@ import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParam
             class="row week"
             [class.row-highlight]="allocationPreviewExceedsAvailable(week.numbers)"
             [class.expanded]="isZoneWeekExpanded(rollup, week)"
+            [class.current-date]="showAsCurrentWeek(rollup, week)"
+            [class.past-date]="showAsPastDate(week.endDate)"
           >
             <div class="expand">
               <button class="btn-link" (click)="toggleZoneWeekExpanded(rollup, week)">
@@ -39,7 +42,7 @@ import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParam
             <div class="date">
               {{ week.startDate | date: 'M/dd':'+0000' }}
             </div>
-            <div>{{ getAvailableValue(week.numbers) | largeNumber }}</div>
+            <div>{{ week.numbers.availability | largeNumber }}</div>
             <div [class.preview]="hasAllocationPreviewAfterChange(week.numbers.allocationPreview)">
               {{ getAllocationValue(week.numbers) | largeNumber }}
             </div>
@@ -53,13 +56,19 @@ import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParam
             </div>
             <div class="days-wrapper">
               <div class="days" [cssProps]="{ '--num-days': week?.days?.length }">
-                <div class="row day" [class.row-highlight]="allocationPreviewExceedsAvailable(day.numbers)" *ngFor="let day of week.days">
+                <div
+                  *ngFor="let day of week.days"
+                  class="row day"
+                  [class.row-highlight]="allocationPreviewExceedsAvailable(day.numbers)"
+                  [class.current-date]="showAsCurrentDate(day.date)"
+                  [class.past-date]="showAsPastDate(day.date)"
+                >
                   <div class="expand"></div>
                   <div class="date">
                     <span>{{ day.date | date: 'M/dd':'+0000' }}</span>
                   </div>
                   <div class="avail">
-                    <span>{{ getAvailableValue(day.numbers) | largeNumber }}</span>
+                    <span>{{ day.numbers.availability | largeNumber }}</span>
                   </div>
                   <div class="goal" [class.preview]="hasAllocationPreviewAfterChange(day.numbers.allocationPreview)">
                     <span>{{ getAllocationValue(day.numbers) | largeNumber }}</span>
@@ -76,7 +85,7 @@ import { Flight, AvailabilityRollup, AvailabilityWeeklyRollup, AvailabilityParam
         <div class="row totals" [class.row-highlight]="allocationPreviewExceedsAvailable(rollup.totals)">
           <div class="expand"></div>
           <div class="date">TOTALS</div>
-          <div>{{ getAvailableValue(rollup.totals) | largeNumber }}</div>
+          <div>{{ rollup.totals.availability | largeNumber }}</div>
           <div [class.preview]="hasAllocationPreviewAfterChange(rollup.totals.allocationPreview)">
             {{ getAllocationValue(rollup.totals) | largeNumber }}
           </div>
@@ -124,6 +133,18 @@ export class AvailabilityComponent {
     this.zoneWeekExpanded[zoneWeekKey] = !this.zoneWeekExpanded[zoneWeekKey];
   }
 
+  showAsCurrentWeek(rollup: AvailabilityRollup, week: AvailabilityWeeklyRollup): boolean {
+    return !this.isZoneWeekExpanded(rollup, week) && week.startDate.valueOf() <= Date.now() && week.endDate.valueOf() >= Date.now();
+  }
+
+  showAsCurrentDate(date: Date): boolean {
+    return getMidnightUTC(new Date()) === getMidnightUTC(date);
+  }
+
+  showAsPastDate(date: Date): boolean {
+    return getMidnightUTC(date) < getMidnightUTC(new Date());
+  }
+
   cantShowInventory() {
     return (
       !this.flight ||
@@ -151,12 +172,7 @@ export class AvailabilityComponent {
     return zone && zone.label;
   }
 
-  getAvailableValue({ allocated, availability }: InventoryNumbers): number {
-    return allocated + availability;
-  }
-
-  allocationPreviewExceedsAvailable(numbers: InventoryNumbers): boolean {
-    const { allocationPreview } = numbers;
-    return this.getAvailableValue(numbers) < allocationPreview;
+  allocationPreviewExceedsAvailable({ availability, allocationPreview }: InventoryNumbers): boolean {
+    return availability < allocationPreview;
   }
 }

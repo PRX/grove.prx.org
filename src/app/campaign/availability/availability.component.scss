@@ -34,6 +34,16 @@ section {
     border-top: $row-divider-border;
   }
 
+  & + &.current-date,
+  &.current-date {
+    border-top: 1px solid mat-color($prx-primary, lighter);
+  }
+
+  &.past-date * {
+    color: mat-color($prx-neutral, default);
+    font-weight: 700;
+  }
+
   &.head {
     background-color: prx-theme-background(table-header);
 
@@ -139,8 +149,6 @@ section {
 }
 
 .preview {
-  color: $success;
-
   &::after {
     content: '*';
   }
