@@ -7,6 +7,7 @@ import * as fromAllocationPreview from './reducers/allocation-preview.reducer';
 import * as fromAvailability from './reducers/availability.reducer';
 import * as fromCampaign from './reducers/campaign.reducer';
 import * as fromFlight from './reducers/flight.reducer';
+import * as fromFlightDays from './reducers/flight-days.reducer';
 
 export interface CampaignStoreState {
   account: fromAccount.State;
@@ -15,6 +16,7 @@ export interface CampaignStoreState {
   availability: fromAvailability.State;
   campaign: CampaignState;
   flights: fromFlight.State;
+  flightDays: fromFlightDays.State;
 }
 
 export const reducers: ActionReducerMap<CampaignStoreState> = {
@@ -23,7 +25,8 @@ export const reducers: ActionReducerMap<CampaignStoreState> = {
   allocationPreview: fromAllocationPreview.reducer,
   availability: fromAvailability.reducer,
   campaign: fromCampaign.reducer,
-  flights: fromFlight.reducer
+  flights: fromFlight.reducer,
+  flightDays: fromFlightDays.reducer
 };
 
 export const metaReducers: MetaReducer<CampaignStoreState>[] = !environment.production ? [] : [];

@@ -8,6 +8,7 @@ import { AllocationPreview, docToAllocationPreview } from './allocation-preview.
 import { AvailabilityDay, docToAvailabilityDay } from './availability.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
+import { FlightDays, docToFlightDays } from './flight-days.models';
 import * as moment from 'moment';
 
 const augury = new MockHalService();
@@ -88,6 +89,18 @@ export const createCampaignState = () => ({
   }
 });
 
+export const flightDaysData = new Array(30).fill(null).map((_, i) => ({
+  allocated: Math.floor(Math.random() * 100),
+  availability: Math.floor(Math.random() * 1000),
+  actuals: i < 15 ? Math.floor(Math.random() * 100) : 0,
+  inventory: Math.floor(Math.random() * 1000),
+  date: moment
+    .utc()
+    .add(i - 15, 'days')
+    .toISOString()
+    .slice(0, 10)
+}));
+
 export const flightFixture: Flight = {
   id: 9,
   createdAt: new Date(),
@@ -103,6 +116,9 @@ export const flightDocFixture = {
   ...flightFixture,
   _links: {
     'prx:inventory': { href: '/some/inventory' }
+  },
+  embedded: {
+    'prx:flight-days': flightDaysData
   }
 };
 
@@ -119,6 +135,20 @@ export const createFlightsState = campaignDoc => ({
         doc: campaignDoc.mock('prx:flight', flightDocFixture)
       }
     }
+  }
+});
+
+export const flightDaysFixture: FlightDays = docToFlightDays(
+  new MockHalDoc(flightDocFixture),
+  flightDaysData.map(doc => new MockHalDoc(doc))
+);
+export const flightDaysEntitities = {
+  [flightDocFixture.id]: flightDaysFixture
+};
+export const createFlightDaysState = () => ({
+  flightDays: {
+    ids: [flightDocFixture.id],
+    entities: flightDaysEntitities
   }
 });
 
@@ -203,12 +233,14 @@ export const createCampaignStoreState = ({
   allocationPreview = createAllocationPreviewState(),
   availability = createAvailabilityState(),
   campaignState = createCampaignState(),
-  flightsState = createFlightsState(campaignState.campaign.doc)
+  flightsState = createFlightsState(campaignState.campaign.doc),
+  flightDaysState = createFlightDaysState()
 } = {}): CampaignStoreState => ({
   ...account,
   ...advertiser,
   ...allocationPreview,
   ...availability,
   ...campaignState,
-  ...flightsState
+  ...flightsState,
+  ...flightDaysState
 });

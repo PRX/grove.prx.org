@@ -13,6 +13,7 @@ import {
   selectRoutedLocalFlight,
   selectCampaignDoc,
   selectCampaignAndFlights
+  selectCampaignStoreState
 } from '../selectors';
 import { Moment } from 'moment';
 
@@ -131,7 +132,9 @@ export class CampaignActionService implements OnDestroy {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.localFlight)),
+        filter(state => {
+          return !!(state && state.localFlight);
+        }),
         first()
       )
       .subscribe(state => {
@@ -158,11 +161,11 @@ export class CampaignActionService implements OnDestroy {
   saveCampaignAndFlights() {
     this.store
       .pipe(select(selectCampaignWithFlightsForSave), first())
-      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) =>
+      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) => {
         this.store.dispatch(
           new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
-        )
-      );
+        );
+      });
   }
 
   deleteCampaign() {
