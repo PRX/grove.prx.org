@@ -47,10 +47,14 @@ export const getFlightZoneIds = (zones: any[]): string[] => {
 };
 
 export const duplicateFlight = (flight: Flight, tempId: number): Flight => {
-  // remove createdAt, startAt, endAt and set temp id
-  const { createdAt, startAt, endAt, ...dupFlight } = flight;
-  dupFlight.id = tempId;
-  return dupFlight as Flight;
+  // remove createdAt, startAt, endAt, and set temp id
+  const { createdAt, startAt, endAt, name, ...dupFlight } = flight;
+
+  return {
+    ...dupFlight,
+    id: tempId,
+    name: `Copy of ${name}`
+  } as Flight;
 };
 
 export const getFlightId = (state: FlightState) => {
