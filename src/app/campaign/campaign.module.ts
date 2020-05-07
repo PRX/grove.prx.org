@@ -13,6 +13,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -38,6 +39,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     MatSidenavModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatMenuModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

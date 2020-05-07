@@ -6,7 +6,14 @@ import * as allocationPreviewActions from './allocation-preview-action.creator';
 import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
 import { Flight, getFlightZoneIds, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
-import { selectCampaignId, selectCampaignWithFlightsForSave, selectRoutedFlight, selectRoutedLocalFlight } from '../selectors';
+import {
+  selectCampaignId,
+  selectCampaignWithFlightsForSave,
+  selectRoutedFlight,
+  selectRoutedLocalFlight,
+  selectCampaignDoc,
+  selectCampaignAndFlights
+} from '../selectors';
 import { Moment } from 'moment';
 
 @Injectable()
@@ -156,5 +163,17 @@ export class CampaignActionService implements OnDestroy {
           new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
         )
       );
+  }
+
+  deleteCampaign() {
+    this.store
+      .pipe(select(selectCampaignDoc), first())
+      .subscribe(campaignDoc => this.store.dispatch(new campaignActions.CampaignDelete(campaignDoc)));
+  }
+
+  duplicateCampaign() {
+    this.store
+      .pipe(select(selectCampaignAndFlights), first())
+      .subscribe(payload => this.store.dispatch(new campaignActions.CampaignDuplicate(payload)));
   }
 }

@@ -22,12 +22,6 @@ import { Campaign, FlightState } from '../store/models';
       </a>
     </mat-nav-list>
     <a class="secondary-link" routerLink="" (click)="createFlight.emit()"><mat-icon>add</mat-icon> Add a Flight</a>
-    <ng-container *ngIf="valid && !changed && !isSaving; else disabledDuplicate">
-      <a class="secondary-link" routerLink="/campaign/new" [state]="dupCampaignState"><mat-icon>file_copy</mat-icon>Duplicate Campaign</a>
-    </ng-container>
-    <ng-template #disabledDuplicate>
-      <a class="secondary-link disabled"><mat-icon>file_copy</mat-icon>Duplicate Campaign</a>
-    </ng-template>
   `,
   styleUrls: ['./campaign-nav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -42,17 +36,5 @@ export class CampaignNavComponent {
 
   statusOk(flight: FlightState): boolean {
     return !flight.localFlight.status || flight.localFlight.status === 'ok';
-  }
-
-  get dupCampaignState(): { campaign; flights } {
-    return {
-      campaign: this.campaign,
-      flights: this.flights
-        .filter(flight => !flight.softDeleted)
-        .map(flight => {
-          // NOTE: router does not want to serialize Moment, so passing thru valueOf, startAt/endAt are removed in reducer
-          return { ...flight.localFlight, startAt: flight.localFlight.startAt.valueOf(), endAt: flight.localFlight.endAt.valueOf() };
-        })
-    };
   }
 }

@@ -8,6 +8,7 @@ import * as campaignActions from '../actions/campaign-action.creator';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignFormSave } from '../models';
 import { CampaignService } from '../../../core';
+import { DashboardService } from '../../../dashboard/dashboard.service';
 
 @Injectable()
 export class CampaignEffects {
@@ -152,10 +153,46 @@ export class CampaignEffects {
   );
 
   @Effect({ dispatch: false })
+  duplicateCampaign$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_DUPLICATE),
+    tap((action: campaignActions.CampaignDuplicate) => {
+      const { campaign, flights } = action.payload;
+      const state = {
+        campaign,
+        flights: flights.map(flight => ({
+          ...flight,
+          startAt: undefined,
+          endAt: undefined
+        }))
+      };
+      this.router.navigate(['/campaign', 'new'], { state });
+    })
+  );
+
+  @Effect({ dispatch: false })
   dupCampaignFromForm$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_DUP_FROM_FORM),
     tap(() => this.toastr.success('Campaign duplicated'))
   );
 
-  constructor(private actions$: Actions, private campaignService: CampaignService, private router: Router, private toastr: ToastrService) {}
+  @Effect()
+  deleteCampaign$ = this.actions$.pipe(
+    ofType(ActionTypes.CAMPAIGN_DELETE),
+    map((action: campaignActions.CampaignDelete) => action.payload),
+    mergeMap((campaignDoc: HalDoc) => this.campaignService.deleteCampaign(campaignDoc)),
+    map(({ id }: HalDoc) => new campaignActions.CampaignDeleteSuccess({ id })),
+    tap(() => {
+      this.toastr.success('Campaign deleted.');
+      this.router.navigate(['/'], { queryParams: this.dashboardService.getRouteQueryParams({}) });
+    }),
+    catchError(error => of(new campaignActions.CampaignDeleteFailure({ error })))
+  );
+
+  constructor(
+    private actions$: Actions,
+    private campaignService: CampaignService,
+    private router: Router,
+    private toastr: ToastrService,
+    private dashboardService: DashboardService
+  ) {}
 }

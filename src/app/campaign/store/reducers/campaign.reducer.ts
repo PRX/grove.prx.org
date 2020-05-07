@@ -118,6 +118,17 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
         error: action.payload.error
       };
     }
+    case ActionTypes.CAMPAIGN_DELETE_SUCCESS: {
+      return {
+        ...initialState
+      };
+    }
+    case ActionTypes.CAMPAIGN_DELETE_FAILURE: {
+      return {
+        ...state,
+        error: action.payload.error
+      };
+    }
     default:
       return state;
   }

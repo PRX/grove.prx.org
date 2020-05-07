@@ -11,7 +11,7 @@ import { selectCampaignDoc, selectFlightDocById } from '../../campaign/store/sel
 export class CampaignService {
   constructor(private augury: AuguryService, private store: Store<any>) {}
 
-  getFlightDocById(id): Observable<HalDoc> {
+  getFlightDocById(id: number): Observable<HalDoc> {
     return this.store.pipe(
       select(selectFlightDocById, { id }),
       filter(doc => !!doc),
@@ -41,6 +41,10 @@ export class CampaignService {
     return this.augury.root.pipe(mergeMap(rootDoc => rootDoc.create('prx:campaign', {}, campaign)));
   }
 
+  deleteCampaign(doc: HalDoc): Observable<HalDoc> {
+    return doc.destroy();
+  }
+
   createFlight(campaignDoc: HalDoc, flight: Flight): Observable<HalDoc> {
     return campaignDoc.create('prx:flights', {}, flight);
   }
@@ -49,7 +53,7 @@ export class CampaignService {
     return this.getFlightDocById(flight.id).pipe(mergeMap((doc: HalDoc) => doc.update(flight)));
   }
 
-  deleteFlight(flightId): Observable<HalDoc> {
+  deleteFlight(flightId: number): Observable<HalDoc> {
     return this.getFlightDocById(flightId).pipe(mergeMap((doc: HalDoc) => doc.destroy()));
   }
 }

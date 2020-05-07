@@ -33,11 +33,13 @@ mat-card form > * {
  * https://github.com/PRX/styleguide.prx.org/issues/212
 */
 ::ng-deep button {
-  flex: initial;
-}
-::ng-deep button:hover,
-::ng-deep button[disabled] {
-  background-color: initial;
+  &.mat-icon-button {
+    flex: initial;
+    &:hover,
+    &[disabled] {
+      background-color: initial;
+    }
+  }
 }
 
 .flight-controls-container {

@@ -1,0 +1,17 @@
+@import '~src/sass/variables';
+
+.menuBtn {
+  width: auto;
+  flex-grow: 0;
+
+  border: none;
+
+  &:hover {
+    background: none;
+    color: $primary;
+  }
+}
+
+.menuPanel {
+  border-radius: 0;
+}

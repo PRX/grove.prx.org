@@ -1,5 +1,6 @@
 export enum ActionTypes {
   CAMPAIGN_NEW = '[Campaign] Campaign New',
+  CAMPAIGN_DUPLICATE = '[Campaign] Campaign Duplicate',
   CAMPAIGN_DUP_FROM_FORM = '[Campaign] Campaign Dup From Form',
   CAMPAIGN_DUP_BY_ID = '[Campaign] Campaign Dup By Id',
   CAMPAIGN_DUP_BY_ID_SUCCESS = '[Campaign] Campaign Dup By Id Success',
@@ -11,6 +12,9 @@ export enum ActionTypes {
   CAMPAIGN_SAVE = '[Campaign] Form Save',
   CAMPAIGN_SAVE_SUCCESS = '[Campaign] Form Save Success',
   CAMPAIGN_SAVE_FAILURE = '[Campaign] Form Save Failure',
+  CAMPAIGN_DELETE = '[Campaign] Campaign Delete',
+  CAMPAIGN_DELETE_SUCCESS = '[Campaign] Campaign Delete Success',
+  CAMPAIGN_DELETE_FAILURE = '[Campaign] Campaign Delete Failure',
   CAMPAIGN_ADD_FLIGHT = '[Campaign] Add Flight',
   CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID = '[Campaign] Add Flight With Temp Id',
   CAMPAIGN_DUP_FLIGHT = '[Campaign] Dup Flight',
