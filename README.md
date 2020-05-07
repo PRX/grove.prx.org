@@ -78,7 +78,7 @@ _The ad MP3 files are sometimes referred to as “Creatives”._
 The daily forecasted Downloads we expect a podcast to receive in the future. May also be broken out by Episode, Country, State, Keywords, etc.
 
 **Inventory**
-The daily number of Impressions available for ad Zones to be sold into in the future. (Equal to the Forecast multiplied by the Placements).
+The daily number of Impressions available for ad Zones to be sold into in the future. (Equal to the Forecast multiplied by the ad Placements - original segment Zones do not get Inventory).
 
 **Allocations**
 The daily Inventory counts reserved by a Flight. May include additional targeting info such as Episode, Country, State, Keywords, etc.
