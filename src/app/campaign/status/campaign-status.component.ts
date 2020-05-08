@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboard.service';
+import { ModalService } from 'ngx-prx-styleguide';
 
 @Component({
   selector: 'grove-campaign-status',
@@ -40,7 +41,7 @@ export class CampaignStatusComponent {
   @Output() delete = new EventEmitter();
   @Output() duplicate = new EventEmitter();
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private dashboardService: DashboardService, public modal: ModalService) {}
 
   get canDuplicate(): boolean {
     return this.valid && !this.changed && !this.isSaving;
@@ -67,6 +68,25 @@ export class CampaignStatusComponent {
   }
 
   onDelete() {
-    this.delete.emit();
+    enum options {
+      DELETE = 'Delete Campaign',
+      CANCEL = 'Cancel'
+    }
+
+    this.modal.show({
+      title: 'Are you sure?',
+      body: 'Deleteing a campaign is permanent and can not be undone.',
+      primaryButton: options.DELETE,
+      secondaryButton: options.CANCEL,
+      buttonCallback: (result: options) => {
+        switch (result) {
+          case options.DELETE:
+            this.delete.emit();
+            break;
+          default:
+          // Do Nothing.
+        }
+      }
+    });
   }
 }

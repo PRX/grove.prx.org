@@ -183,7 +183,7 @@ export class CampaignEffects {
     map(({ id }: HalDoc) => new campaignActions.CampaignDeleteSuccess({ id })),
     tap(() => {
       this.toastr.success('Campaign deleted.');
-      this.router.navigate(['/'], { queryParams: this.dashboardService.getRouteQueryParams({}) });
+      this.router.navigate(['/campaigns'], { queryParams: this.dashboardService.getRouteQueryParams({}) });
     }),
     catchError(error => of(new campaignActions.CampaignDeleteFailure({ error })))
   );
