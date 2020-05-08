@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { utc } from 'moment';
 import { Flight } from '../dashboard.service';
 
 @Pipe({
@@ -27,8 +28,9 @@ export class CampaignFlightDatesPipe implements PipeTransform {
 
   transform(flights: Flight[]): string {
     const dates = this.flightDates(flights);
+    const dateFormat = 'M/DD';
     if (dates && dates.startAt && dates.endAt) {
-      return `${dates.startAt.getMonth() + 1}/${dates.startAt.getDate()} - ${dates.endAt.getMonth() + 1}/${dates.endAt.getDate()}`;
+      return `${utc(dates.startAt).format(dateFormat)} - ${utc(dates.endAt).format(dateFormat)}`;
     }
   }
 }
