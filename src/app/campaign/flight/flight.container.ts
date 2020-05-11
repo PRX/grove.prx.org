@@ -2,15 +2,16 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { Store, select } from '@ngrx/store';
 import { Observable, combineLatest, Subscription } from 'rxjs';
 import { Inventory, InventoryService, InventoryZone } from '../../core';
-import { Flight, AvailabilityRollup } from '../store/models';
+import { Flight, InventoryRollup } from '../store/models';
 import { map } from 'rxjs/operators';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
   selectCurrentInventoryUri,
-  selectRoutedFlightAllocationPreviewError,
-  selectAvailabilityRollup
+  selectFlightPreviewError,
+  selectFlightDaysRollup,
+  selectIsFlightPreview
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -27,15 +28,16 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
         (flightDeleteToggle)="flightDeleteToggle($event)"
         (flightDuplicate)="flightDuplicate($event)"
       ></grove-flight>
-      <grove-availability
+      <grove-inventory
         [flight]="flightLocal$ | async"
         [changed]="flightChanged$ | async"
         [zones]="zoneOpts"
-        [rollups]="flightAvailabilityRollup$ | async"
-        [allocationPreviewError]="allocationPreviewError$ | async"
+        [rollup]="inventoryRollup$ | async"
+        [isPreview]="isPreview$ | async"
+        [previewError]="flightPreviewError$ | async"
         (goalChange)="onGoalChange($event)"
       >
-      </grove-availability>
+      </grove-inventory>
     </ng-container>
   `,
   styleUrls: ['flight.container.scss'],
@@ -45,9 +47,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightLocal$: Observable<Flight>;
   softDeleted$: Observable<boolean>;
   flightChanged$: Observable<boolean>;
-  flightAvailabilityRollup$: Observable<AvailabilityRollup[]>;
+  inventoryRollup$: Observable<InventoryRollup>;
+  isPreview$: Observable<boolean>;
   currentInventoryUri$: Observable<string>;
-  allocationPreviewError$: Observable<any>;
+  flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
@@ -59,8 +62,9 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
-    this.allocationPreviewError$ = this.store.pipe(select(selectRoutedFlightAllocationPreviewError));
-    this.flightAvailabilityRollup$ = this.store.pipe(select(selectAvailabilityRollup));
+    this.flightPreviewError$ = this.store.pipe(select(selectFlightPreviewError));
+    this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
+    this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
 
     this.inventoryOptions$ = this.inventoryService.listInventory();
     this.zoneOptions$ = combineLatest([this.inventoryOptions$, this.currentInventoryUri$]).pipe(

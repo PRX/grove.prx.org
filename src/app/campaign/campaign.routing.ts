@@ -9,8 +9,9 @@ import { CampaignFormContainerComponent } from './form/campaign-form.container';
 import { CampaignFormComponent } from './form/campaign-form.component';
 import { FlightContainerComponent } from './flight/flight.container';
 import { FlightComponent } from './flight/flight.component';
-import { AvailabilityComponent } from './availability/availability.component';
-import { GoalFormComponent } from './availability/goal-form.component';
+import { InventoryComponent } from './inventory/inventory.component';
+import { InventoryTableComponent } from './inventory/inventory-table.component';
+import { GoalFormComponent } from './inventory/goal-form.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
@@ -42,7 +43,8 @@ export const campaignComponents: any[] = [
   CampaignStatusComponent,
   FlightContainerComponent,
   FlightComponent,
-  AvailabilityComponent,
+  InventoryComponent,
+  InventoryTableComponent,
   GoalFormComponent
 ];
 
