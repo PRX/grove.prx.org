@@ -8,10 +8,8 @@ import {
   selectCampaignId,
   selectCampaignWithFlightsForSave,
   selectRoutedFlight,
-  selectRoutedLocalFlight,
   selectCampaignDoc,
-  selectCampaignAndFlights
-  selectCampaignStoreState
+  selectCampaignAndFlights,
   selectRoutedCampaignFlightDocs
 } from '../selectors';
 import { Moment } from 'moment';
