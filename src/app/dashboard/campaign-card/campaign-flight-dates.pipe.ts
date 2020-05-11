@@ -28,7 +28,7 @@ export class CampaignFlightDatesPipe implements PipeTransform {
 
   transform(flights: Flight[]): string {
     const dates = this.flightDates(flights);
-    const dateFormat = 'M/DD';
+    const dateFormat = 'M/D';
     if (dates && dates.startAt && dates.endAt) {
       return `${utc(dates.startAt).format(dateFormat)} - ${utc(dates.endAt).format(dateFormat)}`;
     }
