@@ -50,7 +50,7 @@ export const docToFlightDays = (flightDoc: HalDoc, flightId: number, flightDaysD
     flightId,
     days: flightDaysDocs.map(doc => ({
       numbers: doc as InventoryNumbers,
-      borked: doc['available'] !== null && doc['available'] <= 0,
+      borked: doc['available'] !== null && doc['available'] < 0,
       date: utc(doc['date']).toDate()
     }))
   };
