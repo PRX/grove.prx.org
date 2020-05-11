@@ -40,10 +40,6 @@ describe('CampaignEffects', () => {
           useValue: toastrService
         },
         {
-          provide: AuguryService,
-          useValue: new MockHalService()
-        },
-        {
           provide: CampaignService,
           useValue: {
             loadCampaignZoomFlights: jest.fn(),
