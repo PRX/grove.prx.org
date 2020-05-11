@@ -6,7 +6,7 @@ import {
   flightDocFixture,
   createFlightsState,
   campaignFixture,
-  flightDaysData
+  flightDaysDocFixture
 } from '../models/campaign-state.factory';
 import { reducer, initialState, selectAll, selectEntities, selectIds } from './flight.reducer';
 import { docToFlight, Flight } from '../models';
@@ -34,7 +34,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     expect(selectIds(result).length).toBe(1);
@@ -62,7 +62,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     result = reducer(result, new campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
@@ -76,7 +76,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     result = reducer(
@@ -98,7 +98,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     result = reducer(
@@ -121,7 +121,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     result = reducer(
@@ -170,7 +170,7 @@ describe('Flight Reducer', () => {
       new MockHalDoc({ ...flightDocFixture, id: createdFlightIds[0], startAt, endAt }),
       new MockHalDoc({ ...flightDocFixture, id: createdFlightIds[1], startAt, endAt })
     ];
-    const flightDaysDocs = { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] };
+    const flightDaysDocs = { [flightDocFixture.id]: flightDaysDocFixture };
 
     let result = reducer(initialState, new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }));
     result = reducer(
@@ -213,7 +213,7 @@ describe('Flight Reducer', () => {
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     // duplicate that flight
