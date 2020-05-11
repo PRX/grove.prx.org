@@ -5,7 +5,7 @@ import { map, switchMap, mergeMap, filter, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 import { Campaign, Flight } from '../../campaign/store/models';
-import { selectCampaignDoc, selectFlightDocById } from '../../campaign/store/selectors';
+import { selectFlightDocById } from '../../campaign/store/selectors';
 
 @Injectable()
 export class CampaignService {

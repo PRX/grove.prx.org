@@ -1,6 +1,6 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
-import { Campaign, CampaignState, duplicateCampaign } from '../models';
+import { Campaign, CampaignState } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export const selectCampaignStoreState = createFeatureSelector('campaignState');
