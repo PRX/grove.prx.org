@@ -48,7 +48,11 @@ describe('CampaignEffects', () => {
             createFlight: jest.fn()
           }
         },
-        { provide: Actions, useFactory: getActions }
+        { provide: Actions, useFactory: getActions },
+        {
+          provide: AuguryService,
+          userValue: new MockHalService()
+        }
       ]
     });
     fixture = TestBed.createComponent(TestComponent);
