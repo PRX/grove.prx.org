@@ -126,5 +126,11 @@ describe('Flight Days/Preview Reducer', () => {
     );
   });
 
-  it('should set flight preview error from flight preview create failure', () => {});
+  it('should set flight preview error from flight preview create failure', () => {
+    const result = reducer(
+      initialState,
+      new flightPreviewActions.FlightPreviewCreateFailure({ error: { body: { status: 422, message: 'no allocatable days' } } })
+    );
+    expect(result.previewError.body.message).toEqual('no allocatable days');
+  });
 });
