@@ -263,7 +263,6 @@ describe('CampaignEffects', () => {
       campaignDoc,
       deletedFlightDocs: undefined,
       updatedFlightDocs: { [flightFixture.id]: flightDocs[0] },
-      // updatedFlightDaysDocs: { [flightFixture.id]: flightDaysData.map(d => new MockHalDoc(d)) },
       updatedFlightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] },
       createdFlightDocs: undefined,
       createdFlightDaysDocs: {}
