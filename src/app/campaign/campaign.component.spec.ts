@@ -2,7 +2,7 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSidenavModule, MatListModule, MatIconModule, MatProgressSpinnerModule } from '@angular/material';
+import { MatSidenavModule, MatListModule, MatIconModule, MatProgressSpinnerModule, MatMenuModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule, Store } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
@@ -50,7 +50,8 @@ describe('CampaignComponent', () => {
         MatIconModule,
         MatListModule,
         MatProgressSpinnerModule,
-        MatSidenavModule
+        MatSidenavModule,
+        MatMenuModule
       ],
       declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, TestComponent],
       providers: [

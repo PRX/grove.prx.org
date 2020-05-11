@@ -11,6 +11,8 @@ export interface Campaign {
   createdAt?: Date;
   set_account_uri: string;
   set_advertiser_uri: string;
+  actualCount?: number;
+  totalGoal?: number;
 }
 
 export interface CampaignState {
@@ -35,7 +37,10 @@ export const docToCampaign = (doc: HalDoc): Campaign => {
 
 export const duplicateCampaign = (campaign: Campaign): Campaign => {
   // remove id from dup campaign and set to Draft
-  const { id, ...dupCampaign } = campaign;
-  campaign.status = 'draft';
-  return dupCampaign;
+  const { id, name, ...dupCampaign } = campaign;
+  return {
+    ...dupCampaign,
+    name: `Copy of ${name}`,
+    status: 'draft'
+  } as Campaign;
 };

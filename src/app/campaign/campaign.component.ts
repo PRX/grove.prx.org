@@ -12,7 +12,8 @@ import {
   selectAllFlightsOrderByCreatedAt,
   selectLocalCampaignName,
   selectValid,
-  selectChanged
+  selectChanged,
+  selectLocalCampaignActualCount
 } from './store/selectors';
 import * as accountActions from './store/actions/account-action.creator';
 import * as advertiserActions from './store/actions/advertiser-action.creator';
@@ -26,8 +27,11 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
       [campaignName]="campaignName$ | async"
       [valid]="valid$ | async"
       [changed]="changed$ | async"
+      [actuals]="campaignActualCount$ | async"
       [isSaving]="campaignSaving$ | async"
       (save)="campaignSubmit()"
+      (delete)="campaignDelete()"
+      (duplicate)="campaignDuplicate()"
     ></grove-campaign-status>
     <mat-drawer-container autosize>
       <mat-drawer role="navigation" mode="side" opened disableClose>
@@ -66,6 +70,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   valid$: Observable<boolean>;
   changed$: Observable<boolean>;
   campaignName$: Observable<string>;
+  campaignActualCount$: Observable<number>;
   routeSub: Subscription;
 
   constructor(private route: ActivatedRoute, private store: Store<any>, private campaignActionService: CampaignActionService) {}
@@ -94,6 +99,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));
     this.error$ = this.store.pipe(select(selectError));
     this.campaignName$ = this.store.pipe(select(selectLocalCampaignName));
+    this.campaignActualCount$ = this.store.pipe(select(selectLocalCampaignActualCount));
     this.flights$ = this.store.pipe(select(selectAllFlightsOrderByCreatedAt));
     this.valid$ = this.store.pipe(select(selectValid));
     this.changed$ = this.store.pipe(select(selectChanged));
@@ -103,6 +109,14 @@ export class CampaignComponent implements OnInit, OnDestroy {
     if (this.routeSub) {
       this.routeSub.unsubscribe();
     }
+  }
+
+  campaignDelete() {
+    this.campaignActionService.deleteCampaign();
+  }
+
+  campaignDuplicate() {
+    this.campaignActionService.duplicateCampaign();
   }
 
   campaignSubmit() {

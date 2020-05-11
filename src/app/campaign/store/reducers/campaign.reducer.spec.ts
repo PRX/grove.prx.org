@@ -165,7 +165,7 @@ describe('Campaign Reducer', () => {
     result = reducer(result, new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture] }));
     expect(result.localCampaign).not.toMatchObject(campaignFixture);
     expect(result.localCampaign.id).toBeUndefined();
-    expect(result.localCampaign.name).toEqual(campaignFixture.name);
+    expect(result.localCampaign.name).toEqual(`Copy of ${campaignFixture.name}`);
   });
 
   it('should set campaign state for campaign duplicated by id', () => {
@@ -178,6 +178,6 @@ describe('Campaign Reducer', () => {
     );
     expect(result.localCampaign).not.toMatchObject(campaignFixture);
     expect(result.localCampaign.id).toBeUndefined();
-    expect(result.localCampaign.name).toEqual(campaignFixture.name);
+    expect(result.localCampaign.name).toEqual(`Copy of ${campaignFixture.name}`);
   });
 });

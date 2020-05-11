@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from '../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { campaignRouting, campaignComponents } from './campaign.routing';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -13,9 +11,11 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatMenuModule } from '@angular/material/menu';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+import { SharedModule } from '../shared/shared.module';
 import * as fromCampaignState from './store';
 import { AccountEffects } from './store/effects/account.effects';
 import { AdvertiserEffects } from './store/effects/advertiser.effects';
@@ -23,6 +23,7 @@ import { AllocationPreviewEffects } from './store/effects/allocation-preview.eff
 import { AvailabilityEffects } from './store/effects/availability.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
+import { campaignRouting, campaignComponents } from './campaign.routing';
 
 @NgModule({
   declarations: [...campaignComponents],
@@ -38,6 +39,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
     MatSidenavModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatMenuModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

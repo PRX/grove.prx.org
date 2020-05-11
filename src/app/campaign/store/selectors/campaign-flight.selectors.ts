@@ -1,7 +1,7 @@
 import { createSelector } from '@ngrx/store';
-import { selectCampaign, selectCampaignLoaded, selectCampaignError } from './campaign.selectors';
-import { selectAllFlights, selectFlightEntities, selectRoutedFlightId } from './flight.selectors';
-import { CampaignState, FlightState, CampaignFormSave } from '../models';
+import { selectCampaign, selectCampaignLoaded, selectCampaignError, selectLocalCampaign } from './campaign.selectors';
+import { selectAllFlights, selectFlightEntities, selectRoutedFlightId, selectAllLocalFlights } from './flight.selectors';
+import { Campaign, CampaignState, Flight, FlightState, CampaignFormSave } from '../models';
 
 export const selectCampaignWithFlightsForSave = createSelector(
   selectCampaign,
@@ -15,6 +15,15 @@ export const selectCampaignWithFlightsForSave = createSelector(
     createdFlights: flights.filter(flight => !flight.softDeleted && !flight.remoteFlight).map(flight => flight.localFlight),
     deletedFlights: flights.filter(flight => flight.softDeleted && flight.remoteFlight).map(flight => flight.localFlight),
     tempDeletedFlights: flights.filter(flight => flight.softDeleted && !flight.remoteFlight).map(flight => flight.localFlight)
+  })
+);
+
+export const selectCampaignAndFlights = createSelector(
+  selectLocalCampaign,
+  selectAllLocalFlights,
+  (campaign: Campaign, flights: Flight[]) => ({
+    campaign,
+    flights
   })
 );
 

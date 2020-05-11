@@ -24,6 +24,7 @@ $success: mat-color($prx-success);
 $success-contrast: mat-color($prx-success, default-contrast);
 $warn: mat-color($prx-warn);
 $warn-contrast: mat-color($prx-warn, default-contrast);
+$warn-disabled: lighten($warn, 30%);
 
 //// Define theme functions.
 
@@ -66,33 +67,44 @@ $warn-contrast: mat-color($prx-warn, default-contrast);
   //    slider-off-active
   $foreground: map-get($theme, foreground);
 
-  @return map-merge($theme, (
-    background: map-merge($background, (
-      app-area: mat-color($background, card),
-      tab: mat-color($background, hover),
-      selected-tab: mat-color($background, card),
-      table-header: mat-color($background, status-bar),
-      table-row: mat-color($background, card),
-      table-row-stripe: mat-color($background, app-bar)
-    )),
-    foreground: map-merge($foreground, (
-      tab: $primary,
-      selected-tab: $primary,
-      link: $primary
-    ))
-  ));
-};
+  @return map-merge(
+    $theme,
+    (
+      background:
+        map-merge(
+          $background,
+          (
+            app-area: mat-color($background, card),
+            tab: mat-color($background, hover),
+            selected-tab: mat-color($background, card),
+            table-header: mat-color($background, status-bar),
+            table-row: mat-color($background, card),
+            table-row-stripe: mat-color($background, app-bar)
+          )
+        ),
+      foreground:
+        map-merge(
+          $foreground,
+          (
+            tab: $primary,
+            selected-tab: $primary,
+            link: $primary
+          )
+        )
+    )
+  );
+}
 
 // Helper function to simplify getting theme background values.
 @function prx-theme-background($prop, $opacity: null) {
   $background: map-get(prx-theme(), background);
 
   @return mat-color($background, $prop, $opacity);
-};
+}
 
 // Helper function to simplify getting theme forground values.
 @function prx-theme-foreground($prop, $opacity: null) {
   $foreground: map-get(prx-theme(), foreground);
 
   @return mat-color($foreground, $prop, $opacity);
-};
+}

@@ -10,6 +10,17 @@ export class CampaignNew implements Action {
   constructor(public payload: {}) {}
 }
 
+export class CampaignDuplicate implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DUPLICATE;
+
+  constructor(
+    public payload: {
+      campaign: Campaign;
+      flights: Flight[];
+    }
+  ) {}
+}
+
 export class CampaignDupFromForm implements Action {
   readonly type = ActionTypes.CAMPAIGN_DUP_FROM_FORM;
 
@@ -81,6 +92,22 @@ export class CampaignSaveSuccess implements Action {
 }
 export class CampaignSaveFailure implements Action {
   readonly type = ActionTypes.CAMPAIGN_SAVE_FAILURE;
+
+  constructor(public payload: { error: any }) {}
+}
+
+export class CampaignDelete implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DELETE;
+
+  constructor(public payload: HalDoc) {}
+}
+export class CampaignDeleteSuccess implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DELETE_SUCCESS;
+
+  constructor(public payload: { id: number | string }) {}
+}
+export class CampaignDeleteFailure implements Action {
+  readonly type = ActionTypes.CAMPAIGN_DELETE_FAILURE;
 
   constructor(public payload: { error: any }) {}
 }
@@ -158,4 +185,7 @@ export type CampaignActions =
   | CampaignDeleteFlight
   | CampaignSave
   | CampaignSaveSuccess
-  | CampaignSaveFailure;
+  | CampaignSaveFailure
+  | CampaignDelete
+  | CampaignDeleteSuccess
+  | CampaignDeleteFailure;

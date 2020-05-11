@@ -11,6 +11,10 @@
     margin: 0 0 2px;
     border-left: 0 solid $primary;
 
+    .mat-list-item-content {
+      width: 100%;
+    }
+
     &:hover,
     &.active-link,
     &.changed {

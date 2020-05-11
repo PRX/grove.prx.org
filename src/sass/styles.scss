@@ -13,3 +13,17 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+.mat-menu-item {
+  &.menuItem--warn {
+    color: $warn;
+
+    &[disabled] {
+      color: $warn-disabled;
+    }
+  }
+
+  &[disabled] {
+    background: none;
+  }
+}

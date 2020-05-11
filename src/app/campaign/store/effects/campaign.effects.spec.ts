@@ -6,8 +6,8 @@ import { cold, hot } from 'jasmine-marbles';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { HalHttpError, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
-import { CampaignService } from '../../../core';
+import { HalHttpError, MockHalDoc, ToastrService, MockHalService } from 'ngx-prx-styleguide';
+import { CampaignService, AuguryService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { reducers } from '../';
@@ -48,7 +48,11 @@ describe('CampaignEffects', () => {
             createFlight: jest.fn()
           }
         },
-        { provide: Actions, useFactory: getActions }
+        { provide: Actions, useFactory: getActions },
+        {
+          provide: AuguryService,
+          userValue: new MockHalService()
+        }
       ]
     });
     fixture = TestBed.createComponent(TestComponent);

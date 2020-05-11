@@ -46,3 +46,6 @@ export const selectFlightDocById = createSelector(
   selectFlightEntities,
   (flights: { [id: number]: FlightState }, props: { id: number }): HalDoc => flights && flights[props.id].doc
 );
+export const selectAllLocalFlights = createSelector(selectAllFlights, (flights: FlightState[]): Flight[] =>
+  flights.map((flight: FlightState): Flight => flight.localFlight)
+);
