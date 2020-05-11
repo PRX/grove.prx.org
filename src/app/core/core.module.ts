@@ -5,6 +5,7 @@ import { AuguryService } from './augury.service';
 import { AdvertiserService } from './advertiser/advertiser.service';
 import { AllocationPreviewService } from './allocation/allocation-preview.service';
 import { CampaignService } from './campaign/campaign.service';
+import { FlightPreviewService } from './campaign/flight-preview.service';
 import { UserService } from './user/user.service';
 import { InventoryService } from './inventory/inventory.service';
 
@@ -18,6 +19,7 @@ import { InventoryService } from './inventory/inventory.service';
     AllocationPreviewService,
     InventoryService,
     CampaignService,
+    FlightPreviewService,
     UserService,
     HalService,
     ModalService,

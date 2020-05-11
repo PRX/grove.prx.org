@@ -1,13 +1,25 @@
+import { utc } from 'moment';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { filterUnderscores } from './haldoc.utils';
-import { Moment, utc } from 'moment';
 
-export interface FlightDay {
-  date: Moment;
+export interface FlightPreviewParams {
+  name: string;
+  set_inventory_uri: string;
+  startAt: Date;
+  endAt: Date;
+  totalGoal: number;
+  dailyMinimum: number;
+  zones: string[];
+}
+export interface InventoryNumbers {
   available: number;
   allocated: number;
   actuals: number;
-  inventory: number;
+  inventory?: number;
+}
+export interface FlightDay {
+  date: Date;
+  borked: boolean;
+  numbers: InventoryNumbers;
 }
 
 export interface FlightDays {
@@ -15,15 +27,31 @@ export interface FlightDays {
   flightId: number;
   days: FlightDay[];
 }
+export interface InventoryWeeklyRollup {
+  startDate: Date;
+  endDate: Date;
+  numbers: InventoryNumbers;
+  days: FlightDay[];
+}
+
+export interface InventoryRollup {
+  previewParams: FlightPreviewParams;
+  weeks: InventoryWeeklyRollup[];
+  totals: InventoryNumbers;
+}
 
 export const getFlightDaysId = (state: FlightDays) => {
   return state.flightId;
 };
 
-export const docToFlightDays = (flightDoc: HalDoc, flightDaysDocs: HalDoc[]): FlightDays => {
+export const docToFlightDays = (flightDoc: HalDoc, flightId: number, flightDaysDocs: any[]): FlightDays => {
   return {
     flightDoc,
-    flightId: flightDoc.id,
-    days: flightDaysDocs.map(doc => ({ ...(filterUnderscores(doc) as FlightDay), date: utc(doc['date']) }))
+    flightId,
+    days: flightDaysDocs.map(doc => ({
+      numbers: doc as InventoryNumbers,
+      borked: doc['available'] !== null && doc['available'] <= 0,
+      date: utc(doc['date']).toDate()
+    }))
   };
 };

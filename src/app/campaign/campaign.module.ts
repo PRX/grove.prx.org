@@ -19,9 +19,8 @@ import { SharedModule } from '../shared/shared.module';
 import * as fromCampaignState from './store';
 import { AccountEffects } from './store/effects/account.effects';
 import { AdvertiserEffects } from './store/effects/advertiser.effects';
-import { AllocationPreviewEffects } from './store/effects/allocation-preview.effects';
-import { AvailabilityEffects } from './store/effects/availability.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
+import { FlightPreviewEffects } from './store/effects/flight-preview.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 
@@ -46,7 +45,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     FancyFormModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
-    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, AllocationPreviewEffects, AvailabilityEffects, CampaignEffects])
+    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects])
   ],
   providers: [CampaignActionService]
 })
