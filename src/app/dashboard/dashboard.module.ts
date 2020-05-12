@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -53,6 +54,7 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     PagingModule,
     RouterModule,
     SharedModule,
+    MatCardModule,
     MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,

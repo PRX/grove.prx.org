@@ -162,7 +162,8 @@ export class DashboardService {
               .map(flightId => flightEntites[flightId])
           );
         }
-      })
+      }),
+      map(flights => flights || [])
     );
   }
 
