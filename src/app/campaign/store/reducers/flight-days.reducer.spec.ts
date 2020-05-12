@@ -1,13 +1,7 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
-import {
-  campaignDocFixture,
-  flightDocFixture,
-  createFlightDaysState,
-  flightDaysDocFixture,
-  flightPreviewParams
-} from '../models/campaign-state.factory';
+import { campaignDocFixture, flightDocFixture, createFlightDaysState, flightDaysDocFixture } from '../models/campaign-state.factory';
 import { reducer, initialState, selectIds } from './flight-days.reducer';
 import { docToFlightDays } from '../models';
 import * as moment from 'moment';
@@ -117,9 +111,8 @@ describe('Flight Days/Preview Reducer', () => {
     result = reducer(
       result,
       new flightPreviewActions.FlightPreviewCreateSuccess({
-        params: flightPreviewParams,
+        flight: flightDocFixture,
         flightDaysDocs: flightDaysDocFixture,
-        flightId: flightDocFixture.id,
         flightDoc: new MockHalDoc(flightDocFixture),
         campaignDoc: new MockHalDoc(campaignDocFixture)
       })

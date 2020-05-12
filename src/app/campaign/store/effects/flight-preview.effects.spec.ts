@@ -9,22 +9,19 @@ import { FlightPreviewService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 import { FlightPreviewEffects } from './flight-preview.effects';
-import { campaignDocFixture, flightDocFixture, flightDaysDocFixture, flightPreviewParams } from '../models/campaign-state.factory';
+import { campaignDocFixture, flightFixture, flightDocFixture, flightDaysDocFixture } from '../models/campaign-state.factory';
 
 describe('FlightPreviewEffects', () => {
   let effects: FlightPreviewEffects;
   let actions$: TestActions;
   let flightPreviewService: FlightPreviewService;
 
-  const params = flightPreviewParams;
-  const flightId = flightDocFixture.id;
   const flightDoc = new MockHalDoc(flightDocFixture);
   const campaignDoc = new MockHalDoc(campaignDocFixture);
 
   // create action received by the effect
   const createAction = new flightPreviewActions.FlightPreviewCreate({
-    params,
-    flightId,
+    flight: flightFixture,
     flightDoc,
     campaignDoc
   });
@@ -50,8 +47,7 @@ describe('FlightPreviewEffects', () => {
 
   it('should create flight preview', () => {
     const success = new flightPreviewActions.FlightPreviewCreateSuccess({
-      params,
-      flightId,
+      flight: flightFixture,
       flightDaysDocs: flightDaysDocFixture,
       flightDoc,
       campaignDoc

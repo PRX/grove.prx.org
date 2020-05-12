@@ -7,7 +7,7 @@ import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } f
 import { SharedModule } from '../../shared/shared.module';
 import { InventoryTableComponent } from './inventory-table.component';
 import { InventoryRollup } from '../store/models';
-import { flightPreviewParams, flightFixture } from '../store/models/campaign-state.factory';
+import { flightFixture } from '../store/models/campaign-state.factory';
 
 describe('InventoryTableComponent', () => {
   let comp: InventoryTableComponent;
@@ -15,7 +15,6 @@ describe('InventoryTableComponent', () => {
   let de: DebugElement;
 
   const mockRollup: InventoryRollup = {
-    previewParams: flightPreviewParams,
     totals: { allocated: 31, available: 3463, actuals: 0, inventory: 3463 },
     weeks: [
       {

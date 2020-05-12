@@ -14,13 +14,11 @@ export class FlightPreviewEffects {
     ofType(ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE),
     map((action: flightPreviewActions.FlightPreviewCreate) => action.payload),
     mergeMap(payload => {
-      const { params, flightId, flightDoc, campaignDoc } = payload;
-      const startAt = params.startAt.toISOString().slice(0, 10);
-      const endAt = params.endAt.toISOString().slice(0, 10);
-      return this.flightPreviewService.createFlightPreview({ ...params, startAt, endAt }, flightDoc, campaignDoc).pipe(
+      const { flight, flightDoc, campaignDoc } = payload;
+      return this.flightPreviewService.createFlightPreview(flight, flightDoc, campaignDoc).pipe(
         map(
           (flightDaysDocs: HalDoc[]) =>
-            new flightPreviewActions.FlightPreviewCreateSuccess({ params, flightDaysDocs, flightId, flightDoc, campaignDoc })
+            new flightPreviewActions.FlightPreviewCreateSuccess({ flight, flightDaysDocs, flightDoc, campaignDoc })
         ),
         catchError(error => of(new flightPreviewActions.FlightPreviewCreateFailure({ error })))
       );

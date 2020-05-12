@@ -13,8 +13,7 @@ describe('Flight Days/Preview Selectors', () => {
         new MockHalDoc(campaignStateFactory.flightDocFixture),
         campaignStateFactory.flightDocFixture.id,
         campaignStateFactory.flightDaysDocFixture
-      ),
-      campaignStateFactory.flightPreviewParams
+      )
     );
 
     // AVAILABLE

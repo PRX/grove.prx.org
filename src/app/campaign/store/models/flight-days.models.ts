@@ -1,15 +1,6 @@
 import { utc } from 'moment';
 import { HalDoc } from 'ngx-prx-styleguide';
 
-export interface FlightPreviewParams {
-  name: string;
-  set_inventory_uri: string;
-  startAt: Date;
-  endAt: Date;
-  totalGoal: number;
-  dailyMinimum: number;
-  zones: string[];
-}
 export interface InventoryNumbers {
   available: number;
   allocated: number;
@@ -35,7 +26,6 @@ export interface InventoryWeeklyRollup {
 }
 
 export interface InventoryRollup {
-  previewParams: FlightPreviewParams;
   weeks: InventoryWeeklyRollup[];
   totals: InventoryNumbers;
 }

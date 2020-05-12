@@ -13,8 +13,7 @@ import {
   campaignDocFixture,
   flightFixture,
   flightDocFixture,
-  flightDaysDocFixture,
-  flightPreviewParams
+  flightDaysDocFixture
 } from '../models/campaign-state.factory';
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
@@ -88,8 +87,7 @@ describe('CampaignActionService', () => {
     expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
       JSON.stringify(
         new flightPreviewActions.FlightPreviewCreate({
-          params: { ...flightPreviewParams, endAt: endAt.toDate() },
-          flightId: flightFixture.id,
+          flight: formFlight,
           flightDoc: new MockHalDoc(flightDocFixture),
           campaignDoc: new MockHalDoc(campaignDocFixture)
         })
@@ -153,13 +151,11 @@ describe('CampaignActionService', () => {
   });
 
   it('should load flight preview when total goal is changed', () => {
-    const { id: flightId, createdAt, name, startAt, endAt, set_inventory_uri, zones, totalGoal, dailyMinimum } = flightFixture;
     service.setFlightGoal(flightFixture);
     expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
       JSON.stringify(
         new flightPreviewActions.FlightPreviewCreate({
-          params: flightPreviewParams,
-          flightId,
+          flight: flightFixture,
           flightDoc: new MockHalDoc(flightDocFixture),
           campaignDoc: new MockHalDoc(campaignDocFixture)
         })

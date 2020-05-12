@@ -25,18 +25,8 @@ export class CampaignActionService {
   }
 
   loadFlightPreview(flight: Flight) {
-    const { id: flightId, set_inventory_uri, name, startAt, endAt, zones, totalGoal, dailyMinimum } = flight;
     this.store.pipe(select(selectRoutedCampaignFlightDocs), first()).subscribe(({ campaignDoc, flightDoc }) => {
-      const params = {
-        name,
-        set_inventory_uri,
-        startAt: startAt.toDate(),
-        endAt: endAt.toDate(),
-        totalGoal: totalGoal || 0,
-        dailyMinimum: dailyMinimum || 0,
-        zones: zones.map(zone => zone.id)
-      };
-      this.store.dispatch(new flightPreviewActions.FlightPreviewCreate({ params, flightId, flightDoc, campaignDoc }));
+      this.store.dispatch(new flightPreviewActions.FlightPreviewCreate({ flight, flightDoc, campaignDoc }));
     });
   }
 

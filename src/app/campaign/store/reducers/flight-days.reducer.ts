@@ -2,17 +2,17 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignActions } from '../actions/campaign-action.creator';
 import { FlightPreviewActions } from '../actions/flight-preview-action.creator';
-import { docToFlightDays, getFlightDaysId, FlightDays, FlightPreviewParams } from '../models';
+import { docToFlightDays, getFlightDaysId, FlightDays } from '../models';
 
 export interface State extends EntityState<FlightDays> {
-  previewParams: FlightPreviewParams;
+  preview: boolean;
   previewError: any;
 }
 
 export const adapter: EntityAdapter<FlightDays> = createEntityAdapter<FlightDays>({ selectId: getFlightDaysId });
 
 export const initialState: State = adapter.getInitialState({
-  previewParams: undefined,
+  preview: false,
   previewError: undefined
 });
 
@@ -25,11 +25,11 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS: {
       return adapter.addAll(
         action.payload.flightDocs.map(flightDoc => docToFlightDays(flightDoc, flightDoc.id, action.payload.flightDaysDocs[flightDoc.id])),
-        { ...state, previewParams: null, previewError: null }
+        { ...state, preview: false, previewError: null }
       );
     }
     case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
-      let newState = { ...state, previewParams: null, previewError: null };
+      let newState = { ...state, preview: false, previewError: null };
       const { deletedFlightDocs, updatedFlightDocs, updatedFlightDaysDocs, createdFlightDocs, createdFlightDaysDocs } = action.payload;
       if (deletedFlightDocs) {
         newState = adapter.removeMany(
@@ -56,11 +56,11 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       return newState;
     }
     case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS: {
-      const { params: previewParams, flightDoc, flightId, flightDaysDocs } = action.payload;
-      return adapter.upsertOne(docToFlightDays(flightDoc, flightId, flightDaysDocs), { ...state, previewParams, previewError: null });
+      const { flight, flightDoc, flightDaysDocs } = action.payload;
+      return adapter.upsertOne(docToFlightDays(flightDoc, flight.id, flightDaysDocs), { ...state, preview: true, previewError: null });
     }
     case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE: {
-      return { ...state, previewError: action.payload.error };
+      return { ...state, preview: true, previewError: action.payload.error };
     }
     default: {
       return state;

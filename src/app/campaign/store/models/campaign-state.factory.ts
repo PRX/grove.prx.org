@@ -135,15 +135,6 @@ export const createFlightsState = campaignDoc => ({
   }
 });
 
-export const flightPreviewParams = {
-  name: flightFixture.name,
-  set_inventory_uri: flightFixture.set_inventory_uri,
-  startAt: flightFixture.startAt.toDate(),
-  endAt: flightFixture.endAt.toDate(),
-  totalGoal: flightFixture.totalGoal,
-  dailyMinimum: flightFixture.dailyMinimum,
-  zones: flightFixture.zones.map(zone => zone.id)
-};
 export const flightDaysEntitities = {
   [flightDocFixture.id]: docToFlightDays(new MockHalDoc(flightDocFixture), flightDocFixture.id, flightDaysDocFixture)
 };
@@ -151,7 +142,7 @@ export const createFlightDaysState = () => ({
   flightDays: {
     ids: [flightDocFixture.id],
     entities: flightDaysEntitities,
-    previewParams: flightPreviewParams,
+    preview: true,
     previewError: null
   }
 });

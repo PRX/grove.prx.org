@@ -1,7 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
-import { FlightDay, FlightDays, FlightPreviewParams, InventoryNumbers, InventoryRollup, InventoryWeeklyRollup } from '../models';
+import { FlightDay, FlightDays, InventoryNumbers, InventoryRollup, InventoryWeeklyRollup } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/flight-days.reducer';
 import { selectRoutedFlightId } from './flight.selectors';
 
@@ -18,8 +18,7 @@ export const selectRoutedFlightDays = createSelector(
   }
 );
 
-export const selectFlightPreviewParams = createSelector(selectFlightDaysState, (state): FlightPreviewParams => state.previewParams);
-export const selectIsFlightPreview = createSelector(selectFlightPreviewParams, (params): boolean => !!params);
+export const selectIsFlightPreview = createSelector(selectFlightDaysState, (state): boolean => state.preview);
 export const selectFlightPreviewError = createSelector(selectFlightDaysState, state => state.previewError);
 
 export const getMidnightUTC = (date: Date): number => {
@@ -80,10 +79,7 @@ export const accumulateOntoWeekly = (showAvailable: boolean, weekly: InventoryWe
 };
 
 // Each week's data is keyed by a date string of beginning of each week's date. The days are accumulated onto it.
-export const rollupWeeks = (
-  inventory: FlightDay[],
-  previewParams: FlightPreviewParams
-): { previewParams: FlightPreviewParams; totals: InventoryNumbers; weeks: InventoryWeeklyRollup[] } => {
+export const rollupWeeks = (inventory: FlightDay[]): { totals: InventoryNumbers; weeks: InventoryWeeklyRollup[] } => {
   let beginOfWeek: string;
   let endOfWeek: Date;
   // reduce to accumulate the weekly rollups
@@ -123,7 +119,6 @@ export const rollupWeeks = (
   );
 
   return {
-    previewParams,
     weeks: Object.values(rollups.weeks).sort((a, b) => a.startDate.valueOf() - b.startDate.valueOf()),
     totals: rollups.totals
   };
@@ -131,8 +126,7 @@ export const rollupWeeks = (
 
 export const selectFlightDaysRollup = createSelector(
   selectRoutedFlightDays,
-  selectFlightPreviewParams,
-  (flightDays, previewParams): InventoryRollup => {
-    return flightDays && flightDays.days && rollupWeeks(flightDays.days, previewParams);
+  (flightDays): InventoryRollup => {
+    return flightDays && flightDays.days && rollupWeeks(flightDays.days);
   }
 );
