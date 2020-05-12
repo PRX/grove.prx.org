@@ -20,7 +20,7 @@ export class FlightPreviewEffects {
           (flightDaysDocs: HalDoc[]) =>
             new flightPreviewActions.FlightPreviewCreateSuccess({ flight, flightDaysDocs, flightDoc, campaignDoc })
         ),
-        catchError(error => of(new flightPreviewActions.FlightPreviewCreateFailure({ error })))
+        catchError(error => of(new flightPreviewActions.FlightPreviewCreateFailure({ flight, error })))
       );
     })
   );

@@ -9,7 +9,7 @@ import {
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
   selectCurrentInventoryUri,
-  selectFlightPreviewError,
+  selectRoutedFlightPreviewError,
   selectFlightDaysRollup,
   selectIsFlightPreview
 } from '../store/selectors';
@@ -62,7 +62,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
-    this.flightPreviewError$ = this.store.pipe(select(selectFlightPreviewError));
+    this.flightPreviewError$ = this.store.pipe(select(selectRoutedFlightPreviewError));
     this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
 

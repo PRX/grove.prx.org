@@ -22,7 +22,7 @@ export class FlightPreviewCreateSuccess implements Action {
 export class FlightPreviewCreateFailure implements Action {
   readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE;
 
-  constructor(public payload: { error: any }) {}
+  constructor(public payload: { flight: Flight; error: any }) {}
 }
 
 export type FlightPreviewActions = FlightPreviewCreate | FlightPreviewCreateSuccess | FlightPreviewCreateFailure;

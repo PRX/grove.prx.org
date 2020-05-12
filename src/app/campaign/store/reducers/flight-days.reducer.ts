@@ -6,7 +6,6 @@ import { docToFlightDays, getFlightDaysId, FlightDays } from '../models';
 
 export interface State extends EntityState<FlightDays> {
   preview: boolean;
-  previewError: any;
 }
 
 export const adapter: EntityAdapter<FlightDays> = createEntityAdapter<FlightDays>({ selectId: getFlightDaysId });
@@ -60,7 +59,9 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       return adapter.upsertOne(docToFlightDays(flightDoc, flight.id, flightDaysDocs), { ...state, preview: true, previewError: null });
     }
     case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE: {
-      return { ...state, preview: true, previewError: action.payload.error };
+      const { error: previewError, flight } = action.payload;
+      const days = state.entities[flight.id] ? state.entities[flight.id].days : [];
+      return adapter.upsertOne({ flightId: flight.id, days, previewError }, { ...state, preview: true });
     }
     default: {
       return state;

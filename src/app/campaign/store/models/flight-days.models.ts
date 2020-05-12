@@ -17,6 +17,7 @@ export interface FlightDays {
   flightDoc?: HalDoc;
   flightId: number;
   days: FlightDay[];
+  previewError?: any;
 }
 export interface InventoryWeeklyRollup {
   startDate: Date;

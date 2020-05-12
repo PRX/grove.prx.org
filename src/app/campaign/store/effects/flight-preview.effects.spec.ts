@@ -62,7 +62,7 @@ describe('FlightPreviewEffects', () => {
     const halError = new HalHttpError(500, 'error occurred');
     const errorResponse = cold('#', {}, halError);
     flightPreviewService.createFlightPreview = jest.fn(() => errorResponse);
-    const outcome = new flightPreviewActions.FlightPreviewCreateFailure({ error: halError });
+    const outcome = new flightPreviewActions.FlightPreviewCreateFailure({ flight: flightFixture, error: halError });
 
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-b', { b: outcome });
