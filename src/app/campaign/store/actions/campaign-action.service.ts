@@ -33,7 +33,7 @@ export class CampaignActionService {
         startAt: startAt.toDate(),
         endAt: endAt.toDate(),
         totalGoal: totalGoal || 0,
-        dailyMinimum,
+        dailyMinimum: dailyMinimum || 0,
         zones: zones.map(zone => zone.id)
       };
       this.store.dispatch(new flightPreviewActions.FlightPreviewCreate({ params, flightId, flightDoc, campaignDoc }));
