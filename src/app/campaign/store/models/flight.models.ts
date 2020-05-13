@@ -1,7 +1,6 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
 import { Moment, utc } from 'moment';
-import { MomentDateAdapter } from '@angular/material-moment-adapter';
 export interface FlightZone {
   id: string;
   label?: string;

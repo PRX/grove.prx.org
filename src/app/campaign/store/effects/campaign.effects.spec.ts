@@ -11,7 +11,7 @@ import { CampaignService, AuguryService } from '../../../core';
 import { getActions, TestActions } from '../../../store/test.actions';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { reducers } from '../';
-import { campaignFixture, flightFixture } from '../models/campaign-state.factory';
+import { campaignFixture, flightFixture, flightDocFixture, flightDaysData } from '../models/campaign-state.factory';
 import * as campaignActions from '../actions/campaign-action.creator';
 import { CampaignEffects } from './campaign.effects';
 
@@ -23,7 +23,7 @@ describe('CampaignEffects', () => {
   let fixture: ComponentFixture<TestComponent>;
   const toastrService: ToastrService = { success: jest.fn() } as any;
   const campaignDoc = new MockHalDoc(campaignFixture);
-  const flightDocs = [new MockHalDoc(flightFixture)];
+  const flightDocs = [new MockHalDoc(flightDocFixture)];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -42,7 +42,8 @@ describe('CampaignEffects', () => {
         {
           provide: CampaignService,
           useValue: {
-            loadCampaignZoomFlights: jest.fn(),
+            loadCampaignZoomFlightsAndFlightDays: jest.fn(),
+            loadFlightDays: jest.fn(),
             createCampaign: jest.fn(),
             updateCampaign: jest.fn(),
             createFlight: jest.fn()
@@ -63,10 +64,16 @@ describe('CampaignEffects', () => {
     jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
   }));
 
-  it('should load campaign with flights zoomed', () => {
-    campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
+  it('should load campaign with flights and flights days zoomed', () => {
+    campaignService.loadCampaignZoomFlightsAndFlightDays = jest.fn(() =>
+      of({ campaignDoc, flightDocs, flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] } })
+    );
     const action = new campaignActions.CampaignLoad({ id: 1 });
-    const success = new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs });
+    const success = new campaignActions.CampaignLoadSuccess({
+      campaignDoc,
+      flightDocs,
+      flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+    });
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
@@ -76,7 +83,7 @@ describe('CampaignEffects', () => {
   it('should return campaign load failure action on error', () => {
     const halError = new HalHttpError(500, 'something bad happened');
     const errorResponse = cold('#', {}, halError);
-    campaignService.loadCampaignZoomFlights = jest.fn(() => errorResponse);
+    campaignService.loadCampaignZoomFlightsAndFlightDays = jest.fn(() => errorResponse);
 
     const action = new campaignActions.CampaignLoad({ id: 1 });
     const outcome = new campaignActions.CampaignLoadFailure({ error: halError });
@@ -110,7 +117,9 @@ describe('CampaignEffects', () => {
       campaignDoc,
       deletedFlightDocs: undefined,
       updatedFlightDocs: undefined,
-      createdFlightDocs: undefined
+      updatedFlightDaysDocs: {},
+      createdFlightDocs: undefined,
+      createdFlightDaysDocs: {}
     });
 
     actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
@@ -162,7 +171,9 @@ describe('CampaignEffects', () => {
       campaignDoc,
       deletedFlightDocs: undefined,
       updatedFlightDocs: undefined,
-      createdFlightDocs: undefined
+      updatedFlightDaysDocs: {},
+      createdFlightDocs: undefined,
+      createdFlightDaysDocs: {}
     });
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
@@ -173,12 +184,13 @@ describe('CampaignEffects', () => {
   it('should redirect to a new campaign and flight', done => {
     campaignService.createCampaign = jest.fn(() => of(campaignDoc));
     campaignService.createFlight = jest.fn(() => of(flightDocs[0]));
+    campaignService.loadFlightDays = jest.fn(() => of((flightDaysData as any[]) as MockHalDoc[]));
 
     const { id, ...newCampaign } = campaignFixture;
-    const flightId = new Date().valueOf();
-    const flight = { ...flightFixture, id: flightId };
+    const tempFlightId = new Date().valueOf();
+    const flight = { ...flightFixture, id: tempFlightId };
     fixture.ngZone.run(() => {
-      router.navigateByUrl(`/campaign/new/flight/${flightId}`).then(() => {
+      router.navigateByUrl(`/campaign/new/flight/${tempFlightId}`).then(() => {
         const createAction = new campaignActions.CampaignSave({
           campaign: newCampaign,
           campaignDoc: undefined,
@@ -191,7 +203,9 @@ describe('CampaignEffects', () => {
           campaignDoc,
           deletedFlightDocs: undefined,
           updatedFlightDocs: undefined,
-          createdFlightDocs: { [flightId]: flightDocs[0] }
+          updatedFlightDaysDocs: {},
+          createdFlightDocs: { [tempFlightId]: flightDocs[0] },
+          createdFlightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
         });
         actions$.stream = hot('-a', { a: createAction });
         const expected = cold('-r', { r: success });
@@ -219,7 +233,9 @@ describe('CampaignEffects', () => {
           campaignDoc,
           deletedFlightDocs: { [flightFixture.id]: flightDocs[0] },
           updatedFlightDocs: undefined,
-          createdFlightDocs: undefined
+          updatedFlightDaysDocs: {},
+          createdFlightDocs: undefined,
+          createdFlightDaysDocs: {}
         });
         actions$.stream = hot('-a', { a: deleteAction });
         const expected = cold('-r', { r: success });
@@ -233,6 +249,7 @@ describe('CampaignEffects', () => {
   it('should update an existing flight', () => {
     campaignService.updateCampaign = jest.fn(() => of(campaignDoc));
     campaignService.updateFlight = jest.fn(() => of(flightDocs[0]));
+    campaignService.loadFlightDays = jest.fn(() => of((flightDaysData as any[]) as MockHalDoc[]));
 
     const updateAction = new campaignActions.CampaignSave({
       campaign: campaignFixture,
@@ -246,7 +263,9 @@ describe('CampaignEffects', () => {
       campaignDoc,
       deletedFlightDocs: undefined,
       updatedFlightDocs: { [flightFixture.id]: flightDocs[0] },
-      createdFlightDocs: undefined
+      updatedFlightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] },
+      createdFlightDocs: undefined,
+      createdFlightDaysDocs: {}
     });
     actions$.stream = hot('-a', { a: updateAction });
     const expected = cold('-r', { r: success });

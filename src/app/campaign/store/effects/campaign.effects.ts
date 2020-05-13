@@ -16,8 +16,10 @@ export class CampaignEffects {
   campaignLoad$ = this.actions$.pipe(
     ofType(ActionTypes.CAMPAIGN_LOAD),
     map((action: campaignActions.CampaignLoad) => action.payload),
-    mergeMap(payload => this.campaignService.loadCampaignZoomFlights(payload.id)),
-    map(({ campaignDoc, flightDocs }) => new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs })),
+    mergeMap(payload => this.campaignService.loadCampaignZoomFlightsAndFlightDays(payload.id)),
+    map(
+      ({ campaignDoc, flightDocs, flightDaysDocs }) => new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs })
+    ),
     catchError(error => of(new campaignActions.CampaignLoadFailure({ error })))
   );
 
@@ -33,6 +35,7 @@ export class CampaignEffects {
         campaignSaveResult = this.campaignService.createCampaign(payload.campaign);
       }
       return campaignSaveResult.pipe(
+        // deleted flights
         mergeMap((campaignDoc: HalDoc) => {
           const deletedFlights: { [id: number]: Observable<HalDoc> } = payload.deletedFlights.reduce(
             (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.deleteFlight(flight.id) }),
@@ -42,6 +45,7 @@ export class CampaignEffects {
             ? forkJoin(deletedFlights).pipe(map(deletedFlightDocs => ({ campaignDoc, deletedFlightDocs })))
             : of({ campaignDoc });
         }),
+        // updated flights
         mergeMap(({ campaignDoc, deletedFlightDocs }: { campaignDoc: HalDoc; deletedFlightDocs: { [id: number]: HalDoc } }) => {
           const updatedFlights: { [id: number]: Observable<HalDoc> } = payload.updatedFlights.reduce(
             (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.updateFlight(flight) }),
@@ -51,6 +55,7 @@ export class CampaignEffects {
             ? forkJoin(updatedFlights).pipe(map(updatedFlightDocs => ({ campaignDoc, deletedFlightDocs, updatedFlightDocs })))
             : of({ campaignDoc, deletedFlightDocs });
         }),
+        // created flights
         mergeMap(
           ({
             campaignDoc,
@@ -72,7 +77,8 @@ export class CampaignEffects {
               : of({ campaignDoc, updatedFlightDocs, deletedFlightDocs });
           }
         ),
-        tap(
+        // retrieve the flights' days from each created flight response
+        mergeMap(
           ({
             campaignDoc,
             deletedFlightDocs,
@@ -82,6 +88,70 @@ export class CampaignEffects {
             campaignDoc: HalDoc;
             deletedFlightDocs: { [id: number]: HalDoc };
             updatedFlightDocs: { [id: number]: HalDoc };
+            createdFlightDocs: { [id: number]: HalDoc };
+          }) => {
+            const flightDaysDocs: Observable<{ [id: number]: HalDoc[] }> = createdFlightDocs
+              ? forkJoin(
+                  Object.values(createdFlightDocs).reduce(
+                    (acc, doc) => ({ ...acc, [doc.id]: this.campaignService.loadFlightDays(doc) }),
+                    {}
+                  )
+                )
+              : of({});
+            return flightDaysDocs.pipe(
+              map(createdFlightDaysDocs => ({
+                campaignDoc,
+                deletedFlightDocs,
+                updatedFlightDocs,
+                createdFlightDocs,
+                createdFlightDaysDocs
+              }))
+            );
+          }
+        ),
+        // retrieve the flights' days from each updated flight response
+        mergeMap(
+          ({
+            campaignDoc,
+            deletedFlightDocs,
+            updatedFlightDocs,
+            createdFlightDocs,
+            createdFlightDaysDocs
+          }: {
+            campaignDoc: HalDoc;
+            deletedFlightDocs: { [id: number]: HalDoc };
+            updatedFlightDocs: { [id: number]: HalDoc };
+            createdFlightDocs: { [id: number]: HalDoc };
+            createdFlightDaysDocs: { [id: number]: HalDoc[] };
+          }) => {
+            const flightDaysDocs: Observable<{ [id: number]: HalDoc[] }> = updatedFlightDocs
+              ? forkJoin(
+                  Object.values(updatedFlightDocs).reduce(
+                    (acc, doc) => ({ ...acc, [doc.id]: this.campaignService.loadFlightDays(doc) }),
+                    {}
+                  )
+                )
+              : of({});
+            return flightDaysDocs.pipe(
+              map(updatedFlightDaysDocs => ({
+                campaignDoc,
+                deletedFlightDocs,
+                updatedFlightDocs,
+                updatedFlightDaysDocs,
+                createdFlightDocs,
+                createdFlightDaysDocs
+              }))
+            );
+          }
+        ),
+        tap(
+          ({
+            campaignDoc,
+            deletedFlightDocs,
+            createdFlightDocs
+          }: {
+            campaignDoc: HalDoc;
+            deletedFlightDocs: { [id: number]: HalDoc };
             createdFlightDocs: { [id: number]: HalDoc };
           }) => {
             this.toastr.success('Campaign saved');
@@ -105,13 +175,25 @@ export class CampaignEffects {
             campaignDoc,
             deletedFlightDocs,
             updatedFlightDocs,
-            createdFlightDocs
+            updatedFlightDaysDocs,
+            createdFlightDocs,
+            createdFlightDaysDocs
           }: {
             campaignDoc: HalDoc;
             deletedFlightDocs: { [id: number]: HalDoc };
             updatedFlightDocs: { [id: number]: HalDoc };
+            updatedFlightDaysDocs: { [id: number]: HalDoc[] };
             createdFlightDocs: { [id: number]: HalDoc };
-          }) => new campaignActions.CampaignSaveSuccess({ campaignDoc, deletedFlightDocs, updatedFlightDocs, createdFlightDocs })
+            createdFlightDaysDocs: { [id: number]: HalDoc[] };
+          }) =>
+            new campaignActions.CampaignSaveSuccess({
+              campaignDoc,
+              deletedFlightDocs,
+              updatedFlightDocs,
+              updatedFlightDaysDocs,
+              createdFlightDocs,
+              createdFlightDaysDocs
+            })
         ),
         catchError(error => of(new campaignActions.CampaignSaveFailure({ error })))
       );

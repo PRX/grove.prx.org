@@ -23,15 +23,16 @@ import { CustomRouterSerializer } from '../../store/router-store/custom-router-s
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
-import { flightFixture, flightDocFixture } from '../store/models/campaign-state.factory';
+import { flightFixture, flightDocFixture, flightDaysData } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
 import * as campaignActions from '../store/actions/campaign-action.creator';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 import { FlightContainerComponent } from './flight.container';
 import { FlightComponent } from './flight.component';
-import { AvailabilityComponent } from '../availability/availability.component';
-import { GoalFormComponent } from '../availability/goal-form.component';
+import { InventoryComponent } from '../inventory/inventory.component';
+import { InventoryTableComponent } from '../inventory/inventory-table.component';
+import { GoalFormComponent } from '../inventory/goal-form.component';
 import { TestComponent } from '../../../testing/test.component';
 import * as moment from 'moment';
 
@@ -53,7 +54,7 @@ const campaignRoutes: Routes = [
 ];
 
 describe('FlightContainerComponent', () => {
-  const inventory: ReplaySubject<any> = new ReplaySubject(1);
+  const inventory$: ReplaySubject<any> = new ReplaySubject(1);
   let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
   let router: Router;
@@ -92,7 +93,14 @@ describe('FlightContainerComponent', () => {
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)
       ],
-      declarations: [FlightContainerComponent, FlightComponent, AvailabilityComponent, GoalFormComponent, TestComponent],
+      declarations: [
+        FlightContainerComponent,
+        FlightComponent,
+        InventoryComponent,
+        InventoryTableComponent,
+        GoalFormComponent,
+        TestComponent
+      ],
       providers: [
         {
           provide: ActivatedRoute,
@@ -100,7 +108,7 @@ describe('FlightContainerComponent', () => {
         },
         {
           provide: InventoryService,
-          useValue: { listInventory: jest.fn(() => inventory) }
+          useValue: { listInventory: jest.fn(() => inventory$) }
         },
         CampaignActionService
       ]
@@ -119,7 +127,8 @@ describe('FlightContainerComponent', () => {
         store.dispatch(
           new campaignActions.CampaignLoadSuccess({
             campaignDoc: new MockHalDoc({ id: 1 }),
-            flightDocs: [new MockHalDoc(flightDocFixture)]
+            flightDocs: [new MockHalDoc(flightDocFixture)],
+            flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
           })
         );
         fix.ngZone.run(() => router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`));
@@ -130,10 +139,10 @@ describe('FlightContainerComponent', () => {
     component.ngOnDestroy();
   });
 
-  it('receives availability and allocation preview updates when flight form changes', done => {
+  it('receives inventory updates when flight form changes', done => {
     component.flightUpdateFromForm({ flight: { ...flightFixture, endAt: moment.utc() }, changed: true, valid: true });
-    component.flightAvailabilityRollup$.subscribe(availability => {
-      expect(availability).toBeDefined();
+    component.inventoryRollup$.subscribe(inventory => {
+      expect(inventory).toBeDefined();
       done();
     });
   });
@@ -145,7 +154,7 @@ describe('FlightContainerComponent', () => {
   });
 
   it('generates zone options from inventory', done => {
-    inventory.next([{ self_uri: flightFixture.set_inventory_uri, zones: flightFixture.zones }]);
+    inventory$.next([{ self_uri: flightFixture.set_inventory_uri, zones: flightFixture.zones }]);
     component.zoneOptions$.subscribe(opts => {
       expect(opts).toEqual(flightFixture.zones);
       done();

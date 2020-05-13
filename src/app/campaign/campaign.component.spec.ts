@@ -10,7 +10,6 @@ import { CustomRouterSerializer } from '../store/router-store/custom-router-seri
 import { of } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { AuguryService, InventoryService } from '../core';
-import { AllocationPreviewService } from '../core/allocation/allocation-preview.service';
 import { ActivatedRouteStub } from '../../testing/stub.router';
 import { FancyFormModule, StatusBarModule, MockHalService } from 'ngx-prx-styleguide';
 import { SharedModule } from '../shared/shared.module';
@@ -62,12 +61,6 @@ describe('CampaignComponent', () => {
         {
           provide: AuguryService,
           userValue: new MockHalService()
-        },
-        {
-          provide: AllocationPreviewService,
-          useValue: {
-            getAllocationPreview: jest.fn(() => of(undefined))
-          }
         },
         {
           provide: InventoryService,

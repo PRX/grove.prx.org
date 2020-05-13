@@ -1,13 +1,10 @@
-import { Dictionary } from '@ngrx/entity';
 import { CampaignStoreState } from '..';
 import { MockHalService, MockHalDoc } from 'ngx-prx-styleguide';
-import { selectId as selectAllocationPreviewId } from '../reducers/allocation-preview.reducer';
 import { Account, docToAccount } from './account.models';
 import { Advertiser } from './advertiser.models';
-import { AllocationPreview, docToAllocationPreview } from './allocation-preview.models';
-import { AvailabilityDay, docToAvailabilityDay } from './availability.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
+import { docToFlightDays } from './flight-days.models';
 import * as moment from 'moment';
 
 const augury = new MockHalService();
@@ -88,6 +85,19 @@ export const createCampaignState = () => ({
   }
 });
 
+export const flightDaysData = new Array(30).fill(null).map((_, i) => ({
+  allocated: Math.floor(Math.random() * 100),
+  available: Math.floor(Math.random() * 1000),
+  actuals: i < 15 ? Math.floor(Math.random() * 100) : 0,
+  inventory: Math.floor(Math.random() * 1000),
+  date: moment
+    .utc()
+    .add(i - 15, 'days')
+    .toISOString()
+    .slice(0, 10)
+}));
+export const flightDaysDocFixture = (flightDaysData as any[]) as MockHalDoc[];
+
 export const flightFixture: Flight = {
   id: 9,
   createdAt: new Date(),
@@ -103,6 +113,9 @@ export const flightDocFixture = {
   ...flightFixture,
   _links: {
     'prx:inventory': { href: '/some/inventory' }
+  },
+  embedded: {
+    'prx:flight-days': flightDaysDocFixture
   }
 };
 
@@ -122,69 +135,15 @@ export const createFlightsState = campaignDoc => ({
   }
 });
 
-export const allocationPreviewParamsFixture = {
-  flightId: flightFixture.id,
-  startAt: flightFixture.startAt.toDate(),
-  endAt: flightFixture.endAt.toDate(),
-  name: flightFixture.name,
-  set_inventory_uri: flightFixture.set_inventory_uri,
-  zones: flightFixture.zones.map(zone => ({ id: zone.id })),
-  dailyMinimum: 90,
-  totalGoal: flightFixture.totalGoal
+export const flightDaysEntitities = {
+  [flightDocFixture.id]: docToFlightDays(new MockHalDoc(flightDocFixture), flightDocFixture.id, flightDaysDocFixture)
 };
-
-export const allocationPreviewData: any[] = new Array(30).fill(null).map((_, i) => ({
-  goalCount: Math.floor(Math.random() * 100),
-  zoneName: 'pre_1',
-  date: moment
-    .utc()
-    .add(i - 15, 'days')
-    .toISOString()
-    .slice(0, 10)
-}));
-export const allocationPreviewFixture: AllocationPreview[] = allocationPreviewData.map(allocation => docToAllocationPreview(allocation));
-export const allocationPreviewEntities: Dictionary<AllocationPreview> = allocationPreviewFixture.reduce(
-  (acc, allocation) => ({ ...acc, [selectAllocationPreviewId(allocation)]: allocation }),
-  {}
-);
-
-export const createAllocationPreviewState = () => ({
-  allocationPreview: {
-    ...allocationPreviewParamsFixture,
-    ids: allocationPreviewFixture.map(allocation => selectAllocationPreviewId(allocation)),
-    entities: allocationPreviewEntities
-  }
-});
-
-export const availabilityParamsFixture = {
-  inventoryId: flightFixture.set_inventory_uri.split('/').pop(),
-  startDate: flightFixture.startAt.toDate(),
-  endDate: flightFixture.endAt.toDate(),
-  zone: flightFixture.zones[0].id,
-  flightId: flightFixture.id
-};
-export const availabilityData = new Array(30).fill(null).map((_, i) => ({
-  allocated: Math.floor(Math.random() * 100),
-  availability: Math.floor(Math.random() * 1000),
-  actuals: i < 15 ? Math.floor(Math.random() * 100) : 0,
-  date: moment
-    .utc()
-    .add(i - 15, 'days')
-    .toISOString()
-    .slice(0, 10)
-}));
-export const availabilityDaysFixture: AvailabilityDay[] = availabilityData.map(availability => docToAvailabilityDay(availability));
-export const availabilityEntities = {
-  [`${availabilityParamsFixture.flightId}_${availabilityParamsFixture.zone}`]: {
-    params: availabilityParamsFixture,
-    days: availabilityDaysFixture
-  }
-};
-export const createAvailabilityState = () => ({
-  availability: {
-    ...availabilityParamsFixture,
-    ids: [`${availabilityParamsFixture.flightId}_${availabilityParamsFixture.zone}`],
-    entities: availabilityEntities
+export const createFlightDaysState = () => ({
+  flightDays: {
+    ids: [flightDocFixture.id],
+    entities: flightDaysEntitities,
+    preview: true,
+    previewError: null
   }
 });
 
@@ -200,15 +159,13 @@ export const createRouterState = () => ({
 export const createCampaignStoreState = ({
   account = createAccountState(),
   advertiser = createAdvertiserState(),
-  allocationPreview = createAllocationPreviewState(),
-  availability = createAvailabilityState(),
   campaignState = createCampaignState(),
-  flightsState = createFlightsState(campaignState.campaign.doc)
+  flightsState = createFlightsState(campaignState.campaign.doc),
+  flightDaysState = createFlightDaysState()
 } = {}): CampaignStoreState => ({
   ...account,
   ...advertiser,
-  ...allocationPreview,
-  ...availability,
   ...campaignState,
-  ...flightsState
+  ...flightsState,
+  ...flightDaysState
 });

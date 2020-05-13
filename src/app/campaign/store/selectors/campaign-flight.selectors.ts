@@ -1,6 +1,12 @@
 import { createSelector } from '@ngrx/store';
 import { selectCampaign, selectCampaignLoaded, selectCampaignError, selectLocalCampaign } from './campaign.selectors';
-import { selectAllFlights, selectFlightEntities, selectRoutedFlightId, selectAllLocalFlights } from './flight.selectors';
+import {
+  selectAllFlights,
+  selectFlightEntities,
+  selectRoutedFlightId,
+  selectAllLocalFlights,
+  selectRoutedFlight
+} from './flight.selectors';
 import { Campaign, CampaignState, Flight, FlightState, CampaignFormSave } from '../models';
 
 export const selectCampaignWithFlightsForSave = createSelector(
@@ -51,3 +57,11 @@ export const selectFlightNotFoundError = createSelector(
 export const selectError = createSelector(selectCampaignError, selectFlightNotFoundError, (campaignError: any, flightError: string) => {
   return (campaignError && campaignError.body && campaignError.body.message && 'Campaign ' + campaignError.body.message) || flightError;
 });
+
+export const selectRoutedCampaignFlightDocs = createSelector(
+  selectCampaign,
+  selectRoutedFlight,
+  (campaign: CampaignState, flight: FlightState) => {
+    return { campaignDoc: campaign.doc, flightDoc: flight.doc };
+  }
+);

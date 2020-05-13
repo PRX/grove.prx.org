@@ -1,106 +1,52 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Subscription } from 'rxjs';
 import { first, filter } from 'rxjs/operators';
-import * as allocationPreviewActions from './allocation-preview-action.creator';
-import * as availabilityActions from './availability-action.creator';
 import * as campaignActions from './campaign-action.creator';
-import { Flight, getFlightZoneIds, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
+import * as flightPreviewActions from './flight-preview-action.creator';
+import { Flight, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
 import {
   selectCampaignId,
   selectCampaignWithFlightsForSave,
   selectRoutedFlight,
-  selectRoutedLocalFlight,
   selectCampaignDoc,
-  selectCampaignAndFlights
+  selectCampaignAndFlights,
+  selectRoutedCampaignFlightDocs
 } from '../selectors';
 import { Moment } from 'moment';
 
 @Injectable()
-export class CampaignActionService implements OnDestroy {
-  private flightSub: Subscription;
-  // current flight id only to be used for checking against changed flight id to load availability on flight tab/route change
-  // for any other current/routed flight id needs, please pipe from the selectRoutedFlightId selector
-  // one reason the routed flight id selector is not used here is that is would fire on navigation before the flight is actually loaded
-  private currentFlightId: number;
+export class CampaignActionService {
+  constructor(private store: Store<any>) {}
 
-  constructor(private store: Store<any>) {
-    this.loadAvailabilityOnFlightIdChange();
-  }
-
-  ngOnDestroy() {
-    if (this.flightSub) {
-      this.flightSub.unsubscribe();
+  loadPreviewIfFlightFormChanged(formFlight: Flight, localFlight: Flight) {
+    if (this.isDateRangeValid(formFlight) && this.havePreviewParamsChanged(formFlight, localFlight)) {
+      this.loadFlightPreview({ ...formFlight, id: localFlight.id });
     }
   }
 
-  private loadAvailabilityOnFlightIdChange() {
-    this.flightSub = this.store
-      .pipe(select(selectRoutedLocalFlight))
-      .pipe(filter(flight => flight && this.currentFlightId !== flight.id))
-      .subscribe(flight => {
-        if (this.hasAvailabilityParams(flight)) {
-          this.loadAvailability(flight);
-        }
-        this.currentFlightId = flight.id;
-      });
-  }
-
-  loadAvailabilityAllocationIfChanged(formFlight: Flight, localFlight: Flight) {
-    if (this.isDateRangeValid(formFlight) && this.haveAvailabilityParamsChanged(formFlight, localFlight)) {
-      this.loadAvailability({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
-      if (formFlight.totalGoal) {
-        this.loadAllocationPreview({ ...formFlight, id: localFlight.id, createdAt: localFlight.createdAt });
-      }
-    }
+  loadFlightPreview(flight: Flight) {
+    this.store.pipe(select(selectRoutedCampaignFlightDocs), first()).subscribe(({ campaignDoc, flightDoc }) => {
+      this.store.dispatch(new flightPreviewActions.FlightPreviewCreate({ flight, flightDoc, campaignDoc }));
+    });
   }
 
   isDateRangeValid({ startAt, endAt }: { startAt: Moment; endAt: Moment }) {
     return startAt && endAt && startAt.valueOf() < endAt.valueOf();
   }
 
-  hasAvailabilityParams(flight: Flight): boolean {
-    return flight && flight.startAt && flight.endAt && flight.set_inventory_uri && flight.zones && flight.zones.length > 0;
-  }
-
-  haveAvailabilityParamsChanged(a: Flight, b: Flight) {
+  hasPreviewParams(flight: Flight): boolean {
     return (
-      this.hasAvailabilityParams(a) && (isStartAtChanged(a, b) || isEndAtChanged(a, b) || isInventoryChanged(a, b) || isZonesChanged(a, b))
+      flight &&
+      flight.startAt &&
+      flight.endAt &&
+      flight.set_inventory_uri &&
+      flight.zones &&
+      flight.zones.filter(zone => zone.id).length > 0
     );
   }
 
-  loadAvailability(flight: Flight) {
-    const { id: flightId, createdAt, set_inventory_uri, startAt, endAt, zones } = flight;
-    const inventoryId = set_inventory_uri.split('/').pop();
-    getFlightZoneIds(zones).forEach(zone => {
-      this.store.dispatch(
-        new availabilityActions.AvailabilityLoad({
-          inventoryId,
-          startDate: startAt.toDate(),
-          endDate: endAt.toDate(),
-          zone,
-          createdAt,
-          flightId
-        })
-      );
-    });
-  }
-
-  loadAllocationPreview(flight: Flight) {
-    const { id: flightId, createdAt, set_inventory_uri, name, startAt, endAt, zones, totalGoal, dailyMinimum } = flight;
-    this.store.dispatch(
-      new allocationPreviewActions.AllocationPreviewLoad({
-        flightId,
-        createdAt,
-        set_inventory_uri,
-        name,
-        startAt: startAt.toDate(),
-        endAt: endAt.toDate(),
-        totalGoal,
-        dailyMinimum,
-        zones
-      })
-    );
+  havePreviewParamsChanged(a: Flight, b: Flight) {
+    return this.hasPreviewParams(a) && (isStartAtChanged(a, b) || isEndAtChanged(a, b) || isInventoryChanged(a, b) || isZonesChanged(a, b));
   }
 
   addFlight() {
@@ -131,11 +77,13 @@ export class CampaignActionService implements OnDestroy {
     this.store
       .pipe(
         select(selectRoutedFlight),
-        filter(state => !!(state && state.localFlight)),
+        filter(state => {
+          return !!(state && state.localFlight);
+        }),
         first()
       )
       .subscribe(state => {
-        this.loadAvailabilityAllocationIfChanged(formFlight, state.localFlight);
+        this.loadPreviewIfFlightFormChanged(formFlight, state.localFlight);
         this.store.dispatch(
           new campaignActions.CampaignFlightFormUpdate({
             flight: formFlight,
@@ -149,20 +97,17 @@ export class CampaignActionService implements OnDestroy {
   setFlightGoal(flight: Flight) {
     const { id, totalGoal, dailyMinimum } = flight;
     this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, valid: !!totalGoal }));
-    // if totalGoal, load allocation preview
-    if (totalGoal) {
-      this.loadAllocationPreview(flight);
-    }
+    this.loadFlightPreview(flight);
   }
 
   saveCampaignAndFlights() {
     this.store
       .pipe(select(selectCampaignWithFlightsForSave), first())
-      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) =>
+      .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) => {
         this.store.dispatch(
           new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
-        )
-      );
+        );
+      });
   }
 
   deleteCampaign() {

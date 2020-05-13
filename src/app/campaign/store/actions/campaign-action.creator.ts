@@ -59,7 +59,7 @@ export class CampaignLoad implements Action {
 export class CampaignLoadSuccess implements Action {
   readonly type = ActionTypes.CAMPAIGN_LOAD_SUCCESS;
 
-  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[] }) {}
+  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[]; flightDaysDocs: { [id: number]: HalDoc[] } }) {}
 }
 export class CampaignLoadFailure implements Action {
   readonly type = ActionTypes.CAMPAIGN_LOAD_FAILURE;
@@ -86,7 +86,9 @@ export class CampaignSaveSuccess implements Action {
       campaignDoc: HalDoc;
       deletedFlightDocs: { [id: number]: HalDoc };
       updatedFlightDocs: { [id: number]: HalDoc };
+      updatedFlightDaysDocs: { [id: number]: HalDoc[] };
       createdFlightDocs: { [id: number]: HalDoc };
+      createdFlightDaysDocs: { [id: number]: HalDoc[] };
     }
   ) {}
 }

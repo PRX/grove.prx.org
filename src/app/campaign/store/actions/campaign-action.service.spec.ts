@@ -6,9 +6,15 @@ import { reducers } from '../';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../../../store/router-store/custom-router-serializer';
 import * as campaignActions from './campaign-action.creator';
-import * as allocationPreviewActions from './allocation-preview-action.creator';
+import * as flightPreviewActions from './flight-preview-action.creator';
 import { selectCampaignId, selectCampaignWithFlightsForSave } from '../selectors';
-import { campaignFixture, campaignDocFixture, flightFixture, flightDocFixture } from '../models/campaign-state.factory';
+import {
+  campaignFixture,
+  campaignDocFixture,
+  flightFixture,
+  flightDocFixture,
+  flightDaysDocFixture
+} from '../models/campaign-state.factory';
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { CampaignActionService } from './campaign-action.service';
@@ -45,48 +51,47 @@ describe('CampaignActionService', () => {
       new MockHalDoc({ ...flightDocFixture, id: flightIds[2] }),
       new MockHalDoc({ ...flightDocFixture, id: flightIds[3] })
     ];
-    jest.spyOn(service, 'loadAvailability');
-    fixture.ngZone.run(() => {
-      const loadAction = new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs });
-      store.dispatch(loadAction);
+    const flightDaysDocs = {
+      [flightIds[0]]: flightDaysDocFixture,
+      [flightIds[1]]: flightDaysDocFixture,
+      [flightIds[2]]: flightDaysDocFixture,
+      [flightIds[3]]: flightDaysDocFixture
+    };
+    jest.spyOn(service, 'loadFlightPreview');
 
-      router
-        .navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`)
-        .then(() => (dispatchSpy = jest.spyOn(store, 'dispatch')));
+    fixture.ngZone.run(() => {
+      router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
+        const loadAction = new campaignActions.CampaignLoadSuccess({
+          campaignDoc,
+          flightDocs,
+          flightDaysDocs
+        });
+        store.dispatch(loadAction);
+        dispatchSpy = jest.spyOn(store, 'dispatch');
+      });
     });
   });
 
-  it('should load availability from flight id change', () => {
-    expect(service.loadAvailability).toHaveBeenCalledWith({ MOCKS: {}, ERRORS: {}, ...flightFixture });
-  });
-
-  it('should load availability and allocation preview when flight form is updated', () => {
-    jest.spyOn(service, 'loadAvailabilityAllocationIfChanged');
+  it('should load flight preview when flight form is updated', () => {
+    jest.spyOn(service, 'loadPreviewIfFlightFormChanged');
     service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
-    expect(service.loadAvailabilityAllocationIfChanged).toHaveBeenCalled();
+    expect(service.loadPreviewIfFlightFormChanged).toHaveBeenCalled();
   });
 
-  it('should dispatch action to load allocation preview', () => {
-    const { id: flightId, name, startAt, totalGoal, dailyMinimum, set_inventory_uri, zones } = flightFixture;
+  it('should dispatch action to load flight preview', () => {
     const endAt = moment.utc();
-    const createdAt = new Date();
-
     const formFlight = { ...flightFixture, endAt };
-    const localFlight = { ...flightFixture, createdAt };
-    service.loadAvailabilityAllocationIfChanged(formFlight, localFlight);
+    const localFlight = flightFixture;
+    service.loadPreviewIfFlightFormChanged(formFlight, localFlight);
 
-    expect(dispatchSpy).toHaveBeenLastCalledWith(
-      new allocationPreviewActions.AllocationPreviewLoad({
-        flightId,
-        createdAt,
-        set_inventory_uri,
-        name,
-        startAt: startAt.toDate(),
-        endAt: endAt.toDate(),
-        totalGoal,
-        dailyMinimum,
-        zones
-      })
+    expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
+      JSON.stringify(
+        new flightPreviewActions.FlightPreviewCreate({
+          flight: formFlight,
+          flightDoc: new MockHalDoc(flightDocFixture),
+          campaignDoc: new MockHalDoc(campaignDocFixture)
+        })
+      )
     );
   });
 
@@ -113,9 +118,9 @@ describe('CampaignActionService', () => {
     });
   });
 
-  it('should not load allocation preview if just the flight name changes', () => {
+  it('should not load flight preview if just the flight name changes', () => {
     const changedFlight = { ...flightFixture, name: 'new name' };
-    service.loadAvailabilityAllocationIfChanged(changedFlight, flightFixture);
+    service.loadPreviewIfFlightFormChanged(changedFlight, flightFixture);
     expect(store.dispatch).not.toHaveBeenCalled();
   });
 
@@ -145,21 +150,16 @@ describe('CampaignActionService', () => {
     );
   });
 
-  it('should load allocation preview when total goal is changed', () => {
-    const { id: flightId, createdAt, name, startAt, endAt, set_inventory_uri, zones, totalGoal, dailyMinimum } = flightFixture;
+  it('should load flight preview when total goal is changed', () => {
     service.setFlightGoal(flightFixture);
-    expect(dispatchSpy).toHaveBeenLastCalledWith(
-      new allocationPreviewActions.AllocationPreviewLoad({
-        flightId,
-        createdAt,
-        set_inventory_uri,
-        name,
-        startAt: startAt.toDate(),
-        endAt: endAt.toDate(),
-        totalGoal,
-        dailyMinimum,
-        zones
-      })
+    expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
+      JSON.stringify(
+        new flightPreviewActions.FlightPreviewCreate({
+          flight: flightFixture,
+          flightDoc: new MockHalDoc(flightDocFixture),
+          campaignDoc: new MockHalDoc(campaignDocFixture)
+        })
+      )
     );
   });
 

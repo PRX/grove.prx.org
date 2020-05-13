@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map, switchMap, mergeMap, filter, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
@@ -31,6 +31,31 @@ export class CampaignService {
         return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       })
     );
+  }
+
+  loadCampaignZoomFlightsAndFlightDays(
+    id: number
+  ): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[]; flightDaysDocs: { [id: number]: HalDoc[] } }> {
+    return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights,prx:flight-days' }).pipe(
+      switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
+      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
+        // if total is greater than count, request all flights
+        let params: any;
+        if (+flightDocs['total'] > +flightDocs['count']) {
+          params = { per: +flightDocs['total'] };
+        }
+        return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
+      }),
+      switchMap(({ campaignDoc, flightDocs }) =>
+        forkJoin(flightDocs.reduce((acc, flightDoc) => ({ ...acc, [flightDoc.id]: this.loadFlightDays(flightDoc) }), {})).pipe(
+          map((flightDaysDocs: { [id: number]: HalDoc[] }) => ({ campaignDoc, flightDocs, flightDaysDocs }))
+        )
+      )
+    );
+  }
+
+  loadFlightDays(flightDoc: HalDoc): Observable<HalDoc[]> {
+    return flightDoc.followList('prx:flight-days');
   }
 
   updateCampaign(doc: HalDoc, campaign: Campaign): Observable<HalDoc> {

@@ -5,9 +5,10 @@ import * as campaignActions from '../actions/campaign-action.creator';
 import {
   campaignFixture,
   campaignDocFixture,
-  flightDocFixture,
   createCampaignState,
-  flightFixture
+  flightFixture,
+  flightDocFixture,
+  flightDaysDocFixture
 } from '../models/campaign-state.factory';
 
 describe('Campaign Reducer', () => {
@@ -62,7 +63,8 @@ describe('Campaign Reducer', () => {
       loadResult,
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
-        flightDocs: [new MockHalDoc(flightDocFixture)]
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     expect(loadResult.loading).toBe(false);
@@ -77,7 +79,8 @@ describe('Campaign Reducer', () => {
       initialState,
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
-        flightDocs: [new MockHalDoc(flightDocFixture)]
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     expect(result.loaded).toBe(true);
@@ -88,7 +91,8 @@ describe('Campaign Reducer', () => {
       initialState,
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
-        flightDocs: [new MockHalDoc(flightDocFixture)]
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     expect(result.localCampaign).toMatchObject(campaignFixture);
@@ -120,7 +124,9 @@ describe('Campaign Reducer', () => {
         campaignDoc: new MockHalDoc(campaignFixture),
         deletedFlightDocs: undefined,
         updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
-        createdFlightDocs: undefined
+        updatedFlightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture },
+        createdFlightDocs: undefined,
+        createdFlightDaysDocs: undefined
       })
     );
     expect(result.saving).toBe(false);
@@ -133,7 +139,9 @@ describe('Campaign Reducer', () => {
         campaignDoc: new MockHalDoc(campaignDocFixture),
         deletedFlightDocs: undefined,
         updatedFlightDocs: { [flightFixture.id]: new MockHalDoc(flightFixture) },
-        createdFlightDocs: undefined
+        updatedFlightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture },
+        createdFlightDocs: undefined,
+        createdFlightDaysDocs: undefined
       })
     );
     expect(result.localCampaign).toMatchObject(campaignFixture);
@@ -159,7 +167,8 @@ describe('Campaign Reducer', () => {
       initialState,
       new campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
-        flightDocs: [new MockHalDoc(flightDocFixture)]
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
     result = reducer(result, new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture] }));

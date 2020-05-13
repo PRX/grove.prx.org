@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { HeaderModule, FooterModule, HalService, ModalModule, ModalService, ToastrModule, ToastrService } from 'ngx-prx-styleguide';
 import { AuguryService } from './augury.service';
 import { AdvertiserService } from './advertiser/advertiser.service';
-import { AllocationPreviewService } from './allocation/allocation-preview.service';
 import { CampaignService } from './campaign/campaign.service';
+import { FlightPreviewService } from './campaign/flight-preview.service';
 import { UserService } from './user/user.service';
 import { InventoryService } from './inventory/inventory.service';
 
@@ -15,9 +15,9 @@ import { InventoryService } from './inventory/inventory.service';
   providers: [
     AuguryService,
     AdvertiserService,
-    AllocationPreviewService,
     InventoryService,
     CampaignService,
+    FlightPreviewService,
     UserService,
     HalService,
     ModalService,

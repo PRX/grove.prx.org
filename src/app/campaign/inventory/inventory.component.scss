@@ -1,0 +1,31 @@
+@import '~src/sass/variables';
+
+$row-line-height: 20px;
+$row-divider-height: 1px;
+$row-divider-border: $row-divider-height solid prx-theme-foreground(divider);
+$row-height: $row-line-height + $row-divider-height;
+
+:host {
+  margin: 20px 10px 20px 20px;
+}
+section {
+  margin: 20px 0;
+}
+.title {
+  color: prx-theme-foreground(text);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.errors {
+  color: $warn;
+  display: grid;
+  grid-row-gap: 0.5rem;
+  margin: 0 2rem 1rem 0;
+  font-style: italic;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+}
