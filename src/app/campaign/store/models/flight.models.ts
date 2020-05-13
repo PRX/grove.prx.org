@@ -18,6 +18,7 @@ export interface Flight {
   zones: FlightZone[];
   totalGoal: number;
   dailyMinimum?: number;
+  uncapped?: boolean;
   status?: string;
   status_message?: string;
   createdAt?: Date;

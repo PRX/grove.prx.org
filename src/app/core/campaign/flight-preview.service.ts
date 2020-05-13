@@ -24,6 +24,7 @@ export class FlightPreviewService {
       }[];
       totalGoal?: number;
       dailyMinimum?: number;
+      uncapped?: boolean;
     },
     flightDoc?: HalDoc,
     campaignDoc?: HalDoc
@@ -32,19 +33,20 @@ export class FlightPreviewService {
     const endAt = flight.endAt.toISOString().slice(0, 10);
     const totalGoal = flight.totalGoal || 0;
     const dailyMinimum = flight.dailyMinimum || 0;
+    const uncapped = flight.uncapped || false;
 
     if (flightDoc) {
       return flightDoc
-        .create('preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum })
+        .create('preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })
         .pipe(mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days')));
     } else if (campaignDoc) {
       return campaignDoc
-        .create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum })
+        .create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })
         .pipe(mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days')));
     } else {
       return this.augury.root.pipe(
         first(),
-        map(root => root.create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum })),
+        map(root => root.create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })),
         mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days'))
       );
     }
