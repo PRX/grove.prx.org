@@ -10,7 +10,8 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatSelectModule
+  MatSelectModule,
+  MatSlideToggleModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -89,6 +90,7 @@ describe('FlightContainerComponent', () => {
         MatInputModule,
         MatListModule,
         MatSelectModule,
+        MatSlideToggleModule,
         StoreModule.forRoot({ router: routerReducer }),
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)

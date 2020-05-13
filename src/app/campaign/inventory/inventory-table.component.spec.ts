@@ -50,7 +50,7 @@ describe('InventoryTableComponent', () => {
       {
         startDate: new Date('2019-10-27'),
         endDate: new Date('2019-10-31'),
-        numbers: { allocated: 6, available: 728, actuals: 0, inventory: 728 },
+        numbers: { allocated: 6, available: 728, actuals: 0, inventory: 730 },
         days: []
       }
     ]
@@ -94,6 +94,11 @@ describe('InventoryTableComponent', () => {
       comp.toggleZoneWeekExpanded(week);
       expect(comp.isZoneWeekExpanded(week)).toBeTruthy();
     });
+  });
+
+  it('calculates the number of conflicts on a row', async () => {
+    expect(comp.numConflict(mockRollup.weeks[1])).toEqual(0);
+    expect(comp.numConflict(mockRollup.weeks[4])).toEqual(2);
   });
 
   it('highlights rows that are borked', () => {

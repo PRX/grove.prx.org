@@ -144,9 +144,10 @@ describe('CampaignActionService', () => {
   it('should dispatch action to set flight goal', () => {
     const totalGoal = 1000;
     const dailyMinimum = 10;
-    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum });
+    const uncapped = false;
+    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum, uncapped });
     expect(dispatchSpy).toHaveBeenCalledWith(
-      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, valid: true })
+      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, uncapped, valid: true })
     );
   });
 

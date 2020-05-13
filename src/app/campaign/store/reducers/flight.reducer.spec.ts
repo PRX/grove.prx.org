@@ -126,7 +126,13 @@ describe('Flight Reducer', () => {
     );
     result = reducer(
       result,
-      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal: 999, dailyMinimum: 99, valid: true })
+      new campaignActions.CampaignFlightSetGoal({
+        flightId: flightFixture.id,
+        totalGoal: 999,
+        dailyMinimum: 99,
+        uncapped: false,
+        valid: true
+      })
     );
     expect(result.entities[flightFixture.id].localFlight.totalGoal).toBe(999);
     expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBe(99);
