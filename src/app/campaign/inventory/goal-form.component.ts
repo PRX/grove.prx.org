@@ -19,6 +19,17 @@ import { Flight } from '../store/models';
         <input type="number" matInput placeholder="Daily Minimum" formControlName="dailyMinimum" />
       </mat-form-field>
     </form>
+    <div *ngIf="!isCapped">
+      <p>
+        <strong>Uncapped Flights</strong> will serve an unlimited amount during their date ranges, in equal proportions with other competing
+        uncapped flights.
+      </p>
+      <br />
+      <p>
+        Any competing <strong>capped</strong> flights will be served first before uncapped flights are even considered. Capped flight
+        allocations can be seen below <b class="warn">in red</b>.
+      </p>
+    </div>
   `,
   styleUrls: ['goal-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -124,6 +124,11 @@ $row-height: $row-line-height + $row-divider-height;
   color: $warn;
 }
 
+.is-conflict {
+  color: $warn;
+  font-weight: 700;
+}
+
 .preview {
   &::after {
     content: '*';
