@@ -64,7 +64,7 @@ export class InventoryComponent {
       !this.flight.startAt ||
       !this.flight.endAt ||
       !this.flight.set_inventory_uri ||
-      !(this.flight.zones && this.flight.zones.length)
+      !(this.flight.zones && this.flight.zones.filter(z => z.id).length)
     );
   }
 }
