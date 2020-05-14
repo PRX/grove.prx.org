@@ -96,7 +96,6 @@ export class CampaignActionService {
 
   setFlightGoal(flight: Flight) {
     const { id, totalGoal, dailyMinimum, uncapped } = flight;
-    // TODO: goals of 0 seem to be fine, even for capped flights
     const valid = totalGoal >= 0 && dailyMinimum >= 0;
     this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, uncapped, valid }));
     this.loadFlightPreview(flight);
