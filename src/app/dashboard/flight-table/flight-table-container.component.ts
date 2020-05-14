@@ -5,22 +5,32 @@ import { DashboardService } from '../dashboard.service';
 
 @Component({
   template: `
-    <div *ngIf="error$ | async as error; else flights">
-      {{ error }}
-    </div>
+    <mat-card class="message" *ngIf="error$ | async as error; else flights">
+      <mat-card-content>
+        <p>{{ error }}</p>
+      </mat-card-content>
+    </mat-card>
     <ng-template #flights>
-      <div class="spinner-container" *ngIf="loading$ | async; else flightTable">
+      <div class="spinner-container" *ngIf="loading$ | async; else loaded">
         <mat-spinner></mat-spinner>
       </div>
-      <ng-template #flightTable>
-        <grove-flight-table
-          [routedParams]="routedParams$ | async"
-          [totalActuals]="totalActuals$ | async"
-          [totalGoals]="totalGoals$ | async"
-        ></grove-flight-table>
+      <ng-template #loaded>
+        <mat-card class="message" *ngIf="noFlights; else flightsTable">
+          <mat-card-content>
+            <p>No flights could be found that match your filters.</p>
+          </mat-card-content>
+        </mat-card>
+        <ng-template #flightsTable>
+          <grove-flight-table
+            [routedParams]="routedParams$ | async"
+            [totalActuals]="totalActuals$ | async"
+            [totalGoals]="totalGoals$ | async"
+          ></grove-flight-table>
+        </ng-template>
       </ng-template>
     </ng-template>
   `,
+  styleUrls: ['flight-table-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightTableContainerComponent implements OnInit, OnDestroy {
@@ -47,6 +57,10 @@ export class FlightTableContainerComponent implements OnInit, OnDestroy {
 
   get loading$(): Observable<boolean> {
     return this.dashboardService.flightsLoading;
+  }
+
+  get noFlights(): boolean {
+    return !this.dashboardService.flightCount;
   }
 
   setParamsFromRoute() {
