@@ -9,12 +9,12 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
       <div class="expand"></div>
       <div class="date">Week</div>
 
-      <ng-template [ngIf]="uncapped" [ngIfElse]="capped">
+      <ng-template [ngIf]="uncapped" [ngIfElse]="cappedHeader">
         <div class="expect">Expected</div>
         <div class="conflict">Conflicts</div>
       </ng-template>
 
-      <ng-template #capped>
+      <ng-template #cappedHeader>
         <div class="avail">Available</div>
         <div class="goal">Allocated</div>
       </ng-template>
@@ -39,12 +39,12 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
           {{ week.startDate | date: 'M/dd':'+0000' }}
         </div>
 
-        <ng-template [ngIf]="uncapped" [ngIfElse]="capped">
+        <ng-template [ngIf]="uncapped" [ngIfElse]="cappedWeek">
           <div [class.preview]="isPreview">{{ week.numbers.available | largeNumber }}</div>
           <div [class.is-conflict]="numConflict(week) > 0">{{ numConflict(week) | largeNumber }}</div>
         </ng-template>
 
-        <ng-template #capped>
+        <ng-template #cappedWeek>
           <div>{{ week.numbers.available | largeNumber }}</div>
           <div [class.preview]="isPreview">{{ week.numbers.allocated | largeNumber }}</div>
         </ng-template>
@@ -71,7 +71,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
                 <span>{{ day.date | date: 'M/dd':'+0000' }}</span>
               </div>
 
-              <ng-template [ngIf]="uncapped" [ngIfElse]="capped">
+              <ng-template [ngIf]="uncapped" [ngIfElse]="cappedDay">
                 <div class="expect" [class.preview]="isPreview">
                   <span>{{ day.numbers.available | largeNumber }}</span>
                 </div>
@@ -80,7 +80,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
                 </div>
               </ng-template>
 
-              <ng-template #capped>
+              <ng-template #cappedDay>
                 <div class="avail">
                   <span>{{ day.numbers.available | largeNumber }}</span>
                 </div>
@@ -102,7 +102,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
       <div class="expand"></div>
       <div class="date">TOTALS</div>
 
-      <ng-template [ngIf]="uncapped" [ngIfElse]="capped">
+      <ng-template [ngIf]="uncapped" [ngIfElse]="cappedTotal">
         <div [class.preview]="isPreview">
           <span>{{ rollup.totals.available | largeNumber }}</span>
         </div>
@@ -111,7 +111,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
         </div>
       </ng-template>
 
-      <ng-template #capped>
+      <ng-template #cappedTotal>
         <div>{{ rollup.totals.available | largeNumber }}</div>
         <div [class.preview]="isPreview">
           {{ rollup.totals.allocated | largeNumber }}
