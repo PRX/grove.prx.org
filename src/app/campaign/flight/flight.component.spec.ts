@@ -103,15 +103,6 @@ describe('FlightComponent', () => {
     expect(component.name.disabled).toEqual(false);
   });
 
-  it('preserves totalGoal when emitting form changes', done => {
-    component.flight = flightFixture;
-    component.flightUpdate.subscribe(flightUpdate => {
-      expect(flightUpdate).toMatchObject({ flight: { totalGoal: flightFixture.totalGoal } });
-      done();
-    });
-    component.flightForm.patchValue({ endAt: new Date() });
-  });
-
   it('filters zone options based on the current zone', () => {
     component.flight = flightFixture;
     component.flight.zones.push({ id: 'post_1' });

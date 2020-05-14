@@ -167,7 +167,7 @@ export class CampaignFlightFormUpdate implements Action {
 export class CampaignFlightSetGoal implements Action {
   readonly type = ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL;
 
-  constructor(public payload: { flightId: number; totalGoal: number; dailyMinimum: number; valid: boolean }) {}
+  constructor(public payload: { flightId: number; totalGoal: number; dailyMinimum: number; uncapped: boolean; valid: boolean }) {}
 }
 
 export type CampaignActions =

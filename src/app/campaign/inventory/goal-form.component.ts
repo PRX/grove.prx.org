@@ -8,15 +8,28 @@ import { Flight } from '../store/models';
   selector: 'grove-goal-form',
   template: `
     <form class="goal-form" [formGroup]="goalForm" ngNativeValidate>
-      <mat-form-field appearance="outline">
+      <h2 class="title">Impressions</h2>
+      <mat-slide-toggle formControlName="uncapped">No Cap</mat-slide-toggle>
+      <mat-form-field appearance="outline" *ngIf="isCapped">
         <mat-label>Total Goal</mat-label>
         <input type="number" matInput placeholder="Total Goal" formControlName="totalGoal" required />
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" *ngIf="isCapped">
         <mat-label>Daily Minimum</mat-label>
         <input type="number" matInput placeholder="Daily Minimum" formControlName="dailyMinimum" />
       </mat-form-field>
     </form>
+    <div *ngIf="!isCapped">
+      <p>
+        <strong>Uncapped Flights</strong> will serve an unlimited amount during their date ranges, in equal proportions with other competing
+        uncapped flights.
+      </p>
+      <br />
+      <p>
+        Any competing <strong>capped</strong> flights will be served first before uncapped flights are even considered. Capped flight
+        allocations can be seen below <b class="warn">in red</b>.
+      </p>
+    </div>
   `,
   styleUrls: ['goal-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,10 +50,15 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   @Output() goalChange = new EventEmitter<Flight>();
   goalForm = this.fb.group({
     id: [''],
-    totalGoal: ['', Validators.required],
-    dailyMinimum: ['']
+    totalGoal: [0, Validators.required],
+    dailyMinimum: [0],
+    uncapped: [false]
   });
   goalFormSub: Subscription;
+
+  get isCapped(): boolean {
+    return !this.goalForm.get('uncapped').value;
+  }
 
   constructor(private fb: FormBuilder) {}
 
@@ -49,11 +67,15 @@ export class GoalFormComponent implements OnInit, OnDestroy {
       .pipe(
         debounceTime(200),
         distinctUntilChanged((a, b) => {
-          return a.totalGoal === b.totalGoal && a.dailyMinimum === b.dailyMinimum;
+          return a.totalGoal === b.totalGoal && a.dailyMinimum === b.dailyMinimum && a.uncapped === b.uncapped;
         })
       )
       .subscribe(cmp => {
-        this.formStatusChanged(cmp);
+        if (cmp.uncapped) {
+          this.formStatusChanged({ ...cmp, totalGoal: 0, dailyMinimum: 0 });
+        } else {
+          this.formStatusChanged(cmp);
+        }
       });
   }
 
@@ -66,15 +88,17 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   formStatusChanged(formFields) {
     const totalGoal = formFields.totalGoal && +formFields.totalGoal;
     const dailyMinimum = formFields.dailyMinimum && +formFields.dailyMinimum;
+    const uncapped = formFields.uncapped || false;
     this.goalChange.emit({
       ...this.flight,
       id: formFields.id,
       totalGoal,
-      dailyMinimum
+      dailyMinimum,
+      uncapped
     });
   }
 
-  updateGoalForm({ id, totalGoal, dailyMinimum }: Flight) {
-    this.goalForm.reset({ id, totalGoal, dailyMinimum }, { emitEvent: false, onlySelf: true });
+  updateGoalForm({ id, totalGoal, dailyMinimum, uncapped }: Flight) {
+    this.goalForm.reset({ id, totalGoal, dailyMinimum, uncapped }, { emitEvent: false, onlySelf: true });
   }
 }

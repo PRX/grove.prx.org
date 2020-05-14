@@ -144,10 +144,27 @@ describe('CampaignActionService', () => {
   it('should dispatch action to set flight goal', () => {
     const totalGoal = 1000;
     const dailyMinimum = 10;
-    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum });
+    const uncapped = false;
+    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum, uncapped });
     expect(dispatchSpy).toHaveBeenCalledWith(
-      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, valid: true })
+      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, uncapped, valid: true })
     );
+  });
+
+  it('should validate flight goals', () => {
+    service.setFlightGoal(flightFixture);
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(true);
+    dispatchSpy.mockClear();
+
+    service.setFlightGoal({ ...flightFixture, totalGoal: -1 });
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
+    dispatchSpy.mockClear();
+
+    service.setFlightGoal({ ...flightFixture, dailyMinimum: -1 });
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
   });
 
   it('should load flight preview when total goal is changed', () => {

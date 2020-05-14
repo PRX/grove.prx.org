@@ -48,8 +48,7 @@ export class FlightComponent implements OnInit {
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
     zones: this.fb.array([]),
-    set_inventory_uri: ['', Validators.required],
-    totalGoal: [0, Validators.required]
+    set_inventory_uri: ['', Validators.required]
   });
 
   get name() {

@@ -95,8 +95,9 @@ export class CampaignActionService {
   }
 
   setFlightGoal(flight: Flight) {
-    const { id, totalGoal, dailyMinimum } = flight;
-    this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, valid: !!totalGoal }));
+    const { id, totalGoal, dailyMinimum, uncapped } = flight;
+    const valid = totalGoal >= 0 && dailyMinimum >= 0;
+    this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, uncapped, valid }));
     this.loadFlightPreview(flight);
   }
 

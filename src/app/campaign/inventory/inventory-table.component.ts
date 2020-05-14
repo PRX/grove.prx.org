@@ -8,8 +8,17 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
     <div class="row head">
       <div class="expand"></div>
       <div class="date">Week</div>
-      <div class="avail">Available</div>
-      <div class="goal">Allocated</div>
+
+      <ng-template [ngIf]="uncapped" [ngIfElse]="cappedHeader">
+        <div class="expect">Expected</div>
+        <div class="conflict">Conflicts</div>
+      </ng-template>
+
+      <ng-template #cappedHeader>
+        <div class="avail">Available</div>
+        <div class="goal">Allocated</div>
+      </ng-template>
+
       <div class="goal">Actual</div>
       <div class="edit"><prx-icon name="lock" size="14px" color="secondary"></prx-icon></div>
     </div>
@@ -29,10 +38,17 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
         <div class="date">
           {{ week.startDate | date: 'M/dd':'+0000' }}
         </div>
-        <div>{{ week.numbers.available | largeNumber }}</div>
-        <div [class.preview]="isPreview">
-          {{ week.numbers.allocated | largeNumber }}
-        </div>
+
+        <ng-template [ngIf]="uncapped" [ngIfElse]="cappedWeek">
+          <div [class.preview]="isPreview">{{ week.numbers.available | largeNumber }}</div>
+          <div [class.is-conflict]="numConflict(week) > 0">{{ numConflict(week) | largeNumber }}</div>
+        </ng-template>
+
+        <ng-template #cappedWeek>
+          <div>{{ week.numbers.available | largeNumber }}</div>
+          <div [class.preview]="isPreview">{{ week.numbers.allocated | largeNumber }}</div>
+        </ng-template>
+
         <div>
           {{ showActualsValue(week.startDate) ? (week.numbers.actuals | largeNumber) : '&mdash;' }}
         </div>
@@ -54,12 +70,25 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
               <div class="date">
                 <span>{{ day.date | date: 'M/dd':'+0000' }}</span>
               </div>
-              <div class="avail">
-                <span>{{ day.numbers.available | largeNumber }}</span>
-              </div>
-              <div class="goal" [class.preview]="isPreview">
-                <span>{{ day.numbers.allocated | largeNumber }}</span>
-              </div>
+
+              <ng-template [ngIf]="uncapped" [ngIfElse]="cappedDay">
+                <div class="expect" [class.preview]="isPreview">
+                  <span>{{ day.numbers.available | largeNumber }}</span>
+                </div>
+                <div class="conflict" [class.is-conflict]="numConflict(day) > 0">
+                  <div>{{ numConflict(day) | largeNumber }}</div>
+                </div>
+              </ng-template>
+
+              <ng-template #cappedDay>
+                <div class="avail">
+                  <span>{{ day.numbers.available | largeNumber }}</span>
+                </div>
+                <div class="goal" [class.preview]="isPreview">
+                  <span>{{ day.numbers.allocated | largeNumber }}</span>
+                </div>
+              </ng-template>
+
               <div>
                 {{ showActualsValue(day.date) ? (day.numbers.actuals | largeNumber) : '&mdash;' }}
               </div>
@@ -72,10 +101,23 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
     <div class="row totals">
       <div class="expand"></div>
       <div class="date">TOTALS</div>
-      <div>{{ rollup.totals.available | largeNumber }}</div>
-      <div [class.preview]="isPreview">
-        {{ rollup.totals.allocated | largeNumber }}
-      </div>
+
+      <ng-template [ngIf]="uncapped" [ngIfElse]="cappedTotal">
+        <div [class.preview]="isPreview">
+          <span>{{ rollup.totals.available | largeNumber }}</span>
+        </div>
+        <div [class.is-conflict]="rollup.totals.inventory - rollup.totals.available > 0">
+          <div>{{ rollup.totals.inventory - rollup.totals.available | largeNumber }}</div>
+        </div>
+      </ng-template>
+
+      <ng-template #cappedTotal>
+        <div>{{ rollup.totals.available | largeNumber }}</div>
+        <div [class.preview]="isPreview">
+          {{ rollup.totals.allocated | largeNumber }}
+        </div>
+      </ng-template>
+
       <div>
         {{ showActualsValue(flight.startAt.toDate()) ? rollup.totals.actuals : '&mdash;' }}
       </div>
@@ -90,6 +132,14 @@ export class InventoryTableComponent {
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   zoneWeekExpanded = {};
+
+  get uncapped(): boolean {
+    return !!(this.flight && this.flight.uncapped);
+  }
+
+  numConflict(week: InventoryWeeklyRollup): number {
+    return week.numbers.inventory - week.numbers.available;
+  }
 
   isZoneWeekExpanded(week: InventoryWeeklyRollup): boolean {
     return this.zoneWeekExpanded[getDateSlice(week.startDate)];

@@ -13,3 +13,19 @@ $gap-size: 0.75rem;
     padding: 0;
   }
 }
+
+.title {
+  color: prx-theme-foreground(text);
+  font-size: 1rem;
+  line-height: 2rem;
+}
+
+.warn {
+  color: $warn;
+  font-weight: 700;
+}
+
+mat-slide-toggle {
+  justify-self: right;
+  margin-right: 10px;
+}

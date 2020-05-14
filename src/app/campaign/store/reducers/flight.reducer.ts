@@ -109,11 +109,15 @@ export function reducer(state = initialState, action: CampaignActions): State {
       );
     }
     case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
-      const { flightId: id, totalGoal, dailyMinimum, valid } = action.payload;
+      const { flightId: id, totalGoal, dailyMinimum, uncapped, valid } = action.payload;
       return adapter.updateOne(
         {
           id,
-          changes: { localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0 }, changed: true, valid }
+          changes: {
+            localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0, uncapped: uncapped || false },
+            changed: true,
+            valid
+          }
         },
         state
       );

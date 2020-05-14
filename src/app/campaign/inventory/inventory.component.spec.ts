@@ -3,7 +3,7 @@ import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } from '@angular/material';
+import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { InventoryComponent } from './inventory.component';
 import { InventoryTableComponent } from './inventory-table.component';
@@ -26,7 +26,8 @@ describe('InventoryComponent', () => {
         MatDividerModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        MatSlideToggleModule
       ],
       declarations: [InventoryComponent, InventoryTableComponent, GoalFormComponent]
     })
@@ -78,6 +79,12 @@ describe('InventoryComponent', () => {
     comp.flight = {
       ...flightFixture,
       zones: []
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...flightFixture,
+      zones: [{ id: null }]
     };
     expect(comp.cantShowInventory()).toBeTruthy();
   });

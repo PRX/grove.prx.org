@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatFormFieldModule, MatInputModule } from '@angular/material';
+import { MatFormFieldModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { GoalFormComponent } from './goal-form.component';
 import * as moment from 'moment';
@@ -24,7 +24,7 @@ describe('GoalFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule],
       declarations: [GoalFormComponent]
     })
       .compileComponents()
@@ -48,5 +48,14 @@ describe('GoalFormComponent', () => {
       done();
     });
     comp.goalForm.get('dailyMinimum').setValue(90);
+  });
+
+  it('sets the goals to 0 for uncapped flights', done => {
+    comp.flight = flight;
+    comp.goalChange.subscribe(change => {
+      expect(change).toMatchObject({ ...flight, dailyMinimum: 0, totalGoal: 0, uncapped: true });
+      done();
+    });
+    comp.goalForm.get('uncapped').setValue(true);
   });
 });

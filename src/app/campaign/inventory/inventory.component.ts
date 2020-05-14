@@ -5,10 +5,10 @@ import { Flight, InventoryRollup } from '../store/models';
 @Component({
   selector: 'grove-inventory',
   template: `
-    <h2 class="title">Impressions</h2>
-    <p *ngIf="cantShowInventory(); else inventory">
-      Please select Start and End Dates, Series, and Zones to view inventory.
-    </p>
+    <div *ngIf="cantShowInventory(); else inventory">
+      <h2 class="title">Impressions</h2>
+      <p>Please select Start and End Dates, Series, and Zones to view inventory.</p>
+    </div>
     <ng-template #inventory>
       <grove-goal-form [flight]="flight" (goalChange)="goalChange.emit($event)"></grove-goal-form>
       <ul class="errors" *ngIf="errors as flightErrors">
@@ -64,7 +64,7 @@ export class InventoryComponent {
       !this.flight.startAt ||
       !this.flight.endAt ||
       !this.flight.set_inventory_uri ||
-      !(this.flight.zones && this.flight.zones.length)
+      !(this.flight.zones && this.flight.zones.filter(z => z.id).length)
     );
   }
 }
