@@ -81,5 +81,11 @@ describe('InventoryComponent', () => {
       zones: []
     };
     expect(comp.cantShowInventory()).toBeTruthy();
+
+    comp.flight = {
+      ...flightFixture,
+      zones: [{ id: null }]
+    };
+    expect(comp.cantShowInventory()).toBeTruthy();
   });
 });
