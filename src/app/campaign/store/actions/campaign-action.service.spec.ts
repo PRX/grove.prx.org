@@ -151,6 +151,22 @@ describe('CampaignActionService', () => {
     );
   });
 
+  it('should validate flight goals', () => {
+    service.setFlightGoal(flightFixture);
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(true);
+    dispatchSpy.mockClear();
+
+    service.setFlightGoal({ ...flightFixture, totalGoal: -1 });
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
+    dispatchSpy.mockClear();
+
+    service.setFlightGoal({ ...flightFixture, dailyMinimum: -1 });
+    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
+    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
+  });
+
   it('should load flight preview when total goal is changed', () => {
     service.setFlightGoal(flightFixture);
     expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
