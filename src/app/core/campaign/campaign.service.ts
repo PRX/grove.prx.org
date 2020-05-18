@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { map, switchMap, mergeMap, filter, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
@@ -47,9 +47,11 @@ export class CampaignService {
         return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       }),
       switchMap(({ campaignDoc, flightDocs }) =>
-        forkJoin(flightDocs.reduce((acc, flightDoc) => ({ ...acc, [flightDoc.id]: this.loadFlightDays(flightDoc) }), {})).pipe(
-          map((flightDaysDocs: { [id: number]: HalDoc[] }) => ({ campaignDoc, flightDocs, flightDaysDocs }))
-        )
+        flightDocs.length
+          ? forkJoin(flightDocs.reduce((acc, flightDoc) => ({ ...acc, [flightDoc.id]: this.loadFlightDays(flightDoc) }), {})).pipe(
+              map((flightDaysDocs: { [id: number]: HalDoc[] }) => ({ campaignDoc, flightDocs, flightDaysDocs }))
+            )
+          : of({ campaignDoc, flightDocs, flightDaysDocs: {} })
       )
     );
   }
