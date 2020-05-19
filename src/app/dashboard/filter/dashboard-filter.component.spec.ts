@@ -8,7 +8,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { DashboardService } from '../dashboard.service';
 import { DashboardServiceMock, facets } from '../dashboard.service.mock';
 
-import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from '.';
+import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent, LabelOrderPipe } from '.';
 
 describe('DashboardFilterComponent', () => {
   let comp: DashboardFilterComponent;
@@ -30,7 +30,7 @@ describe('DashboardFilterComponent', () => {
         MatSelectModule,
         NoopAnimationsModule
       ],
-      declarations: [DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent],
+      declarations: [DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent, LabelOrderPipe],
       providers: [
         MatDatepickerModule,
         {

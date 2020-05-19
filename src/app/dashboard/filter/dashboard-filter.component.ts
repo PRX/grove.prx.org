@@ -11,7 +11,7 @@ import { DashboardService, DashboardParams, Facets } from '../dashboard.service'
     <div class="selects">
       <grove-filter-facet
         facetName="Podcast"
-        [options]="facets?.podcast"
+        [options]="facets?.podcast | labelOrder: 'label'"
         [selectedOptions]="params?.podcast"
         (selectedOptionsChange)="routeToParams({ podcast: $event })"
       >
@@ -27,14 +27,14 @@ import { DashboardService, DashboardParams, Facets } from '../dashboard.service'
       <grove-filter-facet
         facetName="Geo Target"
         multiple="true"
-        [options]="facets?.geo"
+        [options]="facets?.geo | labelOrder: 'label'"
         [selectedOptions]="params?.geo"
         (selectedOptionsChange)="routeToParams({ geo: $event })"
       >
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Advertiser"
-        [options]="facets?.advertiser"
+        [options]="facets?.advertiser | labelOrder: 'label'"
         [selectedOptions]="params?.advertiser"
         (selectedOptionsChange)="routeToParams({ advertiser: $event })"
       >

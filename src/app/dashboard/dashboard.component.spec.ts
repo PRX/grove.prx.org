@@ -16,7 +16,7 @@ import { DashboardService } from './dashboard.service';
 import { DashboardServiceMock } from './dashboard.service.mock';
 
 import { DashboardComponent } from './dashboard.component';
-import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from './filter';
+import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent, LabelOrderPipe } from './filter';
 import { CampaignListSortComponent } from './campaign-list/';
 
 describe('DashboardComponent', () => {
@@ -45,7 +45,8 @@ describe('DashboardComponent', () => {
         FilterFacetComponent,
         FilterTextComponent,
         FilterDateComponent,
-        CampaignListSortComponent
+        CampaignListSortComponent,
+        LabelOrderPipe
       ],
       providers: [
         {
