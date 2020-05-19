@@ -27,7 +27,7 @@ import {
 import { DashboardComponent } from './dashboard.component';
 import { dashboardRouting } from './dashboard.routing';
 import { CampaignListComponent, CampaignListSortComponent, CampaignListTotalPagesPipe } from './campaign-list';
-import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent } from './filter';
+import { DashboardFilterComponent, FilterFacetComponent, FilterTextComponent, FilterDateComponent, LabelOrderPipe } from './filter';
 import { FlightTableContainerComponent, FlightTableComponent } from './flight-table/';
 
 @NgModule({
@@ -46,7 +46,8 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     CampaignListSortComponent,
     CampaignListTotalPagesPipe,
     FlightTableContainerComponent,
-    FlightTableComponent
+    FlightTableComponent,
+    LabelOrderPipe
   ],
   imports: [
     dashboardRouting,
