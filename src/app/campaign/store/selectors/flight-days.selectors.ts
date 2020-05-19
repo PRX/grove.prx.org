@@ -18,7 +18,7 @@ export const selectRoutedFlightDays = createSelector(
   }
 );
 
-export const selectIsFlightPreview = createSelector(selectFlightDaysState, (state): boolean => state.preview);
+export const selectIsFlightPreview = createSelector(selectRoutedFlightDays, (state): boolean => state && state.preview);
 export const selectRoutedFlightPreviewError = createSelector(selectRoutedFlightDays, state => state && state.previewError);
 
 export const getMidnightUTC = (date: Date): number => {

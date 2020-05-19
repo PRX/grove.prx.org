@@ -17,6 +17,7 @@ export interface FlightDays {
   flightDoc?: HalDoc;
   flightId: number;
   days: FlightDay[];
+  preview?: boolean;
   previewError?: any;
 }
 export interface InventoryWeeklyRollup {
@@ -35,7 +36,13 @@ export const getFlightDaysId = (state: FlightDays) => {
   return state.flightId;
 };
 
-export const docToFlightDays = (flightDoc: HalDoc, flightId: number, flightDaysDocs: any[]): FlightDays => {
+export const docToFlightDays = (
+  flightDoc: HalDoc,
+  flightId: number,
+  flightDaysDocs: any[],
+  preview?: boolean,
+  previewError?: any
+): FlightDays => {
   return {
     flightDoc,
     flightId,
@@ -43,6 +50,8 @@ export const docToFlightDays = (flightDoc: HalDoc, flightId: number, flightDaysD
       numbers: doc as InventoryNumbers,
       borked: doc['available'] !== null && doc['available'] < 0,
       date: utc(doc['date']).toDate()
-    }))
+    })),
+    preview,
+    previewError
   };
 };
