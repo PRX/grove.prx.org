@@ -16,31 +16,21 @@ import {
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 @Component({
-  selector: 'grove-flight.container',
   template: `
-    <ng-container *ngIf="zoneOptions$ | async as zoneOpts">
-      <grove-flight
-        [inventory]="inventoryOptions$ | async"
-        [zoneOptions]="zoneOpts"
-        [flight]="flightLocal$ | async"
-        [softDeleted]="softDeleted$ | async"
-        (flightUpdate)="flightUpdateFromForm($event)"
-        (flightDeleteToggle)="flightDeleteToggle($event)"
-        (flightDuplicate)="flightDuplicate($event)"
-      ></grove-flight>
-      <grove-inventory
-        [flight]="flightLocal$ | async"
-        [changed]="flightChanged$ | async"
-        [zones]="zoneOpts"
-        [rollup]="inventoryRollup$ | async"
-        [isPreview]="isPreview$ | async"
-        [previewError]="flightPreviewError$ | async"
-        (goalChange)="onGoalChange($event)"
-      >
-      </grove-inventory>
-    </ng-container>
+    <grove-flight
+      *ngIf="zoneOptions$ | async as zoneOpts"
+      [inventory]="inventoryOptions$ | async"
+      [zoneOptions]="zoneOptions$ | async"
+      [flight]="flightLocal$ | async"
+      [softDeleted]="softDeleted$ | async"
+      [rollup]="inventoryRollup$ | async"
+      [isPreview]="isPreview$ | async"
+      [previewError]="flightPreviewError$ | async"
+      (flightUpdate)="flightUpdateFromForm($event)"
+      (flightDeleteToggle)="flightDeleteToggle($event)"
+      (flightDuplicate)="flightDuplicate($event)"
+    ></grove-flight>
   `,
-  styleUrls: ['flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
@@ -83,10 +73,6 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   flightUpdateFromForm({ flight: formFlight, changed, valid }: { flight: Flight; changed: boolean; valid: boolean }) {
     this.campaignAction.updateFlightForm(formFlight, changed, valid);
-  }
-
-  onGoalChange(flight: Flight) {
-    this.campaignAction.setFlightGoal(flight);
   }
 
   flightDuplicate(flight: Flight) {

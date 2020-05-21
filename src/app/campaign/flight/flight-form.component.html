@@ -1,5 +1,5 @@
 <mat-card>
-  <form [formGroup]="flightForm" ngNativeValidate>
+  <div class="flight-form-container" [formGroup]="flightForm" ngNativeValidate>
     <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Flight Name</mat-label>
       <input matInput placeholder="Flight Name" formControlName="name" required />
@@ -26,7 +26,7 @@
     </mat-form-field>
     <fieldset class="flight-zones" formArrayName="zones">
       <h2>Zones</h2>
-      <div *ngFor="let zone of zones.controls; let i = index" [formGroup]="zone" class="inline-fields">
+      <div *ngFor="let zone of zonesControls.controls; let i = index" [formGroup]="zone" class="inline-fields">
         <mat-form-field class="zone-name" appearance="outline">
           <mat-label>Zone Name</mat-label>
           <mat-select formControlName="id" required>
@@ -39,17 +39,17 @@
           <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
           <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
         </mat-form-field>
-        <div *ngIf="zones?.length > 1" class="remove-zone mat-form-field-wrapper">
-          <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
+        <div *ngIf="zonesControls?.length > 1" class="remove-zone mat-form-field-wrapper">
+          <button mat-icon-button aria-label="Remove zone" (click)="removeZone.emit(i)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
       </div>
-      <div class="add-zone" *ngIf="zones?.length < zoneOptions?.length">
-        <a mat-button routerLink="." (click)="onAddZone()"><mat-icon>add</mat-icon> Add a creative</a>
+      <div class="add-zone" *ngIf="zonesControls?.length < zoneOptions?.length">
+        <a mat-button routerLink="." (click)="addZone.emit()"><mat-icon>add</mat-icon> Add a creative</a>
       </div>
     </fieldset>
-  </form>
+  </div>
   <div class="flight-controls-container">
     <button
       (click)="onFlightDeleteToggle()"

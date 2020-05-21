@@ -10,7 +10,7 @@ import { Flight, InventoryRollup } from '../store/models';
       <p>Please select Start and End Dates, Series, and Zones to view inventory.</p>
     </div>
     <ng-template #inventory>
-      <grove-goal-form [flight]="flight" (goalChange)="goalChange.emit($event)"></grove-goal-form>
+      <grove-goal-form></grove-goal-form>
       <ul class="errors" *ngIf="errors as flightErrors">
         <li class="error" *ngFor="let error of flightErrors"><mat-icon>priority_high</mat-icon> {{ error }}</li>
       </ul>
@@ -26,7 +26,6 @@ import { Flight, InventoryRollup } from '../store/models';
 })
 export class InventoryComponent {
   @Input() flight: Flight;
-  @Input() changed: boolean;
   @Input() zones: InventoryZone[];
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;

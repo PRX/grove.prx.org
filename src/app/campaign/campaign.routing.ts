@@ -8,7 +8,8 @@ import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignFormContainerComponent } from './form/campaign-form.container';
 import { CampaignFormComponent } from './form/campaign-form.component';
 import { FlightContainerComponent } from './flight/flight.container';
-import { FlightComponent } from './flight/flight.component';
+import { FlightFormControlContainerComponent } from './flight/flight-form-control-container.component';
+import { FlightFormComponent } from './flight/flight-form.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
@@ -42,7 +43,8 @@ export const campaignComponents: any[] = [
   CampaignNavComponent,
   CampaignStatusComponent,
   FlightContainerComponent,
-  FlightComponent,
+  FlightFormControlContainerComponent,
+  FlightFormComponent,
   InventoryComponent,
   InventoryTableComponent,
   GoalFormComponent

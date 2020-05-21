@@ -30,7 +30,8 @@ import * as campaignActions from '../store/actions/campaign-action.creator';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 import { FlightContainerComponent } from './flight.container';
-import { FlightComponent } from './flight.component';
+import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
+import { FlightFormComponent } from './flight-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
@@ -97,7 +98,8 @@ describe('FlightContainerComponent', () => {
       ],
       declarations: [
         FlightContainerComponent,
-        FlightComponent,
+        FlightFormControlContainerComponent,
+        FlightFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent,

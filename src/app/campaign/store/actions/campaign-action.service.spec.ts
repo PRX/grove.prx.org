@@ -57,7 +57,6 @@ describe('CampaignActionService', () => {
       [flightIds[2]]: flightDaysDocFixture,
       [flightIds[3]]: flightDaysDocFixture
     };
-    jest.spyOn(service, 'loadFlightPreview');
 
     fixture.ngZone.run(() => {
       router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
@@ -72,27 +71,54 @@ describe('CampaignActionService', () => {
     });
   });
 
-  it('should load flight preview when flight form is updated', () => {
-    jest.spyOn(service, 'loadPreviewIfFlightFormChanged');
-    service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
-    expect(service.loadPreviewIfFlightFormChanged).toHaveBeenCalled();
+  it('should pass flight form updates to Subject to be filtered and dispatched', () => {
+    spyOn(service.flightFormValueChanges, 'next');
+    const flight = { ...flightFixture, name: 'new name' };
+    service.updateFlightForm(flight, true, false);
+    expect(service.flightFormValueChanges.next).toHaveBeenCalledWith({
+      flight,
+      changed: true,
+      valid: false
+    });
   });
 
-  it('should dispatch action to load flight preview', () => {
-    const endAt = moment.utc();
-    const formFlight = { ...flightFixture, endAt };
-    const localFlight = flightFixture;
-    service.loadPreviewIfFlightFormChanged(formFlight, localFlight);
+  describe('flight preview', () => {
+    beforeEach(() => {
+      jest.spyOn(service, 'loadFlightPreview');
+    });
 
-    expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
-      JSON.stringify(
-        new flightPreviewActions.FlightPreviewCreate({
-          flight: formFlight,
-          flightDoc: new MockHalDoc(flightDocFixture),
-          campaignDoc: new MockHalDoc(campaignDocFixture)
-        })
-      )
-    );
+    it('should load flight preview when flight form is updated', () => {
+      service.updateFlightForm({ ...flightFixture, totalGoal: 10 }, true, true);
+      expect(service.loadFlightPreview).toHaveBeenCalled();
+    });
+
+    it('should not load flight preview if just the name is changed', () => {
+      service.updateFlightForm({ ...flightFixture, name: 'new name' }, true, true);
+      expect(service.loadFlightPreview).not.toHaveBeenCalled();
+    });
+
+    it('should load flight preview when total goal is changed', () => {
+      service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
+      expect(service.loadFlightPreview).toHaveBeenCalled();
+    });
+
+    it('sets the goals to 0 for uncapped flights', () => {
+      service.updateFlightForm({ ...flightFixture, uncapped: true }, true, true);
+      expect(service.loadFlightPreview).toHaveBeenCalledWith({ ...flightFixture, uncapped: true, totalGoal: 0, dailyMinimum: 0 });
+    });
+
+    it('should dispatch action to load flight preview', () => {
+      service.loadFlightPreview(flightFixture);
+      expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
+        JSON.stringify(
+          new flightPreviewActions.FlightPreviewCreate({
+            flight: flightFixture,
+            flightDoc: new MockHalDoc(flightDocFixture),
+            campaignDoc: new MockHalDoc(campaignDocFixture)
+          })
+        )
+      );
+    });
   });
 
   describe('temporary flight id', () => {
@@ -118,66 +144,9 @@ describe('CampaignActionService', () => {
     });
   });
 
-  it('should not load flight preview if just the flight name changes', () => {
-    const changedFlight = { ...flightFixture, name: 'new name' };
-    service.loadPreviewIfFlightFormChanged(changedFlight, flightFixture);
-    expect(store.dispatch).not.toHaveBeenCalled();
-  });
-
   it('should dispatch action to toggle flight deletion', () => {
     service.deleteRoutedFlightToggle();
     expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
-  });
-
-  it('should dispatch action to update flight form', () => {
-    const flight = { ...flightFixture, name: 'new name' };
-    service.updateFlightForm(flight, true, false);
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      new campaignActions.CampaignFlightFormUpdate({
-        flight,
-        changed: true,
-        valid: false
-      })
-    );
-  });
-
-  it('should dispatch action to set flight goal', () => {
-    const totalGoal = 1000;
-    const dailyMinimum = 10;
-    const uncapped = false;
-    service.setFlightGoal({ ...flightFixture, totalGoal, dailyMinimum, uncapped });
-    expect(dispatchSpy).toHaveBeenCalledWith(
-      new campaignActions.CampaignFlightSetGoal({ flightId: flightFixture.id, totalGoal, dailyMinimum, uncapped, valid: true })
-    );
-  });
-
-  it('should validate flight goals', () => {
-    service.setFlightGoal(flightFixture);
-    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
-    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(true);
-    dispatchSpy.mockClear();
-
-    service.setFlightGoal({ ...flightFixture, totalGoal: -1 });
-    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
-    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
-    dispatchSpy.mockClear();
-
-    service.setFlightGoal({ ...flightFixture, dailyMinimum: -1 });
-    expect(dispatchSpy.mock.calls[0][0]).toBeInstanceOf(campaignActions.CampaignFlightSetGoal);
-    expect(dispatchSpy.mock.calls[0][0].payload.valid).toEqual(false);
-  });
-
-  it('should load flight preview when total goal is changed', () => {
-    service.setFlightGoal(flightFixture);
-    expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
-      JSON.stringify(
-        new flightPreviewActions.FlightPreviewCreate({
-          flight: flightFixture,
-          flightDoc: new MockHalDoc(flightDocFixture),
-          campaignDoc: new MockHalDoc(campaignDocFixture)
-        })
-      )
-    );
   });
 
   it('should dispatch action to save campaign and flights', done => {

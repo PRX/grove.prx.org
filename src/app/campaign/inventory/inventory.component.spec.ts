@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { DebugElement } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { By } from '@angular/platform-browser';
+import { DebugElement, Component, ViewChild } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
@@ -11,11 +10,34 @@ import { GoalFormComponent } from './goal-form.component';
 import { InventoryZone } from '../../core';
 import { flightFixture } from '../store/models/campaign-state.factory';
 
+const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
+@Component({
+  template: `
+    <form [formGroup]="goalForm">
+      <grove-inventory #childForm [flight]="flight" [zones]="zones"></grove-inventory>
+    </form>
+  `
+})
+class ParentFormComponent {
+  constructor(private fb: FormBuilder) {}
+
+  @ViewChild('childForm') childForm: InventoryComponent;
+
+  flight = flightFixture;
+  zones = mockZones;
+
+  goalForm = this.fb.group({
+    totalGoal: [0, [Validators.required, Validators.min(0)]],
+    dailyMinimum: [0, Validators.min(0)],
+    uncapped: [false]
+  });
+}
+
 describe('InventoryComponent', () => {
+  let parent: ParentFormComponent;
   let comp: InventoryComponent;
-  let fix: ComponentFixture<InventoryComponent>;
+  let fix: ComponentFixture<ParentFormComponent>;
   let de: DebugElement;
-  const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -29,12 +51,13 @@ describe('InventoryComponent', () => {
         MatInputModule,
         MatSlideToggleModule
       ],
-      declarations: [InventoryComponent, InventoryTableComponent, GoalFormComponent]
+      declarations: [ParentFormComponent, InventoryComponent, InventoryTableComponent, GoalFormComponent]
     })
       .compileComponents()
       .then(() => {
-        fix = TestBed.createComponent(InventoryComponent);
-        comp = fix.componentInstance;
+        fix = TestBed.createComponent(ParentFormComponent);
+        parent = fix.componentInstance;
+        comp = parent.childForm;
         de = fix.debugElement;
         comp.flight = flightFixture;
         comp.zones = mockZones;
