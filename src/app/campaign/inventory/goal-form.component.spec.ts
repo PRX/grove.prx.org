@@ -54,14 +54,4 @@ describe('GoalFormComponent', () => {
     expect(de.query(By.css('input[type="number"]'))).toBeNull();
     expect(de.query(By.css('.warn')).nativeElement).toBeDefined();
   });
-
-  // move to campaign action service
-  // it('sets the goals to 0 for uncapped flights', done => {
-  //   comp.flight = flight;
-  //   comp.goalChange.subscribe(change => {
-  //     expect(change).toMatchObject({ ...flight, dailyMinimum: 0, totalGoal: 0, uncapped: true });
-  //     done();
-  //   });
-  //   comp.goalForm.get('uncapped').setValue(true);
-  // });
 });
