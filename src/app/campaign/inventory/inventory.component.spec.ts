@@ -111,4 +111,24 @@ describe('InventoryComponent', () => {
     };
     expect(comp.cantShowInventory()).toBeTruthy();
   });
+
+  describe('errors', () => {
+    it('has flight status messages', () => {
+      expect(comp.errors).toEqual([]);
+      comp.flight = { ...flightFixture, statusMessage: 'something bad' };
+      expect(comp.errors).toEqual(['something bad']);
+    });
+
+    it('has flight preview errors', () => {
+      expect(comp.errors).toEqual([]);
+      comp.previewError = 'something bad';
+      expect(comp.errors).toEqual(['something bad']);
+    });
+
+    it('decodes flight preview errors', () => {
+      expect(comp.errors).toEqual([]);
+      comp.previewError = { body: { message: 'something bad' } };
+      expect(comp.errors).toEqual(['something bad']);
+    });
+  });
 });

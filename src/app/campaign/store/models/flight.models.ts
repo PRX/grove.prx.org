@@ -20,7 +20,7 @@ export interface Flight {
   dailyMinimum?: number;
   uncapped?: boolean;
   status?: string;
-  status_message?: string;
+  statusMessage?: string;
   createdAt?: Date;
 }
 
