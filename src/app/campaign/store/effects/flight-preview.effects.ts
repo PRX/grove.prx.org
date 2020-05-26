@@ -16,10 +16,16 @@ export class FlightPreviewEffects {
     mergeMap(payload => {
       const { flight, flightDoc, campaignDoc } = payload;
       return this.flightPreviewService.createFlightPreview(flight, flightDoc, campaignDoc).pipe(
-        map(
-          (flightDaysDocs: HalDoc[]) =>
-            new flightPreviewActions.FlightPreviewCreateSuccess({ flight, flightDaysDocs, flightDoc, campaignDoc })
-        ),
+        map(({ status, statusMessage, days: flightDaysDocs }) => {
+          return new flightPreviewActions.FlightPreviewCreateSuccess({
+            flight,
+            status,
+            statusMessage,
+            flightDaysDocs,
+            flightDoc,
+            campaignDoc
+          });
+        }),
         catchError(error => of(new flightPreviewActions.FlightPreviewCreateFailure({ flight, error })))
       );
     })

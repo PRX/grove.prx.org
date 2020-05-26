@@ -17,7 +17,16 @@ export class FlightPreviewCreate implements Action {
 export class FlightPreviewCreateSuccess implements Action {
   readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS;
 
-  constructor(public payload: { flight: Flight; flightDaysDocs: HalDoc[]; flightDoc?: HalDoc; campaignDoc?: HalDoc }) {}
+  constructor(
+    public payload: {
+      flight: Flight;
+      status: string;
+      statusMessage: string;
+      flightDaysDocs: HalDoc[];
+      flightDoc?: HalDoc;
+      campaignDoc?: HalDoc;
+    }
+  ) {}
 }
 export class FlightPreviewCreateFailure implements Action {
   readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE;
