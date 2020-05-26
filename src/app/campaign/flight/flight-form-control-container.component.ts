@@ -24,8 +24,8 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
         [zoneOptions]="zoneOptions"
         [flight]="flight"
         [softDeleted]="softDeleted"
-        (flightDeleteToggle)="flightDeleteToggle($event)"
-        (flightDuplicate)="flightDuplicate($event)"
+        (flightDeleteToggle)="flightDeleteToggle.emit($event)"
+        (flightDuplicate)="flightDuplicate.emit($event)"
         (addZone)="onAddZone()"
         (removeZone)="onRemoveZone($event)"
       ></grove-flight-form>
