@@ -50,9 +50,9 @@ export class CampaignActionService implements OnDestroy {
       // are we still dealing with these form updates that aren't actual updates?? maybe just on route change at this point
       const nameChanged = flightState.localFlight.name !== formState.flight.name;
       const previewParamsChanged = this.havePreviewParamsChanged(flightState.localFlight, formState.flight);
-      if (!nameChanged && !previewParamsChanged) {
-        console.warn('unchanged?', { formState }, { flightState });
-      }
+      // if (!nameChanged && !previewParamsChanged) {
+      //   console.warn('unchanged?', { formState }, { flightState });
+      // }
       return nameChanged || previewParamsChanged;
     })
   );
