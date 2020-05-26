@@ -112,24 +112,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     return this.flightForm.get('zones') as FormArray;
   }
 
-  // filter zone options to the control at an index
-  zoneOptionsFiltered(zoneIndex?: number) {
-    const selectedFlightZones = (this.flight && this.flight.zones) || [];
-
-    // if zoneOptions hasn't loaded yet, use flight.zones as options
-    const options = this.zoneOptions || (selectedFlightZones as InventoryZone[]);
-
-    return options.filter(zone => {
-      if (selectedFlightZones[zoneIndex] && selectedFlightZones[zoneIndex].id === zone.id) {
-        // include currently selected zone
-        return true;
-      } else {
-        // but remove zones selected by other zone controls
-        return !selectedFlightZones.find(z => z.id === zone.id);
-      }
-    });
-  }
-
   createZoneControl() {
     return this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] });
   }
