@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { HalDoc } from 'ngx-prx-styleguide';
 import { ActionTypes } from '../actions/action.types';
 import { FlightPreviewService } from '../../../core';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
