@@ -66,11 +66,11 @@ export const isInventoryChanged = (
   { set_inventory_uri: compare }: { set_inventory_uri: string },
   { set_inventory_uri: base }: { set_inventory_uri: string }
 ) => compare !== base;
-const dateToString = (date: Moment) => date && date.valueOf();
+const dateValue = (date: Moment) => date && date.valueOf();
 export const isStartAtChanged = ({ startAt: compare }: { startAt: Moment }, { startAt: base }: { startAt: Moment }) =>
-  dateToString(compare) !== dateToString(base);
+  dateValue(compare) !== dateValue(base);
 export const isEndAtChanged = ({ endAt: compare }: { endAt: Moment }, { endAt: base }: { endAt: Moment }) =>
-  dateToString(compare) !== dateToString(base);
+  dateValue(compare) !== dateValue(base);
 export const isZonesChanged = ({ zones: compare }: { zones: FlightZone[] }, { zones: base }: { zones: FlightZone[] }): boolean => {
   const zonesToString = (zs: FlightZone[]) =>
     zs &&

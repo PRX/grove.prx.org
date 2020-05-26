@@ -16,6 +16,23 @@ export interface InventoryZone {
   label: string;
 }
 
+// filter zone options to the control at an index
+export const filterZones = (allZones: InventoryZone[], selectedFlightZones: InventoryZone[], zoneIndex?: number) => {
+  selectedFlightZones = selectedFlightZones || [];
+
+  // if allZones is empty/undefined (hasn't loaded yet,) use the flight.zones as options
+  const options = allZones || selectedFlightZones;
+  return options.filter(zone => {
+    if (selectedFlightZones[zoneIndex] && selectedFlightZones[zoneIndex].id === zone.id) {
+      // include currently selected zone
+      return true;
+    } else {
+      // remove zones selected by other controls
+      return !selectedFlightZones.find(z => z.id === zone.id);
+    }
+  });
+};
+
 @Injectable()
 export class InventoryService {
   constructor(private augury: AuguryService) {}

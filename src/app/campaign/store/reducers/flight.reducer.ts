@@ -10,9 +10,7 @@ export interface State extends EntityState<FlightState> {
 
 export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>({ selectId: getFlightId });
 
-export const initialState: State = adapter.getInitialState({
-  // additional entity state properties
-});
+export const initialState: State = adapter.getInitialState({});
 
 export function reducer(state = initialState, action: CampaignActions): State {
   switch (action.type) {
@@ -92,7 +90,12 @@ export function reducer(state = initialState, action: CampaignActions): State {
     }
     case ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE: {
       const { flight, changed, valid } = action.payload;
-      const localFlight = { ...(state.entities[flight.id] && state.entities[flight.id].localFlight), ...flight };
+      const localFlight = {
+        ...(state.entities[flight.id] && state.entities[flight.id].localFlight),
+        ...flight,
+        dailyMinimum: flight.dailyMinimum || 0,
+        uncapped: flight.uncapped || false
+      };
       return adapter.updateOne(
         {
           id: flight.id,
@@ -102,20 +105,6 @@ export function reducer(state = initialState, action: CampaignActions): State {
             // however, we're seeing updates emit from the form when the form is not dirty (changed: false)
             // so changed state shall be false until true
             changed: (state.entities[flight.id] && state.entities[flight.id].changed) || changed,
-            valid
-          }
-        },
-        state
-      );
-    }
-    case ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL: {
-      const { flightId: id, totalGoal, dailyMinimum, uncapped, valid } = action.payload;
-      return adapter.updateOne(
-        {
-          id,
-          changes: {
-            localFlight: { ...state.entities[id].localFlight, totalGoal, dailyMinimum: dailyMinimum || 0, uncapped: uncapped || false },
-            changed: true,
             valid
           }
         },

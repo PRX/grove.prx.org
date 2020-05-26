@@ -1,6 +1,7 @@
-import { InventoryService, Inventory } from './inventory.service';
+import { InventoryService, Inventory, filterZones, InventoryZone } from './inventory.service';
 import { MockHalService } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
+import { flightFixture } from '../../campaign/store/models/campaign-state.factory';
 
 describe('InventoryService', () => {
   const augury = new MockHalService();
@@ -68,5 +69,22 @@ describe('InventoryService', () => {
         expect(avail['endDate']).toEqual(availabilityFixture.endDate);
         done();
       });
+  });
+
+  it('filters zone options based on the current zone', () => {
+    const flightZones = flightFixture.zones.concat([{ id: 'post_1' }]) as InventoryZone[];
+    const zoneOptions = [
+      { id: 'pre_1', label: 'Preroll 1' },
+      { id: 'pre_2', label: 'Preroll 2' },
+      { id: 'post_1', label: 'Postroll 1' },
+      { id: 'post_2', label: 'Postroll 2' }
+    ];
+    expect(filterZones(zoneOptions, flightZones).map(z => z.id)).toEqual(['pre_2', 'post_2']);
+    expect(filterZones(zoneOptions, flightZones, 0).map(z => z.id)).toEqual(['pre_1', 'pre_2', 'post_2']);
+    expect(filterZones(zoneOptions, flightZones, 1).map(z => z.id)).toEqual(['pre_2', 'post_1', 'post_2']);
+  });
+  it('defaults zone options to the current zone', () => {
+    expect(filterZones(null, flightFixture.zones as InventoryZone[])).toEqual([]);
+    expect(filterZones(null, flightFixture.zones as InventoryZone[], 0)).toEqual(flightFixture.zones);
   });
 });

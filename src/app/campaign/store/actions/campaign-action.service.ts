@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { first, filter } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
 import { Flight, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
@@ -15,12 +16,54 @@ import {
 import { Moment } from 'moment';
 
 @Injectable()
-export class CampaignActionService {
-  constructor(private store: Store<any>) {}
+export class CampaignActionService implements OnDestroy {
+  // use a Subject to filter form updates through a pipe to dispatch form changes and load preview
+  flightFormValueChanges = new Subject<{ flight: Flight; changed: boolean; valid: boolean }>();
+  flightFormValueChangesSubscription: Subscription;
+  flightFormValueChangesStream = this.flightFormValueChanges.pipe(
+    // map form field values to a proper Flight
+    map(({ flight, changed, valid }) => {
+      return {
+        flight: {
+          ...flight,
+          uncapped: flight.uncapped || false,
+          totalGoal: flight.uncapped ? 0 : +flight.totalGoal,
+          dailyMinimum: flight.uncapped ? 0 : +flight.dailyMinimum
+        },
+        changed,
+        valid
+      };
+    }),
+    // if preview params changed, dispatch loadFlightPreview
+    withLatestFrom(this.store.pipe(select(selectRoutedFlight))),
+    tap(([formState, flightState]) => {
+      if (
+        this.hasPreviewParams(formState.flight) &&
+        this.isDateRangeValid(formState.flight) &&
+        this.havePreviewParamsChanged(flightState.localFlight, formState.flight)
+      ) {
+        this.loadFlightPreview(formState.flight);
+      }
+    }),
+    // guard flight form updates
+    filter(([formState, flightState]) => {
+      // are we still dealing with these form updates that aren't actual updates?? maybe just on route change at this point
+      const nameChanged = flightState.localFlight.name !== formState.flight.name;
+      const previewParamsChanged = this.havePreviewParamsChanged(flightState.localFlight, formState.flight);
+      // if (!nameChanged && !previewParamsChanged) {
+      //   console.warn('unchanged?', { formState }, { flightState });
+      // }
+      return nameChanged || previewParamsChanged;
+    })
+  );
 
-  loadPreviewIfFlightFormChanged(formFlight: Flight, localFlight: Flight) {
-    if (this.isDateRangeValid(formFlight) && this.havePreviewParamsChanged(formFlight, localFlight)) {
-      this.loadFlightPreview({ ...formFlight, id: localFlight.id });
+  constructor(private store: Store<any>) {
+    this.updateFlightFormOnValueChanges();
+  }
+
+  ngOnDestroy() {
+    if (this.flightFormValueChangesSubscription) {
+      this.flightFormValueChangesSubscription.unsubscribe();
     }
   }
 
@@ -46,7 +89,16 @@ export class CampaignActionService {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    return this.hasPreviewParams(a) && (isStartAtChanged(a, b) || isEndAtChanged(a, b) || isInventoryChanged(a, b) || isZonesChanged(a, b));
+    return (
+      isStartAtChanged(a, b) ||
+      isEndAtChanged(a, b) ||
+      isInventoryChanged(a, b) ||
+      isZonesChanged(a, b) ||
+      a.totalGoal !== b.totalGoal ||
+      a.dailyMinimum !== b.dailyMinimum ||
+      // coerce to boolean comparison in case undefined
+      !!a.uncapped !== !!b.uncapped
+    );
   }
 
   addFlight() {
@@ -74,31 +126,20 @@ export class CampaignActionService {
   }
 
   updateFlightForm(formFlight: Flight, changed: boolean, valid: boolean) {
-    this.store
-      .pipe(
-        select(selectRoutedFlight),
-        filter(state => {
-          return !!(state && state.localFlight);
-        }),
-        first()
-      )
-      .subscribe(state => {
-        this.loadPreviewIfFlightFormChanged(formFlight, state.localFlight);
-        this.store.dispatch(
-          new campaignActions.CampaignFlightFormUpdate({
-            flight: formFlight,
-            changed,
-            valid
-          })
-        );
-      });
+    this.flightFormValueChanges.next({ flight: formFlight, changed, valid });
   }
 
-  setFlightGoal(flight: Flight) {
-    const { id, totalGoal, dailyMinimum, uncapped } = flight;
-    const valid = totalGoal >= 0 && dailyMinimum >= 0;
-    this.store.dispatch(new campaignActions.CampaignFlightSetGoal({ flightId: id, totalGoal, dailyMinimum, uncapped, valid }));
-    this.loadFlightPreview(flight);
+  updateFlightFormOnValueChanges() {
+    this.flightFormValueChangesSubscription = this.flightFormValueChangesStream.subscribe(([formState]) => {
+      const { flight, changed, valid } = formState;
+      this.store.dispatch(
+        new campaignActions.CampaignFlightFormUpdate({
+          flight,
+          changed,
+          valid
+        })
+      );
+    });
   }
 
   saveCampaignAndFlights() {

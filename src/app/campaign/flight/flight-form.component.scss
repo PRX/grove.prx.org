@@ -5,12 +5,12 @@ mat-card {
   min-height: 400px;
   border-radius: 0;
 }
-mat-card form {
+.flight-form-container {
   display: flex;
   flex-direction: column;
   flex-flow: column;
 }
-mat-card form > * {
+.flight-form-container > * {
   width: 100%;
 }
 
