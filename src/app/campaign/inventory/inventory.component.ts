@@ -34,13 +34,16 @@ export class InventoryComponent {
   zoneWeekExpanded = {};
 
   get errors() {
-    return [
-      // allocation preview error
-      // TODO: Updated with discussed "nice_message" when available.
-      this.previewError && this.previewError.body && this.previewError.body.message,
-      // flight status message, should only exist when there was an error
-      this.flight.status_message
-    ].filter(error => !!error);
+    return [this.decodedPreviewError, this.flight.statusMessage].filter(error => !!error);
+  }
+
+  // TODO: Updated with discussed "nice_message" when available.
+  get decodedPreviewError(): string {
+    if (this.previewError && this.previewError.body && this.previewError.body.message) {
+      return this.previewError.body.message;
+    } else {
+      return this.previewError;
+    }
   }
 
   getZoneName(zoneId: string): string {

@@ -1,54 +1,39 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, mergeMap, first } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { mergeMap, first } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
-import { Moment } from 'moment';
 
 @Injectable()
 export class FlightPreviewService {
   constructor(private augury: AuguryService) {}
 
   createFlightPreview(
-    flight: {
-      name: string;
-      set_inventory_uri: string;
-      startAt: Moment;
-      endAt: Moment;
-      zones: {
-        id: string;
-        label?: string;
-        url?: string;
-        fileSize?: number;
-        mimeType?: string;
-      }[];
-      totalGoal?: number;
-      dailyMinimum?: number;
-      uncapped?: boolean;
-    },
+    flight: {},
     flightDoc?: HalDoc,
     campaignDoc?: HalDoc
-  ): Observable<HalDoc[]> {
-    const startAt = flight.startAt.toISOString().slice(0, 10);
-    const endAt = flight.endAt.toISOString().slice(0, 10);
-    const totalGoal = flight.totalGoal || 0;
-    const dailyMinimum = flight.dailyMinimum || 0;
-    const uncapped = flight.uncapped || false;
-
+  ): Observable<{ status: string; statusMessage: string; days: HalDoc[] }> {
     if (flightDoc) {
-      return flightDoc
-        .create('preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })
-        .pipe(mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days')));
+      return this.preview(flight, flightDoc, 'preview');
     } else if (campaignDoc) {
-      return campaignDoc
-        .create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })
-        .pipe(mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days')));
+      return this.preview(flight, campaignDoc, 'prx:flight-allocation-preview');
     } else {
       return this.augury.root.pipe(
         first(),
-        map(root => root.create('prx:flight-allocation-preview', {}, { ...flight, startAt, endAt, totalGoal, dailyMinimum, uncapped })),
-        mergeMap(flightPreviewDoc => flightPreviewDoc.followList('prx:flight-days'))
+        mergeMap(root => this.preview(flight, root, 'prx:flight-allocation-preview'))
       );
     }
+  }
+
+  private preview(flight: {}, doc: HalDoc, link: string) {
+    return doc.create(link, {}, flight).pipe(
+      mergeMap((flightPreviewDoc: HalDoc) => {
+        return forkJoin({
+          status: of(flightPreviewDoc['status']),
+          statusMessage: of(flightPreviewDoc['statusMessage']),
+          days: flightPreviewDoc.followList('prx:flight-days')
+        });
+      })
+    );
   }
 }

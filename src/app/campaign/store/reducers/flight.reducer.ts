@@ -1,6 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { ActionTypes } from '../actions/action.types';
 import { CampaignActions } from '../actions/campaign-action.creator';
+import { FlightPreviewActions } from '../actions/flight-preview-action.creator';
 import { docToFlight, duplicateFlight, Flight, FlightState, getFlightId } from '../models';
 
 export interface State extends EntityState<FlightState> {
@@ -12,7 +13,7 @@ export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightSta
 
 export const initialState: State = adapter.getInitialState({});
 
-export function reducer(state = initialState, action: CampaignActions): State {
+export function reducer(state = initialState, action: CampaignActions | FlightPreviewActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_NEW: {
       return { ...adapter.removeAll(state), campaignId: undefined };
@@ -145,6 +146,11 @@ export function reducer(state = initialState, action: CampaignActions): State {
         );
       }
       return newState;
+    }
+    case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS: {
+      const { flight, status, statusMessage } = action.payload;
+      const localFlight = state.entities[flight.id].localFlight;
+      return adapter.updateOne({ id: flight.id, changes: { localFlight: { ...localFlight, status, statusMessage } } }, state);
     }
     default: {
       return state;

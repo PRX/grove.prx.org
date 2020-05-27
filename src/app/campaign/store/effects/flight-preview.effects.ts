@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
-import { HalDoc } from 'ngx-prx-styleguide';
 import { ActionTypes } from '../actions/action.types';
 import { FlightPreviewService } from '../../../core';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
@@ -16,10 +15,16 @@ export class FlightPreviewEffects {
     mergeMap(payload => {
       const { flight, flightDoc, campaignDoc } = payload;
       return this.flightPreviewService.createFlightPreview(flight, flightDoc, campaignDoc).pipe(
-        map(
-          (flightDaysDocs: HalDoc[]) =>
-            new flightPreviewActions.FlightPreviewCreateSuccess({ flight, flightDaysDocs, flightDoc, campaignDoc })
-        ),
+        map(({ status, statusMessage, days: flightDaysDocs }) => {
+          return new flightPreviewActions.FlightPreviewCreateSuccess({
+            flight,
+            status,
+            statusMessage,
+            flightDaysDocs,
+            flightDoc,
+            campaignDoc
+          });
+        }),
         catchError(error => of(new flightPreviewActions.FlightPreviewCreateFailure({ flight, error })))
       );
     })

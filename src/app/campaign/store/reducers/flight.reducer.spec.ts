@@ -1,5 +1,6 @@
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
+import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 import {
   campaignDocFixture,
   flightFixture,
@@ -256,5 +257,28 @@ describe('Flight Reducer', () => {
     expect(state.entities[timestamp]).toBeDefined();
     expect(state.entities[timestamp].localFlight.id).toEqual(timestamp);
     expect(state.entities[timestamp].localFlight.createdAt).toBeUndefined();
+  });
+
+  it('should update the flight status/message from preview', () => {
+    let result = reducer(
+      initialState,
+      new campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
+      })
+    );
+    result = reducer(
+      result,
+      new flightPreviewActions.FlightPreviewCreateSuccess({
+        flight: flightFixture,
+        status: 'error',
+        statusMessage: 'something bad',
+        flightDaysDocs: []
+      })
+    );
+    expect(result.entities[flightFixture.id].localFlight).toMatchObject(flightFixture);
+    expect(result.entities[flightFixture.id].localFlight.status).toBe('error');
+    expect(result.entities[flightFixture.id].localFlight.statusMessage).toBe('something bad');
   });
 });
