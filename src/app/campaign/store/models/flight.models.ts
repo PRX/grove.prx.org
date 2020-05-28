@@ -17,6 +17,7 @@ export interface Flight {
   set_inventory_uri: string;
   zones: FlightZone[];
   totalGoal: number;
+  actualCount?: number;
   dailyMinimum?: number;
   uncapped?: boolean;
   status?: string;
