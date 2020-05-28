@@ -45,4 +45,8 @@ export class FlightFormComponent implements OnInit {
   get zonesControls(): FormArray {
     return this.flightForm.get('zones') as FormArray;
   }
+
+  get canBeDeleted(): boolean {
+    return !this.flight.actualCount;
+  }
 }
