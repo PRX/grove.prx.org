@@ -20,6 +20,7 @@ class ParentFormComponent {
 
   goalForm = this.fb.group({
     totalGoal: [0, [Validators.required, Validators.min(0)]],
+    contractGoal: ['', Validators.min(0)],
     dailyMinimum: [0, Validators.min(0)],
     uncapped: [false]
   });
@@ -48,10 +49,10 @@ describe('GoalFormComponent', () => {
 
   it('show form controls based on capped/uncapped form field value', () => {
     comp.goalForm.get('uncapped').setValue(false);
-    expect(de.query(By.css('input[type="number"]')).nativeElement).toBeDefined();
+    expect(de.query(By.css('input[formcontrolname="totalGoal"]')).nativeElement).toBeDefined();
     comp.goalForm.get('uncapped').setValue(true);
     fix.detectChanges();
-    expect(de.query(By.css('input[type="number"]'))).toBeNull();
+    expect(de.query(By.css('input[formcontrolname="totalGoal"]'))).toBeNull();
     expect(de.query(By.css('.warn')).nativeElement).toBeDefined();
   });
 });

@@ -15,6 +15,10 @@ import { ControlContainer, FormGroup } from '@angular/forms';
         <mat-label>Daily Minimum</mat-label>
         <input type="number" matInput placeholder="Daily Minimum" formControlName="dailyMinimum" />
       </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Contract Goal</mat-label>
+        <input type="number" matInput placeholder="Contract Goal" formControlName="contractGoal" />
+      </mat-form-field>
     </div>
     <div *ngIf="!isCapped">
       <p>
