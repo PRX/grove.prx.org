@@ -21,7 +21,7 @@ const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];
 class ParentFormComponent {
   constructor(private fb: FormBuilder) {}
 
-  @ViewChild('childForm') childForm: InventoryComponent;
+  @ViewChild('childForm', { static: true }) childForm: InventoryComponent;
 
   flight = flightFixture;
   zones = mockZones;
