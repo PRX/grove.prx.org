@@ -82,6 +82,56 @@ describe('CampaignActionService', () => {
     });
   });
 
+  describe('flight form update', () => {
+    it('dispatches updates when the form changes', () => {
+      const flight = { ...flightFixture, name: 'new name' };
+      service.updateFlightForm(flight, true, true);
+      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
+    });
+
+    it('does not dispatch non-changes', () => {
+      const flight = { ...flightFixture };
+      service.updateFlightForm(flight, true, true);
+      expect(dispatchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hasChanged', () => {
+    it('compares arrays', () => {
+      expect(service.hasChanged([], [])).toEqual(false);
+      expect(service.hasChanged(['one'], ['one'])).toEqual(false);
+      expect(service.hasChanged(['one'], ['two'])).toEqual(true);
+      expect(service.hasChanged(['one'], ['one', 'two'])).toEqual(true);
+      expect(service.hasChanged(['one', 'two'], ['one'])).toEqual(true);
+    });
+
+    it('compares objects', () => {
+      expect(service.hasChanged({}, {})).toEqual(false);
+      expect(service.hasChanged({ one: 1 }, { one: 1 })).toEqual(false);
+      expect(service.hasChanged({ one: 1 }, { one: 2 })).toEqual(true);
+      expect(service.hasChanged({ one: 1 }, { two: 2 })).toEqual(true);
+      expect(service.hasChanged({ one: 1 }, { one: 1, two: 2 })).toEqual(false);
+      expect(service.hasChanged({ one: 1, two: 2 }, { one: 1 })).toEqual(true);
+    });
+
+    it('compares other stuff', () => {
+      expect(service.hasChanged('a', 'a')).toEqual(false);
+      expect(service.hasChanged('a', 'b')).toEqual(true);
+      expect(service.hasChanged(1, 1)).toEqual(false);
+      expect(service.hasChanged(1, '1')).toEqual(true);
+      expect(service.hasChanged(null, null)).toEqual(false);
+      expect(service.hasChanged(null, undefined)).toEqual(false);
+      expect(service.hasChanged(undefined, undefined)).toEqual(false);
+      expect(service.hasChanged(undefined, null)).toEqual(false);
+      expect(service.hasChanged(null, false)).toEqual(true);
+    });
+
+    it('compares recursively', () => {
+      expect(service.hasChanged({ a: [{ one: 'one' }] }, { a: [{ one: 'one', two: 'two' }] })).toEqual(false);
+      expect(service.hasChanged({ a: [{ one: 'one' }, { two: 'two' }] }, { a: [{ one: 'one' }, { two: 'three' }] })).toEqual(true);
+    });
+  });
+
   describe('flight preview', () => {
     beforeEach(() => {
       jest.spyOn(service, 'loadFlightPreview');
