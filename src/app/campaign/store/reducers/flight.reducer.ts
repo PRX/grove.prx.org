@@ -20,8 +20,8 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
     }
     case ActionTypes.CAMPAIGN_DUP_FROM_FORM: {
       return adapter.addAll(
-        action.payload.flights.map((flight, i) => {
-          const tempId = action.payload.timestamp + i;
+        action.flights.map((flight, i) => {
+          const tempId = action.timestamp + i;
           return {
             id: tempId,
             localFlight: duplicateFlight(flight, tempId),
@@ -33,8 +33,8 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       );
     }
     case ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS: {
-      const flights = action.payload.flightDocs.map((doc, i) => {
-        const tempId = action.payload.timestamp + i;
+      const flights = action.flightDocs.map((doc, i) => {
+        const tempId = action.timestamp + i;
         return {
           id: tempId,
           localFlight: duplicateFlight(docToFlight(doc), tempId),
@@ -47,11 +47,11 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
     case ActionTypes.CAMPAIGN_LOAD: {
       return {
         ...adapter.removeAll(state),
-        ...(action.payload && { campaignId: action.payload.id })
+        ...{ campaignId: action.id }
       };
     }
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS: {
-      const flights = action.payload.flightDocs.map(doc => {
+      const flights = action.flightDocs.map(doc => {
         const flight = docToFlight(doc);
         return {
           doc,
@@ -64,7 +64,7 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       return adapter.addAll(flights, state);
     }
     case ActionTypes.CAMPAIGN_ADD_FLIGHT: {
-      const { flightId: id, startAt, endAt } = action.payload;
+      const { flightId: id, startAt, endAt } = action;
       const initialFlightState: FlightState = {
         localFlight: {
           id,
@@ -81,16 +81,16 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       return adapter.addOne(initialFlightState, state);
     }
     case ActionTypes.CAMPAIGN_DUP_FLIGHT: {
-      const { flight, flightId } = action.payload;
+      const { flight, flightId } = action;
       const localFlight: Flight = duplicateFlight({ ...flight, name: `${flight.name} (Copy)` }, flightId);
       return adapter.addOne({ localFlight, changed: true, valid: true }, state);
     }
     case ActionTypes.CAMPAIGN_DELETE_FLIGHT: {
-      const { id, softDeleted } = action.payload;
+      const { id, softDeleted } = action;
       return adapter.updateOne({ id, changes: { softDeleted } }, state);
     }
     case ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE: {
-      const { flight, changed, valid } = action.payload;
+      const { flight, changed, valid } = action;
       const localFlight = {
         ...(state.entities[flight.id] && state.entities[flight.id].localFlight),
         ...flight,
@@ -114,13 +114,13 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
     }
     case ActionTypes.CAMPAIGN_SAVE: {
       return adapter.removeMany(
-        action.payload.tempDeletedFlights.map(flight => flight.id),
+        action.tempDeletedFlights.map(flight => flight.id),
         state
       );
     }
     case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
       let newState = state;
-      const { deletedFlightDocs, updatedFlightDocs, createdFlightDocs } = action.payload;
+      const { deletedFlightDocs, updatedFlightDocs, createdFlightDocs } = action;
       if (deletedFlightDocs) {
         newState = adapter.removeMany(Object.keys(deletedFlightDocs), newState);
       }
@@ -148,7 +148,7 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       return newState;
     }
     case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS: {
-      const { flight, status, statusMessage } = action.payload;
+      const { flight, status, statusMessage } = action;
       const localFlight = state.entities[flight.id].localFlight;
       return adapter.updateOne({ id: flight.id, changes: { localFlight: { ...localFlight, status, statusMessage } } }, state);
     }

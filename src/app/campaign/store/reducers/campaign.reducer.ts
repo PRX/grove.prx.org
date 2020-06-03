@@ -28,7 +28,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
     }
     case ActionTypes.CAMPAIGN_DUP_FROM_FORM: {
       return {
-        localCampaign: duplicateCampaign(action.payload.campaign),
+        localCampaign: duplicateCampaign(action.campaign),
         changed: true,
         valid: true,
         loading: false,
@@ -38,7 +38,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
     }
     case ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS: {
       return {
-        localCampaign: duplicateCampaign(docToCampaign(action.payload.campaignDoc)),
+        localCampaign: duplicateCampaign(docToCampaign(action.campaignDoc)),
         changed: true,
         valid: true,
         loading: false,
@@ -47,7 +47,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
       };
     }
     case ActionTypes.CAMPAIGN_FORM_UPDATE: {
-      const { campaign, changed, valid } = action.payload;
+      const { campaign, changed, valid } = action;
       return {
         ...state,
         localCampaign: {
@@ -59,7 +59,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
       };
     }
     case ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS: {
-      const { set_advertiser_uri } = docToAdvertiser(action.payload.doc);
+      const { set_advertiser_uri } = docToAdvertiser(action.doc);
       return {
         ...state,
         localCampaign: {
@@ -85,11 +85,11 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
     }
     case ActionTypes.CAMPAIGN_LOAD_SUCCESS:
     case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
-      if (action.payload.campaignDoc) {
-        const campaign = docToCampaign(action.payload.campaignDoc);
+      if (action.campaignDoc) {
+        const campaign = docToCampaign(action.campaignDoc);
         return {
           ...state,
-          doc: action.payload.campaignDoc,
+          doc: action.campaignDoc,
           localCampaign: campaign,
           remoteCampaign: campaign,
           changed: false,
@@ -108,14 +108,14 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
         ...initialState,
         loading: false,
         loaded: true,
-        error: action.payload.error
+        error: action.error
       };
     }
     case ActionTypes.CAMPAIGN_SAVE_FAILURE: {
       return {
         ...state,
         saving: false,
-        error: action.payload.error
+        error: action.error
       };
     }
     case ActionTypes.CAMPAIGN_DELETE_SUCCESS: {
@@ -126,7 +126,7 @@ export function reducer(state = initialState, action: CampaignActions | Advertis
     case ActionTypes.CAMPAIGN_DELETE_FAILURE: {
       return {
         ...state,
-        error: action.payload.error
+        error: action.error
       };
     }
     default:

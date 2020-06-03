@@ -35,10 +35,10 @@ export class CampaignFormContainerComponent implements OnInit {
   }
 
   campaignUpdateFromForm({ campaign, changed, valid }: { campaign: Campaign; changed: boolean; valid: boolean }) {
-    this.store.dispatch(new campaignActions.CampaignFormUpdate({ campaign, changed, valid }));
+    this.store.dispatch(campaignActions.CampaignFormUpdate({ campaign, changed, valid }));
   }
 
   onAddAdvertiser(name: string) {
-    this.store.dispatch(new advertiserActions.AddAdvertiser({ name }));
+    this.store.dispatch(advertiserActions.AddAdvertiser({ name }));
   }
 }

@@ -16,14 +16,14 @@ export const initialState: State = adapter.getInitialState({
 export function reducer(state = initialState, action: AdvertiserActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_SUCCESS: {
-      return { ...adapter.addAll(action.payload.docs.map(docToAdvertiser), state), error: null };
+      return { ...adapter.addAll(action.docs.map(docToAdvertiser), state), error: null };
     }
     case ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS: {
-      return { ...adapter.addOne(docToAdvertiser(action.payload.doc), state) };
+      return { ...adapter.addOne(docToAdvertiser(action.doc), state) };
     }
     case ActionTypes.CAMPAIGN_ADD_ADVERTISER_FAILURE:
     case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_FAILURE: {
-      return { ...state, error: action.payload.error };
+      return { ...state, error: action.error };
     }
     default: {
       return state;

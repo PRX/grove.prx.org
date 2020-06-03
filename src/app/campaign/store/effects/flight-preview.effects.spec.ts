@@ -20,7 +20,7 @@ describe('FlightPreviewEffects', () => {
   const campaignDoc = new MockHalDoc(campaignDocFixture);
 
   // create action received by the effect
-  const createAction = new flightPreviewActions.FlightPreviewCreate({
+  const createAction = flightPreviewActions.FlightPreviewCreate({
     flight: flightFixture,
     flightDoc,
     campaignDoc
@@ -46,7 +46,7 @@ describe('FlightPreviewEffects', () => {
   }));
 
   it('should create flight preview', () => {
-    const success = new flightPreviewActions.FlightPreviewCreateSuccess({
+    const success = flightPreviewActions.FlightPreviewCreateSuccess({
       flight: flightFixture,
       status: 'ok',
       statusMessage: null,
@@ -64,7 +64,7 @@ describe('FlightPreviewEffects', () => {
     const halError = new HalHttpError(500, 'error occurred');
     const errorResponse = cold('#', {}, halError);
     flightPreviewService.createFlightPreview = jest.fn(() => errorResponse);
-    const outcome = new flightPreviewActions.FlightPreviewCreateFailure({ flight: flightFixture, error: halError });
+    const outcome = flightPreviewActions.FlightPreviewCreateFailure({ flight: flightFixture, error: halError });
 
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-b', { b: outcome });

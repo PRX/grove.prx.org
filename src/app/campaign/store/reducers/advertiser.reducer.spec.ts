@@ -18,7 +18,7 @@ describe('Advertiser Reducer', () => {
     it('should save advertisers on state', () => {
       const state = reducer(
         initialState,
-        new advertiserActions.AdvertisersLoadSuccess({ docs: advertiserDocsFixture.map(a => new MockHalDoc(a)) })
+        advertiserActions.AdvertisersLoadSuccess({ docs: advertiserDocsFixture.map(a => new MockHalDoc(a)) })
       );
       expect(state.entities[advertiserDocsFixture[0].id]).toMatchObject(advertisersFixture[0]);
     });
@@ -29,7 +29,7 @@ describe('Advertiser Reducer', () => {
       const id = advertisersFixture[advertisersFixture.length - 1].id + 1;
       const state = reducer(
         initialState,
-        new advertiserActions.AddAdvertiserSuccess({
+        advertiserActions.AddAdvertiserSuccess({
           doc: new MockHalDoc({ id, name, _links: { self: { href: 'some/uri' } } })
         })
       );
@@ -41,16 +41,16 @@ describe('Advertiser Reducer', () => {
     it('should clear error on load success', () => {
       const state = reducer(
         { error: 'previous error', ids: [], entities: {} },
-        new advertiserActions.AdvertisersLoadSuccess({ docs: advertiserDocsFixture.map(a => new MockHalDoc(a)) })
+        advertiserActions.AdvertisersLoadSuccess({ docs: advertiserDocsFixture.map(a => new MockHalDoc(a)) })
       );
       expect(state.error).toBeNull();
     });
 
     it('should set error on failure', () => {
       expect(initialState.error).not.toBeDefined();
-      let state = reducer(initialState, new advertiserActions.AdvertisersLoadFailure({ error: 'something bad happened' }));
+      let state = reducer(initialState, advertiserActions.AdvertisersLoadFailure({ error: 'something bad happened' }));
       expect(state.error).toBeDefined();
-      state = reducer(initialState, new advertiserActions.AddAdvertiserFailure({ error: 'something even worse happened' }));
+      state = reducer(initialState, advertiserActions.AddAdvertiserFailure({ error: 'something even worse happened' }));
       expect(state.error).toBeDefined();
     });
   });

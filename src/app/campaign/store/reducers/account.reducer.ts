@@ -16,10 +16,10 @@ export const initialState: State = adapter.getInitialState({
 export function reducer(state = initialState, action: AccountActions): State {
   switch (action.type) {
     case ActionTypes.CAMPAIGN_ACCOUNTS_LOAD_SUCCESS: {
-      return { ...adapter.addAll(action.payload.docs.map(docToAccount), state), error: null };
+      return { ...adapter.addAll(action.docs.map(docToAccount), state), error: null };
     }
     case ActionTypes.CAMPAIGN_ACCOUNTS_LOAD_FAILURE: {
-      return { ...state, error: action.payload.error };
+      return { ...state, error: action.error };
     }
     default: {
       return state;

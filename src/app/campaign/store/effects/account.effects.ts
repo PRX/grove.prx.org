@@ -4,18 +4,17 @@ import { of } from 'rxjs';
 import { catchError, withLatestFrom, switchMap, map } from 'rxjs/operators';
 import { UserService } from '../../../core';
 import * as accountActions from '../actions/account-action.creator';
-import { ActionTypes } from '../actions/action.types';
 
 @Injectable()
 export class AccountEffects {
   @Effect()
   loadAccounts$ = this.actions$.pipe(
-    ofType(ActionTypes.CAMPAIGN_ACCOUNTS_LOAD),
+    ofType(accountActions.AccountsLoad),
     switchMap(() => this.user.accounts),
     withLatestFrom(this.user.defaultAccount),
-    map(([accounts, defaultAccount]) => new accountActions.AccountsLoadSuccess({ docs: [defaultAccount].concat(accounts) })),
-    catchError(error => of(new accountActions.AccountsLoadFailure({ error })))
+    map(([accounts, defaultAccount]) => accountActions.AccountsLoadSuccess({ docs: [defaultAccount].concat(accounts) })),
+    catchError(error => of(accountActions.AccountsLoadFailure({ error })))
   );
 
-  constructor(private actions$: Actions, private user: UserService) {}
+  constructor(private actions$: Actions<accountActions.AccountActions>, private user: UserService) {}
 }
