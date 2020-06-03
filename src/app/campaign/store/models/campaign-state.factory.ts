@@ -106,6 +106,7 @@ export const flightFixture: Flight = {
   endAt: moment.utc('2019-11-01'),
   totalGoal: 999,
   dailyMinimum: 99,
+  uncapped: false,
   zones: [{ id: 'pre_1', label: 'Preroll 1' }],
   set_inventory_uri: '/some/inventory'
 };

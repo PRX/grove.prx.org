@@ -6,18 +6,42 @@
     </mat-form-field>
     <div class="inline-fields">
       <mat-form-field appearance="outline">
-        <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" [max]="flight?.endAt" placeholder="Start Date"
-          formControlName="startAt" />
+        <mat-label>Actual Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" [max]="flight?.endAt" placeholder="Actual Start Date" formControlName="startAt" />
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Actual End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" [min]="flight?.startAt" placeholder="End Date"
-          formControlName="endAt" />
+        <input matInput [matDatepicker]="endPicker" [min]="flight?.startAt" placeholder="Actual End Date" formControlName="endAt" />
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="inline-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Contract Start Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="contractStartPicker"
+          [max]="flight?.contractEndAt"
+          placeholder="Contract Start Date"
+          formControlName="contractStartAt"
+        />
+        <mat-datepicker-toggle matSuffix [for]="contractStartPicker"></mat-datepicker-toggle>
+        <mat-datepicker #contractStartPicker></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Contract End Date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="contractEndPicker"
+          [min]="flight?.contractStartAt"
+          placeholder="Contract End Date"
+          formControlName="contractEndAt"
+        />
+        <mat-datepicker-toggle matSuffix [for]="contractEndPicker"></mat-datepicker-toggle>
+        <mat-datepicker #contractEndPicker></mat-datepicker>
       </mat-form-field>
     </div>
     <mat-form-field class="flight-form-field" appearance="outline">
@@ -48,15 +72,18 @@
         </div>
       </div>
       <div class="add-zone" *ngIf="zonesControls?.length < zoneOptions?.length">
-        <a mat-button routerLink="." (click)="addZone.emit()">
-          <mat-icon>add</mat-icon> Add a creative
-        </a>
+        <a mat-button routerLink="." (click)="addZone.emit()"> <mat-icon>add</mat-icon> Add a creative </a>
       </div>
     </fieldset>
   </div>
   <div class="flight-controls-container">
-    <button (click)="onFlightDeleteToggle()" mat-fab [color]="softDeleted ? 'primary' : 'warn'"
-      [attr.aria-label]="softDeleted ? 'Restore flight' : 'Delete flight'" *ngIf="canBeDeleted">
+    <button
+      (click)="onFlightDeleteToggle()"
+      mat-fab
+      [color]="softDeleted ? 'primary' : 'warn'"
+      [attr.aria-label]="softDeleted ? 'Restore flight' : 'Delete flight'"
+      *ngIf="canBeDeleted"
+    >
       <mat-icon>{{ softDeleted ? 'restore_from_trash' : 'delete' }}</mat-icon>
     </button>
     <button (click)="onFlightDuplicate()" mat-fab color="primary" aria-label="Copy flight">

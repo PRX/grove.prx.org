@@ -46,15 +46,7 @@ export class CampaignActionService implements OnDestroy {
       }
     }),
     // guard flight form updates
-    filter(([formState, flightState]) => {
-      // are we still dealing with these form updates that aren't actual updates?? maybe just on route change at this point
-      const nameChanged = flightState.localFlight.name !== formState.flight.name;
-      const previewParamsChanged = this.havePreviewParamsChanged(flightState.localFlight, formState.flight);
-      // if (!nameChanged && !previewParamsChanged) {
-      //   console.warn('unchanged?', { formState }, { flightState });
-      // }
-      return nameChanged || previewParamsChanged;
-    })
+    filter(([formState, flightState]) => this.hasChanged(formState.flight, flightState.localFlight))
   );
 
   constructor(private store: Store<any>) {
@@ -75,6 +67,22 @@ export class CampaignActionService implements OnDestroy {
 
   isDateRangeValid({ startAt, endAt }: { startAt: Moment; endAt: Moment }) {
     return startAt && endAt && startAt.valueOf() < endAt.valueOf();
+  }
+
+  hasChanged(a: any, b: any) {
+    if (a instanceof Array && b instanceof Array) {
+      // arrays - compare each item if same length
+      return a.length !== b.length || a.some((val, idx) => this.hasChanged(val, b[idx]));
+    } else if (a instanceof Object && b instanceof Object) {
+      // objects - compare keys in A to B (ignoring keys missing from A)
+      return Object.keys(a).some(key => this.hasChanged(a[key], b[key]));
+    } else if ((a === undefined || a === null) && (b === undefined || b === null)) {
+      // nulls and undefined equate to the same thing
+      return false;
+    } else {
+      // anything else - strict comparison
+      return a !== b;
+    }
   }
 
   hasPreviewParams(flight: Flight): boolean {

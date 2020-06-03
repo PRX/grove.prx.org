@@ -23,6 +23,9 @@ export interface Flight {
   status?: string;
   statusMessage?: string;
   createdAt?: Date;
+  contractGoal?: number;
+  contractStartAt?: Moment;
+  contractEndAt?: Moment;
 }
 
 export interface FlightState {
@@ -40,6 +43,8 @@ export const docToFlight = (doc: HalDoc): Flight => {
   flight.endAt = utc(flight.endAt);
   flight.createdAt = new Date(flight.createdAt);
   flight.set_inventory_uri = doc.expand('prx:inventory');
+  flight.contractStartAt = flight.contractStartAt ? utc(flight.contractStartAt) : null;
+  flight.contractEndAt = flight.contractEndAt ? utc(flight.contractEndAt) : null;
   return flight;
 };
 

@@ -79,6 +79,8 @@ class ParentFormComponent {
     name: ['', Validators.required],
     startAt: ['', Validators.required],
     endAt: ['', Validators.required],
+    contractStartAt: [''],
+    contractEndAt: [''],
     zones: this.fb.array([this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] })]),
     set_inventory_uri: ['', Validators.required]
   });

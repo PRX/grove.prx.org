@@ -28,6 +28,7 @@ class ParentFormComponent {
 
   goalForm = this.fb.group({
     totalGoal: [0, [Validators.required, Validators.min(0)]],
+    contractGoal: ['', Validators.min(0)],
     dailyMinimum: [0, Validators.min(0)],
     uncapped: [false]
   });
