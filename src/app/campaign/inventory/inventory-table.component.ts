@@ -134,7 +134,7 @@ export class InventoryTableComponent {
   zoneWeekExpanded = {};
 
   get uncapped(): boolean {
-    return !!(this.flight && this.flight.uncapped);
+    return !!(this.flight && this.flight.deliveryMode === 'uncapped');
   }
 
   numConflict(week: InventoryWeeklyRollup): number {

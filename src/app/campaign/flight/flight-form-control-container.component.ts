@@ -82,10 +82,10 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     contractEndAt: [''],
     zones: this.fb.array([]),
     set_inventory_uri: ['', Validators.required],
-    totalGoal: [0, [Validators.required, Validators.min(0)]],
+    totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
-    dailyMinimum: [0, Validators.min(0)],
-    uncapped: [false]
+    dailyMinimum: ['', Validators.min(0)],
+    deliveryMode: ['', Validators.required]
   });
 
   constructor(private fb: FormBuilder) {}
