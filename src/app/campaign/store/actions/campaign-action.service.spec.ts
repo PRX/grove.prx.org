@@ -86,7 +86,7 @@ describe('CampaignActionService', () => {
     it('dispatches updates when the form changes', () => {
       const flight = { ...flightFixture, name: 'new name' };
       service.updateFlightForm(flight, true, true);
-      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
+      expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
     });
 
     it('does not dispatch non-changes', () => {

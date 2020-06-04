@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { ActionTypes } from '../actions/action.types';
-import { AdvertiserActions } from '../actions/advertiser-action.creator';
+import { createReducer, on } from '@ngrx/store';
+import * as advertiserActions from '../actions/advertiser-action.creator';
 import { docToAdvertiser, Advertiser } from '../models';
 
 export interface State extends EntityState<Advertiser> {
@@ -9,26 +9,19 @@ export interface State extends EntityState<Advertiser> {
 
 export const adapter: EntityAdapter<Advertiser> = createEntityAdapter<Advertiser>();
 
-export const initialState: State = adapter.getInitialState({
-  // additional entity state properties
-});
+export const initialState: State = adapter.getInitialState({});
 
-export function reducer(state = initialState, action: AdvertiserActions): State {
-  switch (action.type) {
-    case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_SUCCESS: {
-      return { ...adapter.addAll(action.docs.map(docToAdvertiser), state), error: null };
-    }
-    case ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS: {
-      return { ...adapter.addOne(docToAdvertiser(action.doc), state) };
-    }
-    case ActionTypes.CAMPAIGN_ADD_ADVERTISER_FAILURE:
-    case ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_FAILURE: {
-      return { ...state, error: action.error };
-    }
-    default: {
-      return state;
-    }
-  }
-}
+export const reducer = createReducer(
+  initialState,
+  on(advertiserActions.AdvertisersLoadSuccess, (state, action) => ({
+    ...adapter.addAll(action.docs.map(docToAdvertiser), state),
+    error: null
+  })),
+  on(advertiserActions.AddAdvertiserSuccess, (state, action) => adapter.addOne(docToAdvertiser(action.doc), state)),
+  on(advertiserActions.AddAdvertiserFailure, advertiserActions.AdvertisersLoadFailure, (state, action) => ({
+    ...state,
+    error: action.error
+  }))
+);
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

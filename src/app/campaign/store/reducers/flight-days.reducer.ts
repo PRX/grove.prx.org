@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { ActionTypes } from '../actions/action.types';
-import { CampaignActions } from '../actions/campaign-action.creator';
-import { FlightPreviewActions } from '../actions/flight-preview-action.creator';
+import { createReducer, on } from '@ngrx/store';
+import * as campaignActions from '../actions/campaign-action.creator';
+import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 import { docToFlightDays, getFlightDaysId, FlightDays } from '../models';
 
 export type State = EntityState<FlightDays>;
@@ -10,58 +10,51 @@ export const adapter: EntityAdapter<FlightDays> = createEntityAdapter<FlightDays
 
 export const initialState: State = adapter.getInitialState({});
 
-export function reducer(state = initialState, action: CampaignActions | FlightPreviewActions): State {
-  switch (action.type) {
-    case ActionTypes.CAMPAIGN_NEW:
-    case ActionTypes.CAMPAIGN_LOAD: {
-      return adapter.removeAll(state);
-    }
-    case ActionTypes.CAMPAIGN_LOAD_SUCCESS: {
-      return adapter.addAll(
-        action.flightDocs.map(flightDoc => docToFlightDays(flightDoc, flightDoc.id, action.flightDaysDocs[flightDoc.id])),
-        state
+export const reducer = createReducer(
+  initialState,
+  on(campaignActions.CampaignNew, campaignActions.CampaignLoad, (state, action) => adapter.removeAll(state)),
+  on(campaignActions.CampaignLoadSuccess, (state, action) =>
+    adapter.addAll(
+      action.flightDocs.map(flightDoc => docToFlightDays(flightDoc, flightDoc.id, action.flightDaysDocs[flightDoc.id])),
+      state
+    )
+  ),
+  on(campaignActions.CampaignSaveSuccess, (state, action) => {
+    let newState = state;
+    const { deletedFlightDocs, updatedFlightDocs, updatedFlightDaysDocs, createdFlightDocs, createdFlightDaysDocs } = action;
+    if (deletedFlightDocs) {
+      newState = adapter.removeMany(
+        Object.keys(deletedFlightDocs).map(id => +id),
+        newState
       );
     }
-    case ActionTypes.CAMPAIGN_SAVE_SUCCESS: {
-      let newState = state;
-      const { deletedFlightDocs, updatedFlightDocs, updatedFlightDaysDocs, createdFlightDocs, createdFlightDaysDocs } = action;
-      if (deletedFlightDocs) {
-        newState = adapter.removeMany(
-          Object.keys(deletedFlightDocs).map(id => +id),
-          newState
-        );
-      }
-      if (updatedFlightDaysDocs) {
-        const updatedFlightIds = Object.keys(updatedFlightDaysDocs).map(id => +id);
-        newState = adapter.updateMany(
-          updatedFlightIds.map(flightId => {
-            return { id: flightId, changes: docToFlightDays(updatedFlightDocs[flightId], flightId, updatedFlightDaysDocs[flightId]) };
-          }),
-          newState
-        );
-      }
-      if (createdFlightDaysDocs) {
-        const newFlightIds = Object.keys(createdFlightDaysDocs).map(id => +id);
-        newState = adapter.addMany(
-          newFlightIds.map(flightId => docToFlightDays(createdFlightDocs[flightId], flightId, createdFlightDaysDocs[flightId])),
-          newState
-        );
-      }
-      return newState;
+    if (updatedFlightDaysDocs) {
+      const updatedFlightIds = Object.keys(updatedFlightDaysDocs).map(id => +id);
+      newState = adapter.updateMany(
+        updatedFlightIds.map(flightId => {
+          return { id: flightId, changes: docToFlightDays(updatedFlightDocs[flightId], flightId, updatedFlightDaysDocs[flightId]) };
+        }),
+        newState
+      );
     }
-    case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS: {
-      const { flight, flightDoc, flightDaysDocs } = action;
-      return adapter.upsertOne(docToFlightDays(flightDoc, flight.id, flightDaysDocs, true), state);
+    if (createdFlightDaysDocs) {
+      const newFlightIds = Object.keys(createdFlightDaysDocs).map(id => +id);
+      newState = adapter.addMany(
+        newFlightIds.map(flightId => docToFlightDays(createdFlightDocs[flightId], flightId, createdFlightDaysDocs[flightId])),
+        newState
+      );
     }
-    case ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE: {
-      const { error: previewError, flight } = action;
-      const days = state.entities[flight.id] ? state.entities[flight.id].days : [];
-      return adapter.upsertOne({ flightId: flight.id, days, preview: false, previewError }, state);
-    }
-    default: {
-      return state;
-    }
-  }
-}
+    return newState;
+  }),
+  on(flightPreviewActions.FlightPreviewCreateSuccess, (state, action) => {
+    const { flight, flightDoc, flightDaysDocs } = action;
+    return adapter.upsertOne(docToFlightDays(flightDoc, flight.id, flightDaysDocs, true), state);
+  }),
+  on(flightPreviewActions.FlightPreviewCreateFailure, (state, action) => {
+    const { error: previewError, flight } = action;
+    const days = state.entities[flight.id] ? state.entities[flight.id].days : [];
+    return adapter.upsertOne({ flightId: flight.id, days, preview: false, previewError }, state);
+  })
+);
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();
