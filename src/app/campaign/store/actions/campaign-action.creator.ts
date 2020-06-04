@@ -164,12 +164,6 @@ export class CampaignFlightFormUpdate implements Action {
   constructor(public payload: { flight: Flight; changed: boolean; valid: boolean }) {}
 }
 
-export class CampaignFlightSetGoal implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_SET_GOAL;
-
-  constructor(public payload: { flightId: number; totalGoal: number; dailyMinimum: number; uncapped: boolean; valid: boolean }) {}
-}
-
 export type CampaignActions =
   | CampaignNew
   | CampaignDupFromForm
@@ -181,7 +175,6 @@ export type CampaignActions =
   | CampaignLoadFailure
   | CampaignFormUpdate
   | CampaignFlightFormUpdate
-  | CampaignFlightSetGoal
   | CampaignAddFlight
   | CampaignDupFlight
   | CampaignDeleteFlight

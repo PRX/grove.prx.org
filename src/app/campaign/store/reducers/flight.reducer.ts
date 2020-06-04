@@ -71,7 +71,7 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
           name: 'New Flight ' + (state.ids.length + 1),
           startAt,
           endAt,
-          totalGoal: null,
+          deliveryMode: 'capped',
           zones: [],
           set_inventory_uri: null
         },
@@ -93,9 +93,7 @@ export function reducer(state = initialState, action: CampaignActions | FlightPr
       const { flight, changed, valid } = action.payload;
       const localFlight = {
         ...(state.entities[flight.id] && state.entities[flight.id].localFlight),
-        ...flight,
-        dailyMinimum: flight.dailyMinimum || 0,
-        uncapped: flight.uncapped || false
+        ...flight
       };
       return adapter.updateOne(
         {

@@ -116,29 +116,6 @@ describe('Flight Reducer', () => {
     expect(flight.localFlight.set_inventory_uri).toBe(flightFixture.set_inventory_uri);
   });
 
-  it('should set the goal', () => {
-    let result = reducer(
-      initialState,
-      new campaignActions.CampaignLoadSuccess({
-        campaignDoc: new MockHalDoc(campaignDocFixture),
-        flightDocs: [new MockHalDoc(flightDocFixture)],
-        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
-      })
-    );
-    result = reducer(
-      result,
-      new campaignActions.CampaignFlightSetGoal({
-        flightId: flightFixture.id,
-        totalGoal: 999,
-        dailyMinimum: 99,
-        uncapped: false,
-        valid: true
-      })
-    );
-    expect(result.entities[flightFixture.id].localFlight.totalGoal).toBe(999);
-    expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBe(99);
-  });
-
   it('should delete temporary softDeleted flights from save action', () => {
     const flightId = Date.now();
     let state = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId }));
