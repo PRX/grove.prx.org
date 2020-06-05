@@ -41,7 +41,8 @@ const flightFixture: Flight = {
   endAt: moment.utc(),
   totalGoal: 123,
   zones: [{ id: 'pre_1' }],
-  set_inventory_uri: '/some/inventory'
+  set_inventory_uri: '/some/inventory',
+  deliveryMode: 'capped'
 };
 @Component({
   template: `
