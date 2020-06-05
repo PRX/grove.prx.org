@@ -3,7 +3,7 @@ import { DebugElement, Component, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatFormFieldModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
+import { MatFormFieldModule, MatInputModule, MatSelectModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { GoalFormComponent } from './goal-form.component';
 @Component({
@@ -19,10 +19,10 @@ class ParentFormComponent {
   @ViewChild('childForm') childForm: GoalFormComponent;
 
   goalForm = this.fb.group({
-    totalGoal: [0, [Validators.required, Validators.min(0)]],
+    totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
-    dailyMinimum: [0, Validators.min(0)],
-    uncapped: [false]
+    dailyMinimum: ['', Validators.min(0)],
+    deliveryMode: ['', Validators.required]
   });
 }
 
@@ -34,7 +34,7 @@ describe('GoalFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule],
+      imports: [SharedModule, NoopAnimationsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule],
       declarations: [ParentFormComponent, GoalFormComponent]
     })
       .compileComponents()
@@ -47,12 +47,43 @@ describe('GoalFormComponent', () => {
       });
   }));
 
-  it('show form controls based on capped/uncapped form field value', () => {
-    comp.goalForm.get('uncapped').setValue(false);
+  it('show form controls based on delivery mode', () => {
+    comp.goalForm.get('deliveryMode').setValue('capped');
+    fix.detectChanges();
     expect(de.query(By.css('input[formcontrolname="totalGoal"]')).nativeElement).toBeDefined();
-    comp.goalForm.get('uncapped').setValue(true);
+    expect(de.query(By.css('input[formcontrolname="dailyMinimum"]')).nativeElement).toBeDefined();
+
+    comp.goalForm.get('deliveryMode').setValue('uncapped');
+    fix.detectChanges();
+    expect(de.query(By.css('input[formcontrolname="totalGoal"]')).nativeElement).toBeDefined();
+    expect(de.query(By.css('input[formcontrolname="dailyMinimum"]'))).toBeNull();
+
+    comp.goalForm.get('deliveryMode').setValue('greedy_uncapped');
     fix.detectChanges();
     expect(de.query(By.css('input[formcontrolname="totalGoal"]'))).toBeNull();
-    expect(de.query(By.css('.warn')).nativeElement).toBeDefined();
+    expect(de.query(By.css('input[formcontrolname="dailyMinimum"]'))).toBeNull();
+  });
+
+  it('resets the daily minimum based on velocity', () => {
+    comp.goalForm.get('totalGoal').setValue(100);
+    comp.goalForm.get('dailyMinimum').setValue(10);
+
+    comp.setVelocity('fastly');
+    expect(comp.dailyMinimum).toEqual(100);
+
+    comp.setVelocity('evenly');
+    expect(comp.dailyMinimum).toEqual('');
+  });
+
+  it('changes velocity based on daily minimum', () => {
+    comp.goalForm.get('totalGoal').setValue(100);
+    comp.goalForm.get('dailyMinimum').setValue(10);
+    expect(comp.getVelocity()).toEqual('');
+
+    comp.goalForm.get('dailyMinimum').setValue(100);
+    expect(comp.getVelocity()).toEqual('fastly');
+
+    comp.goalForm.get('dailyMinimum').setValue(0);
+    expect(comp.getVelocity()).toEqual('evenly');
   });
 });
