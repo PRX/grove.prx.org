@@ -45,7 +45,7 @@ import { ControlContainer, FormGroup } from '@angular/forms';
       </p>
       <br />
       <p>
-        Any competing <strong>capped</strong> or <strong>baked-in</strong> flights will be served first before uncapped flights are even
+        Any competing <strong>capped</strong> or <strong>baked-in</strong> flights will be served first before remnant flights are even
         considered. The allocations that will be served before this flight can be seen below <b class="warn">in red</b>.
       </p>
     </div>
