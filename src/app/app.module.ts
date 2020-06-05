@@ -9,7 +9,7 @@ import { ErrorService } from './error/error.service';
 import { AppRoutingModule, routingComponents } from './app.routing.module';
 import { AppComponent } from './app.component';
 
-import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material';
+import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import {
   MatMomentDateModule,
   MomentDateAdapter,
