@@ -31,8 +31,8 @@
     "@ngrx/store": "~8.6.0",
     "@ngrx/store-devtools": "~8.6.0",
     "angulartics2": "^7.5.2",
-    "ngx-prx-styleguide": "2.20.0",
-    "prx-ng-serve": "^1.1.0",
+    "ngx-prx-styleguide": "3.0.0",
+    "prx-ng-serve": "^3.0.0",
     "rxjs": "~6.5.5",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"
