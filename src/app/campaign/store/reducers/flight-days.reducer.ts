@@ -10,7 +10,8 @@ export const adapter: EntityAdapter<FlightDays> = createEntityAdapter<FlightDays
 
 export const initialState: State = adapter.getInitialState({});
 
-export const reducer = createReducer(
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
   initialState,
   on(campaignActions.CampaignNew, campaignActions.CampaignLoad, (state, action) => adapter.removeAll(state)),
   on(campaignActions.CampaignLoadSuccess, (state, action) =>
@@ -56,5 +57,9 @@ export const reducer = createReducer(
     return adapter.upsertOne({ flightId: flight.id, days, preview: false, previewError }, state);
   })
 );
+
+export function reducer(state, action) {
+  return _reducer(state, action);
+}
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

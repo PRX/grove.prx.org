@@ -13,7 +13,8 @@ export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightSta
 
 export const initialState: State = adapter.getInitialState({});
 
-export const reducer = createReducer(
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
   initialState,
   on(campaignActions.CampaignNew, (state, action) => ({ ...adapter.removeAll(state), campaignId: undefined })),
   on(campaignActions.CampaignDupFromForm, (state, action) =>
@@ -134,5 +135,9 @@ export const reducer = createReducer(
     return adapter.updateOne({ id: flight.id, changes: { localFlight: { ...localFlight, status, statusMessage } } }, state);
   })
 );
+
+export function reducer(state, action) {
+  return _reducer(state, action);
+}
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

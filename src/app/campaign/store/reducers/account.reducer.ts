@@ -11,10 +11,14 @@ export const adapter: EntityAdapter<Account> = createEntityAdapter<Account>();
 
 export const initialState: State = adapter.getInitialState({});
 
-export const reducer = createReducer(
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
   initialState,
   on(accountActions.AccountsLoadSuccess, (state, action) => ({ ...adapter.addAll(action.docs.map(docToAccount), state), error: null })),
   on(accountActions.AccountsLoadFailure, (state, action) => ({ ...state, error: action.error }))
 );
+export function reducer(state, action) {
+  return _reducer(state, action);
+}
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

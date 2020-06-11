@@ -11,7 +11,8 @@ export const adapter: EntityAdapter<Advertiser> = createEntityAdapter<Advertiser
 
 export const initialState: State = adapter.getInitialState({});
 
-export const reducer = createReducer(
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
   initialState,
   on(advertiserActions.AdvertisersLoadSuccess, (state, action) => ({
     ...adapter.addAll(action.docs.map(docToAdvertiser), state),
@@ -23,5 +24,9 @@ export const reducer = createReducer(
     error: action.error
   }))
 );
+
+export function reducer(state, action) {
+  return _reducer(state, action);
+}
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

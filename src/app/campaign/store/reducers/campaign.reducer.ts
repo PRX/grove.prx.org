@@ -21,7 +21,8 @@ export const initialState: CampaignState = {
   saving: false
 };
 
-export const reducer = createReducer(
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
   initialState,
   on(campaignActions.CampaignNew, campaignActions.CampaignDeleteSuccess, (state, action) => ({
     ...initialState,
@@ -110,3 +111,7 @@ export const reducer = createReducer(
     error: action.error
   }))
 );
+
+export function reducer(state, action) {
+  return _reducer(state, action);
+}
