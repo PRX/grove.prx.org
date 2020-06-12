@@ -130,7 +130,7 @@ describe('FlightContainerComponent', () => {
         campaignActionService = TestBed.get(CampaignActionService);
 
         store.dispatch(
-          new campaignActions.CampaignLoadSuccess({
+          campaignActions.CampaignLoadSuccess({
             campaignDoc: new MockHalDoc({ id: 1 }),
             flightDocs: [new MockHalDoc(flightDocFixture)],
             flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }

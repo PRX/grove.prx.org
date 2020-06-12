@@ -1,37 +1,31 @@
-import { Action } from '@ngrx/store';
+import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { Flight } from '../models';
 
-export class FlightPreviewCreate implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE;
+export const FlightPreviewCreate = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE,
+  props<{
+    flight: Flight;
+    flightDoc?: HalDoc;
+    campaignDoc?: HalDoc;
+  }>()
+);
+export const FlightPreviewCreateSuccess = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS,
+  props<{
+    flight: Flight;
+    status: string;
+    statusMessage: string;
+    flightDaysDocs: HalDoc[];
+    flightDoc?: HalDoc;
+    campaignDoc?: HalDoc;
+  }>()
+);
+export const FlightPreviewCreateFailure = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE,
+  props<{ flight: Flight; error: any }>()
+);
 
-  constructor(
-    public payload: {
-      flight: Flight;
-      flightDoc?: HalDoc;
-      campaignDoc?: HalDoc;
-    }
-  ) {}
-}
-export class FlightPreviewCreateSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS;
-
-  constructor(
-    public payload: {
-      flight: Flight;
-      status: string;
-      statusMessage: string;
-      flightDaysDocs: HalDoc[];
-      flightDoc?: HalDoc;
-      campaignDoc?: HalDoc;
-    }
-  ) {}
-}
-export class FlightPreviewCreateFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE;
-
-  constructor(public payload: { flight: Flight; error: any }) {}
-}
-
-export type FlightPreviewActions = FlightPreviewCreate | FlightPreviewCreateSuccess | FlightPreviewCreateFailure;
+const all = union({ FlightPreviewCreate, FlightPreviewCreateSuccess, FlightPreviewCreateFailure });
+export type FlightPreviewActions = typeof all;

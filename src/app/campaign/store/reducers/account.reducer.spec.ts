@@ -16,7 +16,7 @@ describe('Account Reducer', () => {
 
   describe('On Load Success', () => {
     it('should save accounts on state', () => {
-      const state = reducer(initialState, new accountActions.AccountsLoadSuccess({ docs: accountsFixture.map(a => new MockHalDoc(a)) }));
+      const state = reducer(initialState, accountActions.AccountsLoadSuccess({ docs: accountsFixture.map(a => new MockHalDoc(a)) }));
       expect(state.entities[accountsFixture[0].id]).toMatchObject(accountsFixture[0]);
     });
   });
@@ -25,14 +25,14 @@ describe('Account Reducer', () => {
     it('should clear error on load success', () => {
       const state = reducer(
         { error: 'previous error', ids: [], entities: {} },
-        new accountActions.AccountsLoadSuccess({ docs: accountsFixture.map(a => new MockHalDoc(a)) })
+        accountActions.AccountsLoadSuccess({ docs: accountsFixture.map(a => new MockHalDoc(a)) })
       );
       expect(state.error).toBeNull();
     });
 
     it('should set error on failure', () => {
       expect(initialState.error).not.toBeDefined();
-      const state = reducer(initialState, new accountActions.AccountsLoadFailure({ error: 'something bad happened' }));
+      const state = reducer(initialState, accountActions.AccountsLoadFailure({ error: 'something bad happened' }));
       expect(state.error).toBeDefined();
     });
   });

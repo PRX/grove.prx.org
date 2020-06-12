@@ -1,6 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { ActionTypes } from '../actions/action.types';
-import { AccountActions } from '../actions/account-action.creator';
+import { createReducer, on } from '@ngrx/store';
+import * as accountActions from '../actions/account-action.creator';
 import { docToAccount, Account } from '../models';
 
 export interface State extends EntityState<Account> {
@@ -9,22 +9,16 @@ export interface State extends EntityState<Account> {
 
 export const adapter: EntityAdapter<Account> = createEntityAdapter<Account>();
 
-export const initialState: State = adapter.getInitialState({
-  // additional entity state properties
-});
+export const initialState: State = adapter.getInitialState({});
 
-export function reducer(state = initialState, action: AccountActions): State {
-  switch (action.type) {
-    case ActionTypes.CAMPAIGN_ACCOUNTS_LOAD_SUCCESS: {
-      return { ...adapter.addAll(action.payload.docs.map(docToAccount), state), error: null };
-    }
-    case ActionTypes.CAMPAIGN_ACCOUNTS_LOAD_FAILURE: {
-      return { ...state, error: action.payload.error };
-    }
-    default: {
-      return state;
-    }
-  }
+// tslint:disable-next-line: variable-name
+const _reducer = createReducer(
+  initialState,
+  on(accountActions.AccountsLoadSuccess, (state, action) => ({ ...adapter.addAll(action.docs.map(docToAccount), state), error: null })),
+  on(accountActions.AccountsLoadFailure, (state, action) => ({ ...state, error: action.error }))
+);
+export function reducer(state, action) {
+  return _reducer(state, action);
 }
 
 export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

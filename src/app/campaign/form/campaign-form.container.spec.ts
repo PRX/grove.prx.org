@@ -51,11 +51,11 @@ describe('CampaignFormContainerComponent', () => {
     const changed = true;
     const valid = false;
     component.campaignUpdateFromForm({ campaign: campaignFixture, changed, valid });
-    expect(store.dispatch).toHaveBeenCalledWith(new campaignActions.CampaignFormUpdate({ campaign: campaignFixture, changed, valid }));
+    expect(store.dispatch).toHaveBeenCalledWith(campaignActions.CampaignFormUpdate({ campaign: campaignFixture, changed, valid }));
   });
 
   it('dispatches action to add a new advertiser', () => {
     component.onAddAdvertiser('Squarespace');
-    expect(store.dispatch).toHaveBeenCalledWith(new advertiserActions.AddAdvertiser({ name: 'Squarespace' }));
+    expect(store.dispatch).toHaveBeenCalledWith(advertiserActions.AddAdvertiser({ name: 'Squarespace' }));
   });
 });

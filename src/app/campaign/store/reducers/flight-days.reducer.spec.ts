@@ -18,14 +18,14 @@ describe('Flight Days/Preview Reducer', () => {
   });
 
   it('should remove flight days entries for a new campaign', () => {
-    const result = reducer(createFlightDaysState().flightDays, new campaignActions.CampaignNew({}));
+    const result = reducer(createFlightDaysState().flightDays, campaignActions.CampaignNew());
     expect(result).toMatchObject({ ids: [], entities: {} });
   });
 
   it('should set flight days from campaign load success', () => {
     const result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -63,10 +63,10 @@ describe('Flight Days/Preview Reducer', () => {
       [updatedFlightIds[1]]: flightDaysDocFixture
     };
 
-    let result = reducer(initialState, new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }));
+    let result = reducer(initialState, campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }));
     result = reducer(
       result,
-      new campaignActions.CampaignSaveSuccess({
+      campaignActions.CampaignSaveSuccess({
         campaignDoc,
         deletedFlightDocs: { [deletedFlightIds[0]]: flightDocs[0], [deletedFlightIds[1]]: flightDocs[1] },
         updatedFlightDocs: { [updatedFlightIds[0]]: flightDocs[2], [updatedFlightIds[1]]: flightDocs[3] },
@@ -102,7 +102,7 @@ describe('Flight Days/Preview Reducer', () => {
   it('should update flight days from flight preview create success', () => {
     let result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -110,7 +110,7 @@ describe('Flight Days/Preview Reducer', () => {
     );
     result = reducer(
       result,
-      new flightPreviewActions.FlightPreviewCreateSuccess({
+      flightPreviewActions.FlightPreviewCreateSuccess({
         flight: flightDocFixture,
         status: 'ok',
         statusMessage: null,
@@ -124,7 +124,7 @@ describe('Flight Days/Preview Reducer', () => {
   it('should set flight preview error from flight preview create failure', () => {
     const result = reducer(
       initialState,
-      new flightPreviewActions.FlightPreviewCreateFailure({
+      flightPreviewActions.FlightPreviewCreateFailure({
         flight: flightDocFixture,
         error: { body: { status: 422, message: 'no allocatable days' } }
       })

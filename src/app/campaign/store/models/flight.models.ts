@@ -48,15 +48,19 @@ export const docToFlight = (doc: HalDoc): Flight => {
   return flight;
 };
 
-export const duplicateFlight = (flight: Flight, tempId: number): Flight => {
+export const duplicateFlightState = (flight: Flight, tempId: number, changed, valid): FlightState => {
   // remove createdAt, startAt, endAt, and set temp id
   const { createdAt, startAt, endAt, name, ...dupFlight } = flight;
 
   return {
-    ...dupFlight,
-    id: tempId,
-    name: `Copy of ${name}`
-  } as Flight;
+    localFlight: {
+      ...dupFlight,
+      id: tempId,
+      name: `Copy of ${name}`
+    } as Flight,
+    changed,
+    valid
+  };
 };
 
 export const getFlightId = (state: FlightState) => {

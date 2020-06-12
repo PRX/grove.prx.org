@@ -1,138 +1,90 @@
-import { Action } from '@ngrx/store';
+import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
 import { Campaign, Flight, CampaignFormSave } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { utc, Moment } from 'moment';
 
-export class CampaignNew implements Action {
-  readonly type = ActionTypes.CAMPAIGN_NEW;
+export const CampaignNew = createAction(ActionTypes.CAMPAIGN_NEW);
 
-  constructor(public payload: {}) {}
-}
+export const CampaignDuplicate = createAction(ActionTypes.CAMPAIGN_DUPLICATE, props<{ campaign: Campaign; flights: Flight[] }>());
 
-export class CampaignDuplicate implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUPLICATE;
+export const CampaignDupFromForm = createAction(
+  ActionTypes.CAMPAIGN_DUP_FROM_FORM,
+  ({ campaign, flights, timestamp }: { campaign: Campaign; flights: Flight[]; timestamp?: number }) => ({
+    campaign,
+    flights,
+    timestamp: timestamp || Date.now()
+  })
+);
 
-  constructor(
-    public payload: {
-      campaign: Campaign;
-      flights: Flight[];
-    }
-  ) {}
-}
+export const CampaignDupById = createAction(ActionTypes.CAMPAIGN_DUP_BY_ID, ({ id, timestamp }: { id: number; timestamp?: number }) => ({
+  id,
+  timestamp: timestamp || Date.now()
+}));
+export const CampaignDupByIdSuccess = createAction(
+  ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS,
+  ({ campaignDoc, flightDocs, timestamp }: { campaignDoc: HalDoc; flightDocs: HalDoc[]; timestamp?: number }) => ({
+    campaignDoc,
+    flightDocs,
+    timestamp: timestamp || Date.now()
+  })
+);
+export const CampaignDupByIdFailure = createAction(ActionTypes.CAMPAIGN_DUP_BY_ID_FAILURE, props<{ error }>());
 
-export class CampaignDupFromForm implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_FROM_FORM;
+export const CampaignLoad = createAction(ActionTypes.CAMPAIGN_LOAD, props<{ id }>());
+export const CampaignLoadSuccess = createAction(
+  ActionTypes.CAMPAIGN_LOAD_SUCCESS,
+  ({
+    campaignDoc,
+    flightDocs,
+    flightDaysDocs
+  }: {
+    campaignDoc: HalDoc;
+    flightDocs: HalDoc[];
+    flightDaysDocs: { [id: number]: HalDoc[] };
+  }) => ({ campaignDoc, flightDocs, flightDaysDocs })
+);
+export const CampaignLoadFailure = createAction(ActionTypes.CAMPAIGN_LOAD_FAILURE, props<{ error }>());
 
-  constructor(public payload: { campaign: Campaign; flights: Flight[]; timestamp?: number }) {
-    this.payload.timestamp = payload.timestamp || Date.now();
-  }
-}
+export const CampaignFormUpdate = createAction(
+  ActionTypes.CAMPAIGN_FORM_UPDATE,
+  ({ campaign, changed, valid }: { campaign: Campaign; changed: boolean; valid: boolean }) => ({ campaign, changed, valid })
+);
 
-export class CampaignDupById implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID;
+export const CampaignSave = createAction(ActionTypes.CAMPAIGN_SAVE, (params: CampaignFormSave) => params);
+export const CampaignSaveSuccess = createAction(
+  ActionTypes.CAMPAIGN_SAVE_SUCCESS,
+  props<{
+    campaignDoc: HalDoc;
+    deletedFlightDocs: { [id: number]: HalDoc };
+    updatedFlightDocs: { [id: number]: HalDoc };
+    updatedFlightDaysDocs: { [id: number]: HalDoc[] };
+    createdFlightDocs: { [id: number]: HalDoc };
+    createdFlightDaysDocs: { [id: number]: HalDoc[] };
+  }>()
+);
+export const CampaignSaveFailure = createAction(ActionTypes.CAMPAIGN_SAVE_FAILURE, props<{ error }>());
 
-  constructor(public payload: { id: number; timestamp?: number }) {
-    this.payload.timestamp = payload.timestamp || Date.now();
-  }
-}
+export const CampaignDelete = createAction(ActionTypes.CAMPAIGN_DELETE, props<{ doc: HalDoc }>());
+export const CampaignDeleteSuccess = createAction(ActionTypes.CAMPAIGN_DELETE_SUCCESS, props<{ id: number | string }>());
+export const CampaignDeleteFailure = createAction(ActionTypes.CAMPAIGN_DELETE_FAILURE, props<{ error }>());
 
-export class CampaignDupByIdSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID_SUCCESS;
-
-  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[]; timestamp?: number }) {
-    this.payload.timestamp = payload.timestamp || Date.now();
-  }
-}
-
-export class CampaignDupByIdFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_BY_ID_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export class CampaignLoad implements Action {
-  readonly type = ActionTypes.CAMPAIGN_LOAD;
-
-  constructor(public payload: { id: number }) {}
-}
-export class CampaignLoadSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_LOAD_SUCCESS;
-
-  constructor(public payload: { campaignDoc: HalDoc; flightDocs: HalDoc[]; flightDaysDocs: { [id: number]: HalDoc[] } }) {}
-}
-export class CampaignLoadFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_LOAD_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export class CampaignFormUpdate implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FORM_UPDATE;
-
-  constructor(public payload: { campaign: Campaign; changed: boolean; valid: boolean }) {}
-}
-
-export class CampaignSave implements Action {
-  readonly type = ActionTypes.CAMPAIGN_SAVE;
-
-  constructor(public payload: CampaignFormSave) {}
-}
-export class CampaignSaveSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_SAVE_SUCCESS;
-
-  constructor(
-    public payload: {
-      campaignDoc: HalDoc;
-      deletedFlightDocs: { [id: number]: HalDoc };
-      updatedFlightDocs: { [id: number]: HalDoc };
-      updatedFlightDaysDocs: { [id: number]: HalDoc[] };
-      createdFlightDocs: { [id: number]: HalDoc };
-      createdFlightDaysDocs: { [id: number]: HalDoc[] };
-    }
-  ) {}
-}
-export class CampaignSaveFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_SAVE_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export class CampaignDelete implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DELETE;
-
-  constructor(public payload: HalDoc) {}
-}
-export class CampaignDeleteSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DELETE_SUCCESS;
-
-  constructor(public payload: { id: number | string }) {}
-}
-export class CampaignDeleteFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DELETE_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export class CampaignAddFlight implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADD_FLIGHT;
-
-  public payload: { campaignId: number | string; flightId: number; startAt: Moment; endAt: Moment };
-
-  constructor(payload: { campaignId: number | string; flightId?: number; startAt?: Moment; endAt?: Moment }) {
+export const CampaignAddFlight = createAction(
+  ActionTypes.CAMPAIGN_ADD_FLIGHT,
+  ({ campaignId, flightId, startAt, endAt }: { campaignId: number | string; flightId?: number; startAt?: Moment; endAt?: Moment }) => {
     const date = utc();
-    this.payload = {
-      campaignId: payload.campaignId,
-      flightId: payload.flightId || date.valueOf(),
+    return {
+      campaignId,
+      flightId: flightId || date.valueOf(),
       startAt:
-        payload.startAt ||
+        startAt ||
         utc(date.valueOf())
           .hours(0)
           .minutes(0)
           .seconds(0)
           .milliseconds(0),
       endAt:
-        payload.endAt ||
+        endAt ||
         utc(date.valueOf())
           .month(date.month() + 1)
           .date(1)
@@ -142,45 +94,43 @@ export class CampaignAddFlight implements Action {
           .milliseconds(0)
     };
   }
-}
+);
 
-export class CampaignDupFlight implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DUP_FLIGHT;
+export const CampaignDupFlight = createAction(
+  ActionTypes.CAMPAIGN_DUP_FLIGHT,
+  ({ campaignId, flight, flightId }: { campaignId: number | string; flight: Flight; flightId?: number }) => ({
+    campaignId,
+    flight,
+    flightId: flightId || Date.now()
+  })
+);
 
-  constructor(public payload: { campaignId: number | string; flight: Flight; flightId?: number }) {
-    this.payload.flightId = payload.flightId || Date.now();
-  }
-}
+export const CampaignDeleteFlight = createAction(ActionTypes.CAMPAIGN_DELETE_FLIGHT, props<{ id: number; softDeleted: boolean }>());
 
-export class CampaignDeleteFlight implements Action {
-  readonly type = ActionTypes.CAMPAIGN_DELETE_FLIGHT;
+export const CampaignFlightFormUpdate = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE,
+  props<{ flight: Flight; changed: boolean; valid: boolean }>()
+);
 
-  constructor(public payload: { id: number; softDeleted: boolean }) {}
-}
-
-export class CampaignFlightFormUpdate implements Action {
-  readonly type = ActionTypes.CAMPAIGN_FLIGHT_FORM_UPDATE;
-
-  constructor(public payload: { flight: Flight; changed: boolean; valid: boolean }) {}
-}
-
-export type CampaignActions =
-  | CampaignNew
-  | CampaignDupFromForm
-  | CampaignDupById
-  | CampaignDupByIdSuccess
-  | CampaignDupByIdFailure
-  | CampaignLoad
-  | CampaignLoadSuccess
-  | CampaignLoadFailure
-  | CampaignFormUpdate
-  | CampaignFlightFormUpdate
-  | CampaignAddFlight
-  | CampaignDupFlight
-  | CampaignDeleteFlight
-  | CampaignSave
-  | CampaignSaveSuccess
-  | CampaignSaveFailure
-  | CampaignDelete
-  | CampaignDeleteSuccess
-  | CampaignDeleteFailure;
+const all = union({
+  CampaignNew,
+  CampaignDupFromForm,
+  CampaignDupById,
+  CampaignDupByIdSuccess,
+  CampaignDupByIdFailure,
+  CampaignLoad,
+  CampaignLoadSuccess,
+  CampaignLoadFailure,
+  CampaignFormUpdate,
+  CampaignFlightFormUpdate,
+  CampaignAddFlight,
+  CampaignDupFlight,
+  CampaignDeleteFlight,
+  CampaignSave,
+  CampaignSaveSuccess,
+  CampaignSaveFailure,
+  CampaignDelete,
+  CampaignDeleteSuccess,
+  CampaignDeleteFailure
+});
+export type CampaignActions = typeof all;

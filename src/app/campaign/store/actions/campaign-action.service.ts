@@ -65,7 +65,7 @@ export class CampaignActionService implements OnDestroy {
 
   loadFlightPreview(flight: Flight) {
     this.store.pipe(select(selectRoutedCampaignFlightDocs), first()).subscribe(({ campaignDoc, flightDoc }) => {
-      this.store.dispatch(new flightPreviewActions.FlightPreviewCreate({ flight, flightDoc, campaignDoc }));
+      this.store.dispatch(flightPreviewActions.FlightPreviewCreate({ flight, flightDoc, campaignDoc }));
     });
   }
 
@@ -112,13 +112,13 @@ export class CampaignActionService implements OnDestroy {
 
   addFlight() {
     this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new campaignActions.CampaignAddFlight({ campaignId }));
+      this.store.dispatch(campaignActions.CampaignAddFlight({ campaignId }));
     });
   }
 
   dupFlight(flight: Flight) {
     this.store.pipe(select(selectCampaignId), first()).subscribe(campaignId => {
-      this.store.dispatch(new campaignActions.CampaignDupFlight({ campaignId, flight }));
+      this.store.dispatch(campaignActions.CampaignDupFlight({ campaignId, flight }));
     });
   }
 
@@ -130,7 +130,7 @@ export class CampaignActionService implements OnDestroy {
         first()
       )
       .subscribe(state =>
-        this.store.dispatch(new campaignActions.CampaignDeleteFlight({ id: state.localFlight.id, softDeleted: !state.softDeleted }))
+        this.store.dispatch(campaignActions.CampaignDeleteFlight({ id: state.localFlight.id, softDeleted: !state.softDeleted }))
       );
   }
 
@@ -142,7 +142,7 @@ export class CampaignActionService implements OnDestroy {
     this.flightFormValueChangesSubscription = this.flightFormValueChangesStream.subscribe(([formState]) => {
       const { flight, changed, valid } = formState;
       this.store.dispatch(
-        new campaignActions.CampaignFlightFormUpdate({
+        campaignActions.CampaignFlightFormUpdate({
           flight,
           changed,
           valid
@@ -156,20 +156,18 @@ export class CampaignActionService implements OnDestroy {
       .pipe(select(selectCampaignWithFlightsForSave), first())
       .subscribe(({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights }) => {
         this.store.dispatch(
-          new campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
+          campaignActions.CampaignSave({ campaign, campaignDoc, updatedFlights, createdFlights, deletedFlights, tempDeletedFlights })
         );
       });
   }
 
   deleteCampaign() {
-    this.store
-      .pipe(select(selectCampaignDoc), first())
-      .subscribe(campaignDoc => this.store.dispatch(new campaignActions.CampaignDelete(campaignDoc)));
+    this.store.pipe(select(selectCampaignDoc), first()).subscribe(doc => this.store.dispatch(campaignActions.CampaignDelete({ doc })));
   }
 
   duplicateCampaign() {
     this.store
       .pipe(select(selectCampaignAndFlights), first())
-      .subscribe(payload => this.store.dispatch(new campaignActions.CampaignDuplicate(payload)));
+      .subscribe(params => this.store.dispatch(campaignActions.CampaignDuplicate(params)));
   }
 }

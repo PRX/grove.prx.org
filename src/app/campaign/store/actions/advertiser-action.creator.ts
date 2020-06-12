@@ -1,43 +1,21 @@
-import { Action } from '@ngrx/store';
+import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
 import { HalDoc } from 'ngx-prx-styleguide';
 
-export class AdvertisersLoad implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADVERTISERS_LOAD;
+export const AdvertisersLoad = createAction(ActionTypes.CAMPAIGN_ADVERTISERS_LOAD);
+export const AdvertisersLoadSuccess = createAction(ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_SUCCESS, props<{ docs: HalDoc[] }>());
+export const AdvertisersLoadFailure = createAction(ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_FAILURE, props<{ error: any }>());
 
-  constructor(public payload: {}) {}
-}
-export class AdvertisersLoadSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_SUCCESS;
+export const AddAdvertiser = createAction(ActionTypes.CAMPAIGN_ADD_ADVERTISER, props<{ name: string }>());
+export const AddAdvertiserSuccess = createAction(ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS, props<{ doc: HalDoc }>());
+export const AddAdvertiserFailure = createAction(ActionTypes.CAMPAIGN_ADD_ADVERTISER_FAILURE, props<{ error: any }>());
 
-  constructor(public payload: { docs: HalDoc[] }) {}
-}
-export class AdvertisersLoadFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADVERTISERS_LOAD_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export class AddAdvertiser implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADD_ADVERTISER;
-
-  constructor(public payload: { name: string }) {}
-}
-export class AddAdvertiserSuccess implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADD_ADVERTISER_SUCCESS;
-
-  constructor(public payload: { doc: HalDoc }) {}
-}
-export class AddAdvertiserFailure implements Action {
-  readonly type = ActionTypes.CAMPAIGN_ADD_ADVERTISER_FAILURE;
-
-  constructor(public payload: { error: any }) {}
-}
-
-export type AdvertiserActions =
-  | AdvertisersLoad
-  | AdvertisersLoadSuccess
-  | AdvertisersLoadFailure
-  | AddAdvertiser
-  | AddAdvertiserSuccess
-  | AddAdvertiserFailure;
+const all = union({
+  AdvertisersLoad,
+  AdvertisersLoadSuccess,
+  AdvertisersLoadFailure,
+  AddAdvertiser,
+  AddAdvertiserSuccess,
+  AddAdvertiserFailure
+});
+export type AdvertiserActions = typeof all;

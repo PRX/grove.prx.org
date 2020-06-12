@@ -25,14 +25,14 @@ describe('Flight Reducer', () => {
   });
 
   it('should remove flight entries for a new campaign', () => {
-    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, new campaignActions.CampaignNew({}));
+    const result = reducer(createFlightsState(new MockHalDoc(campaignDocFixture)).flights, campaignActions.CampaignNew());
     expect(result).toMatchObject({ ids: [], entities: {} });
   });
 
   it('should set flights from campaign load success', () => {
     const result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -43,7 +43,7 @@ describe('Flight Reducer', () => {
   });
 
   it('should create a new flight', () => {
-    const result = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
+    const result = reducer(initialState, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
     const newFlight = selectAll(result).find(flight => !flight.remoteFlight);
     expect(newFlight.localFlight.name).toContain('New Flight');
   });
@@ -51,7 +51,7 @@ describe('Flight Reducer', () => {
   it('should duplicate a flight', () => {
     const result = reducer(
       initialState,
-      new campaignActions.CampaignDupFlight({ campaignId: campaignFixture.id, flightId: Date.now(), flight: flightFixture })
+      campaignActions.CampaignDupFlight({ campaignId: campaignFixture.id, flightId: Date.now(), flight: flightFixture })
     );
     const dupFlight = selectAll(result).find(flight => flight.localFlight.name.indexOf('(Copy)') > -1);
     expect(dupFlight.localFlight.zones).toBe(flightFixture.zones);
@@ -60,13 +60,13 @@ describe('Flight Reducer', () => {
   it('should soft delete a flight', () => {
     let result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
       })
     );
-    result = reducer(result, new campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
+    result = reducer(result, campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
     const flight = selectEntities(result)[flightFixture.id];
     expect(flight.softDeleted).toBe(true);
   });
@@ -74,7 +74,7 @@ describe('Flight Reducer', () => {
   it('should update flight from form', () => {
     let result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -82,7 +82,7 @@ describe('Flight Reducer', () => {
     );
     result = reducer(
       result,
-      new campaignActions.CampaignFlightFormUpdate({
+      campaignActions.CampaignFlightFormUpdate({
         flight: { ...flightFixture, name: 'This is a flight name' },
         changed: true,
         valid: true
@@ -96,7 +96,7 @@ describe('Flight Reducer', () => {
   it('should retain flight values not in the form update', () => {
     let result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -104,7 +104,7 @@ describe('Flight Reducer', () => {
     );
     result = reducer(
       result,
-      new campaignActions.CampaignFlightFormUpdate({
+      campaignActions.CampaignFlightFormUpdate({
         // update only contains name
         flight: { id: flightFixture.id, name: 'This is a flight name' } as Flight,
         changed: true,
@@ -118,11 +118,11 @@ describe('Flight Reducer', () => {
 
   it('should delete temporary softDeleted flights from save action', () => {
     const flightId = Date.now();
-    let state = reducer(initialState, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId }));
-    state = reducer(state, new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: flightId + 1 }));
+    let state = reducer(initialState, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId }));
+    state = reducer(state, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: flightId + 1 }));
     state = reducer(
       state,
-      new campaignActions.CampaignSave({
+      campaignActions.CampaignSave({
         campaign: campaignFixture,
         campaignDoc: new MockHalDoc(campaignDocFixture),
         deletedFlights: [],
@@ -156,18 +156,18 @@ describe('Flight Reducer', () => {
     ];
     const flightDaysDocs = { [flightDocFixture.id]: flightDaysDocFixture };
 
-    let result = reducer(initialState, new campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }));
+    let result = reducer(initialState, campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }));
     result = reducer(
       result,
-      new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[0], startAt, endAt })
+      campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[0], startAt, endAt })
     );
     result = reducer(
       result,
-      new campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[1], startAt, endAt })
+      campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id, flightId: newFlightIds[1], startAt, endAt })
     );
     result = reducer(
       result,
-      new campaignActions.CampaignSaveSuccess({
+      campaignActions.CampaignSaveSuccess({
         campaignDoc,
         deletedFlightDocs: { [deletedFlightIds[0]]: flightDocs[0], [deletedFlightIds[1]]: flightDocs[1] },
         updatedFlightDocs: { [updatedFlightIds[0]]: flightDocs[2], [updatedFlightIds[1]]: flightDocs[3] },
@@ -194,7 +194,7 @@ describe('Flight Reducer', () => {
     // load a flight into the flight form state
     let state = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -203,7 +203,7 @@ describe('Flight Reducer', () => {
     // duplicate that flight
     state = reducer(
       state,
-      new campaignActions.CampaignDupFromForm({
+      campaignActions.CampaignDupFromForm({
         campaign: campaignFixture,
         flights: [flightFixture],
         timestamp
@@ -222,7 +222,7 @@ describe('Flight Reducer', () => {
     // starting from intialState, duplicate a flight by id where the campaign and flights are provided by an effect success action
     const state = reducer(
       initialState,
-      new campaignActions.CampaignDupByIdSuccess({
+      campaignActions.CampaignDupByIdSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         timestamp
@@ -239,7 +239,7 @@ describe('Flight Reducer', () => {
   it('should update the flight status/message from preview', () => {
     let result = reducer(
       initialState,
-      new campaignActions.CampaignLoadSuccess({
+      campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
         flightDocs: [new MockHalDoc(flightDocFixture)],
         flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
@@ -247,7 +247,7 @@ describe('Flight Reducer', () => {
     );
     result = reducer(
       result,
-      new flightPreviewActions.FlightPreviewCreateSuccess({
+      flightPreviewActions.FlightPreviewCreateSuccess({
         flight: flightFixture,
         status: 'error',
         statusMessage: 'something bad',

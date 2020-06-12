@@ -60,7 +60,7 @@ describe('CampaignActionService', () => {
 
     fixture.ngZone.run(() => {
       router.navigateByUrl(`/campaign/${campaignFixture.id}/flight/${flightFixture.id}`).then(() => {
-        const loadAction = new campaignActions.CampaignLoadSuccess({
+        const loadAction = campaignActions.CampaignLoadSuccess({
           campaignDoc,
           flightDocs,
           flightDaysDocs
@@ -86,7 +86,7 @@ describe('CampaignActionService', () => {
     it('dispatches updates when the form changes', () => {
       const flight = { ...flightFixture, name: 'new name' };
       service.updateFlightForm(flight, true, true);
-      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
+      expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
     });
 
     it('does not dispatch non-changes', () => {
@@ -181,7 +181,7 @@ describe('CampaignActionService', () => {
       service.loadFlightPreview(flightFixture);
       expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
         JSON.stringify(
-          new flightPreviewActions.FlightPreviewCreate({
+          flightPreviewActions.FlightPreviewCreate({
             flight: flightFixture,
             flightDoc: new MockHalDoc(flightDocFixture),
             campaignDoc: new MockHalDoc(campaignDocFixture)
@@ -200,7 +200,7 @@ describe('CampaignActionService', () => {
     it('should dispatch action to add a new flight', done => {
       service.addFlight();
       store.pipe(select(selectCampaignId)).subscribe(campaignId => {
-        expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignAddFlight({ campaignId, flightId }));
+        expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignAddFlight({ campaignId, flightId }));
         done();
       });
     });
@@ -208,7 +208,7 @@ describe('CampaignActionService', () => {
     it('should dispatch action to duplicate flight', done => {
       service.dupFlight(flightFixture);
       store.pipe(select(selectCampaignId)).subscribe(campaignId => {
-        expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignDupFlight({ campaignId, flight: flightFixture, flightId }));
+        expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignDupFlight({ campaignId, flight: flightFixture, flightId }));
         done();
       });
     });
@@ -216,13 +216,13 @@ describe('CampaignActionService', () => {
 
   it('should dispatch action to toggle flight deletion', () => {
     service.deleteRoutedFlightToggle();
-    expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
+    expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignDeleteFlight({ id: flightFixture.id, softDeleted: true }));
   });
 
   it('should dispatch action to save campaign and flights', done => {
     service.saveCampaignAndFlights();
     store.pipe(select(selectCampaignWithFlightsForSave)).subscribe(campaignFlights => {
-      expect(dispatchSpy).toHaveBeenCalledWith(new campaignActions.CampaignSave(campaignFlights));
+      expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignSave(campaignFlights));
       done();
     });
   });
