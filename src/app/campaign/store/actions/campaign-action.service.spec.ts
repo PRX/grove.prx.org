@@ -32,7 +32,15 @@ describe('CampaignActionService', () => {
       declarations: [TestComponent],
       imports: [
         RouterTestingModule.withRoutes(campaignRoutes),
-        StoreModule.forRoot({ router: routerReducer }),
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)
       ],
@@ -99,7 +107,7 @@ describe('CampaignActionService', () => {
       const flight = { ...flightFixture, deliveryMode: 'uncapped', dailyMinimum: 123 };
       service.updateFlightForm(flight, true, true);
       expect(dispatchSpy).toHaveBeenCalledWith(
-        new campaignActions.CampaignFlightFormUpdate({ flight: { ...flight, dailyMinimum: null }, changed: true, valid: true })
+        campaignActions.CampaignFlightFormUpdate({ flight: { ...flight, dailyMinimum: null }, changed: true, valid: true })
       );
     });
 
@@ -107,7 +115,7 @@ describe('CampaignActionService', () => {
       const flight = { ...flightFixture, deliveryMode: 'greedy_uncapped', contractGoal: 123, dailyMinimum: 456 };
       service.updateFlightForm(flight, true, true);
       expect(dispatchSpy).toHaveBeenCalledWith(
-        new campaignActions.CampaignFlightFormUpdate({
+        campaignActions.CampaignFlightFormUpdate({
           flight: { ...flight, contractGoal: null, dailyMinimum: null },
           changed: true,
           valid: true
