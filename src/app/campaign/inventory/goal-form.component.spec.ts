@@ -16,7 +16,7 @@ import { GoalFormComponent } from './goal-form.component';
 class ParentFormComponent {
   constructor(private fb: FormBuilder) {}
 
-  @ViewChild('childForm') childForm: GoalFormComponent;
+  @ViewChild('childForm', { static: true }) childForm: GoalFormComponent;
 
   goalForm = this.fb.group({
     totalGoal: [0, [Validators.required, Validators.min(0)]],

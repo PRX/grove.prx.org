@@ -76,20 +76,20 @@ export class CampaignComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private store: Store<any>, private campaignActionService: CampaignActionService) {}
 
   ngOnInit() {
-    this.store.dispatch(new accountActions.AccountsLoad({}));
-    this.store.dispatch(new advertiserActions.AdvertisersLoad({}));
+    this.store.dispatch(accountActions.AccountsLoad());
+    this.store.dispatch(advertiserActions.AdvertisersLoad());
     this.routeSub = this.route.paramMap.subscribe(params => {
       if (params.get('id')) {
         const id = +params.get('id');
-        this.store.dispatch(new campaignActions.CampaignLoad({ id }));
+        this.store.dispatch(campaignActions.CampaignLoad({ id }));
       } else {
         const { state } = window.history;
         if (state.campaign) {
-          this.store.dispatch(new campaignActions.CampaignDupFromForm({ campaign: state.campaign, flights: state.flights }));
+          this.store.dispatch(campaignActions.CampaignDupFromForm({ campaign: state.campaign, flights: state.flights }));
         } else if (state.id) {
-          this.store.dispatch(new campaignActions.CampaignDupById({ id: state.id }));
+          this.store.dispatch(campaignActions.CampaignDupById({ id: state.id }));
         } else {
-          this.store.dispatch(new campaignActions.CampaignNew({}));
+          this.store.dispatch(campaignActions.CampaignNew());
         }
       }
     });

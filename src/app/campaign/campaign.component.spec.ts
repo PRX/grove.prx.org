@@ -89,7 +89,7 @@ describe('CampaignComponent', () => {
       router.navigateByUrl('/campaign/123');
       route.setParamMap({ id: '123' });
       route.paramMap.pipe(first()).subscribe(() => {
-        expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignLoad({ id: 123 }));
+        expect(store.dispatch).toHaveBeenLastCalledWith(campaignActions.CampaignLoad({ id: 123 }));
         done();
       });
     });
@@ -109,7 +109,7 @@ describe('CampaignComponent', () => {
         router.navigateByUrl('/campaign/new');
         route.setParamMap({});
         route.paramMap.pipe(first()).subscribe(() => {
-          expect(store.dispatch).toHaveBeenLastCalledWith(new campaignActions.CampaignDupById({ id: 123, timestamp }));
+          expect(store.dispatch).toHaveBeenLastCalledWith(campaignActions.CampaignDupById({ id: 123, timestamp }));
           done();
         });
       });
@@ -123,7 +123,7 @@ describe('CampaignComponent', () => {
         route.setParamMap({});
         route.paramMap.pipe(first()).subscribe(() => {
           expect(store.dispatch).toHaveBeenLastCalledWith(
-            new campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture], timestamp })
+            campaignActions.CampaignDupFromForm({ campaign: campaignFixture, flights: [flightFixture], timestamp })
           );
           done();
         });

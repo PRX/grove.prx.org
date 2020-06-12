@@ -63,7 +63,7 @@ const flightFixture: Flight = {
 class ParentFormComponent {
   constructor(private fb: FormBuilder) {}
 
-  @ViewChild('childForm') childForm: FlightFormComponent;
+  @ViewChild('childForm', { static: true }) childForm: FlightFormComponent;
 
   inventory = inventoryFixture;
   zoneOptions = inventoryFixture[0].zones;

@@ -39,8 +39,8 @@ describe('AccountEffects', () => {
   }));
 
   it('should load default and other accounts', () => {
-    const loadAction = new accountActions.AccountsLoad({});
-    const success = new accountActions.AccountsLoadSuccess({ docs: [defaultAccountDoc].concat(accountDocs) });
+    const loadAction = accountActions.AccountsLoad();
+    const success = accountActions.AccountsLoadSuccess({ docs: [defaultAccountDoc].concat(accountDocs) });
     actions$.stream = hot('-a', { a: loadAction });
     const expected = cold('-r', { r: success });
     expect(effects.loadAccounts$).toBeObservable(expected);

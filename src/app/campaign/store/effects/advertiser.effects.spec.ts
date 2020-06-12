@@ -17,7 +17,7 @@ describe('AdvertiserEffects', () => {
   let advertiserService: AdvertiserService;
 
   // load action received by the effect
-  const loadAction = new advertiserActions.AdvertisersLoad({});
+  const loadAction = advertiserActions.AdvertisersLoad();
   const docs = advertisersFixture.map(a => new MockHalDoc(a));
   const newAdvertiserDoc = new MockHalDoc({ id: `${docs[docs.length - 1].id + 1}`, name, set_advertiser_uri: '/some/uri' });
 
@@ -42,7 +42,7 @@ describe('AdvertiserEffects', () => {
   }));
 
   it('should load advertisers', () => {
-    const success = new advertiserActions.AdvertisersLoadSuccess({ docs });
+    const success = advertiserActions.AdvertisersLoadSuccess({ docs });
 
     actions$.stream = hot('-a', { a: loadAction });
     const expected = cold('-r', { r: success });
@@ -56,7 +56,7 @@ describe('AdvertiserEffects', () => {
     advertiserService.loadAdvertisers = jest.fn(() => errorResponse);
 
     // expected failure action to be emitted by effect upon catchError
-    const outcome = new advertiserActions.AdvertisersLoadFailure({ error: halError });
+    const outcome = advertiserActions.AdvertisersLoadFailure({ error: halError });
 
     // emit the load action
     actions$.stream = hot('-a', { a: loadAction });
@@ -67,8 +67,8 @@ describe('AdvertiserEffects', () => {
   });
 
   it('should add an advertiser', () => {
-    const success = new advertiserActions.AddAdvertiserSuccess({ doc: newAdvertiserDoc });
-    const addAction = new advertiserActions.AddAdvertiser({ name: 'Nooks Cranny' });
+    const success = advertiserActions.AddAdvertiserSuccess({ doc: newAdvertiserDoc });
+    const addAction = advertiserActions.AddAdvertiser({ name: 'Nooks Cranny' });
 
     actions$.stream = hot('-a', { a: addAction });
     const expected = cold('-r', { r: success });
