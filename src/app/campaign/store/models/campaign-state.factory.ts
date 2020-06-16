@@ -5,6 +5,7 @@ import { Advertiser } from './advertiser.models';
 import { Campaign } from './campaign.models';
 import { Flight } from './flight.models';
 import { docToFlightDays } from './flight-days.models';
+import { Inventory, InventoryTargets } from './inventory.models';
 import * as moment from 'moment';
 
 const augury = new MockHalService();
@@ -148,6 +149,41 @@ export const createFlightDaysState = () => ({
   }
 });
 
+export const inventoryFixture: Inventory[] = [
+  {
+    id: 1,
+    podcastTitle: 'Some Title 1',
+    self_uri: '/some/uri/1',
+    zones: [
+      { id: 'pre', label: 'Preroll' },
+      { id: 'orig', label: 'Original' }
+    ]
+  },
+  {
+    id: 2,
+    podcastTitle: 'Some Title 2',
+    self_uri: '/some/uri/2',
+    zones: [
+      { id: 'orig', label: 'Original' },
+      { id: 'post', label: 'Postroll' }
+    ]
+  }
+];
+export const inventoryDocsFixture = inventoryFixture.map(i => new MockHalDoc({ ...i, _links: { self: { href: i.self_uri } } }));
+export const createInventoryState = () => ({
+  inventory: {
+    ids: inventoryFixture.map(inventory => inventory.id),
+    entities: inventoryFixture.reduce((acc, inventory) => ({ ...acc, [inventory.id]: inventory }), {})
+  }
+});
+
+export const inventoryTargetsFixture: InventoryTargets = {
+  inventoryId: 1,
+  episodes: [{ type: 'episode', code: '1111', label: 'Episode 1' }],
+  countries: [{ type: 'country', code: 'CA', label: 'Canadia' }]
+};
+export const inventoryTargetsDocFixture = new MockHalDoc(inventoryTargetsFixture);
+
 export const createRouterState = () => ({
   router: {
     state: {
@@ -162,11 +198,13 @@ export const createCampaignStoreState = ({
   advertiser = createAdvertiserState(),
   campaignState = createCampaignState(),
   flightsState = createFlightsState(campaignState.campaign.doc),
-  flightDaysState = createFlightDaysState()
+  flightDaysState = createFlightDaysState(),
+  inventoryState = createInventoryState()
 } = {}): CampaignStoreState => ({
   ...account,
   ...advertiser,
   ...campaignState,
   ...flightsState,
-  ...flightDaysState
+  ...flightDaysState,
+  ...inventoryState
 });
