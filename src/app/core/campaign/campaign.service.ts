@@ -77,6 +77,8 @@ export class CampaignService {
   }
 
   updateFlight(flight: Flight): Observable<HalDoc> {
+    // TODO: this is temporary, to avoid PUT-ing back the deprecated "uncapped" attr
+    delete flight['uncapped'];
     return this.getFlightDocById(flight.id).pipe(mergeMap((doc: HalDoc) => doc.update(flight)));
   }
 

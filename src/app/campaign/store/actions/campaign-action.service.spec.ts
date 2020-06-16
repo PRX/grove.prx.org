@@ -32,7 +32,15 @@ describe('CampaignActionService', () => {
       declarations: [TestComponent],
       imports: [
         RouterTestingModule.withRoutes(campaignRoutes),
-        StoreModule.forRoot({ router: routerReducer }),
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)
       ],
@@ -94,6 +102,26 @@ describe('CampaignActionService', () => {
       service.updateFlightForm(flight, true, true);
       expect(dispatchSpy).not.toHaveBeenCalled();
     });
+
+    it('transforms fields for uncapped flights', () => {
+      const flight = { ...flightFixture, deliveryMode: 'uncapped', dailyMinimum: 123 };
+      service.updateFlightForm(flight, true, true);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        campaignActions.CampaignFlightFormUpdate({ flight: { ...flight, dailyMinimum: null }, changed: true, valid: true })
+      );
+    });
+
+    it('transforms fields for greedy flights', () => {
+      const flight = { ...flightFixture, deliveryMode: 'greedy_uncapped', contractGoal: 123, dailyMinimum: 456 };
+      service.updateFlightForm(flight, true, true);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        campaignActions.CampaignFlightFormUpdate({
+          flight: { ...flight, contractGoal: null, dailyMinimum: null },
+          changed: true,
+          valid: true
+        })
+      );
+    });
   });
 
   describe('hasChanged', () => {
@@ -152,9 +180,9 @@ describe('CampaignActionService', () => {
       expect(service.loadFlightPreview).toHaveBeenCalled();
     });
 
-    it('sets the goals to 0 for uncapped flights', () => {
-      service.updateFlightForm({ ...flightFixture, uncapped: true }, true, true);
-      expect(service.loadFlightPreview).toHaveBeenCalledWith({ ...flightFixture, uncapped: true, totalGoal: 0, dailyMinimum: 0 });
+    it('should load flight preview when delivery mode is changed', () => {
+      service.updateFlightForm({ ...flightFixture, deliveryMode: 'uncapped' }, true, true);
+      expect(service.loadFlightPreview).toHaveBeenCalled();
     });
 
     it('should dispatch action to load flight preview', () => {

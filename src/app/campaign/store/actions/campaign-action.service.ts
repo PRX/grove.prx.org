@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
-import { Flight, isZonesChanged, isStartAtChanged, isEndAtChanged, isInventoryChanged } from '../models';
+import { Flight } from '../models';
 import {
   selectCampaignId,
   selectCampaignWithFlightsForSave,
@@ -15,25 +15,19 @@ import {
 } from '../selectors';
 import { Moment } from 'moment';
 
+interface FlightFormState {
+  flight: Flight;
+  changed: boolean;
+  valid: boolean;
+}
+
 @Injectable()
 export class CampaignActionService implements OnDestroy {
   // use a Subject to filter form updates through a pipe to dispatch form changes and load preview
-  flightFormValueChanges = new Subject<{ flight: Flight; changed: boolean; valid: boolean }>();
+  flightFormValueChanges = new Subject<FlightFormState>();
   flightFormValueChangesSubscription: Subscription;
   flightFormValueChangesStream = this.flightFormValueChanges.pipe(
-    // map form field values to a proper Flight
-    map(({ flight, changed, valid }) => {
-      return {
-        flight: {
-          ...flight,
-          uncapped: flight.uncapped || false,
-          totalGoal: flight.uncapped ? 0 : +flight.totalGoal,
-          dailyMinimum: flight.uncapped ? 0 : +flight.dailyMinimum
-        },
-        changed,
-        valid
-      };
-    }),
+    map(this.transformFlightForm),
     // if preview params changed, dispatch loadFlightPreview
     withLatestFrom(this.store.pipe(select(selectRoutedFlight))),
     tap(([formState, flightState]) => {
@@ -56,6 +50,16 @@ export class CampaignActionService implements OnDestroy {
   ngOnDestroy() {
     if (this.flightFormValueChangesSubscription) {
       this.flightFormValueChangesSubscription.unsubscribe();
+    }
+  }
+
+  transformFlightForm({ flight, changed, valid }: FlightFormState): FlightFormState {
+    if (flight.deliveryMode === 'uncapped') {
+      return { flight: { ...flight, dailyMinimum: null }, changed, valid };
+    } else if (flight.deliveryMode === 'greedy_uncapped') {
+      return { flight: { ...flight, contractGoal: null, dailyMinimum: null }, changed, valid };
+    } else {
+      return { flight, changed, valid };
     }
   }
 
@@ -97,16 +101,13 @@ export class CampaignActionService implements OnDestroy {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    return (
-      isStartAtChanged(a, b) ||
-      isEndAtChanged(a, b) ||
-      isInventoryChanged(a, b) ||
-      isZonesChanged(a, b) ||
-      a.totalGoal !== b.totalGoal ||
-      a.dailyMinimum !== b.dailyMinimum ||
-      // coerce to boolean comparison in case undefined
-      !!a.uncapped !== !!b.uncapped
-    );
+    const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'totalGoal', 'dailyMinimum', 'deliveryMode'];
+    return check.some(fld => {
+      if (this.hasChanged(b[fld], a[fld])) {
+        // console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);
+        return true;
+      }
+    });
   }
 
   addFlight() {

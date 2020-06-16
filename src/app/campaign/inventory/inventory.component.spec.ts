@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement, Component, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
+import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { InventoryComponent } from './inventory.component';
 import { InventoryTableComponent } from './inventory-table.component';
@@ -27,10 +27,10 @@ class ParentFormComponent {
   zones = mockZones;
 
   goalForm = this.fb.group({
-    totalGoal: [0, [Validators.required, Validators.min(0)]],
+    totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
-    dailyMinimum: [0, Validators.min(0)],
-    uncapped: [false]
+    dailyMinimum: ['', Validators.min(0)],
+    deliveryMode: ['', Validators.required]
   });
 }
 
@@ -50,7 +50,7 @@ describe('InventoryComponent', () => {
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
-        MatSlideToggleModule
+        MatSelectModule
       ],
       declarations: [ParentFormComponent, InventoryComponent, InventoryTableComponent, GoalFormComponent]
     })

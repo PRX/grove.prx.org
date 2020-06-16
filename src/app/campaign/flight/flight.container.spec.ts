@@ -72,7 +72,8 @@ describe('FlightContainerComponent', () => {
     endAt: moment.utc('2019-11-01'),
     set_inventory_uri: '/some/url',
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
-    totalGoal: 999
+    totalGoal: 999,
+    deliveryMode: 'capped'
   };
 
   beforeEach(async(() => {
