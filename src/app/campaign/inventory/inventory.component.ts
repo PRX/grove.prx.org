@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { InventoryZone } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
+import { Flight, InventoryRollup, InventoryZone } from '../store/models';
 
 @Component({
   selector: 'grove-inventory',

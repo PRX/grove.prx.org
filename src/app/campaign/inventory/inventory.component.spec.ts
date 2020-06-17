@@ -7,7 +7,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { InventoryComponent } from './inventory.component';
 import { InventoryTableComponent } from './inventory-table.component';
 import { GoalFormComponent } from './goal-form.component';
-import { InventoryZone } from '../../core';
+import { InventoryZone } from '../store/models';
 import { flightFixture } from '../store/models/campaign-state.factory';
 
 const mockZones: InventoryZone[] = [{ id: 'pre_1', label: 'Preroll 1' }];

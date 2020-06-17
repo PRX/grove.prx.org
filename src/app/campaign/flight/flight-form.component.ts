@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
-import { Inventory, InventoryZone, filterZones } from '../../core';
-import { Flight } from '../store/models';
+import { Flight, Inventory, InventoryZone, filterZones } from '../store/models';
 
 @Component({
   selector: 'grove-flight-form',
@@ -47,6 +46,6 @@ export class FlightFormComponent implements OnInit {
   }
 
   get canBeDeleted(): boolean {
-    return !this.flight.actualCount;
+    return this.flight && !this.flight.actualCount;
   }
 }

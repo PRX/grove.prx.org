@@ -22,9 +22,8 @@ import {
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightFormComponent } from './flight-form.component';
-import { Flight } from '../store/models';
+import { Flight, Inventory } from '../store/models';
 import * as moment from 'moment';
-import { Inventory } from '../../core/';
 import { validateMp3 } from './flight-form-control-container.component';
 
 const inventoryFixture: Inventory[] = [

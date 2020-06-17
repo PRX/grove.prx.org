@@ -22,6 +22,7 @@ import { AccountEffects } from './store/effects/account.effects';
 import { AdvertiserEffects } from './store/effects/advertiser.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
 import { FlightPreviewEffects } from './store/effects/flight-preview.effects';
+import { InventoryEffects } from './store/effects/inventory.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 
@@ -47,7 +48,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     FancyFormModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
-    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects])
+    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects, InventoryEffects])
   ],
   providers: [CampaignActionService]
 })

@@ -6,6 +6,7 @@ import {
   MatButtonModule,
   MatCardModule,
   MatDatepickerModule,
+  MatNativeDateModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
@@ -13,20 +14,18 @@ import {
   MatSelectModule,
   MatSlideToggleModule
 } from '@angular/material';
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { ReplaySubject } from 'rxjs';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { ActivatedRouteStub } from '../../../testing/stub.router';
 import { Store, StoreModule } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
 import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
 import { MockHalDoc } from 'ngx-prx-styleguide';
-import { InventoryService } from '../../core';
 import { SharedModule } from '../../shared/shared.module';
-import { flightFixture, flightDocFixture, flightDaysData } from '../store/models/campaign-state.factory';
+import { flightFixture, flightDocFixture, flightDaysData, inventoryDocsFixture } from '../store/models/campaign-state.factory';
 import { reducers } from '../store';
 import * as campaignActions from '../store/actions/campaign-action.creator';
+import * as inventoryActions from '../store/actions/inventory-action.creator';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 import { FlightContainerComponent } from './flight.container';
@@ -56,7 +55,6 @@ const campaignRoutes: Routes = [
 ];
 
 describe('FlightContainerComponent', () => {
-  const inventory$: ReplaySubject<any> = new ReplaySubject(1);
   let campaignActionService: CampaignActionService;
   const route: ActivatedRouteStub = new ActivatedRouteStub();
   let router: Router;
@@ -86,14 +84,22 @@ describe('FlightContainerComponent', () => {
         MatButtonModule,
         MatCardModule,
         MatDatepickerModule,
-        MatMomentDateModule,
+        MatNativeDateModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
         MatListModule,
         MatSelectModule,
         MatSlideToggleModule,
-        StoreModule.forRoot({ router: routerReducer }),
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers)
       ],
@@ -110,10 +116,6 @@ describe('FlightContainerComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: route
-        },
-        {
-          provide: InventoryService,
-          useValue: { listInventory: jest.fn(() => inventory$) }
         },
         CampaignActionService
       ]
@@ -136,6 +138,7 @@ describe('FlightContainerComponent', () => {
             flightDaysDocs: { [flightDocFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
           })
         );
+        store.dispatch(inventoryActions.InventoryLoadSuccess({ docs: inventoryDocsFixture }));
         fix.ngZone.run(() => router.navigateByUrl(`/campaign/1/flight/${flightDocFixture.id}`));
       });
   }));
@@ -158,10 +161,18 @@ describe('FlightContainerComponent', () => {
     expect(campaignActionService.updateFlightForm).toHaveBeenCalledWith(flight, true, false);
   });
 
+  it('generates inventory options', done => {
+    component.inventoryOptions$.subscribe(opts => {
+      expect(opts.length).toEqual(inventoryDocsFixture.length);
+      expect(opts.map(opt => opt.id)).toEqual(inventoryDocsFixture.map(doc => doc.id));
+      done();
+    });
+  });
+
   it('generates zone options from inventory', done => {
-    inventory$.next([{ self_uri: flightFixture.set_inventory_uri, zones: flightFixture.zones }]);
     component.zoneOptions$.subscribe(opts => {
-      expect(opts).toEqual(flightFixture.zones);
+      expect(opts.length).toEqual(inventoryDocsFixture[0]['zones'].length);
+      expect(opts.map(opt => opt.id)).toEqual(inventoryDocsFixture[0]['zones'].map((z: any) => z.id));
       done();
     });
   });

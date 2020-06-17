@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Inventory, InventoryZone, filterZones } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
+import { Flight, InventoryRollup, Inventory, InventoryZone, filterZones } from '../store/models';
 
 export const validateMp3 = (control: AbstractControl): { [key: string]: any } | null => {
   if (control.value) {
@@ -18,7 +17,7 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
 @Component({
   selector: 'grove-flight',
   template: `
-    <form [formGroup]="flightForm" *ngIf="flightForm && zoneOptions">
+    <form [formGroup]="flightForm">
       <grove-flight-form
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
@@ -81,6 +80,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     contractStartAt: [''],
     contractEndAt: [''],
     zones: this.fb.array([]),
+    targets: this.fb.array([]),
     set_inventory_uri: ['', Validators.required],
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],

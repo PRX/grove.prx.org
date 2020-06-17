@@ -1,9 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable, combineLatest, Subscription } from 'rxjs';
-import { Inventory, InventoryService, InventoryZone } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
-import { map } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { Flight, InventoryRollup, Inventory, InventoryZone } from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -11,14 +9,15 @@ import {
   selectCurrentInventoryUri,
   selectRoutedFlightPreviewError,
   selectFlightDaysRollup,
-  selectIsFlightPreview
+  selectIsFlightPreview,
+  selectAllInventoryOrderByName,
+  selectCurrentInventoryZones
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 @Component({
   template: `
     <grove-flight
-      *ngIf="zoneOptions$ | async as zoneOpts"
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
       [flight]="flightLocal$ | async"
@@ -45,7 +44,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   zoneOptions$: Observable<InventoryZone[]>;
   flightSub: Subscription;
 
-  constructor(private inventoryService: InventoryService, private store: Store<any>, private campaignAction: CampaignActionService) {}
+  constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
 
   ngOnInit() {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
@@ -55,14 +54,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightPreviewError$ = this.store.pipe(select(selectRoutedFlightPreviewError));
     this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
-
-    this.inventoryOptions$ = this.inventoryService.listInventory();
-    this.zoneOptions$ = combineLatest([this.inventoryOptions$, this.currentInventoryUri$]).pipe(
-      map(([options, uri]) => {
-        const inventory = options.find(i => i.self_uri === uri);
-        return inventory ? inventory.zones : [];
-      })
-    );
+    this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
+    this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
   }
 
   ngOnDestroy() {

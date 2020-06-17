@@ -109,12 +109,12 @@ export const flightFixture: Flight = {
   dailyMinimum: 99,
   deliveryMode: 'capped',
   zones: [{ id: 'pre_1', label: 'Preroll 1' }],
-  set_inventory_uri: '/some/inventory'
+  set_inventory_uri: '/some/inventory/1'
 };
 export const flightDocFixture = {
   ...flightFixture,
   _links: {
-    'prx:inventory': { href: '/some/inventory' }
+    'prx:inventory': { href: '/some/inventory/1' }
   },
   embedded: {
     'prx:flight-days': flightDaysDocFixture
@@ -153,7 +153,7 @@ export const inventoryFixture: Inventory[] = [
   {
     id: 1,
     podcastTitle: 'Some Title 1',
-    self_uri: '/some/uri/1',
+    self_uri: '/some/inventory/1',
     zones: [
       { id: 'pre', label: 'Preroll' },
       { id: 'orig', label: 'Original' }
@@ -162,7 +162,7 @@ export const inventoryFixture: Inventory[] = [
   {
     id: 2,
     podcastTitle: 'Some Title 2',
-    self_uri: '/some/uri/2',
+    self_uri: '/some/inventory/2',
     zones: [
       { id: 'orig', label: 'Original' },
       { id: 'post', label: 'Postroll' }
