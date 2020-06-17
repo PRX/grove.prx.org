@@ -18,6 +18,7 @@ import {
 import * as accountActions from './store/actions/account-action.creator';
 import * as advertiserActions from './store/actions/advertiser-action.creator';
 import * as campaignActions from './store/actions/campaign-action.creator';
+import * as inventoryActions from './store/actions/inventory-action.creator';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 
 @Component({
@@ -78,6 +79,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(accountActions.AccountsLoad());
     this.store.dispatch(advertiserActions.AdvertisersLoad());
+    this.store.dispatch(inventoryActions.InventoryLoad());
     this.routeSub = this.route.paramMap.subscribe(params => {
       if (params.get('id')) {
         const id = +params.get('id');
