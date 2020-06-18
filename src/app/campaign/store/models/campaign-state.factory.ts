@@ -109,6 +109,7 @@ export const flightFixture: Flight = {
   dailyMinimum: 99,
   deliveryMode: 'capped',
   zones: [{ id: 'pre_1', label: 'Preroll 1' }],
+  targets: [],
   set_inventory_uri: '/some/inventory/1'
 };
 export const flightDocFixture = {

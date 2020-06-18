@@ -12,7 +12,8 @@ import {
   MatInputModule,
   MatListModule,
   MatSelectModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatCheckboxModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -31,6 +32,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
 import { FlightContainerComponent } from './flight.container';
 import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
 import { FlightFormComponent } from './flight-form.component';
+import { FlightTargetsFormComponent } from './flight-targets-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
@@ -91,6 +93,7 @@ describe('FlightContainerComponent', () => {
         MatListModule,
         MatSelectModule,
         MatSlideToggleModule,
+        MatCheckboxModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {
@@ -107,6 +110,7 @@ describe('FlightContainerComponent', () => {
         FlightContainerComponent,
         FlightFormControlContainerComponent,
         FlightFormComponent,
+        FlightTargetsFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent,
