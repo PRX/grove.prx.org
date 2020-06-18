@@ -47,6 +47,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
   formSubcription: Subscription;
+  resetting = false;
 
   // tslint:disable-next-line
   private _flight: Flight;
@@ -56,8 +57,10 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input()
   set flight(flight: Flight) {
     if (flight) {
+      this.resetting = true;
       this._flight = flight;
       this.setFlightForm(this._flight);
+      this.resetting = false;
     }
   }
 
@@ -106,11 +109,13 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
 
   // emits updates when reactive form fields change
   onFormValueChanges(flight: Flight) {
-    this.flightUpdate.emit({
-      flight,
-      changed: this.flightForm.dirty,
-      valid: this.flightForm.valid
-    });
+    if (!this.resetting) {
+      this.flightUpdate.emit({
+        flight,
+        changed: this.flightForm.dirty,
+        valid: this.flightForm.valid
+      });
+    }
   }
 
   get zonesControls(): FormArray {
