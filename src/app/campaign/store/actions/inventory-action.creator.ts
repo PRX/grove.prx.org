@@ -6,7 +6,7 @@ export const InventoryLoad = createAction(ActionTypes.CAMPAIGN_INVENTORY_LOAD);
 export const InventoryLoadSuccess = createAction(ActionTypes.CAMPAIGN_INVENTORY_LOAD_SUCCESS, props<{ docs: HalDoc[] }>());
 export const InventoryLoadFailure = createAction(ActionTypes.CAMPAIGN_INVENTORY_LOAD_FAILURE, props<{ error: any }>());
 
-export const InventoryTargetsLoad = createAction(ActionTypes.CAMPAIGN_INVENTORY_TARGETS_LOAD, props<{ inventoryId: number }>());
+export const InventoryTargetsLoad = createAction(ActionTypes.CAMPAIGN_INVENTORY_TARGETS_LOAD, props<{ inventory: number | HalDoc }>());
 export const InventoryTargetsLoadSuccess = createAction(ActionTypes.CAMPAIGN_INVENTORY_TARGETS_LOAD_SUCCESS, props<{ doc: HalDoc }>());
 export const InventoryTargetsLoadFailure = createAction(ActionTypes.CAMPAIGN_INVENTORY_TARGETS_LOAD_FAILURE, props<{ error: any }>());
 

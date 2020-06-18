@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone, filterZones } from '../store/models';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
 
 export const validateMp3 = (control: AbstractControl): { [key: string]: any } | null => {
   if (control.value) {
@@ -21,6 +21,7 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
       <grove-flight-form
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
+        [targetOptions]="targetOptions"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
@@ -38,6 +39,7 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
 export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
+  @Input() targetOptions: InventoryTargets;
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   @Input() previewError: any;
@@ -80,7 +82,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     contractStartAt: [''],
     contractEndAt: [''],
     zones: this.fb.array([]),
-    targets: this.fb.array([]),
+    targets: [''],
     set_inventory_uri: ['', Validators.required],
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],

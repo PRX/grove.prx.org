@@ -2,7 +2,7 @@ import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '..';
 import { selectCampaignStoreState } from './campaign.selectors';
 import { selectCurrentInventoryUri } from './flight.selectors';
-import { Inventory, InventoryZone } from '../models';
+import { Inventory, InventoryZone, InventoryTargets } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/inventory.reducer';
 
 export const selectInventoryState = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.inventory);
@@ -24,4 +24,9 @@ export const selectCurrentInventory = createSelector(
 export const selectCurrentInventoryZones = createSelector(
   selectCurrentInventory,
   (inventory): InventoryZone[] => inventory && inventory.zones
+);
+
+export const selectCurrentInventoryTargets = createSelector(
+  selectCurrentInventory,
+  (inventory): InventoryTargets => inventory && inventory.targets
 );

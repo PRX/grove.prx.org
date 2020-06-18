@@ -10,6 +10,7 @@ import { CampaignFormComponent } from './form/campaign-form.component';
 import { FlightContainerComponent } from './flight/flight.container';
 import { FlightFormControlContainerComponent } from './flight/flight-form-control-container.component';
 import { FlightFormComponent } from './flight/flight-form.component';
+import { FlightTargetsFormComponent } from './flight/flight-targets-form.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
@@ -45,6 +46,7 @@ export const campaignComponents: any[] = [
   FlightContainerComponent,
   FlightFormControlContainerComponent,
   FlightFormComponent,
+  FlightTargetsFormComponent,
   InventoryComponent,
   InventoryTableComponent,
   GoalFormComponent

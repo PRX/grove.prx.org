@@ -1,7 +1,7 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 import * as inventoryActions from '../actions/inventory-action.creator';
-import { docToInventory, Inventory } from '../models';
+import { docToInventory, docToInventoryTargets, Inventory } from '../models';
 
 export interface State extends EntityState<Inventory> {
   error?: any;
@@ -20,9 +20,9 @@ const _reducer = createReducer(
   })),
   on(inventoryActions.InventoryLoadFailure, (state, action) => ({ ...state, error: action.error })),
   on(inventoryActions.InventoryTargetsLoadSuccess, (state, action) => {
-    const { inventoryId, episodes, countries } = action.doc as any;
+    const targets = docToInventoryTargets(action.doc);
     return {
-      ...adapter.updateOne({ id: inventoryId, changes: { episodeTargets: episodes, countryTargets: countries } }, state),
+      ...adapter.updateOne({ id: targets.inventoryId, changes: { targets } }, state),
       error: null
     };
   }),

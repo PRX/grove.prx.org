@@ -26,7 +26,7 @@ export class FlightPreviewService {
   }
 
   private preview(flight: {}, doc: HalDoc, link: string) {
-    return doc.create(link, {}, flight).pipe(
+    return doc.create(link, {}, this.previewParams(flight)).pipe(
       mergeMap((flightPreviewDoc: HalDoc) => {
         return forkJoin({
           status: of(flightPreviewDoc['status']),
@@ -35,5 +35,13 @@ export class FlightPreviewService {
         });
       })
     );
+  }
+
+  private previewParams(flight: any): any {
+    if (flight.targets && flight.targets.length) {
+      return { ...flight, targets: flight.targets.filter(t => t.type && t.code) };
+    } else {
+      return flight;
+    }
   }
 }

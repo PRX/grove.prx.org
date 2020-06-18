@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone } from '../store/models';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -11,7 +11,8 @@ import {
   selectFlightDaysRollup,
   selectIsFlightPreview,
   selectAllInventoryOrderByName,
-  selectCurrentInventoryZones
+  selectCurrentInventoryZones,
+  selectCurrentInventoryTargets
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -20,6 +21,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
     <grove-flight
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
+      [targetOptions]="targetOptions$ | async"
       [flight]="flightLocal$ | async"
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
@@ -42,6 +44,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
+  targetOptions$: Observable<InventoryTargets>;
   flightSub: Subscription;
 
   constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
@@ -56,6 +59,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
     this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
+    this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
   }
 
   ngOnDestroy() {

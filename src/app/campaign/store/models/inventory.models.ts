@@ -6,8 +6,7 @@ export interface Inventory {
   podcastTitle: string;
   zones: InventoryZone[];
   self_uri: string;
-  episodeTargets?: InventoryTarget[];
-  countryTargets?: InventoryTarget[];
+  targets?: InventoryTargets;
   _doc?: HalDoc;
 }
 
