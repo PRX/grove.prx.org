@@ -29,6 +29,7 @@ h2 {
   align-items: center;
   justify-content: center;
   button {
+    margin-bottom: 6px;
     color: mat-color($prx-gray, 300);
     &:hover {
       background-color: transparent;

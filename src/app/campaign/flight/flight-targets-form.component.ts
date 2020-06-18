@@ -1,15 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import {
-  ControlContainer,
-  FormGroup,
-  FormArray,
-  FormBuilder,
-  Validators,
-  NG_VALUE_ACCESSOR,
-  NG_VALIDATORS,
-  ControlValueAccessor,
-  FormControl
-} from '@angular/forms';
+import { Component, Input } from '@angular/core';
+import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
 import { InventoryTargets, InventoryTarget, FlightTarget } from '../store/models';
 
 @Component({
@@ -31,7 +21,7 @@ import { InventoryTargets, InventoryTarget, FlightTarget } from '../store/models
           </mat-select>
         </mat-form-field>
         <div class="target-exclude mat-form-field-wrapper">
-          <mat-checkbox>Exclude</mat-checkbox>
+          <mat-checkbox formControlName="exclude">Exclude</mat-checkbox>
         </div>
         <div class="remove-target mat-form-field-wrapper">
           <button mat-icon-button aria-label="Remove target" (click)="removeTarget(i)">
@@ -70,22 +60,20 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   ];
   codeOptions: InventoryTarget[][];
 
+  newFlightTarget(target: FlightTarget) {
+    return new FormGroup({
+      type: new FormControl(target.type, Validators.required),
+      code: new FormControl(target.code, Validators.required),
+      exclude: new FormControl(target.exclude || false)
+    });
+  }
+
   writeValue(targets: FlightTarget[]) {
-    console.log('writeValue', targets);
     this.setCodeOptions(targets);
-    this.targets = new FormArray(
-      (targets || []).map(t => {
-        return new FormGroup({
-          type: new FormControl(t.type, Validators.required),
-          code: new FormControl(t.code, Validators.required),
-          exclude: new FormControl(t.exclude || false)
-        });
-      })
-    );
+    this.targets = new FormArray((targets || []).map(this.newFlightTarget));
     this.targets.valueChanges.subscribe(formTargets => {
-      console.log('valueCHHANGES', JSON.stringify(formTargets));
-      this.onChangeFn(formTargets);
       this.setCodeOptions(formTargets);
+      this.onChangeFn(this.validTargetCodes(formTargets));
     });
   }
 
@@ -97,19 +85,44 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     this.onTouchedFn = fn;
   }
 
-  validate({ value }: FormControl) {
-    console.log('validate', value);
-    return !this.targets || this.targets.valid ? null : { error: 'Some fields are not fullfilled' };
+  validate(_control: FormControl) {
+    return !this.targets || this.targets.valid ? null : { error: 'Invalid targets' };
   }
 
-  setCodeOptions(targets: FlightTarget[]) {
-    console.log('setCodeOptions', targets);
-    this.codeOptions = targets.map(target => {
+  addTarget() {
+    this.targets.markAsDirty();
+    this.targets.push(this.newFlightTarget({ type: '', code: '', exclude: false }));
+  }
+
+  removeTarget(index: number) {
+    this.targets.markAsDirty();
+    this.targets.removeAt(index);
+  }
+
+  private validTargetCodes(targets: FlightTarget[]) {
+    return targets.filter(({ type, code }, index) => {
+      if (!type || !code) {
+        return false;
+      } else if (!this.codeOptions[index].find(opt => opt.code === code)) {
+        // the type changed, and now the code is stale ... clear it!
+        this.targets
+          .at(index)
+          .get('code')
+          .setValue('');
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
+
+  private setCodeOptions(targets: FlightTarget[]) {
+    this.codeOptions = (targets || []).map(target => {
       return this.filteredTargetOptions(target.type, target.code, targets);
     });
   }
 
-  filteredTargetOptions(type: string, code: string, currentTargets: FlightTarget[]) {
+  private filteredTargetOptions(type: string, code: string, currentTargets: FlightTarget[]) {
     return this.targetCodesForType(type).filter(opt => {
       if (opt.type == type && opt.code == code) {
         return true;
@@ -119,7 +132,7 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     });
   }
 
-  targetCodesForType(type: string) {
+  private targetCodesForType(type: string) {
     if (this.targetOptions && type === 'episode') {
       return this.targetOptions.episodes.sort((a, b) => a.label.localeCompare(b.label));
     } else if (this.targetOptions && type === 'country') {
