@@ -54,13 +54,17 @@ export class CampaignActionService implements OnDestroy {
   }
 
   transformFlightForm({ flight, changed, valid }: FlightFormState): FlightFormState {
+    // set goal fields based on delivery mode
     if (flight.deliveryMode === 'uncapped') {
-      return { flight: { ...flight, dailyMinimum: null }, changed, valid };
+      flight = { ...flight, dailyMinimum: null };
     } else if (flight.deliveryMode === 'greedy_uncapped') {
-      return { flight: { ...flight, contractGoal: null, dailyMinimum: null }, changed, valid };
-    } else {
-      return { flight, changed, valid };
+      flight = { ...flight, contractGoal: null, dailyMinimum: null };
     }
+
+    // augury doesn't like null targets
+    flight = { ...flight, targets: flight.targets || [] };
+
+    return { flight, changed, valid };
   }
 
   loadFlightPreview(flight: Flight) {

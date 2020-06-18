@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, switchMap, map, filter, withLatestFrom } from 'rxjs/operators';
+import { catchError, switchMap, map, filter } from 'rxjs/operators';
 import { InventoryService } from '../../../core';
 import { selectCurrentInventory } from '../selectors';
 import * as inventoryActions from '../actions/inventory-action.creator';
@@ -32,7 +32,7 @@ export class InventoryEffects {
     this.actions$.pipe(
       ofType(campaignActions.CampaignLoadSuccess),
       switchMap(_action => this.store.pipe(select(selectCurrentInventory))),
-      filter(inv => !inv.targets),
+      filter(inv => inv && !inv.targets),
       map(inv => inventoryActions.InventoryTargetsLoad({ inventory: inv._doc }))
     )
   );
@@ -41,7 +41,7 @@ export class InventoryEffects {
     this.actions$.pipe(
       ofType(campaignActions.CampaignFlightFormUpdate),
       switchMap(_action => this.store.pipe(select(selectCurrentInventory))),
-      filter(inv => !inv.targets),
+      filter(inv => inv && !inv.targets),
       map(inv => inventoryActions.InventoryTargetsLoad({ inventory: inv._doc }))
     )
   );
