@@ -133,6 +133,15 @@ describe('CampaignActionService', () => {
       expect(service.hasChanged(['one', 'two'], ['one'])).toEqual(true);
     });
 
+    it('compares mismatched arrays', () => {
+      expect(service.hasChanged([], null)).toEqual(false);
+      expect(service.hasChanged([], undefined)).toEqual(false);
+      expect(service.hasChanged([], '')).toEqual(false);
+      expect(service.hasChanged(null, [])).toEqual(false);
+      expect(service.hasChanged([], false)).toEqual(true);
+      expect(service.hasChanged(['one'], null)).toEqual(true);
+    });
+
     it('compares objects', () => {
       expect(service.hasChanged({}, {})).toEqual(false);
       expect(service.hasChanged({ one: 1 }, { one: 1 })).toEqual(false);

@@ -81,6 +81,12 @@ export class CampaignActionService implements OnDestroy {
     if (a instanceof Array && b instanceof Array) {
       // arrays - compare each item if same length
       return a.length !== b.length || a.some((val, idx) => this.hasChanged(val, b[idx]));
+    } else if (a instanceof Array || b instanceof Array) {
+      // array vs non-array - only equal if "empty"
+      return !(
+        (a === undefined || a === null || a === '' || a.length === 0) &&
+        (b === undefined || b === null || b === '' || b.length === 0)
+      );
     } else if (a instanceof Object && b instanceof Object) {
       // objects - compare keys in A to B (ignoring keys missing from A)
       return Object.keys(a).some(key => this.hasChanged(a[key], b[key]));
