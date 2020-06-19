@@ -28,7 +28,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [isPreview]="isPreview$ | async"
       [previewError]="flightPreviewError$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
-      (flightDeleteToggle)="flightDeleteToggle($event)"
+      (flightDeleteToggle)="flightDeleteToggle()"
       (flightDuplicate)="flightDuplicate($event)"
     ></grove-flight>
   `,
