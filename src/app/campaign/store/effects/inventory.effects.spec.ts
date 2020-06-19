@@ -68,7 +68,7 @@ describe('InventoryEffects', () => {
   it('loads inventory targets', () => {
     const success = inventoryActions.InventoryTargetsLoadSuccess({ doc: inventoryTargetsDocFixture });
 
-    actions$.stream = hot('-a', { a: inventoryActions.InventoryTargetsLoad({ inventoryId: 1 }) });
+    actions$.stream = hot('-a', { a: inventoryActions.InventoryTargetsLoad({ inventory: 1 }) });
     const expected = cold('-r', { r: success });
     expect(effects.loadInventoryTargets$).toBeObservable(expected);
   });
@@ -78,7 +78,7 @@ describe('InventoryEffects', () => {
     service.loadInventoryTargets = jest.fn(() => cold('#', {}, error));
 
     const outcome = inventoryActions.InventoryTargetsLoadFailure({ error });
-    actions$.stream = hot('-a', { a: inventoryActions.InventoryTargetsLoad({ inventoryId: 1 }) });
+    actions$.stream = hot('-a', { a: inventoryActions.InventoryTargetsLoad({ inventory: 1 }) });
     const expected = cold('-(b|)', { b: outcome });
     expect(effects.loadInventoryTargets$).toBeObservable(expected);
   });
