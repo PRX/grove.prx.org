@@ -19,6 +19,7 @@ export interface InventoryTarget {
   type: string;
   code: string;
   label: string;
+  metadata?: any;
 }
 
 export interface InventoryTargets {

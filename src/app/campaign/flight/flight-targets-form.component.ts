@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
 import { InventoryTargets, InventoryTarget, FlightTarget } from '../store/models';
+import moment from 'moment';
 
 @Component({
   selector: 'grove-flight-targets',
@@ -134,11 +135,31 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
 
   private targetCodesForType(type: string) {
     if (this.targetOptions && type === 'episode') {
-      return this.targetOptions.episodes.sort((a, b) => a.label.localeCompare(b.label));
+      return this.targetOptions.episodes.sort(this.compareEpisodes).map(this.formatEpisodeLabel);
     } else if (this.targetOptions && type === 'country') {
       return this.targetOptions.countries.sort((a, b) => a.label.localeCompare(b.label));
     } else {
       return [];
+    }
+  }
+
+  private compareEpisodes(a: InventoryTarget, b: InventoryTarget) {
+    const apub = a.metadata ? a.metadata.publishedAt || a.metadata.releasedAt : null;
+    const bpub = b.metadata ? b.metadata.publishedAt || b.metadata.releasedAt : null;
+    if (apub && bpub) {
+      return bpub.localeCompare(apub);
+    } else {
+      return a.label.localeCompare(b.label);
+    }
+  }
+
+  private formatEpisodeLabel(t: InventoryTarget) {
+    const pub = t.metadata ? t.metadata.publishedAt || t.metadata.releasedAt : null;
+    if (pub) {
+      const date = moment(pub).format('l');
+      return { ...t, label: `${date} - ${t.label}` };
+    } else {
+      return t;
     }
   }
 }

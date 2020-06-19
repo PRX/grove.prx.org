@@ -28,7 +28,7 @@ class ParentFormComponent {
   };
 }
 
-describe('FlightFormComponent', () => {
+describe('FlightTargetsFormComponent', () => {
   let parent: ParentFormComponent;
   let component: FlightTargetsFormComponent;
   let fixture: ComponentFixture<ParentFormComponent>;
@@ -128,5 +128,20 @@ describe('FlightFormComponent', () => {
 
     component.targets.at(0).setValue({ type: 'episode', code: '', exclude: false });
     expect(component.codeOptions[0]).toEqual(parent.options.episodes);
+  });
+
+  it('sorts episode options by publish date', () => {
+    component.targetOptions = {
+      inventoryId: 1234,
+      countries: [],
+      episodes: [
+        { type: 'episode', code: 'A', label: 'Ep A', metadata: { publishedAt: '2020-02-12T00:00:00.000Z' } },
+        { type: 'episode', code: 'B', label: 'Ep B', metadata: { releasedAt: '2020-01-22T00:00:00.000Z' } },
+        { type: 'episode', code: 'C', label: 'Ep C', metadata: { publishedAt: '2020-02-02T00:00:00.000Z' } },
+        { type: 'episode', code: 'D', label: 'Ep D', metadata: { publishedAt: '2020-02-22T00:00:00.000Z' } }
+      ]
+    };
+    parent.flightForm.reset({ targets: [{ type: 'episode', code: '', exclude: false }] });
+    expect(component.codeOptions[0].map(o => o.code)).toEqual(['D', 'A', 'C', 'B']);
   });
 });
