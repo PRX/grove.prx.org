@@ -10,6 +10,7 @@ import {
   selectRoutedFlightPreviewError,
   selectFlightDaysRollup,
   selectIsFlightPreview,
+  selectIsFlightPreviewLoading,
   selectAllInventoryOrderByName,
   selectCurrentInventoryZones,
   selectCurrentInventoryTargets
@@ -26,6 +27,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
       [isPreview]="isPreview$ | async"
+      [isLoading]="isLoading$ | async"
       [previewError]="flightPreviewError$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
       (flightDeleteToggle)="flightDeleteToggle()"
@@ -40,6 +42,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightChanged$: Observable<boolean>;
   inventoryRollup$: Observable<InventoryRollup>;
   isPreview$: Observable<boolean>;
+  isLoading$: Observable<boolean>;
   currentInventoryUri$: Observable<string>;
   flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
@@ -57,6 +60,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightPreviewError$ = this.store.pipe(select(selectRoutedFlightPreviewError));
     this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
+    this.isLoading$ = this.store.pipe(select(selectIsFlightPreviewLoading));
     this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
     this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));

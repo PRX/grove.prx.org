@@ -5,6 +5,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
 @Component({
   selector: 'grove-inventory-table',
   template: `
+    <div *ngIf="isLoading" class="loading"><mat-spinner diameter="50"></mat-spinner></div>
     <div class="row head">
       <div class="expand"></div>
       <div class="date">Week</div>
@@ -130,6 +131,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
 export class InventoryTableComponent {
   @Input() flight: Flight;
   @Input() rollup: InventoryRollup;
+  @Input() isLoading: boolean;
   @Input() isPreview: boolean;
   zoneWeekExpanded = {};
 

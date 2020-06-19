@@ -29,7 +29,14 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
         (addZone)="onAddZone()"
         (removeZone)="onRemoveZone($event)"
       ></grove-flight-form>
-      <grove-inventory [flight]="flight" [zones]="zoneOptions" [rollup]="rollup" [isPreview]="isPreview" [previewError]="previewError">
+      <grove-inventory
+        [flight]="flight"
+        [zones]="zoneOptions"
+        [rollup]="rollup"
+        [isPreview]="isPreview"
+        [isLoading]="isLoading"
+        [previewError]="previewError"
+      >
       </grove-inventory>
     </form>
   `,
@@ -42,6 +49,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() targetOptions: InventoryTargets;
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
+  @Input() isLoading: boolean;
   @Input() previewError: any;
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
