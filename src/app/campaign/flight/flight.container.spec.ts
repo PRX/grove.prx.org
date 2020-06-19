@@ -12,6 +12,7 @@ import {
   MatInputModule,
   MatListModule,
   MatSelectModule,
+  MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatCheckboxModule
 } from '@angular/material';
@@ -92,6 +93,7 @@ describe('FlightContainerComponent', () => {
         MatInputModule,
         MatListModule,
         MatSelectModule,
+        MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatCheckboxModule,
         StoreModule.forRoot(

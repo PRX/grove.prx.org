@@ -8,6 +8,7 @@ import {
   MatInputModule,
   MatSelectModule,
   MatCheckboxModule,
+  MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatDatepickerModule,
   DateAdapter,
@@ -61,6 +62,7 @@ describe('FlightFormControlContainerComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatCheckboxModule,
+        MatProgressSpinnerModule,
         MatSlideToggleModule,
         SharedModule
       ],

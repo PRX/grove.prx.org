@@ -3,7 +3,7 @@ import { DebugElement } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule } from '@angular/material';
+import { MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressSpinnerModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 import { InventoryTableComponent } from './inventory-table.component';
 import { InventoryRollup } from '../store/models';
@@ -65,7 +65,8 @@ describe('InventoryTableComponent', () => {
         MatDividerModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        MatProgressSpinnerModule
       ],
       declarations: [InventoryTableComponent]
     })
