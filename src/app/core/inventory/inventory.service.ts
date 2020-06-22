@@ -12,7 +12,7 @@ export class InventoryService {
   }
 
   loadInventoryTargets(inventory: number | HalDoc): Observable<HalDoc> {
-    if (inventory instanceof HalDoc) {
+    if (inventory instanceof HalDoc && inventory.follow) {
       return inventory.follow('prx:targets');
     } else {
       return this.augury.follow('prx:inventory', { id: inventory }).follow('prx:targets');
