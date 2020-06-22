@@ -42,6 +42,7 @@ import moment from 'moment';
   ]
 })
 export class FlightTargetsFormComponent implements ControlValueAccessor {
+  // tslint:disable-next-line
   private _targetOptions: InventoryTargets;
   get targetOptions() {
     return this._targetOptions;
@@ -86,6 +87,7 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     this.onTouchedFn = fn;
   }
 
+  // tslint:disable-next-line
   validate(_control: FormControl) {
     return !this.targets || this.targets.valid ? null : { error: 'Invalid targets' };
   }
@@ -125,10 +127,10 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
 
   private filteredTargetOptions(type: string, code: string, currentTargets: FlightTarget[]) {
     return this.targetCodesForType(type).filter(opt => {
-      if (opt.type == type && opt.code == code) {
+      if (opt.type === type && opt.code === code) {
         return true;
       } else {
-        return !currentTargets.find(t => opt.type == t.type && opt.code == t.code);
+        return !currentTargets.find(t => opt.type === t.type && opt.code === t.code);
       }
     });
   }

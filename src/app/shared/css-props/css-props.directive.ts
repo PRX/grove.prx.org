@@ -7,6 +7,7 @@ import { Directive, ElementRef, Input, OnChanges, SimpleChanges } from '@angular
  * Can work for any style properties.
  */
 @Directive({
+  // tslint:disable-next-line
   selector: '[cssProps]'
 })
 export class CSSPropsDirective implements OnChanges {

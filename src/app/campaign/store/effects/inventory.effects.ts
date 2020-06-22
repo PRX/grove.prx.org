@@ -31,7 +31,7 @@ export class InventoryEffects {
   loadInventoryTargetsOnCampaignLoad$ = createEffect(() =>
     this.actions$.pipe(
       ofType(campaignActions.CampaignLoadSuccess),
-      switchMap(_action => this.store.pipe(select(selectCurrentInventory))),
+      switchMap(_ => this.store.pipe(select(selectCurrentInventory))),
       filter(inv => inv && !inv.targets),
       map(inv => inventoryActions.InventoryTargetsLoad({ inventory: inv._doc }))
     )
@@ -40,7 +40,7 @@ export class InventoryEffects {
   loadInventoryTargetsOnFormChange$ = createEffect(() =>
     this.actions$.pipe(
       ofType(campaignActions.CampaignFlightFormUpdate),
-      switchMap(_action => this.store.pipe(select(selectCurrentInventory))),
+      switchMap(_ => this.store.pipe(select(selectCurrentInventory))),
       filter(inv => inv && !inv.targets),
       map(inv => inventoryActions.InventoryTargetsLoad({ inventory: inv._doc }))
     )
