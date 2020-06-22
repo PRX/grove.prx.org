@@ -20,7 +20,18 @@ describe('AccountEffects', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [StoreModule.forRoot({}), EffectsModule.forRoot([AccountEffects])],
+      imports: [
+        StoreModule.forRoot(
+          {},
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        EffectsModule.forRoot([AccountEffects])
+      ],
       providers: [
         AccountEffects,
         {

@@ -18,6 +18,7 @@ export interface FlightDays {
   flightId: number;
   days: FlightDay[];
   preview?: boolean;
+  loading?: boolean;
   previewError?: any;
 }
 export interface InventoryWeeklyRollup {
@@ -52,6 +53,7 @@ export const docToFlightDays = (
       date: utc(doc['date']).toDate()
     })),
     preview,
+    loading: false,
     previewError
   };
 };

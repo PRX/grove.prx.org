@@ -39,7 +39,15 @@ describe('CampaignComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule.withRoutes(campaignRoutes),
-        StoreModule.forRoot({ router: routerReducer }),
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
         StoreModule.forFeature('campaignState', reducers),
         SharedModule,

@@ -29,7 +29,15 @@ describe('CampaignFormContainerComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
-        StoreModule.forRoot({}),
+        StoreModule.forRoot(
+          {},
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         StoreModule.forFeature('campaignState', reducers)
       ],
       declarations: [CampaignFormContainerComponent, CampaignFormComponent]

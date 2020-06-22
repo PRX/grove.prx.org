@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +23,7 @@ import { AccountEffects } from './store/effects/account.effects';
 import { AdvertiserEffects } from './store/effects/advertiser.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
 import { FlightPreviewEffects } from './store/effects/flight-preview.effects';
+import { InventoryEffects } from './store/effects/inventory.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 
@@ -36,6 +38,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatCheckboxModule,
     MatSlideToggleModule,
     MatSidenavModule,
     MatListModule,
@@ -47,7 +50,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     FancyFormModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
-    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects])
+    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects, InventoryEffects])
   ],
   providers: [CampaignActionService]
 })

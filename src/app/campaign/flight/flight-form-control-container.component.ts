@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Inventory, InventoryZone, filterZones } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
 
 export const validateMp3 = (control: AbstractControl): { [key: string]: any } | null => {
   if (control.value) {
@@ -18,10 +17,11 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
 @Component({
   selector: 'grove-flight',
   template: `
-    <form [formGroup]="flightForm" *ngIf="flightForm && zoneOptions">
+    <form [formGroup]="flightForm">
       <grove-flight-form
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
+        [targetOptions]="targetOptions"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
@@ -29,7 +29,14 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
         (addZone)="onAddZone()"
         (removeZone)="onRemoveZone($event)"
       ></grove-flight-form>
-      <grove-inventory [flight]="flight" [zones]="zoneOptions" [rollup]="rollup" [isPreview]="isPreview" [previewError]="previewError">
+      <grove-inventory
+        [flight]="flight"
+        [zones]="zoneOptions"
+        [rollup]="rollup"
+        [isPreview]="isPreview"
+        [isLoading]="isLoading"
+        [previewError]="previewError"
+      >
       </grove-inventory>
     </form>
   `,
@@ -39,8 +46,10 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
 export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
+  @Input() targetOptions: InventoryTargets;
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
+  @Input() isLoading: boolean;
   @Input() previewError: any;
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
@@ -84,6 +93,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     contractStartAt: [''],
     contractEndAt: [''],
     zones: this.fb.array([]),
+    targets: [''],
     set_inventory_uri: ['', Validators.required],
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],

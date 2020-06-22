@@ -32,5 +32,11 @@ export enum ActionTypes {
   CAMPAIGN_ADVERTISERS_LOAD_FAILURE = '[Campaign] Advertisers Load Failure',
   CAMPAIGN_ADD_ADVERTISER = '[Campaign] Add Advertiser',
   CAMPAIGN_ADD_ADVERTISER_SUCCESS = '[Campaign] Add Advertiser Success',
-  CAMPAIGN_ADD_ADVERTISER_FAILURE = '[Campaign] Add Advertiser Failure'
+  CAMPAIGN_ADD_ADVERTISER_FAILURE = '[Campaign] Add Advertiser Failure',
+  CAMPAIGN_INVENTORY_LOAD = '[Campaign] Inventory Load',
+  CAMPAIGN_INVENTORY_LOAD_SUCCESS = '[Campaign] Inventory Load Success',
+  CAMPAIGN_INVENTORY_LOAD_FAILURE = '[Campaign] Inventory Load Failure',
+  CAMPAIGN_INVENTORY_TARGETS_LOAD = '[Campaign] Inventory Targets Load',
+  CAMPAIGN_INVENTORY_TARGETS_LOAD_SUCCESS = '[Campaign] Inventory Targets Load Success',
+  CAMPAIGN_INVENTORY_TARGETS_LOAD_FAILURE = '[Campaign] Inventory Targets Load Failure'
 }

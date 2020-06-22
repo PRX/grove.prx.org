@@ -28,7 +28,18 @@ describe('FlightPreviewEffects', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [StoreModule.forRoot({}), EffectsModule.forRoot([FlightPreviewEffects])],
+      imports: [
+        StoreModule.forRoot(
+          {},
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        EffectsModule.forRoot([FlightPreviewEffects])
+      ],
       providers: [
         FlightPreviewEffects,
         {

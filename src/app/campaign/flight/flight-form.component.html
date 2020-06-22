@@ -75,6 +75,7 @@
         <a mat-button routerLink="." (click)="addZone.emit()"> <mat-icon>add</mat-icon> Add a creative </a>
       </div>
     </fieldset>
+    <grove-flight-targets formControlName="targets" [targetOptions]="targetOptions"> </grove-flight-targets>
   </div>
   <div class="flight-controls-container">
     <button

@@ -1,12 +1,20 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
 import { Moment, utc } from 'moment';
+
 export interface FlightZone {
   id: string;
   label?: string;
   url?: string;
   fileSize?: number;
   mimeType?: string;
+}
+
+export interface FlightTarget {
+  type: string;
+  code: string;
+  label?: string;
+  exclude?: boolean;
 }
 
 export interface Flight {
@@ -16,6 +24,7 @@ export interface Flight {
   endAt: Moment;
   set_inventory_uri: string;
   zones: FlightZone[];
+  targets?: FlightTarget[];
   totalGoal?: number;
   actualCount?: number;
   dailyMinimum?: number;
@@ -48,7 +57,7 @@ export const docToFlight = (doc: HalDoc): Flight => {
   return flight;
 };
 
-export const duplicateFlightState = (flight: Flight, tempId: number, changed, valid): FlightState => {
+export const duplicateFlightState = (flight: Flight, tempId: number, changed: boolean, valid: boolean): FlightState => {
   // remove createdAt, startAt, endAt, and set temp id
   const { createdAt, startAt, endAt, name, ...dupFlight } = flight;
 

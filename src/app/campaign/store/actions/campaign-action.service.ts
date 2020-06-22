@@ -54,13 +54,17 @@ export class CampaignActionService implements OnDestroy {
   }
 
   transformFlightForm({ flight, changed, valid }: FlightFormState): FlightFormState {
+    // set goal fields based on delivery mode
     if (flight.deliveryMode === 'uncapped') {
-      return { flight: { ...flight, dailyMinimum: null }, changed, valid };
+      flight = { ...flight, dailyMinimum: null };
     } else if (flight.deliveryMode === 'greedy_uncapped') {
-      return { flight: { ...flight, contractGoal: null, dailyMinimum: null }, changed, valid };
-    } else {
-      return { flight, changed, valid };
+      flight = { ...flight, contractGoal: null, dailyMinimum: null };
     }
+
+    // augury doesn't like null targets
+    flight = { ...flight, targets: flight.targets || [] };
+
+    return { flight, changed, valid };
   }
 
   loadFlightPreview(flight: Flight) {
@@ -77,6 +81,12 @@ export class CampaignActionService implements OnDestroy {
     if (a instanceof Array && b instanceof Array) {
       // arrays - compare each item if same length
       return a.length !== b.length || a.some((val, idx) => this.hasChanged(val, b[idx]));
+    } else if (a instanceof Array || b instanceof Array) {
+      // array vs non-array - only equal if "empty"
+      return !(
+        (a === undefined || a === null || a === '' || a.length === 0) &&
+        (b === undefined || b === null || b === '' || b.length === 0)
+      );
     } else if (a instanceof Object && b instanceof Object) {
       // objects - compare keys in A to B (ignoring keys missing from A)
       return Object.keys(a).some(key => this.hasChanged(a[key], b[key]));
@@ -101,7 +111,7 @@ export class CampaignActionService implements OnDestroy {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'totalGoal', 'dailyMinimum', 'deliveryMode'];
+    const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode'];
     return check.some(fld => {
       if (this.hasChanged(b[fld], a[fld])) {
         // console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);

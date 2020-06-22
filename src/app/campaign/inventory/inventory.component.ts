@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
-import { InventoryZone } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
+import { Flight, InventoryRollup, InventoryZone } from '../store/models';
 
 @Component({
   selector: 'grove-inventory',
@@ -17,7 +16,13 @@ import { Flight, InventoryRollup } from '../store/models';
       <mat-divider></mat-divider>
       <section>
         <h3 class="title">{{ zoneNames }}</h3>
-        <grove-inventory-table *ngIf="rollup" [flight]="flight" [rollup]="rollup" [isPreview]="isPreview"></grove-inventory-table>
+        <grove-inventory-table
+          *ngIf="rollup"
+          [flight]="flight"
+          [rollup]="rollup"
+          [isPreview]="isPreview"
+          [isLoading]="isLoading"
+        ></grove-inventory-table>
       </section>
     </ng-template>
   `,
@@ -29,6 +34,7 @@ export class InventoryComponent {
   @Input() zones: InventoryZone[];
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
+  @Input() isLoading: boolean;
   @Input() previewError: any;
   @Output() goalChange = new EventEmitter<Flight>();
   zoneWeekExpanded = {};

@@ -1,9 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable, combineLatest, Subscription } from 'rxjs';
-import { Inventory, InventoryService, InventoryZone } from '../../core';
-import { Flight, InventoryRollup } from '../store/models';
-import { map } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -11,23 +9,28 @@ import {
   selectCurrentInventoryUri,
   selectRoutedFlightPreviewError,
   selectFlightDaysRollup,
-  selectIsFlightPreview
+  selectIsFlightPreview,
+  selectIsFlightPreviewLoading,
+  selectAllInventoryOrderByName,
+  selectCurrentInventoryZones,
+  selectCurrentInventoryTargets
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
 @Component({
   template: `
     <grove-flight
-      *ngIf="zoneOptions$ | async as zoneOpts"
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
+      [targetOptions]="targetOptions$ | async"
       [flight]="flightLocal$ | async"
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
       [isPreview]="isPreview$ | async"
+      [isLoading]="isLoading$ | async"
       [previewError]="flightPreviewError$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
-      (flightDeleteToggle)="flightDeleteToggle($event)"
+      (flightDeleteToggle)="flightDeleteToggle()"
       (flightDuplicate)="flightDuplicate($event)"
     ></grove-flight>
   `,
@@ -39,13 +42,15 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightChanged$: Observable<boolean>;
   inventoryRollup$: Observable<InventoryRollup>;
   isPreview$: Observable<boolean>;
+  isLoading$: Observable<boolean>;
   currentInventoryUri$: Observable<string>;
   flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
+  targetOptions$: Observable<InventoryTargets>;
   flightSub: Subscription;
 
-  constructor(private inventoryService: InventoryService, private store: Store<any>, private campaignAction: CampaignActionService) {}
+  constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
 
   ngOnInit() {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
@@ -55,14 +60,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightPreviewError$ = this.store.pipe(select(selectRoutedFlightPreviewError));
     this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
-
-    this.inventoryOptions$ = this.inventoryService.listInventory();
-    this.zoneOptions$ = combineLatest([this.inventoryOptions$, this.currentInventoryUri$]).pipe(
-      map(([options, uri]) => {
-        const inventory = options.find(i => i.self_uri === uri);
-        return inventory ? inventory.zones : [];
-      })
-    );
+    this.isLoading$ = this.store.pipe(select(selectIsFlightPreviewLoading));
+    this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
+    this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
+    this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
   }
 
   ngOnDestroy() {

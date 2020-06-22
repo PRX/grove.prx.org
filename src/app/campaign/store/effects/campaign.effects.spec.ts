@@ -29,7 +29,15 @@ describe('CampaignEffects', () => {
     TestBed.configureTestingModule({
       declarations: [TestComponent],
       imports: [
-        StoreModule.forRoot({ ...reducers }),
+        StoreModule.forRoot(
+          { ...reducers },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
         EffectsModule.forRoot([CampaignEffects]),
         RouterTestingModule.withRoutes(campaignRoutes)
       ],

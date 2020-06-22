@@ -6,6 +6,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatSelectModule,
+  MatCheckboxModule,
   MatButtonModule,
   MatIconModule,
   MatDatepickerModule,
@@ -22,9 +23,9 @@ import {
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightFormComponent } from './flight-form.component';
-import { Flight } from '../store/models';
+import { FlightTargetsFormComponent } from './flight-targets-form.component';
+import { Flight, Inventory } from '../store/models';
 import * as moment from 'moment';
-import { Inventory } from '../../core/';
 import { validateMp3 } from './flight-form-control-container.component';
 
 const inventoryFixture: Inventory[] = [
@@ -83,6 +84,7 @@ class ParentFormComponent {
     contractStartAt: [''],
     contractEndAt: [''],
     zones: this.fb.array([this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] })]),
+    targets: [''],
     set_inventory_uri: ['', Validators.required]
   });
 }
@@ -101,12 +103,13 @@ describe('FlightFormComponent', () => {
         MatFormFieldModule,
         MatInputModule,
         MatSelectModule,
+        MatCheckboxModule,
         MatDatepickerModule,
         MatMomentDateModule,
         MatButtonModule,
         MatIconModule
       ],
-      declarations: [ParentFormComponent, FlightFormComponent],
+      declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent],
       providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
         { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },

@@ -47,6 +47,9 @@ const _reducer = createReducer(
     }
     return newState;
   }),
+  on(flightPreviewActions.FlightPreviewCreate, (state, action) => {
+    return adapter.updateOne({ id: action.flight.id, changes: { loading: true } }, state);
+  }),
   on(flightPreviewActions.FlightPreviewCreateSuccess, (state, action) => {
     const { flight, flightDoc, flightDaysDocs } = action;
     return adapter.upsertOne(docToFlightDays(flightDoc, flight.id, flightDaysDocs, true), state);

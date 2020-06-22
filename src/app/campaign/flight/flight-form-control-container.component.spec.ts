@@ -7,6 +7,8 @@ import {
   MatIconModule,
   MatInputModule,
   MatSelectModule,
+  MatCheckboxModule,
+  MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatDatepickerModule,
   DateAdapter,
@@ -24,6 +26,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
 import { FlightFormComponent } from './flight-form.component';
+import { FlightTargetsFormComponent } from './flight-targets-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
@@ -58,12 +61,15 @@ describe('FlightFormControlContainerComponent', () => {
         MatMomentDateModule,
         MatButtonModule,
         MatIconModule,
+        MatCheckboxModule,
+        MatProgressSpinnerModule,
         MatSlideToggleModule,
         SharedModule
       ],
       declarations: [
         FlightFormControlContainerComponent,
         FlightFormComponent,
+        FlightTargetsFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent

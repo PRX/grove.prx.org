@@ -1,0 +1,39 @@
+@import '~src/sass/colors';
+
+:host {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  margin-bottom: 0.5em;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.inline-fields {
+  display: grid;
+  grid-column-gap: 0.5rem;
+  grid-template-columns: 1fr 5fr 1fr 40px;
+
+  // allow < 180px width selects
+  ::ng-deep .mat-form-field-infix {
+    width: auto;
+    min-width: 80px;
+  }
+}
+
+.target-exclude,
+.remove-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  button {
+    margin-bottom: 6px;
+    color: mat-color($prx-gray, 300);
+    &:hover {
+      background-color: transparent;
+      color: mat-color($prx-gray, 600);
+    }
+  }
+}

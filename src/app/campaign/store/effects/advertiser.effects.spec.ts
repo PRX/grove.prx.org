@@ -23,7 +23,18 @@ describe('AdvertiserEffects', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [StoreModule.forRoot({}), EffectsModule.forRoot([AdvertiserEffects])],
+      imports: [
+        StoreModule.forRoot(
+          {},
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        EffectsModule.forRoot([AdvertiserEffects])
+      ],
       providers: [
         AdvertiserEffects,
         {
