@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { FlightPreviewService } from '../../../core';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 
@@ -10,7 +10,7 @@ export class FlightPreviewEffects {
   createFlightPreview$ = createEffect(() =>
     this.actions$.pipe(
       ofType(flightPreviewActions.FlightPreviewCreate),
-      mergeMap(action => {
+      switchMap(action => {
         const { flight, flightDoc, campaignDoc } = action;
         return this.flightPreviewService.createFlightPreview(flight, flightDoc, campaignDoc).pipe(
           map(({ status, statusMessage, days: flightDaysDocs }) => {
