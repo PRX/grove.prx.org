@@ -109,6 +109,10 @@ const _reducer = createReducer(
   on(campaignActions.CampaignDeleteFailure, (state, action) => ({
     ...state,
     error: action.error
+  })),
+  on(campaignActions.CampaignDismissError, (state, action) => ({
+    ...state,
+    error: null
   }))
 );
 

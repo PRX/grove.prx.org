@@ -14,6 +14,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -25,6 +26,7 @@ import { CampaignEffects } from './store/effects/campaign.effects';
 import { FlightPreviewEffects } from './store/effects/flight-preview.effects';
 import { InventoryEffects } from './store/effects/inventory.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
+import { CampaignErrorService } from './campaign-error.service';
 import { campaignRouting, campaignComponents } from './campaign.routing';
 
 @NgModule({
@@ -44,6 +46,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     MatListModule,
     MatProgressSpinnerModule,
     MatMenuModule,
+    MatSnackBarModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,
@@ -52,6 +55,10 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
     EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, FlightPreviewEffects, InventoryEffects])
   ],
-  providers: [CampaignActionService]
+  providers: [
+    CampaignActionService,
+    CampaignErrorService,
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { horizontalPosition: 'center', verticalPosition: 'top' } }
+  ]
 })
 export class CampaignModule {}

@@ -15,6 +15,7 @@ export enum ActionTypes {
   CAMPAIGN_DELETE = '[Campaign] Campaign Delete',
   CAMPAIGN_DELETE_SUCCESS = '[Campaign] Campaign Delete Success',
   CAMPAIGN_DELETE_FAILURE = '[Campaign] Campaign Delete Failure',
+  CAMPAIGN_DISMISS_ERROR = '[Campaign] Dismiss Error',
   CAMPAIGN_ADD_FLIGHT = '[Campaign] Add Flight',
   CAMPAIGN_ADD_FLIGHT_WITH_TEMP_ID = '[Campaign] Add Flight With Temp Id',
   CAMPAIGN_DUP_FLIGHT = '[Campaign] Dup Flight',
