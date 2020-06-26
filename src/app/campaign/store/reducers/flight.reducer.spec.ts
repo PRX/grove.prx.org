@@ -44,8 +44,9 @@ describe('Flight Reducer', () => {
 
   it('should create a new flight', () => {
     const result = reducer(initialState, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
-    const newFlight = selectAll(result).find(flight => !flight.remoteFlight);
-    expect(newFlight.localFlight.name).toContain('New Flight');
+    const newFlightState = selectAll(result).find(flight => !flight.remoteFlight);
+    expect(newFlightState.localFlight.name).toContain('New Flight');
+    expect(newFlightState.valid).toBeFalsy();
   });
 
   it('should duplicate a flight', () => {

@@ -59,7 +59,7 @@ const _reducer = createReducer(
         set_inventory_uri: null
       },
       changed: false,
-      valid: true
+      valid: false
     };
     return adapter.addOne(initialFlightState, state);
   }),
