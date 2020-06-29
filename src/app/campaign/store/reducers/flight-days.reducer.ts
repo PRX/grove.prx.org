@@ -57,7 +57,7 @@ const _reducer = createReducer(
   on(flightPreviewActions.FlightPreviewCreateFailure, (state, action) => {
     const { error: previewError, flight } = action;
     const days = state.entities[flight.id] ? state.entities[flight.id].days : [];
-    return adapter.upsertOne({ flightId: flight.id, days, preview: false, previewError }, state);
+    return adapter.upsertOne({ flightId: flight.id, days, loading: false, preview: false, previewError }, state);
   })
 );
 
