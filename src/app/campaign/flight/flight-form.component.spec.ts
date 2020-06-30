@@ -10,6 +10,7 @@ import {
   MatButtonModule,
   MatIconModule,
   MatDatepickerModule,
+  MatSlideToggleModule,
   DateAdapter,
   MAT_DATE_LOCALE,
   MAT_DATE_FORMATS
@@ -85,7 +86,8 @@ class ParentFormComponent {
     contractEndAt: [''],
     zones: this.fb.array([this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] })]),
     targets: [''],
-    set_inventory_uri: ['', Validators.required]
+    set_inventory_uri: ['', Validators.required],
+    isCompanion: [false]
   });
 }
 
@@ -107,7 +109,8 @@ describe('FlightFormComponent', () => {
         MatDatepickerModule,
         MatMomentDateModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
+        MatSlideToggleModule
       ],
       declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent],
       providers: [

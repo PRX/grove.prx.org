@@ -7,13 +7,15 @@
     <div class="inline-fields">
       <mat-form-field appearance="outline">
         <mat-label>Actual Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" [max]="flight?.endAt" placeholder="Actual Start Date" formControlName="startAt" />
+        <input matInput [matDatepicker]="startPicker" [max]="flight?.endAt" placeholder="Actual Start Date"
+          formControlName="startAt" />
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Actual End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" [min]="flight?.startAt" placeholder="Actual End Date" formControlName="endAt" />
+        <input matInput [matDatepicker]="endPicker" [min]="flight?.startAt" placeholder="Actual End Date"
+          formControlName="endAt" />
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
@@ -21,25 +23,15 @@
     <div class="inline-fields">
       <mat-form-field appearance="outline">
         <mat-label>Contract Start Date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="contractStartPicker"
-          [max]="flight?.contractEndAt"
-          placeholder="Contract Start Date"
-          formControlName="contractStartAt"
-        />
+        <input matInput [matDatepicker]="contractStartPicker" [max]="flight?.contractEndAt"
+          placeholder="Contract Start Date" formControlName="contractStartAt" />
         <mat-datepicker-toggle matSuffix [for]="contractStartPicker"></mat-datepicker-toggle>
         <mat-datepicker #contractStartPicker></mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Contract End Date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="contractEndPicker"
-          [min]="flight?.contractStartAt"
-          placeholder="Contract End Date"
-          formControlName="contractEndAt"
-        />
+        <input matInput [matDatepicker]="contractEndPicker" [min]="flight?.contractStartAt"
+          placeholder="Contract End Date" formControlName="contractEndAt" />
         <mat-datepicker-toggle matSuffix [for]="contractEndPicker"></mat-datepicker-toggle>
         <mat-datepicker #contractEndPicker></mat-datepicker>
       </mat-form-field>
@@ -50,41 +42,43 @@
         <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <fieldset class="flight-zones" formArrayName="zones">
-      <h2>Zones</h2>
-      <div *ngFor="let zone of zonesControls.controls; let i = index" [formGroup]="zone" class="inline-fields">
-        <mat-form-field class="zone-name" appearance="outline">
-          <mat-label>Zone Name</mat-label>
-          <mat-select formControlName="id" required>
-            <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Creative Url</mat-label>
-          <input matInput formControlName="url" autocomplete="off" placeholder="Leave blank for a 0-second MP3" />
-          <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
-          <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
-        </mat-form-field>
-        <div *ngIf="zonesControls?.length > 1" class="remove-zone mat-form-field-wrapper">
-          <button mat-icon-button aria-label="Remove zone" (click)="removeZone.emit(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
+    <div class="flight-zones">
+      <div class="flight-zones-header">
+        <h2>Zones</h2>
+        <mat-slide-toggle formControlName="isCompanion">Companions</mat-slide-toggle>
+      </div>
+      <fieldset formArrayName="zones">
+        <div *ngFor="let zone of zonesControls.controls; let i = index" [formGroup]="zone" class="inline-fields">
+          <mat-form-field class="zone-name" appearance="outline">
+            <mat-label>Zone Name</mat-label>
+            <mat-select formControlName="id" required>
+              <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Creative Url</mat-label>
+            <input matInput formControlName="url" autocomplete="off" placeholder="Leave blank for a 0-second MP3" />
+            <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
+            <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
+          </mat-form-field>
+          <div *ngIf="zonesControls?.length > 1" class="remove-zone mat-form-field-wrapper">
+            <button mat-icon-button aria-label="Remove zone" (click)="removeZone.emit(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
-      </div>
+      </fieldset>
       <div class="add-zone" *ngIf="zonesControls?.length < zoneOptions?.length">
-        <a mat-button routerLink="." (click)="addZone.emit()"> <mat-icon>add</mat-icon> Add a creative </a>
+        <a mat-button routerLink="." (click)="addZone.emit()">
+          <mat-icon>add</mat-icon> {{ addCreativeLabel }}
+        </a>
       </div>
-    </fieldset>
+    </div>
     <grove-flight-targets formControlName="targets" [targetOptions]="targetOptions"> </grove-flight-targets>
   </div>
   <div class="flight-controls-container">
-    <button
-      (click)="onFlightDeleteToggle()"
-      mat-fab
-      [color]="softDeleted ? 'primary' : 'warn'"
-      [attr.aria-label]="softDeleted ? 'Restore flight' : 'Delete flight'"
-      *ngIf="canBeDeleted"
-    >
+    <button (click)="onFlightDeleteToggle()" mat-fab [color]="softDeleted ? 'primary' : 'warn'"
+      [attr.aria-label]="softDeleted ? 'Restore flight' : 'Delete flight'" *ngIf="canBeDeleted">
       <mat-icon>{{ softDeleted ? 'restore_from_trash' : 'delete' }}</mat-icon>
     </button>
     <button (click)="onFlightDuplicate()" mat-fab color="primary" aria-label="Copy flight">

@@ -35,6 +35,7 @@ export interface Flight {
   contractGoal?: number;
   contractStartAt?: Moment;
   contractEndAt?: Moment;
+  isCompanion?: boolean;
 }
 
 export interface FlightState {
