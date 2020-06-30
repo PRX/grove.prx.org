@@ -57,23 +57,7 @@ mat-card {
     font-size: 22px;
     font-weight: 400;
   }
-  .inline-fields {
-    grid-template-columns: 1fr 3fr 40px;
-  }
-  .remove-zone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    button {
-      color: mat-color($prx-gray, 300);
-      &:hover {
-        background-color: transparent;
-        color: mat-color($prx-gray, 600);
-      }
-    }
-  }
 }
-
 .flight-zones-header {
   display: grid;
   grid-template-columns: 1fr max-content;

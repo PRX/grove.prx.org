@@ -1,18 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
-
-export const validateMp3 = (control: AbstractControl): { [key: string]: any } | null => {
-  if (control.value) {
-    if (!control.value.match(/^http(s)?:\/\//)) {
-      return { invalidUrl: { value: control.value } };
-    } else if (!control.value.endsWith('.mp3')) {
-      return { notMp3: { value: control.value } };
-    }
-  }
-  return null;
-};
+import { Flight, FlightZone, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
 
 @Component({
   selector: 'grove-flight',
@@ -26,8 +15,8 @@ export const validateMp3 = (control: AbstractControl): { [key: string]: any } | 
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
         (flightDuplicate)="flightDuplicate.emit($event)"
-        (addZone)="onAddZone()"
-        (removeZone)="onRemoveZone($event)"
+        (addZone)="addZone.emit($event)"
+        (removeZone)="removeZone.emit($event)"
       ></grove-flight-form>
       <grove-inventory
         [flight]="flight"
@@ -54,6 +43,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
+  @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
+  @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
   formSubcription: Subscription;
   resetting = false;
 
@@ -94,7 +85,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     contractEndAt: [''],
     contractEndAtFudged: [''],
     isCompanion: [false],
-    zones: this.fb.array([]),
+    zones: [''],
     targets: [''],
     set_inventory_uri: ['', Validators.required],
     totalGoal: ['', Validators.min(0)],
@@ -128,42 +119,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  get zonesControls(): FormArray {
-    return this.flightForm.get('zones') as FormArray;
-  }
-
-  createZoneControl() {
-    return this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] });
-  }
-
-  onAddZone() {
-    // create new form group/zone control with initial empty values
-    const newZone = this.createZoneControl();
-    // (re)set the new group/control value to the first option and remove that option from options list
-    newZone.reset(filterZones(this.zoneOptions, this.flight.zones as InventoryZone[]).shift(), { emitEvent: false });
-    this.zonesControls.markAsDirty();
-    this.zonesControls.push(newZone);
-  }
-
-  onRemoveZone(index: number) {
-    this.zonesControls.markAsDirty();
-    this.zonesControls.removeAt(index);
-  }
-
-  // TODO: when zone options are set to empty, form should not be valid. maybe related to #199
   // updates the form from @Input() set flight
   setFlightForm(flight: Flight) {
-    const zones = this.flightForm.get('zones') as FormArray;
-    // get the correct number of zone fields
-    while (this.zonesControls.length > (flight.zones.length || 1)) {
-      this.zonesControls.removeAt(zones.length - 1);
-      this.zonesControls.markAsPristine();
-    }
-    while (this.zonesControls.length < (flight.zones.length || 1)) {
-      this.zonesControls.push(this.createZoneControl());
-      this.zonesControls.markAsPristine();
-    }
-
     // reset the form
     this.flightForm.reset(flight, { emitEvent: false });
   }

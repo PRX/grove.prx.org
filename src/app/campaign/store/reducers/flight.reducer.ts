@@ -94,6 +94,40 @@ const _reducer = createReducer(
       state
     );
   }),
+  on(campaignActions.CampaignFlightAddZone, (state, action) => {
+    const { flightId: id, zone } = action;
+    const localFlight = state.entities[id].localFlight;
+    return adapter.updateOne(
+      {
+        id,
+        changes: {
+          localFlight: {
+            ...localFlight,
+            zones: [...localFlight.zones, zone]
+          },
+          changed: true
+        }
+      },
+      state
+    );
+  }),
+  on(campaignActions.CampaignFlightRemoveZone, (state, action) => {
+    const { flightId: id, index } = action;
+    const localFlight = state.entities[id].localFlight;
+    return adapter.updateOne(
+      {
+        id,
+        changes: {
+          localFlight: {
+            ...localFlight,
+            zones: [...localFlight.zones.slice(0, index), ...localFlight.zones.slice(index + 1)]
+          },
+          changed: true
+        }
+      },
+      state
+    );
+  }),
   on(campaignActions.CampaignSave, (state, action) =>
     adapter.removeMany(
       action.tempDeletedFlights.map(flight => flight.id),

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
-import { Flight, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
+import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
 
 @Component({
   selector: 'grove-flight-form',
@@ -16,8 +16,8 @@ export class FlightFormComponent implements OnInit {
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
-  @Output() addZone = new EventEmitter();
-  @Output() removeZone = new EventEmitter<number>();
+  @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
+  @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
   flightForm: FormGroup;
 
   ngOnInit() {
@@ -34,24 +34,15 @@ export class FlightFormComponent implements OnInit {
     this.flightDeleteToggle.emit();
   }
 
-  checkInvalidUrl(zone: AbstractControl, type: string): boolean {
-    return zone.get('url').hasError(type);
-  }
-
-  zoneOptionsFiltered(index: number): InventoryZone[] {
-    return filterZones(this.zoneOptions, this.flight.zones as InventoryZone[], index);
-  }
-
-  get zonesControls(): FormArray {
-    return this.flightForm.get('zones') as FormArray;
-  }
-
   get canBeDeleted(): boolean {
     return this.flight && !this.flight.actualCount;
   }
 
-  get addCreativeLabel(): string {
-    const type = this.flight.isCompanion ? 'companion' : 'creative';
-    return `Add a ${type}`;
+  onAddZone({ zone }: { zone: FlightZone }) {
+    this.addZone.emit({ flightId: this.flight.id, zone });
+  }
+
+  onRemoveZone({ index }: { index: number }) {
+    this.removeZone.emit({ flightId: this.flight.id, index });
   }
 }
