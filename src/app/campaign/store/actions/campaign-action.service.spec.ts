@@ -120,8 +120,14 @@ describe('CampaignActionService', () => {
         .milliseconds(0);
       const yesterday = moment.utc(today.valueOf()).subtract(1, 'days');
       service.updateFlightForm({ ...flightFixture, endAtFudged: yesterday }, true, true);
-      expect(dispatchSpy).toHaveBeenCalledWith(
-        campaignActions.CampaignFlightFormUpdate({ flight: { ...flightFixture, endAt: today }, changed: true, valid: true })
+      expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
+        JSON.stringify(
+          campaignActions.CampaignFlightFormUpdate({
+            flight: { ...flightFixture, endAt: today, endAtFudged: yesterday },
+            changed: true,
+            valid: true
+          })
+        )
       );
     });
 
