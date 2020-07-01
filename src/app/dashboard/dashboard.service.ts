@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, Params } from '@angular/router';
 import { BehaviorSubject, Observable, combineLatest, of } from 'rxjs';
 import { switchMap, concatAll, withLatestFrom, map, first, finalize } from 'rxjs/operators';
+import { utc } from 'moment';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../core/augury.service';
 
@@ -235,7 +236,11 @@ export class DashboardService {
               status: doc['status'],
               statusOk: doc['status'] === 'ok',
               startAt: doc['startAt'] && new Date(doc['startAt']),
-              endAt: doc['endAt'] && new Date(doc['endAt']),
+              endAt:
+                doc['endAt'] &&
+                utc(doc['endAt'])
+                  .subtract(1, 'days')
+                  .toDate(),
               // map zonesId from facets
               zones: doc['zones'].map(zoneId => {
                 const zoneFacet = campaignFacets && campaignFacets.zone && campaignFacets.zone.find(facet => facet.id === zoneId);
@@ -291,7 +296,11 @@ export class DashboardService {
             status: flightDoc['status'],
             statusOk: flightDoc['status'] === 'ok',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
-            endAt: flightDoc['endAt'] && new Date(flightDoc['endAt']),
+            endAt:
+              flightDoc['endAt'] &&
+              utc(flightDoc['endAt'])
+                .subtract(1, 'days')
+                .toDate(),
             actualCount: flightDoc['actualCount'],
             totalGoal: flightDoc['totalGoal'] || 0,
             // map zonesId from facets
