@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Subject, Subscription } from 'rxjs';
 import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
+import { utc } from 'moment';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
 import { Flight } from '../models';
@@ -54,17 +55,20 @@ export class CampaignActionService implements OnDestroy {
   }
 
   transformFlightForm({ flight, changed, valid }: FlightFormState): FlightFormState {
-    // set goal fields based on delivery mode
-    if (flight.deliveryMode === 'uncapped') {
-      flight = { ...flight, dailyMinimum: null };
-    } else if (flight.deliveryMode === 'greedy_uncapped') {
-      flight = { ...flight, contractGoal: null, dailyMinimum: null };
-    }
-
-    // augury doesn't like null targets
-    flight = { ...flight, targets: flight.targets || [] };
-
-    return { flight, changed, valid };
+    return {
+      flight: {
+        ...flight,
+        // set goal fields based on delivery mode
+        ...(flight.deliveryMode === 'uncapped' && { dailyMinimum: null }),
+        ...(flight.deliveryMode === 'greedy_uncapped' && { contractGoal: null, dailyMinimum: null }),
+        // augury doesn't like null targets
+        targets: flight.targets || [],
+        // set the endAt from any form changes to endAtFudged
+        ...(flight.endAtFudged && { endAt: utc(flight.endAtFudged.valueOf()).add(1, 'days') })
+      },
+      changed,
+      valid
+    };
   }
 
   loadFlightPreview(flight: Flight) {

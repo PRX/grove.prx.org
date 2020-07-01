@@ -48,6 +48,32 @@ describe('Flight Reducer', () => {
     expect(newFlight.localFlight.name).toContain('New Flight');
   });
 
+  it('should fudge the end date by -1 day to appear as if the flight ends on the date it is set to stop serving', () => {
+    let result = reducer(
+      initialState,
+      campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flightDocFixture)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
+      })
+    );
+    expect(result.entities[flightFixture.id].localFlight.endAtFudged.valueOf()).toEqual(
+      moment
+        .utc(flightFixture.endAt.valueOf())
+        .subtract(1, 'days')
+        .valueOf()
+    );
+
+    result = reducer(initialState, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
+    const newFlight = selectAll(result).find(flight => !flight.remoteFlight);
+    expect(newFlight.localFlight.endAtFudged.valueOf()).toEqual(
+      moment
+        .utc(newFlight.localFlight.endAt.valueOf())
+        .subtract(1, 'days')
+        .valueOf()
+    );
+  });
+
   it('should duplicate a flight', () => {
     const result = reducer(
       initialState,

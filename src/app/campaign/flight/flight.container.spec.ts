@@ -71,6 +71,7 @@ describe('FlightContainerComponent', () => {
     name: 'my-flight',
     startAt: moment.utc('2019-10-01'),
     endAt: moment.utc('2019-11-01'),
+    endAtFudged: moment.utc('2019-10-31'),
     set_inventory_uri: '/some/url',
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
     totalGoal: 999,

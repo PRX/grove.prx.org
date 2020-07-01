@@ -111,6 +111,20 @@ describe('CampaignActionService', () => {
       );
     });
 
+    it('sets endAt from flight form endAtFudged', () => {
+      const today = moment
+        .utc()
+        .hours(0)
+        .minutes(0)
+        .seconds(0)
+        .milliseconds(0);
+      const yesterday = moment.utc(today.valueOf()).subtract(1, 'days');
+      service.updateFlightForm({ ...flightFixture, endAtFudged: yesterday }, true, true);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        campaignActions.CampaignFlightFormUpdate({ flight: { ...flightFixture, endAt: today }, changed: true, valid: true })
+      );
+    });
+
     it('transforms fields for greedy flights', () => {
       const flight = { ...flightFixture, deliveryMode: 'greedy_uncapped', contractGoal: 123, dailyMinimum: 456 };
       service.updateFlightForm(flight, true, true);
