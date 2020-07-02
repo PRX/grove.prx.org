@@ -123,7 +123,7 @@ describe('CampaignActionService', () => {
       expect(JSON.stringify(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0])).toEqual(
         JSON.stringify(
           campaignActions.CampaignFlightFormUpdate({
-            flight: { ...flightFixture, endAt: today, endAtFudged: yesterday, contractEndAt: today, contractEndAtFudged: yesterday },
+            flight: { ...flightFixture, endAt: today, endAtFudged: yesterday, contractEndAtFudged: yesterday, contractEndAt: today },
             changed: true,
             valid: true
           })
