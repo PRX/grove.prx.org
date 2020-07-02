@@ -73,3 +73,9 @@ mat-card {
     }
   }
 }
+
+.flight-zones-header {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  grid-gap: 1rem;
+}
