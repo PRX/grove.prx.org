@@ -49,4 +49,9 @@ export class FlightFormComponent implements OnInit {
   get canBeDeleted(): boolean {
     return this.flight && !this.flight.actualCount;
   }
+
+  get addCreativeLabel(): string {
+    const type = this.flight.isCompanion ? 'companion' : 'creative';
+    return `Add a ${type}`;
+  }
 }
