@@ -22,6 +22,7 @@ export interface Flight {
   name: string;
   startAt: Moment;
   endAt: Moment;
+  endAtFudged?: Moment;
   set_inventory_uri: string;
   zones: FlightZone[];
   targets?: FlightTarget[];
@@ -35,6 +36,7 @@ export interface Flight {
   contractGoal?: number;
   contractStartAt?: Moment;
   contractEndAt?: Moment;
+  contractEndAtFudged?: Moment;
   isCompanion?: boolean;
 }
 
@@ -48,13 +50,19 @@ export interface FlightState {
 }
 
 export const docToFlight = (doc: HalDoc): Flight => {
-  const flight = filterUnderscores(doc) as Flight;
-  flight.startAt = utc(flight.startAt);
-  flight.endAt = utc(flight.endAt);
-  flight.createdAt = new Date(flight.createdAt);
-  flight.set_inventory_uri = doc.expand('prx:inventory');
-  flight.contractStartAt = flight.contractStartAt ? utc(flight.contractStartAt) : null;
-  flight.contractEndAt = flight.contractEndAt ? utc(flight.contractEndAt) : null;
+  let flight = filterUnderscores(doc) as Flight;
+  flight = {
+    ...flight,
+    startAt: utc(flight.startAt),
+    endAt: utc(flight.endAt),
+    // the cutoff is midnight the following day, but want it to appear as if the flight ends on the date it is set to stop serving
+    endAtFudged: utc(flight.endAt).subtract(1, 'days'),
+    createdAt: new Date(flight.createdAt),
+    set_inventory_uri: doc.expand('prx:inventory'),
+    ...(flight.contractStartAt && { contractStartAt: utc(flight.contractStartAt) }),
+    ...(flight.contractEndAt && { contractEndAt: utc(flight.contractEndAt) }),
+    ...(flight.contractEndAt && { contractEndAtFudged: utc(flight.contractEndAt).subtract(1, 'days') })
+  };
   return flight;
 };
 

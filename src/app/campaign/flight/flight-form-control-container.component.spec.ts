@@ -37,6 +37,7 @@ const flightFixture: Flight = {
   name: 'my-flight',
   startAt: moment.utc(),
   endAt: moment.utc(),
+  endAtFudged: moment.utc().subtract(1, 'days'),
   deliveryMode: 'capped',
   totalGoal: 123,
   zones: [{ id: 'pre_1' }],
@@ -90,7 +91,8 @@ describe('FlightFormControlContainerComponent', () => {
 
   it('updates the flight form', () => {
     component.flight = flightFixture;
-    expect(component.flightForm.value).toMatchObject(flightFixture);
+    const { endAt, ...flight } = flightFixture;
+    expect(component.flightForm.value).toMatchObject(flight);
   });
 
   it('updates the total goal from flight', () => {

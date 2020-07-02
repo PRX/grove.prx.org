@@ -1,5 +1,6 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
+import { utc } from 'moment';
 import * as campaignActions from '../actions/campaign-action.creator';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 import { docToFlight, duplicateFlightState, FlightState, getFlightId } from '../models';
@@ -54,6 +55,7 @@ const _reducer = createReducer(
         name: 'New Flight ' + (state.ids.length + 1),
         startAt,
         endAt,
+        endAtFudged: utc(endAt.valueOf()).subtract(1, 'days'),
         deliveryMode: 'capped',
         zones: [],
         set_inventory_uri: null
