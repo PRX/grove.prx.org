@@ -30,7 +30,7 @@
         <input
           matInput
           [matDatepicker]="contractStartPicker"
-          [max]="flight?.contractEndAt"
+          [max]="flight?.contractEndAtFudged"
           placeholder="Contract Start Date"
           formControlName="contractStartAt"
         />
@@ -44,7 +44,7 @@
           [matDatepicker]="contractEndPicker"
           [min]="flight?.contractStartAt"
           placeholder="Contract End Date"
-          formControlName="contractEndAt"
+          formControlName="contractEndAtFudged"
         />
         <mat-datepicker-toggle matSuffix [for]="contractEndPicker"></mat-datepicker-toggle>
         <mat-datepicker #contractEndPicker></mat-datepicker>

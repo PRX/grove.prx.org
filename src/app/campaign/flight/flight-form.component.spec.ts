@@ -85,6 +85,7 @@ class ParentFormComponent {
     endAtFudged: ['', Validators.required],
     contractStartAt: [''],
     contractEndAt: [''],
+    contractEndAtFudged: [''],
     zones: this.fb.array([this.fb.group({ id: ['', Validators.required], url: ['', validateMp3] })]),
     targets: [''],
     set_inventory_uri: ['', Validators.required],

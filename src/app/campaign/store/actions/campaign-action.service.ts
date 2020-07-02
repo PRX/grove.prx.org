@@ -64,7 +64,8 @@ export class CampaignActionService implements OnDestroy {
         // augury doesn't like null targets
         targets: flight.targets || [],
         // set the endAt from any form changes to endAtFudged
-        ...(flight.endAtFudged && { endAt: utc(flight.endAtFudged.valueOf()).add(1, 'days') })
+        ...(flight.endAtFudged && { endAt: utc(flight.endAtFudged.valueOf()).add(1, 'days') }),
+        ...(flight.contractEndAtFudged && { contractEndAt: utc(flight.contractEndAtFudged.valueOf()).add(1, 'days') })
       },
       changed,
       valid
