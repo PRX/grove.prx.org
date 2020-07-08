@@ -73,6 +73,8 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   writeValue(targets: FlightTarget[]) {
     this.setCodeOptions(targets);
     this.targets = new FormArray((targets || []).map(this.newFlightTarget));
+    // TODO: wouldn't this be leaking subscriptions? Instead of new'ing the FormArray and subscribing on each update,
+    //  it should update/add/remove the controls in the array
     this.targets.valueChanges.subscribe(formTargets => {
       this.setCodeOptions(formTargets);
       this.onChangeFn(this.validTargetCodes(formTargets));
