@@ -146,7 +146,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
 
   // updates the form from @Input() set flight
   setFlightForm(flight: Flight) {
-    // reset the form
-    this.flightForm.reset(flight, { emitEvent: false });
+    // patch values onto the form
+    this.flightForm.patchValue(flight, { emitEvent: false });
   }
 }
