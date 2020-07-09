@@ -27,6 +27,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
 import { FlightFormComponent } from './flight-form.component';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
+import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
@@ -71,6 +72,7 @@ describe('FlightFormControlContainerComponent', () => {
         FlightFormControlContainerComponent,
         FlightFormComponent,
         FlightTargetsFormComponent,
+        FlightZonesFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent
@@ -127,58 +129,5 @@ describe('FlightFormControlContainerComponent', () => {
     expect(component.flightForm.get('name').disabled).toEqual(true);
     component.softDeleted = false;
     expect(component.flightForm.get('name').disabled).toEqual(false);
-  });
-
-  it('updates zone controls to match the flight', () => {
-    component.flight = { ...flightFixture, zones: [{ id: 'pre_1' }, { id: 'pre_2', url: 'http://file.mp3' }] };
-    expect(component.zonesControls.value).toEqual([
-      { id: 'pre_1', url: null },
-      { id: 'pre_2', url: 'http://file.mp3' }
-    ]);
-
-    // should keep 1 around - can't have 0 zones
-    component.flight = { ...flightFixture, zones: [] };
-    expect(component.zonesControls.value).toEqual([{ id: null, url: null }]);
-  });
-
-  it('adds and removes zone controls', () => {
-    component.flight = flightFixture;
-    component.zoneOptions = [
-      { id: 'pre_1', label: 'Preroll 1' },
-      { id: 'pre_2', label: 'Preroll 2' }
-    ];
-    expect(component.zonesControls.value).toEqual([{ id: 'pre_1', url: null }]);
-
-    component.onAddZone();
-    expect(component.zonesControls.value).toEqual([
-      { id: 'pre_1', url: null },
-      { id: 'pre_2', url: null }
-    ]);
-
-    component.onRemoveZone(0);
-    expect(component.zonesControls.value).toEqual([{ id: 'pre_2', url: null }]);
-  });
-
-  it('does very basic mp3 validations', () => {
-    component.flight = flightFixture;
-
-    const zone = component.zonesControls.at(0);
-    const urlField = zone.get('url');
-
-    urlField.setValue('');
-    expect(urlField.errors).toEqual(null);
-
-    urlField.setValue('http://this.looks/valid.mp3');
-    expect(urlField.errors).toEqual(null);
-    expect(zone.get('url').hasError('invalidUrl')).toEqual(false);
-    expect(zone.get('url').hasError('notMp3')).toEqual(false);
-
-    urlField.setValue('ftp://this.is/invalid.mp3');
-    expect(urlField.errors).toEqual({ invalidUrl: { value: 'ftp://this.is/invalid.mp3' } });
-    expect(zone.get('url').hasError('invalidUrl')).toEqual(true);
-
-    urlField.setValue('http://this.is/notaudio.jpg');
-    expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
-    expect(zone.get('url').hasError('notMp3')).toEqual(true);
   });
 });

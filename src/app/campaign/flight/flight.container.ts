@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, FlightZone } from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -32,6 +32,8 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       (flightUpdate)="flightUpdateFromForm($event)"
       (flightDeleteToggle)="flightDeleteToggle()"
       (flightDuplicate)="flightDuplicate($event)"
+      (addZone)="addZone($event)"
+      (removeZone)="removeZone($event)"
     ></grove-flight>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -82,5 +84,13 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   flightDeleteToggle() {
     this.campaignAction.deleteRoutedFlightToggle();
+  }
+
+  addZone({ flightId, zone }: { flightId: number; zone: FlightZone }) {
+    this.campaignAction.addFlightZone({ flightId, zone });
+  }
+
+  removeZone({ flightId, index }: { flightId: number; index: number }) {
+    this.campaignAction.removeFlightZone({ flightId, index });
   }
 }

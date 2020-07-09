@@ -61,30 +61,14 @@
         <h2>Zones</h2>
         <mat-slide-toggle formControlName="isCompanion">Companions</mat-slide-toggle>
       </div>
-      <fieldset formArrayName="zones">
-        <div *ngFor="let zone of zonesControls.controls; let i = index" [formGroup]="zone" class="inline-fields">
-          <mat-form-field class="zone-name" appearance="outline">
-            <mat-label>Zone Name</mat-label>
-            <mat-select formControlName="id" required>
-              <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Creative Url</mat-label>
-            <input matInput formControlName="url" autocomplete="off" placeholder="Leave blank for a 0-second MP3" />
-            <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
-            <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
-          </mat-form-field>
-          <div *ngIf="zonesControls?.length > 1" class="remove-zone mat-form-field-wrapper">
-            <button mat-icon-button aria-label="Remove zone" (click)="removeZone.emit(i)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-      </fieldset>
-      <div class="add-zone" *ngIf="zonesControls?.length < zoneOptions?.length">
-        <a mat-button routerLink="." (click)="addZone.emit()"> <mat-icon>add</mat-icon> {{ addCreativeLabel }} </a>
-      </div>
+      <grove-flight-zones
+        formControlName="zones"
+        [flightZones]="flight?.zones"
+        [isCompanion]="flight?.isCompanion"
+        [zoneOptions]="zoneOptions"
+        (addZone)="onAddZone($event)"
+        (removeZone)="onRemoveZone($event)"
+      ></grove-flight-zones>
     </div>
     <grove-flight-targets formControlName="targets" [targetOptions]="targetOptions"> </grove-flight-targets>
   </div>

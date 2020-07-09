@@ -297,9 +297,10 @@ describe('CampaignEffects', () => {
   });
 
   it('should get campaign and flights to duplicate by id', () => {
+    const timestamp = Date.now();
     campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
-    const action = campaignActions.CampaignDupById({ id: campaignFixture.id });
-    const success = campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs, timestamp: Date.now() });
+    const action = campaignActions.CampaignDupById({ id: campaignFixture.id, timestamp });
+    const success = campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs, timestamp });
     actions$.stream = hot('a', { a: action });
     const expected = cold('r', { r: success });
     expect(effects.dupCampaignById$).toBeObservable(expected);
