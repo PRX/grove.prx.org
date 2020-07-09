@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Flight, FlightZone, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
+import { utc } from 'moment';
 
 @Component({
   selector: 'grove-flight',
@@ -40,6 +41,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;
   @Input() previewError: any;
+  @Input() flightActualsDateBoundaries: { startAt: Date; endAt: Date };
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
@@ -79,8 +81,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   flightForm = this.fb.group({
     id: [],
     name: ['', Validators.required],
-    startAt: ['', Validators.required],
-    endAtFudged: ['', Validators.required],
+    startAt: ['', [Validators.required, this.validateStartAt.bind(this)]],
+    endAtFudged: ['', [Validators.required, this.validateEndAt.bind(this)]],
     contractStartAt: [''],
     contractEndAt: [''],
     contractEndAtFudged: [''],
@@ -105,6 +107,29 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.formSubcription) {
       this.formSubcription.unsubscribe();
+    }
+  }
+
+  validateStartAt(startAt: AbstractControl): { [key: string]: any } | null {
+    if (
+      this.flightActualsDateBoundaries &&
+      this.flightActualsDateBoundaries.startAt &&
+      this.flightActualsDateBoundaries.startAt.valueOf() < startAt.value.valueOf()
+    ) {
+      return { error: `Cannot set start date after ${utc(this.flightActualsDateBoundaries.startAt).format('M/D/YYYY')} actuals` };
+    }
+    return null;
+  }
+
+  validateEndAt(endAt: AbstractControl): { [key: string]: any } | null {
+    if (
+      this.flightActualsDateBoundaries &&
+      this.flightActualsDateBoundaries.endAt &&
+      this.flightActualsDateBoundaries.endAt.valueOf() > endAt.value.valueOf() + 24 * 60 * 60 * 1000
+    ) {
+      return { error: `Cannot set end date before ${utc(this.flightActualsDateBoundaries.startAt).format('M/D/YYYY')} actuals` };
+    } else {
+      return null;
     }
   }
 

@@ -1,7 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FormGroup, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
-import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
+import { FormGroup, AbstractControl, ControlContainer } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material';
+import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets } from '../store/models';
 
+export class FlightFormErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: AbstractControl): boolean {
+    return control && control.invalid && (control.dirty || control.touched);
+  }
+}
 @Component({
   selector: 'grove-flight-form',
   templateUrl: './flight-form.component.html',
@@ -19,6 +25,7 @@ export class FlightFormComponent implements OnInit {
   @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
   flightForm: FormGroup;
+  matcher = new FlightFormErrorStateMatcher();
 
   ngOnInit() {
     this.flightForm = this.formContainer.control as FormGroup;
@@ -44,5 +51,9 @@ export class FlightFormComponent implements OnInit {
 
   onRemoveZone({ index }: { index: number }) {
     this.removeZone.emit({ flightId: this.flight.id, index });
+  }
+
+  checkError(fieldName: string, type = 'error') {
+    return this.flightForm.get(fieldName).getError(type);
   }
 }

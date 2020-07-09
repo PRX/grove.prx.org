@@ -13,7 +13,8 @@ import {
   selectIsFlightPreviewLoading,
   selectAllInventoryOrderByName,
   selectCurrentInventoryZones,
-  selectCurrentInventoryTargets
+  selectCurrentInventoryTargets,
+  selectFlightActualsDateBoundaries
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -29,6 +30,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [isPreview]="isPreview$ | async"
       [isLoading]="isLoading$ | async"
       [previewError]="flightPreviewError$ | async"
+      [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
       (flightDeleteToggle)="flightDeleteToggle()"
       (flightDuplicate)="flightDuplicate($event)"
@@ -50,6 +52,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
   targetOptions$: Observable<InventoryTargets>;
+  flightActualsDateBoundaries$: Observable<{ startAt: Date; endAt: Date }>;
   flightSub: Subscription;
 
   constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
@@ -66,6 +69,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
     this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
+    this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
   }
 
   ngOnDestroy() {
