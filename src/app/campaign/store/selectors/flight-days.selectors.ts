@@ -141,8 +141,5 @@ export const selectFlightActualsDateBoundaries = createSelector(selectRoutedFlig
     flightDays &&
     flightDays.days &&
     [...flightDays.days].sort((a, b) => b.date.valueOf() - a.date.valueOf()).find(day => day.numbers.actuals > 0);
-  if (startAt && endAt) {
-    console.log({ startAt: startAt.date, endAt: endAt.date });
-  }
   return startAt && endAt ? { startAt: startAt.date, endAt: endAt.date } : null;
 });
