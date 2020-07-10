@@ -11,6 +11,7 @@ import {
   MatIconModule,
   MatDatepickerModule,
   MatSlideToggleModule,
+  MatMenuModule,
   DateAdapter,
   MAT_DATE_LOCALE,
   MAT_DATE_FORMATS
@@ -112,7 +113,8 @@ describe('FlightFormComponent', () => {
         MatMomentDateModule,
         MatButtonModule,
         MatIconModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        MatMenuModule
       ],
       declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent, FlightZonesFormComponent],
       providers: [

@@ -23,6 +23,8 @@ export enum ActionTypes {
   CAMPAIGN_FLIGHT_FORM_UPDATE = '[Campaign] Flight Form Update',
   CAMPAIGN_FLIGHT_ADD_ZONE = '[Campaign] Flight Add Zone',
   CAMPAIGN_FLIGHT_REMOVE_ZONE = '[Campaign] Flight Remove Zone',
+  CAMPAIGN_FLIGHT_ADD_TARGET = '[Campaign] Flight Add Target',
+  CAMPAIGN_FLIGHT_REMOVE_TARGET = '[Campaign] Flight Remove Target',
   CAMPAIGN_FLIGHT_PREVIEW_CREATE = '[Campaign] Flight Preview Create',
   CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS = '[Campaign] Flight Preview Create Success',
   CAMPAIGN_FLIGHT_PREVIEW_CREATE_FAILURE = '[Campaign] Flight Preview Create Failure',

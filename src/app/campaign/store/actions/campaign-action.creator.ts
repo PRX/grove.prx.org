@@ -1,6 +1,6 @@
 import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
-import { Campaign, Flight, FlightZone, CampaignFormSave } from '../models';
+import { Campaign, Flight, FlightZone, CampaignFormSave, FlightTarget } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { utc, Moment } from 'moment';
 
@@ -114,6 +114,15 @@ export const CampaignFlightFormUpdate = createAction(
 
 export const CampaignFlightAddZone = createAction(ActionTypes.CAMPAIGN_FLIGHT_ADD_ZONE, props<{ flightId: number; zone: FlightZone }>());
 export const CampaignFlightRemoveZone = createAction(ActionTypes.CAMPAIGN_FLIGHT_REMOVE_ZONE, props<{ flightId: number; index: number }>());
+
+export const CampaignFlightAddTarget = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_ADD_TARGET,
+  props<{ flightId: number; target: FlightTarget }>()
+);
+export const CampaignFlightRemoveTarget = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_REMOVE_TARGET,
+  props<{ flightId: number; index: number }>()
+);
 
 const all = union({
   CampaignNew,

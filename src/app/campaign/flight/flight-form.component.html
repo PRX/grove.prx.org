@@ -70,7 +70,13 @@
         (removeZone)="onRemoveZone($event)"
       ></grove-flight-zones>
     </div>
-    <grove-flight-targets formControlName="targets" [targetOptions]="targetOptions"> </grove-flight-targets>
+    <grove-flight-targets
+      formControlName="targets"
+      [targetOptions]="targetOptions"
+      [targetTypes]="targetTypes"
+      (addTarget)="onAddTarget($event)"
+      (removeTarget)="onRemoveTarget($event)"
+    ></grove-flight-targets>
   </div>
   <div class="flight-controls-container">
     <button

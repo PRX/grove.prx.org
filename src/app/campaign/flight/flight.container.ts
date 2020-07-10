@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, FlightZone } from '../store/models';
+import {
+  Flight,
+  InventoryRollup,
+  Inventory,
+  InventoryZone,
+  InventoryTargets,
+  FlightZone,
+  InventoryTargetType,
+  FlightTarget
+} from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -13,7 +22,8 @@ import {
   selectIsFlightPreviewLoading,
   selectAllInventoryOrderByName,
   selectCurrentInventoryZones,
-  selectCurrentInventoryTargets
+  selectCurrentInventoryTargets,
+  selectCurrentInventoryTargetTypes
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -23,6 +33,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
       [targetOptions]="targetOptions$ | async"
+      [targetTypes]="targetTypes$ | async"
       [flight]="flightLocal$ | async"
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
@@ -34,6 +45,8 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       (flightDuplicate)="flightDuplicate($event)"
       (addZone)="addZone($event)"
       (removeZone)="removeZone($event)"
+      (addTarget)="addTarget($event)"
+      (removeTarget)="removeTarget($event)"
     ></grove-flight>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -50,6 +63,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
   targetOptions$: Observable<InventoryTargets>;
+  targetTypes$: Observable<InventoryTargetType[]>;
   flightSub: Subscription;
 
   constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
@@ -66,6 +80,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
     this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
+    this.targetTypes$ = this.store.pipe(select(selectCurrentInventoryTargetTypes));
   }
 
   ngOnDestroy() {
@@ -92,5 +107,13 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   removeZone({ flightId, index }: { flightId: number; index: number }) {
     this.campaignAction.removeFlightZone({ flightId, index });
+  }
+
+  addTarget({ flightId, target }: { flightId: number; target: FlightTarget }) {
+    this.campaignAction.addFlightTarget({ flightId, target });
+  }
+
+  removeTarget({ flightId, index }: { flightId: number; index: number }) {
+    this.campaignAction.removeFlightTarget({ flightId, index });
   }
 }

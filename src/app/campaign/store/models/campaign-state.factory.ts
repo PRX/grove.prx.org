@@ -181,7 +181,15 @@ export const createInventoryState = () => ({
 export const inventoryTargetsFixture: InventoryTargets = {
   inventoryId: 1,
   episodes: [{ type: 'episode', code: '1111', label: 'Episode 1' }],
-  countries: [{ type: 'country', code: 'CA', label: 'Canadia' }]
+  countries: [{ type: 'country', code: 'CA', label: 'Canadia' }],
+  types: [
+    { type: 'country', label: 'Country', labelPlural: 'Countries' },
+    { type: 'episode', label: 'Episode', labelPlural: 'Episodes' }
+  ],
+  targets: [
+    { type: 'episode', code: '1111', label: 'Episode 1' },
+    { type: 'country', code: 'CA', label: 'Canadia' }
+  ]
 };
 export const inventoryTargetsDocFixture = new MockHalDoc(inventoryTargetsFixture);
 

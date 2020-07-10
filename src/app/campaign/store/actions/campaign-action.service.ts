@@ -5,7 +5,7 @@ import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
 import { utc } from 'moment';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
-import { Flight, FlightZone } from '../models';
+import { Flight, FlightZone, FlightTarget } from '../models';
 import {
   selectCampaignId,
   selectCampaignWithFlightsForSave,
@@ -192,5 +192,13 @@ export class CampaignActionService implements OnDestroy {
 
   removeFlightZone({ flightId, index }: { flightId: number; index: number }) {
     this.store.dispatch(campaignActions.CampaignFlightRemoveZone({ flightId, index }));
+  }
+
+  addFlightTarget({ flightId, target }: { flightId: number; target: FlightTarget }) {
+    this.store.dispatch(campaignActions.CampaignFlightAddTarget({ flightId, target }));
+  }
+
+  removeFlightTarget({ flightId, index }: { flightId: number; index: number }) {
+    this.store.dispatch(campaignActions.CampaignFlightRemoveTarget({ flightId, index }));
   }
 }

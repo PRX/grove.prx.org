@@ -128,6 +128,40 @@ const _reducer = createReducer(
       state
     );
   }),
+  on(campaignActions.CampaignFlightAddTarget, (state, action) => {
+    const { flightId: id, target } = action;
+    const localFlight = state.entities[id].localFlight;
+    return adapter.updateOne(
+      {
+        id,
+        changes: {
+          localFlight: {
+            ...localFlight,
+            targets: [...localFlight.targets, target]
+          },
+          changed: true
+        }
+      },
+      state
+    );
+  }),
+  on(campaignActions.CampaignFlightRemoveTarget, (state, action) => {
+    const { flightId: id, index } = action;
+    const localFlight = state.entities[id].localFlight;
+    return adapter.updateOne(
+      {
+        id,
+        changes: {
+          localFlight: {
+            ...localFlight,
+            targets: [...localFlight.targets.slice(0, index), ...localFlight.targets.slice(index + 1)]
+          },
+          changed: true
+        }
+      },
+      state
+    );
+  }),
   on(campaignActions.CampaignSave, (state, action) =>
     adapter.removeMany(
       action.tempDeletedFlights.map(flight => flight.id),

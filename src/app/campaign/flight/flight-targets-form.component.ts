@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
-import { InventoryTargets, InventoryTarget, FlightTarget } from '../store/models';
+import { InventoryTargets, InventoryTarget, FlightTarget, InventoryTargetType } from '../store/models';
 import moment from 'moment';
 
 @Component({
@@ -31,7 +31,10 @@ import moment from 'moment';
         </div>
       </div>
       <div class="add-target">
-        <a mat-button routerLink="." (click)="addTarget()"><mat-icon>add</mat-icon> Add a target</a>
+        <button mat-button color="primary" [matMenuTriggerFor]="addTargetMenu"><mat-icon>add</mat-icon> Add a target</button>
+        <mat-menu #addTargetMenu="matMenu">
+          <button mat-menu-item *ngFor="let type of targetTypes" (click)="addTarget(type.type)">{{ type.label }}</button>
+        </mat-menu>
       </div>
     </fieldset>
   `,
@@ -52,6 +55,9 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     this._targetOptions = targetOptions;
     this.setCodeOptions(this.targets ? (this.targets.value as FlightTarget[]) : []);
   }
+  @Input() targetTypes: InventoryTargetType[];
+  @Output() addZone = new EventEmitter<{ target: FlightTarget }>();
+  @Output() removeZone = new EventEmitter<{ index: number }>();
 
   targets: FormArray;
   onChangeFn: (value: any) => void;

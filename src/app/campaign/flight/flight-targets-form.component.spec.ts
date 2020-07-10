@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatButtonModule, MatIconModule } from '@angular/material';
+import { MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatButtonModule, MatIconModule, MatMenuModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
@@ -42,7 +42,8 @@ describe('FlightTargetsFormComponent', () => {
         MatSelectModule,
         MatCheckboxModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
+        MatMenuModule
       ],
       declarations: [ParentFormComponent, FlightTargetsFormComponent]
     }).compileComponents();

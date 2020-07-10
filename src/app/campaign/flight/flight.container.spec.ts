@@ -14,7 +14,8 @@ import {
   MatSelectModule,
   MatProgressSpinnerModule,
   MatSlideToggleModule,
-  MatCheckboxModule
+  MatCheckboxModule,
+  MatMenuModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -98,6 +99,7 @@ describe('FlightContainerComponent', () => {
         MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatCheckboxModule,
+        MatMenuModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {

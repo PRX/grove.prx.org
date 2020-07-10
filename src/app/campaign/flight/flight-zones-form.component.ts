@@ -57,7 +57,7 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
       </div>
     </fieldset>
     <div *ngIf="zones?.controls?.length < zoneOptions?.length">
-      <a mat-button routerLink="." (click)="onAddZone()"> <mat-icon>add</mat-icon> {{ addCreativeLabel }} </a>
+      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addCreativeLabel }}</button>
     </div>
   `,
   styleUrls: ['./flight-zones-form.component.scss'],

@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Flight, FlightZone, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
+import {
+  Flight,
+  FlightZone,
+  InventoryRollup,
+  Inventory,
+  InventoryZone,
+  InventoryTargets,
+  InventoryTargetType,
+  FlightTarget
+} from '../store/models';
 
 @Component({
   selector: 'grove-flight',
@@ -11,12 +20,15 @@ import { Flight, FlightZone, InventoryRollup, Inventory, InventoryZone, Inventor
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
         [targetOptions]="targetOptions"
+        [targetTypes]="targetTypes"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
         (flightDuplicate)="flightDuplicate.emit($event)"
         (addZone)="addZone.emit($event)"
         (removeZone)="removeZone.emit($event)"
+        (addTarget)="addTarget.emit($event)"
+        (removeTarget)="removeTarget.emit($event)"
       ></grove-flight-form>
       <grove-inventory
         [flight]="flight"
@@ -36,6 +48,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
   @Input() targetOptions: InventoryTargets;
+  @Input() targetTypes: InventoryTargetType[];
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;
@@ -45,6 +58,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Output() flightDeleteToggle = new EventEmitter(true);
   @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
+  @Output() addTarget = new EventEmitter<{ flightId: number; target: FlightTarget }>();
+  @Output() removeTarget = new EventEmitter<{ flightId: number; index: number }>();
   formSubcription: Subscription;
   resetting = false;
 

@@ -15,6 +15,12 @@ export interface InventoryZone {
   label: string;
 }
 
+export interface InventoryTargetType {
+  type: string;
+  label: string;
+  labelPlural: string;
+}
+
 export interface InventoryTarget {
   type: string;
   code: string;
@@ -24,8 +30,14 @@ export interface InventoryTarget {
 
 export interface InventoryTargets {
   inventoryId: number;
-  episodes: InventoryTarget[];
-  countries: InventoryTarget[];
+  episodes?: InventoryTarget[];
+  countries?: InventoryTarget[];
+  types?: InventoryTargetType[];
+  targets?: InventoryTarget[];
+}
+
+export interface InventoryTargetsMap {
+  [k: string]: InventoryTarget[];
 }
 
 export const docToInventory = (doc: HalDoc): Inventory => {

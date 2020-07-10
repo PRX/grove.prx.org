@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FormGroup, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
-import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets, filterZones } from '../store/models';
+import { FormGroup, ControlContainer } from '@angular/forms';
+import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets, InventoryTargetType, FlightTarget } from '../store/models';
 
 @Component({
   selector: 'grove-flight-form',
@@ -13,11 +13,14 @@ export class FlightFormComponent implements OnInit {
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
   @Input() targetOptions: InventoryTargets;
+  @Input() targetTypes: InventoryTargetType[];
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
   @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
+  @Output() addTarget = new EventEmitter<{ flightId: number; target: FlightTarget }>();
+  @Output() removeTarget = new EventEmitter<{ flightId: number; index: number }>();
   flightForm: FormGroup;
 
   ngOnInit() {
@@ -44,5 +47,13 @@ export class FlightFormComponent implements OnInit {
 
   onRemoveZone({ index }: { index: number }) {
     this.removeZone.emit({ flightId: this.flight.id, index });
+  }
+
+  onAddTarget({ target }: { target: FlightTarget }) {
+    this.addTarget.emit({ flightId: this.flight.id, target });
+  }
+
+  onRemoveTarget({ index }: { index: number }) {
+    this.removeTarget.emit({ flightId: this.flight.id, index });
   }
 }
