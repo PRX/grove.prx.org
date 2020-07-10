@@ -189,6 +189,29 @@ describe('CampaignEffects', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
   });
 
+  it('should handle form save error by redirecting to a new campaign if campaign creation succeeded', () => {
+    const halError = new HalHttpError(500, 'something bad happened');
+    const errorResponse = cold('-#|', {}, halError);
+    campaignService.createFlight = jest.fn(() => errorResponse);
+    campaignService.createCampaign = jest.fn(() => of(campaignDoc));
+    const { id, ...createCampaign } = campaignFixture;
+    const tempFlightId = new Date().valueOf();
+    const flight = { ...flightFixture, id: tempFlightId };
+    const createAction = campaignActions.CampaignSave({
+      campaign: createCampaign,
+      campaignDoc: undefined,
+      updatedFlights: [],
+      createdFlights: [flight],
+      deletedFlights: [],
+      tempDeletedFlights: []
+    });
+    const outcome = campaignActions.CampaignSaveFailure({ error: halError });
+    actions$.stream = hot('-a', { a: createAction });
+    const expected = cold('--r', { r: outcome });
+    expect(effects.campaignFormSave$).toBeObservable(expected);
+    expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
+  });
+
   it('should redirect to a new campaign and flight', done => {
     campaignService.createCampaign = jest.fn(() => of(campaignDoc));
     campaignService.createFlight = jest.fn(() => of(flightDocs[0]));
