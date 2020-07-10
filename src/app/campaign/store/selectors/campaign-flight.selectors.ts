@@ -54,9 +54,13 @@ export const selectFlightNotFoundError = createSelector(
   (loaded, flightId, flights): string => loaded && flightId && !flights[flightId] && 'Flight Not Found'
 );
 
-export const selectError = createSelector(selectCampaignError, selectFlightNotFoundError, (campaignError: any, flightError: string) => {
-  return (campaignError && campaignError.body && campaignError.body.message && 'Campaign ' + campaignError.body.message) || flightError;
-});
+export const selectError = createSelector(
+  selectCampaignError,
+  selectFlightNotFoundError,
+  (campaignError: any, flightNotFoundError: string) => {
+    return (campaignError && campaignError.body && campaignError.body.message) || flightNotFoundError;
+  }
+);
 
 export const selectRoutedCampaignFlightDocs = createSelector(
   selectCampaign,

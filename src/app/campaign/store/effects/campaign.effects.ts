@@ -22,8 +22,9 @@ export class CampaignEffects {
     )
   );
 
-  campaignFormSave$ = createEffect(() =>
-    this.actions$.pipe(
+  campaignFormSave$ = createEffect(() => {
+    let newCampaignId;
+    return this.actions$.pipe(
       ofType(campaignActions.CampaignSave),
       mergeMap((action: CampaignFormSave) => {
         let campaignSaveResult: Observable<HalDoc>;
@@ -64,6 +65,10 @@ export class CampaignEffects {
               updatedFlightDocs: { [id: number]: HalDoc };
               deletedFlightDocs: { [id: number]: HalDoc };
             }) => {
+              // save off new campaign id in case campaign create succeeded but flight creation fails
+              if (!action.campaign.id || action.campaign.id !== campaignDoc.id) {
+                newCampaignId = campaignDoc.id;
+              }
               const createdFlights: { [id: number]: Observable<HalDoc> } = action.createdFlights.reduce(
                 (acc, flight) => ({ ...acc, [flight.id]: this.campaignService.createFlight(campaignDoc, flight) }),
                 {}
@@ -193,11 +198,17 @@ export class CampaignEffects {
                 createdFlightDaysDocs
               })
           ),
-          catchError(error => of(campaignActions.CampaignSaveFailure({ error })))
+          catchError(error => {
+            // if there's a new campaign id, navigate to it
+            if (newCampaignId) {
+              this.router.navigate(['/campaign', newCampaignId]);
+            }
+            return of(campaignActions.CampaignSaveFailure({ error }));
+          })
         );
       })
-    )
-  );
+    );
+  });
 
   addFlight$ = createEffect(
     () =>

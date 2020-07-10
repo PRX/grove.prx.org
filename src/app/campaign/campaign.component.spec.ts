@@ -2,7 +2,7 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatSidenavModule, MatListModule, MatIconModule, MatProgressSpinnerModule, MatMenuModule } from '@angular/material';
+import { MatIconModule, MatListModule, MatMenuModule, MatProgressSpinnerModule, MatSidenavModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule, Store } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
@@ -19,6 +19,7 @@ import * as campaignActions from './store/actions/campaign-action.creator';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
+import { CampaignErrorService } from './campaign-error.service';
 import { TestComponent, campaignRoutes } from '../../testing/test.component';
 import { campaignFixture, flightFixture } from './store/models/campaign-state.factory';
 
@@ -56,9 +57,9 @@ describe('CampaignComponent', () => {
         NoopAnimationsModule,
         MatIconModule,
         MatListModule,
+        MatMenuModule,
         MatProgressSpinnerModule,
-        MatSidenavModule,
-        MatMenuModule
+        MatSidenavModule
       ],
       declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, TestComponent],
       providers: [
@@ -73,6 +74,10 @@ describe('CampaignComponent', () => {
         {
           provide: InventoryService,
           useValue: { listInventory: jest.fn(() => of([])) }
+        },
+        {
+          provide: CampaignErrorService,
+          userValue: {}
         },
         CampaignActionService
       ]
@@ -111,7 +116,7 @@ describe('CampaignComponent', () => {
       jest.spyOn(store, 'dispatch');
     });
     it('calls action to duplicate a campaign by id', done => {
-      // id is passed through the /camp[aign/new router link state
+      // id is passed through the /campaign/new router link state
       Object.defineProperty(window.history, 'state', { writable: true, value: { id: 123 } });
       fix.ngZone.run(() => {
         router.navigateByUrl('/campaign/new');

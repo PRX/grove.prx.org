@@ -4,7 +4,6 @@ import { Observable, Subscription } from 'rxjs';
 import { Store, select } from '@ngrx/store';
 import { FlightState, Campaign } from './store/models';
 import {
-  selectError,
   selectLocalCampaign,
   selectCampaignLoaded,
   selectCampaignLoading,
@@ -20,6 +19,7 @@ import * as advertiserActions from './store/actions/advertiser-action.creator';
 import * as campaignActions from './store/actions/campaign-action.creator';
 import * as inventoryActions from './store/actions/inventory-action.creator';
 import { CampaignActionService } from './store/actions/campaign-action.service';
+import { CampaignErrorService } from './campaign-error.service';
 
 @Component({
   selector: 'grove-campaign',
@@ -47,10 +47,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
       </mat-drawer>
       <mat-drawer-content role="main">
         <ng-container *ngIf="campaignLoaded$ | async; else loading">
-          <div class="error" *ngIf="error$ | async as error; else content">{{ error }}</div>
-          <ng-template #content>
-            <router-outlet></router-outlet>
-          </ng-template>
+          <router-outlet></router-outlet>
         </ng-container>
         <ng-template #loading>
           <div class="loading" *ngIf="campaignLoading$ | async"><mat-spinner></mat-spinner></div>
@@ -67,14 +64,18 @@ export class CampaignComponent implements OnInit, OnDestroy {
   campaignLoaded$: Observable<boolean>;
   campaignLoading$: Observable<boolean>;
   campaignSaving$: Observable<boolean>;
-  error$: Observable<any>;
   valid$: Observable<boolean>;
   changed$: Observable<boolean>;
   campaignName$: Observable<string>;
   campaignActualCount$: Observable<number>;
   routeSub: Subscription;
 
-  constructor(private route: ActivatedRoute, private store: Store<any>, private campaignActionService: CampaignActionService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private store: Store<any>,
+    private campaignActionService: CampaignActionService,
+    private campaignErrorService: CampaignErrorService
+  ) {}
 
   ngOnInit() {
     this.store.dispatch(accountActions.AccountsLoad());
@@ -99,7 +100,6 @@ export class CampaignComponent implements OnInit, OnDestroy {
     this.campaignLoaded$ = this.store.pipe(select(selectCampaignLoaded));
     this.campaignLoading$ = this.store.pipe(select(selectCampaignLoading));
     this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));
-    this.error$ = this.store.pipe(select(selectError));
     this.campaignName$ = this.store.pipe(select(selectLocalCampaignName));
     this.campaignActualCount$ = this.store.pipe(select(selectLocalCampaignActualCount));
     this.flights$ = this.store.pipe(select(selectAllFlightsOrderByCreatedAt));
