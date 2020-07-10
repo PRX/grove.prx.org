@@ -131,3 +131,15 @@ export const selectFlightDaysRollup = createSelector(
     return flightDays && flightDays.days && rollupWeeks(flightDays.days);
   }
 );
+
+export const selectFlightActualsDateBoundaries = createSelector(selectRoutedFlightDays, (flightDays): { startAt: Date; endAt: Date } => {
+  const startAt =
+    flightDays &&
+    flightDays.days &&
+    [...flightDays.days].sort((a, b) => a.date.valueOf() - b.date.valueOf()).find(day => day.numbers.actuals > 0);
+  const endAt =
+    flightDays &&
+    flightDays.days &&
+    [...flightDays.days].sort((a, b) => b.date.valueOf() - a.date.valueOf()).find(day => day.numbers.actuals > 0);
+  return startAt && endAt ? { startAt: startAt.date, endAt: endAt.date } : null;
+});
