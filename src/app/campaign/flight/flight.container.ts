@@ -9,7 +9,8 @@ import {
   InventoryTargets,
   FlightZone,
   InventoryTargetType,
-  FlightTarget
+  FlightTarget,
+  InventoryTargetsMap
 } from '../store/models';
 import {
   selectRoutedLocalFlight,
@@ -23,7 +24,8 @@ import {
   selectAllInventoryOrderByName,
   selectCurrentInventoryZones,
   selectCurrentInventoryTargets,
-  selectCurrentInventoryTargetTypes
+  selectCurrentInventoryTargetTypes,
+  selectCurrentInventoryTargetsTypeMap
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -34,6 +36,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [zoneOptions]="zoneOptions$ | async"
       [targetOptions]="targetOptions$ | async"
       [targetTypes]="targetTypes$ | async"
+      [targetOptionsMap]="targetOptionsMap$ | async"
       [flight]="flightLocal$ | async"
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
@@ -64,6 +67,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   zoneOptions$: Observable<InventoryZone[]>;
   targetOptions$: Observable<InventoryTargets>;
   targetTypes$: Observable<InventoryTargetType[]>;
+  targetOptionsMap$: Observable<InventoryTargetsMap>;
   flightSub: Subscription;
 
   constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
@@ -81,6 +85,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
     this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
     this.targetTypes$ = this.store.pipe(select(selectCurrentInventoryTargetTypes));
+    this.targetOptionsMap$ = this.store.pipe(select(selectCurrentInventoryTargetsTypeMap));
   }
 
   ngOnDestroy() {

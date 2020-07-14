@@ -57,27 +57,29 @@ describe('FlightTargetsFormComponent', () => {
   });
 
   it('sets targets from the parent form', () => {
-    expect(component.targets.length).toEqual(0);
+    expect(component.targetsForm.length).toEqual(0);
     parent.flightForm.setValue({ targets: [{}] });
-    expect(component.targets.length).toEqual(1);
+    expect(component.targetsForm.length).toEqual(1);
     parent.flightForm.reset({ targets: [{}, {}] });
-    expect(component.targets.length).toEqual(2);
+    expect(component.targetsForm.length).toEqual(2);
   });
 
-  it('adds targets but only emits them when they have values', () => {
+  it('adds empty targets of a specific types', () => {
     expect(parent.flightForm.value).toEqual({ targets: '' });
     expect(parent.flightForm.dirty).toEqual(false);
 
-    component.addTarget();
-    component.addTarget();
+    component.onAddTarget('country');
+    component.onAddTarget('episode');
     expect(parent.flightForm.value).toEqual({ targets: [] });
-    expect(component.targets.length).toEqual(2);
+    expect(component.targetsForm.length).toEqual(2);
+    expect(component.targetsForm[0].get('type')).toEqual('country');
+    expect(component.targetsForm[1].get('type')).toEqual('episode');
     expect(parent.flightForm.dirty).toEqual(true);
 
-    component.targets.at(1).setValue({ type: 'country', code: '', exclude: false });
+    component.targetsForm.at(1).setValue({ type: 'country', code: '', exclude: false });
     expect(parent.flightForm.value).toEqual({ targets: [] });
 
-    component.targets.at(1).setValue({ type: 'country', code: 'CA', exclude: false });
+    component.targetsForm.at(1).setValue({ type: 'country', code: 'CA', exclude: false });
     expect(parent.flightForm.value).toEqual({ targets: [{ type: 'country', code: 'CA', exclude: false }] });
   });
 
@@ -90,7 +92,7 @@ describe('FlightTargetsFormComponent', () => {
     });
     expect(parent.flightForm.dirty).toEqual(false);
 
-    component.removeTarget(0);
+    component.onRemoveTarget(0);
     expect(parent.flightForm.value).toEqual({ targets: [{ type: 'episode', code: 'AAAA', exclude: false }] });
     expect(parent.flightForm.dirty).toEqual(true);
   });
@@ -98,13 +100,13 @@ describe('FlightTargetsFormComponent', () => {
   it('validates targets', () => {
     expect(parent.flightForm.valid).toEqual(true);
 
-    component.addTarget();
+    component.onAddTarget('country');
     expect(parent.flightForm.valid).toEqual(false);
 
-    component.targets.at(0).setValue({ type: 'country', code: '', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'country', code: '', exclude: false });
     expect(parent.flightForm.valid).toEqual(false);
 
-    component.targets.at(0).setValue({ type: 'country', code: 'US', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'country', code: 'US', exclude: false });
     expect(parent.flightForm.valid).toEqual(true);
   });
 
@@ -112,22 +114,22 @@ describe('FlightTargetsFormComponent', () => {
     parent.flightForm.reset({ targets: [{ type: 'country', code: 'US', exclude: false }] });
     expect(component.codeOptions[0]).toEqual(parent.options.countries);
 
-    component.targets.at(0).setValue({ type: 'episode', code: 'US', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'episode', code: 'US', exclude: false });
     expect(parent.flightForm.value).toEqual({ targets: [] });
     expect(component.targets.value).toEqual([{ type: 'episode', code: '', exclude: false }]);
   });
 
   it('restricts target codes based on their type', () => {
-    component.addTarget();
+    component.onAddTarget('foobar');
     expect(component.codeOptions[0]).toEqual([]);
 
-    component.targets.at(0).setValue({ type: 'foobar', code: '', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'foobar', code: '', exclude: false });
     expect(component.codeOptions[0]).toEqual([]);
 
-    component.targets.at(0).setValue({ type: 'country', code: '', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'country', code: '', exclude: false });
     expect(component.codeOptions[0]).toEqual(parent.options.countries);
 
-    component.targets.at(0).setValue({ type: 'episode', code: '', exclude: false });
+    component.targetsForm.at(0).setValue({ type: 'episode', code: '', exclude: false });
     expect(component.codeOptions[0]).toEqual(parent.options.episodes);
   });
 

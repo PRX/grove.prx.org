@@ -1,6 +1,14 @@
 @import '~src/sass/variables';
 @import '~src/sass/colors';
 
+:host {
+  h2 {
+    margin-bottom: 0.5em;
+    font-size: 22px;
+    font-weight: 400;
+  }
+}
+
 mat-card {
   min-height: 400px;
   border-radius: 0;
@@ -52,11 +60,6 @@ mat-card {
 }
 
 .flight-zones {
-  h2 {
-    margin-bottom: 0.5em;
-    font-size: 22px;
-    font-weight: 400;
-  }
 }
 .flight-zones-header {
   display: grid;

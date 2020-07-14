@@ -118,8 +118,11 @@ export class CampaignActionService implements OnDestroy {
   havePreviewParamsChanged(a: Flight, b: Flight) {
     const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
     return check.some(fld => {
+      if (fld === 'targets') {
+        console.log('havePreviewParamsChanged >> targets', a[fld], b[fld]);
+      }
       if (this.hasChanged(b[fld], a[fld])) {
-        // console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);
+        console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);
         return true;
       }
     });

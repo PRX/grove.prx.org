@@ -37,20 +37,24 @@ export const selectCurrentInventoryTargetTypes = createSelector(
   (targets): InventoryTargetType[] => targets && targets.types
 );
 
-export const selectCurrentInventoryAllTargets = createSelector(
-  selectCurrentInventoryTargets,
-  (targets): InventoryTarget[] => targets && targets.targets
-);
+export const selectCurrentInventoryAllTargets = createSelector(selectCurrentInventoryTargets, (targets): InventoryTarget[] => {
+  console.log('selectCurrentInventoryAllTargets >> targets', targets);
+  return targets && targets.targets;
+});
 
 export const selectCurrentInventoryTargetsTypeMap = createSelector(
   selectCurrentInventoryAllTargets,
-  (targets): InventoryTargetsMap =>
-    targets &&
-    targets.reduce(
-      (a, target) => ({
-        ...a,
-        [target.type]: [...(a[target.type] || []), target]
-      }),
-      {}
-    )
+  (targets): InventoryTargetsMap => {
+    const map =
+      targets &&
+      targets.reduce(
+        (a, target) => ({
+          ...a,
+          [target.type]: [...(a[target.type] || []), target]
+        }),
+        {}
+      );
+    console.log('selectCurrentInventoryTargetsTypeMap >> map', map);
+    return map;
+  }
 );

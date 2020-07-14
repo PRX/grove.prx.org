@@ -9,7 +9,8 @@ import {
   InventoryZone,
   InventoryTargets,
   InventoryTargetType,
-  FlightTarget
+  FlightTarget,
+  InventoryTargetsMap
 } from '../store/models';
 
 @Component({
@@ -21,6 +22,7 @@ import {
         [zoneOptions]="zoneOptions"
         [targetOptions]="targetOptions"
         [targetTypes]="targetTypes"
+        [targetOptionsMap]="targetOptionsMap"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
@@ -49,6 +51,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() zoneOptions: InventoryZone[];
   @Input() targetOptions: InventoryTargets;
   @Input() targetTypes: InventoryTargetType[];
+  @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;

@@ -9,7 +9,6 @@ export interface FlightZone {
   fileSize?: number;
   mimeType?: string;
 }
-
 export interface FlightTarget {
   type: string;
   code: string;

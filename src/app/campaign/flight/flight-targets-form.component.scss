@@ -14,7 +14,7 @@ h2 {
 .inline-fields {
   display: grid;
   grid-column-gap: 0.5rem;
-  grid-template-columns: 1fr 5fr 1fr 40px;
+  grid-template-columns: 1fr max-content 40px;
 
   // allow < 180px width selects
   ::ng-deep .mat-form-field-infix {

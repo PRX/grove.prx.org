@@ -45,6 +45,7 @@ const flightFixture: Flight = {
   endAtFudged: moment.utc().subtract(1, 'days'),
   totalGoal: 123,
   zones: [{ id: 'pre_1' }],
+  targets: [],
   set_inventory_uri: '/some/inventory',
   deliveryMode: 'capped'
 };

@@ -1,6 +1,15 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, ControlContainer } from '@angular/forms';
-import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets, InventoryTargetType, FlightTarget } from '../store/models';
+import {
+  Flight,
+  FlightZone,
+  Inventory,
+  InventoryZone,
+  InventoryTargets,
+  InventoryTargetType,
+  FlightTarget,
+  InventoryTargetsMap
+} from '../store/models';
 
 @Component({
   selector: 'grove-flight-form',
@@ -14,6 +23,7 @@ export class FlightFormComponent implements OnInit {
   @Input() zoneOptions: InventoryZone[];
   @Input() targetOptions: InventoryTargets;
   @Input() targetTypes: InventoryTargetType[];
+  @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
