@@ -69,6 +69,8 @@ export const CampaignDelete = createAction(ActionTypes.CAMPAIGN_DELETE, props<{ 
 export const CampaignDeleteSuccess = createAction(ActionTypes.CAMPAIGN_DELETE_SUCCESS, props<{ id: number | string }>());
 export const CampaignDeleteFailure = createAction(ActionTypes.CAMPAIGN_DELETE_FAILURE, props<{ error }>());
 
+export const CampaignDismissError = createAction(ActionTypes.CAMPAIGN_DISMISS_ERROR);
+
 export const CampaignAddFlight = createAction(
   ActionTypes.CAMPAIGN_ADD_FLIGHT,
   ({ campaignId, flightId, startAt, endAt }: { campaignId: number | string; flightId?: number; startAt?: Moment; endAt?: Moment }) => {
@@ -131,6 +133,7 @@ const all = union({
   CampaignDelete,
   CampaignDeleteSuccess,
   CampaignDeleteFailure,
+  CampaignDismissError,
   CampaignFlightFormUpdate,
   CampaignAddFlight,
   CampaignDupFlight,

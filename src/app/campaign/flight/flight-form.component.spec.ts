@@ -49,6 +49,9 @@ const flightFixture: Flight = {
   set_inventory_uri: '/some/inventory',
   deliveryMode: 'capped'
 };
+
+// arbitrary validator to produce an error for spec
+export const cannotStartInPast = control => (control.value.valueOf() > Date.now() ? { error: 'start date cannot be in the past' } : null);
 @Component({
   template: `
     <form [formGroup]="flightForm">
@@ -83,7 +86,7 @@ class ParentFormComponent {
   flightForm = this.fb.group({
     id: [],
     name: ['', Validators.required],
-    startAt: ['', Validators.required],
+    startAt: ['', [Validators.required, cannotStartInPast]],
     endAtFudged: ['', Validators.required],
     contractStartAt: [''],
     contractEndAt: [''],
@@ -145,5 +148,11 @@ describe('FlightFormComponent', () => {
   it('emits flight delete toggle', done => {
     component.flightDeleteToggle.subscribe(() => done());
     component.onFlightDeleteToggle();
+  });
+
+  it('checks for flight form errors', () => {
+    component.flightForm.get('startAt').setValue(moment.utc().subtract(2, 'days'));
+    component.flightForm.get('startAt').markAsTouched();
+    expect(component.checkError('startAt')).toBeDefined();
   });
 });

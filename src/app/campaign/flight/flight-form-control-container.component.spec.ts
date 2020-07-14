@@ -133,4 +133,23 @@ describe('FlightFormControlContainerComponent', () => {
     component.softDeleted = false;
     expect(component.flightForm.get('name').disabled).toEqual(false);
   });
+
+  it('should validate flight start and end at', () => {
+    component.flightForm.patchValue(flightFixture);
+    expect(component.flightForm.valid).toBeTruthy();
+    component.flightActualsDateBoundaries = {
+      startAt: moment
+        .utc()
+        .subtract(7, 'days')
+        .toDate(),
+      endAt: moment.utc().toDate()
+    };
+    component.flightForm.get('startAt').setValue(moment.utc().subtract(4, 'days'));
+    component.flightForm.get('startAt').markAsTouched();
+    component.flightForm.get('endAtFudged').setValue(moment.utc().subtract(2, 'days'));
+    component.flightForm.get('endAtFudged').markAsTouched();
+    expect(component.validateStartAt(component.flightForm.get('startAt')).error).toBeDefined();
+    expect(component.validateEndAt(component.flightForm.get('endAtFudged')).error).toBeDefined();
+    expect(component.flightForm.invalid).toBeTruthy();
+  });
 });
