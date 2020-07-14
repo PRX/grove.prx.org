@@ -178,7 +178,9 @@ export class FlightTargetsFormComponent implements ControlValueAccessor, OnDestr
   private formatEpisodeLabel(t: InventoryTarget) {
     const pub = t.metadata ? t.metadata.publishedAt || t.metadata.releasedAt : null;
     if (pub) {
-      const date = moment(pub).format('l');
+      const date = moment(pub)
+        .utc()
+        .format('l');
       return { ...t, label: `${date} - ${t.label}` };
     } else {
       return t;

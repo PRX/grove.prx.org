@@ -133,6 +133,6 @@ describe('FlightTargetsFormComponent', () => {
     component.targetOptionsMap = {
       episode: [{ type: 'episode', code: 'A', label: 'Ep A', metadata: { publishedAt: '2020-02-12T00:00:00.000Z' } }]
     };
-    expect(component.targetOptionsMap.episode[0].label).toEqual('2/11/2020 - Ep A');
+    expect(component.targetOptionsMap.episode[0].label).toEqual('2/12/2020 - Ep A');
   });
 });
