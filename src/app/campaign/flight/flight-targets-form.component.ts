@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
-import { InventoryTargets, InventoryTarget, FlightTarget, InventoryTargetType, InventoryTargetsMap } from '../store/models';
+import { InventoryTarget, FlightTarget, InventoryTargetType, InventoryTargetsMap } from '../store/models';
 import moment from 'moment';
 import { Subscription } from 'rxjs';
 
@@ -38,7 +38,7 @@ import { Subscription } from 'rxjs';
     { provide: NG_VALIDATORS, useExisting: FlightTargetsFormComponent, multi: true }
   ]
 })
-export class FlightTargetsFormComponent implements ControlValueAccessor {
+export class FlightTargetsFormComponent implements ControlValueAccessor, OnDestroy {
   // tslint:disable-next-line
   private _targetOptionsMap: InventoryTargetsMap;
   get targetOptionsMap() {
@@ -60,6 +60,10 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   targetsFormSub: Subscription;
   onChangeFn = (value: any) => {};
   onTouchedFn = (value: any) => {};
+
+  ngOnDestroy() {
+    this.unsubscribeFromTargetsForm();
+  }
 
   get ready() {
     return !!this.targetOptionsMap && this.targetTypes;
@@ -90,7 +94,7 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     if (Array.isArray(targets)) {
       // Clean up subscriptions and previous form groups.
       if (this.targetsFormSub) {
-        this.targetsFormSub.unsubscribe();
+        this.unsubscribeFromTargetsForm();
         this.targetsForm.clear();
       }
 
@@ -153,6 +157,12 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     this.targets.splice(index, 1);
     // Remove form group.
     this.targetsForm.removeAt(index);
+  }
+
+  private unsubscribeFromTargetsForm() {
+    if (this.targetsFormSub) {
+      this.targetsFormSub.unsubscribe();
+    }
   }
 
   private compareEpisodes(a: InventoryTarget, b: InventoryTarget) {
