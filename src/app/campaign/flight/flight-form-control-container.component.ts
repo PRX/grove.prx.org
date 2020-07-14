@@ -9,7 +9,6 @@ import {
   InventoryZone,
   InventoryTargets,
   InventoryTargetType,
-  FlightTarget,
   InventoryTargetsMap
 } from '../store/models';
 
@@ -20,7 +19,6 @@ import {
       <grove-flight-form
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
-        [targetOptions]="targetOptions"
         [targetTypes]="targetTypes"
         [targetOptionsMap]="targetOptionsMap"
         [flight]="flight"
@@ -29,8 +27,6 @@ import {
         (flightDuplicate)="flightDuplicate.emit($event)"
         (addZone)="addZone.emit($event)"
         (removeZone)="removeZone.emit($event)"
-        (addTarget)="addTarget.emit($event)"
-        (removeTarget)="removeTarget.emit($event)"
       ></grove-flight-form>
       <grove-inventory
         [flight]="flight"
@@ -61,8 +57,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Output() flightDeleteToggle = new EventEmitter(true);
   @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
-  @Output() addTarget = new EventEmitter<{ flightId: number; target: FlightTarget }>();
-  @Output() removeTarget = new EventEmitter<{ flightId: number; index: number }>();
   formSubcription: Subscription;
   resetting = false;
 

@@ -74,12 +74,8 @@
       <h2>Targets</h2>
       <grove-flight-targets
         formControlName="targets"
-        [flightTargets]="flight?.targets"
-        [targetOptions]="targetOptions"
         [targetTypes]="targetTypes"
         [targetOptionsMap]="targetOptionsMap"
-        (addTarget)="onAddTarget($event)"
-        (removeTarget)="onRemoveTarget($event)"
       ></grove-flight-targets>
     </div>
   </div>

@@ -35,7 +35,8 @@ export class CampaignActionService implements OnDestroy {
       if (
         this.hasPreviewParams(formState.flight) &&
         this.isDateRangeValid(formState.flight) &&
-        this.havePreviewParamsChanged(flightState.localFlight, formState.flight)
+        this.havePreviewParamsChanged(flightState.localFlight, formState.flight) &&
+        this.allFlightTargetsHaveCode(formState.flight)
       ) {
         this.loadFlightPreview(formState.flight);
       }
@@ -118,14 +119,14 @@ export class CampaignActionService implements OnDestroy {
   havePreviewParamsChanged(a: Flight, b: Flight) {
     const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
     return check.some(fld => {
-      if (fld === 'targets') {
-        console.log('havePreviewParamsChanged >> targets', a[fld], b[fld]);
-      }
       if (this.hasChanged(b[fld], a[fld])) {
-        console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);
         return true;
       }
     });
+  }
+
+  allFlightTargetsHaveCode({ targets }: Flight) {
+    return targets.reduce((a, { code }: FlightTarget) => a && !!code, true);
   }
 
   addFlight() {
@@ -195,13 +196,5 @@ export class CampaignActionService implements OnDestroy {
 
   removeFlightZone({ flightId, index }: { flightId: number; index: number }) {
     this.store.dispatch(campaignActions.CampaignFlightRemoveZone({ flightId, index }));
-  }
-
-  addFlightTarget({ flightId, target }: { flightId: number; target: FlightTarget }) {
-    this.store.dispatch(campaignActions.CampaignFlightAddTarget({ flightId, target }));
-  }
-
-  removeFlightTarget({ flightId, index }: { flightId: number; index: number }) {
-    this.store.dispatch(campaignActions.CampaignFlightRemoveTarget({ flightId, index }));
   }
 }

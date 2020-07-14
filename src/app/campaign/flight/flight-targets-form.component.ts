@@ -24,13 +24,13 @@ import { Subscription } from 'rxjs';
           </button>
         </div>
       </div>
+      <div class="add-target">
+        <button mat-button color="primary" [matMenuTriggerFor]="addTargetMenu"><mat-icon>add</mat-icon> Add a target</button>
+        <mat-menu #addTargetMenu="matMenu" xPosition="after">
+          <button mat-menu-item *ngFor="let type of targetTypes" (click)="onAddTarget(type.type)">{{ type.label }}</button>
+        </mat-menu>
+      </div>
     </fieldset>
-    <div class="add-target">
-      <button mat-button color="primary" [matMenuTriggerFor]="addTargetMenu"><mat-icon>add</mat-icon> Add a target</button>
-      <mat-menu #addTargetMenu="matMenu" xPosition="after">
-        <button mat-menu-item *ngFor="let type of targetTypes" (click)="onAddTarget(type.type)">{{ type.label }}</button>
-      </mat-menu>
-    </div>
   `,
   styleUrls: ['flight-targets-form.component.scss'],
   providers: [
@@ -40,20 +40,20 @@ import { Subscription } from 'rxjs';
 })
 export class FlightTargetsFormComponent implements ControlValueAccessor {
   // tslint:disable-next-line
-  private _targetOptions: InventoryTargets;
-  get targetOptions() {
-    return this._targetOptions;
+  private _targetOptionsMap: InventoryTargetsMap;
+  get targetOptionsMap() {
+    return this._targetOptionsMap;
   }
   @Input()
-  set targetOptions(targetOptions: InventoryTargets) {
-    this._targetOptions = targetOptions;
-    // this.setCodeOptions(this.targets ? (this.targets.value as FlightTarget[]) : []);
+  set targetOptionsMap(targetOptionsMap: InventoryTargetsMap) {
+    this._targetOptionsMap = targetOptionsMap && {
+      ...targetOptionsMap,
+      ...(targetOptionsMap.episode && {
+        episode: targetOptionsMap.episode.sort(this.compareEpisodes).map(this.formatEpisodeLabel)
+      })
+    };
   }
-  @Input() flightTargets: FlightTarget[];
   @Input() targetTypes: InventoryTargetType[];
-  @Input() targetOptionsMap: InventoryTargetsMap;
-  @Output() addTarget = new EventEmitter<{ target: FlightTarget }>();
-  @Output() removeTarget = new EventEmitter<{ index: number }>();
 
   targets: { type: string }[] = [];
   targetsForm: FormArray;
@@ -62,7 +62,7 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   onTouchedFn = (value: any) => {};
 
   get ready() {
-    return !!this.targets.length && !!this.targetOptionsMap;
+    return !!this.targetOptionsMap && this.targetTypes;
   }
 
   get targetTypesMap(): { [k: string]: InventoryTargetType } {
@@ -75,14 +75,6 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
     );
   }
 
-  newFlightTarget(target: FlightTarget) {
-    return new FormGroup({
-      type: new FormControl(target.type, Validators.required),
-      code: new FormControl(target.code, Validators.required),
-      exclude: new FormControl(target.exclude || false)
-    });
-  }
-
   flightTargetFormGroup(target: FlightTarget): FormGroup {
     const { code, exclude } = target;
     return new FormGroup({
@@ -92,36 +84,14 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   }
 
   writeValue(targets: FlightTarget[]) {
-    // this.setCodeOptions(targets);
-    // this.targets = new FormArray((targets || []).map(this.newFlightTarget));
-    // // TODO: wouldn't this be leaking subscriptions? Instead of new'ing the FormArray and subscribing on each update,
-    // //  it should update/add/remove the controls in the array
-    // this.targets.valueChanges.subscribe(formTargets => {
-    //   this.setCodeOptions(formTargets);
-    //   this.onChangeFn(this.validTargetCodes(formTargets));
-    // });
-
-    console.log('writeValue >> targets', targets);
-
-    // // get the correct number of zone fields and patchValue
-    // const expectedLength = targets.length;
-    // while (this.targets.controls.length > expectedLength) {
-    //   this.targets.removeAt(this.targets.controls.length - 1);
-    //   this.targets.markAsPristine();
-    // }
-    // const addZones = [...targets];
-    // while (this.targets.controls.length < expectedLength) {
-    //   // this only adds controls, doesn't reset controls already in form
-    //   this.targets.push(this.flightTargetFormGroup(targets && addZones.pop()));
-    //   this.targets.markAsPristine();
-    // }
-    // // patch all of the values onto the FormArray
-    // this.targets.patchValue(targets || [], { emitEvent: false });
-
+    // TODO: This check is here to prevent an error seen in tests. Determine if
+    // there is something in the spec that could be done differently to not
+    // require this check.
     if (Array.isArray(targets)) {
-      // Clean up subscriptions.
+      // Clean up subscriptions and previous form groups.
       if (this.targetsFormSub) {
         this.targetsFormSub.unsubscribe();
+        this.targetsForm.clear();
       }
 
       // Build our array of static target prop values.
@@ -134,10 +104,6 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
       this.targetsForm = new FormArray(formGroups);
       // Create new subscription for form changes.
       this.targetsFormSub = this.targetsForm.valueChanges.subscribe(formTargets => {
-        let hasEmptyCode = false;
-
-        console.log('targetsSub >> targets', this.targets);
-
         // Combine static values with form values.
         const changes = formTargets.map((group, i: number) => ({
           type: this.targets[i].type,
@@ -145,14 +111,8 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
           exclude: group.exclude
         }));
 
-        changes.forEach(({ code }: FlightTarget) => (hasEmptyCode = !code));
-
-        console.log('targetsSub >> changes', changes);
-
-        // Pass on changes.
-        if (!hasEmptyCode) {
-          this.onChangeFn(changes);
-        }
+        // Pass on changes if all targets have codes.
+        this.onChangeFn(changes);
       });
     }
   }
@@ -170,75 +130,30 @@ export class FlightTargetsFormComponent implements ControlValueAccessor {
   }
 
   onAddTarget(type: string) {
-    const newTarget = { type, code: '', exclude: false };
-    let newIndex: number;
-
-    console.log('onAddTarget >> type', type);
-
+    // Append object with target static prop values to targets array.
     if (!this.targets) {
+      // Make sure targets is an array.
       this.targets = [];
     }
-
-    newIndex = this.targets.length;
-    const formGroup = this.flightTargetFormGroup(newTarget);
     this.targets.push({
       type
     });
-    this.targetsForm.push(formGroup);
 
-    console.log('onAddTarget >> targets', this.targets);
-    // this.addTarget.emit({ target: newTarget });
+    // Append new form group to targets form array.
+    const formGroup = this.flightTargetFormGroup({ type, code: '', exclude: false });
+    if (!this.targetsForm) {
+      // Make sure targetsForm is a form array.
+      this.targetsForm = new FormArray([]);
+    }
+    this.targetsForm.push(formGroup);
   }
 
   onRemoveTarget(index: number) {
-    this.targetsForm.removeAt(index);
+    // Remove static values object.
     this.targets.splice(index, 1);
-    this.targetsForm.updateValueAndValidity();
-    // this.removeTarget.emit({ index });
+    // Remove form group.
+    this.targetsForm.removeAt(index);
   }
-
-  // private validTargetCodes(targets: FlightTarget[]) {
-  //   return targets.filter(({ type, code }, index) => {
-  //     if (!type || !code) {
-  //       return false;
-  //     } else if (!this.codeOptions[index].find(opt => opt.code === code)) {
-  //       // the type changed, and now the code is stale ... clear it!
-  //       this.targets
-  //         .at(index)
-  //         .get('code')
-  //         .setValue('');
-  //       return false;
-  //     } else {
-  //       return true;
-  //     }
-  //   });
-  // }
-
-  // private setCodeOptions(targets: FlightTarget[]) {
-  //   this.codeOptions = (targets || []).map(target => {
-  //     return this.filteredTargetOptions(target.type, target.code, targets);
-  //   });
-  // }
-
-  // private filteredTargetOptions(type: string, code: string, currentTargets: FlightTarget[]) {
-  //   return this.targetCodesForType(type).filter(opt => {
-  //     if (opt.type === type && opt.code === code) {
-  //       return true;
-  //     } else {
-  //       return !currentTargets.find(t => opt.type === t.type && opt.code === t.code);
-  //     }
-  //   });
-  // }
-
-  // private targetCodesForType(type: string) {
-  //   if (this.targetOptions && type === 'episode') {
-  //     return this.targetOptions.episodes.sort(this.compareEpisodes).map(this.formatEpisodeLabel);
-  //   } else if (this.targetOptions && type === 'country') {
-  //     return this.targetOptions.countries.sort((a, b) => a.label.localeCompare(b.label));
-  //   } else {
-  //     return [];
-  //   }
-  // }
 
   private compareEpisodes(a: InventoryTarget, b: InventoryTarget) {
     const apub = a.metadata ? a.metadata.publishedAt || a.metadata.releasedAt : null;

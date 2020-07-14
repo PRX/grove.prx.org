@@ -21,7 +21,6 @@ export class FlightFormComponent implements OnInit {
   @Input() flight: Flight;
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
-  @Input() targetOptions: InventoryTargets;
   @Input() targetTypes: InventoryTargetType[];
   @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() softDeleted: boolean;
@@ -29,8 +28,6 @@ export class FlightFormComponent implements OnInit {
   @Output() flightDeleteToggle = new EventEmitter(true);
   @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
-  @Output() addTarget = new EventEmitter<{ flightId: number; target: FlightTarget }>();
-  @Output() removeTarget = new EventEmitter<{ flightId: number; index: number }>();
   flightForm: FormGroup;
 
   ngOnInit() {
@@ -57,13 +54,5 @@ export class FlightFormComponent implements OnInit {
 
   onRemoveZone({ index }: { index: number }) {
     this.removeZone.emit({ flightId: this.flight.id, index });
-  }
-
-  onAddTarget({ target }: { target: FlightTarget }) {
-    this.addTarget.emit({ flightId: this.flight.id, target });
-  }
-
-  onRemoveTarget({ index }: { index: number }) {
-    this.removeTarget.emit({ flightId: this.flight.id, index });
   }
 }
