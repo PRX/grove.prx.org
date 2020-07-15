@@ -1,12 +1,10 @@
 @import '~src/sass/variables';
 @import '~src/sass/colors';
 
-:host {
-  h2 {
-    margin-bottom: 0.5em;
-    font-size: 22px;
-    font-weight: 400;
-  }
+h2 {
+  margin-bottom: 0.5em;
+  font-size: 22px;
+  font-weight: 400;
 }
 
 mat-card {
