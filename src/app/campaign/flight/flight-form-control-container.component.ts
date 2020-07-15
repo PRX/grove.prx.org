@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { Flight, FlightZone, InventoryRollup, Inventory, InventoryZone, InventoryTargets } from '../store/models';
+import {
+  Flight,
+  FlightZone,
+  InventoryRollup,
+  Inventory,
+  InventoryZone,
+  InventoryTargets,
+  InventoryTargetType,
+  InventoryTargetsMap
+} from '../store/models';
 import { utc } from 'moment';
 
 @Component({
@@ -11,7 +20,8 @@ import { utc } from 'moment';
       <grove-flight-form
         [inventory]="inventory"
         [zoneOptions]="zoneOptions"
-        [targetOptions]="targetOptions"
+        [targetTypes]="targetTypes"
+        [targetOptionsMap]="targetOptionsMap"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
@@ -37,6 +47,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
   @Input() targetOptions: InventoryTargets;
+  @Input() targetTypes: InventoryTargetType[];
+  @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;

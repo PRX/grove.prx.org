@@ -11,6 +11,7 @@ import {
   MatIconModule,
   MatDatepickerModule,
   MatSlideToggleModule,
+  MatMenuModule,
   DateAdapter,
   MAT_DATE_LOCALE,
   MAT_DATE_FORMATS
@@ -44,6 +45,7 @@ const flightFixture: Flight = {
   endAtFudged: moment.utc().subtract(1, 'days'),
   totalGoal: 123,
   zones: [{ id: 'pre_1' }],
+  targets: [],
   set_inventory_uri: '/some/inventory',
   deliveryMode: 'capped'
 };
@@ -115,7 +117,8 @@ describe('FlightFormComponent', () => {
         MatMomentDateModule,
         MatButtonModule,
         MatIconModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        MatMenuModule
       ],
       declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent, FlightZonesFormComponent],
       providers: [

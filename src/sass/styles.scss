@@ -14,6 +14,10 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
+button.mat-button {
+  background-color: initial;
+}
+
 .mat-menu-item {
   &.menuItem--warn {
     color: $warn;

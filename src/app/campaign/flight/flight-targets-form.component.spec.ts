@@ -1,16 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatButtonModule, MatIconModule } from '@angular/material';
+import { MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatButtonModule, MatIconModule, MatMenuModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
-import { InventoryTargets } from '../store/models';
+import { InventoryTargetsMap } from '../store/models';
 
 @Component({
   template: `
     <form [formGroup]="flightForm">
-      <grove-flight-targets #childForm formControlName="targets" [targetOptions]="options"> </grove-flight-targets>
+      <grove-flight-targets #childForm formControlName="targets" [targetOptionsMap]="optionsMap"> </grove-flight-targets>
     </form>
   `
 })
@@ -18,13 +18,12 @@ class ParentFormComponent {
   @ViewChild('childForm', { static: true }) childForm: FlightTargetsFormComponent;
   constructor(private fb: FormBuilder) {}
   flightForm = this.fb.group({ targets: [''] });
-  options: InventoryTargets = {
-    inventoryId: 1234,
-    countries: [
+  optionsMap: InventoryTargetsMap = {
+    country: [
       { type: 'country', code: 'US', label: 'The Us' },
       { type: 'country', code: 'CA', label: 'The Canadia' }
     ],
-    episodes: [{ type: 'episode', code: 'AAAA', label: 'The Episoded' }]
+    episode: [{ type: 'episode', code: 'AAAA', label: 'The Episoded' }]
   };
 }
 
@@ -42,7 +41,8 @@ describe('FlightTargetsFormComponent', () => {
         MatSelectModule,
         MatCheckboxModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
+        MatMenuModule
       ],
       declarations: [ParentFormComponent, FlightTargetsFormComponent]
     }).compileComponents();
@@ -56,28 +56,35 @@ describe('FlightTargetsFormComponent', () => {
   });
 
   it('sets targets from the parent form', () => {
-    expect(component.targets.length).toEqual(0);
+    expect(component.targetsForm).toBeUndefined();
     parent.flightForm.setValue({ targets: [{}] });
-    expect(component.targets.length).toEqual(1);
+    expect(component.targetsForm.length).toEqual(1);
     parent.flightForm.reset({ targets: [{}, {}] });
-    expect(component.targets.length).toEqual(2);
+    expect(component.targetsForm.length).toEqual(2);
   });
 
-  it('adds targets but only emits them when they have values', () => {
-    expect(parent.flightForm.value).toEqual({ targets: '' });
-    expect(parent.flightForm.dirty).toEqual(false);
+  it('adds empty target of a specific types', () => {
+    component.onAddTarget('country');
+    expect(component.targets).toBeDefined();
+    expect(component.targets.length).toBe(1);
+    expect(component.targets[0].type).toBe('country');
+    expect(component.targetsForm).toBeDefined();
+    expect(component.targetsForm.length).toEqual(1);
+    expect(component.targetsForm.at(0).get('code')).toBeDefined();
+    expect(component.targetsForm.at(0).get('code').value).toBe('');
+    expect(component.targetsForm.at(0).get('exclude')).toBeDefined();
+    expect(component.targetsForm.at(0).get('exclude').value).toBe(false);
+    expect(component.targetsForm.valid).toBe(false);
+  });
 
-    component.addTarget();
-    component.addTarget();
-    expect(parent.flightForm.value).toEqual({ targets: [] });
-    expect(component.targets.length).toEqual(2);
-    expect(parent.flightForm.dirty).toEqual(true);
-
-    component.targets.at(1).setValue({ type: 'country', code: '', exclude: false });
-    expect(parent.flightForm.value).toEqual({ targets: [] });
-
-    component.targets.at(1).setValue({ type: 'country', code: 'CA', exclude: false });
-    expect(parent.flightForm.value).toEqual({ targets: [{ type: 'country', code: 'CA', exclude: false }] });
+  it('becomes valid when target code is selected', () => {
+    component.onAddTarget('country');
+    component.targetsForm
+      .at(0)
+      .get('code')
+      .setValue('CA');
+    expect(component.targetsForm.at(0).get('code').value).toBe('CA');
+    expect(component.targetsForm.valid).toBe(true);
   });
 
   it('removes targets', () => {
@@ -88,60 +95,44 @@ describe('FlightTargetsFormComponent', () => {
       ]
     });
     expect(parent.flightForm.dirty).toEqual(false);
+    expect(component.targetsForm.length).toBe(2);
+    expect(component.targetsForm.at(0).get('code').value).toBe('US');
 
-    component.removeTarget(0);
-    expect(parent.flightForm.value).toEqual({ targets: [{ type: 'episode', code: 'AAAA', exclude: false }] });
-    expect(parent.flightForm.dirty).toEqual(true);
+    component.onRemoveTarget(0);
+    expect(component.targets.length).toBe(1);
+    expect(component.targetsForm.length).toBe(1);
+    expect(component.targetsForm.at(0).get('code').value).toBe('AAAA');
   });
 
   it('validates targets', () => {
     expect(parent.flightForm.valid).toEqual(true);
 
-    component.addTarget();
-    expect(parent.flightForm.valid).toEqual(false);
+    component.onAddTarget('country');
+    expect(component.targetsForm.valid).toEqual(false);
 
-    component.targets.at(0).setValue({ type: 'country', code: '', exclude: false });
-    expect(parent.flightForm.valid).toEqual(false);
+    component.targetsForm.at(0).setValue({ code: '', exclude: false });
+    expect(component.targetsForm.valid).toEqual(false);
 
-    component.targets.at(0).setValue({ type: 'country', code: 'US', exclude: false });
-    expect(parent.flightForm.valid).toEqual(true);
-  });
-
-  it('removes target codes when their type changes', () => {
-    parent.flightForm.reset({ targets: [{ type: 'country', code: 'US', exclude: false }] });
-    expect(component.codeOptions[0]).toEqual(parent.options.countries);
-
-    component.targets.at(0).setValue({ type: 'episode', code: 'US', exclude: false });
-    expect(parent.flightForm.value).toEqual({ targets: [] });
-    expect(component.targets.value).toEqual([{ type: 'episode', code: '', exclude: false }]);
-  });
-
-  it('restricts target codes based on their type', () => {
-    component.addTarget();
-    expect(component.codeOptions[0]).toEqual([]);
-
-    component.targets.at(0).setValue({ type: 'foobar', code: '', exclude: false });
-    expect(component.codeOptions[0]).toEqual([]);
-
-    component.targets.at(0).setValue({ type: 'country', code: '', exclude: false });
-    expect(component.codeOptions[0]).toEqual(parent.options.countries);
-
-    component.targets.at(0).setValue({ type: 'episode', code: '', exclude: false });
-    expect(component.codeOptions[0]).toEqual(parent.options.episodes);
+    component.targetsForm.at(0).setValue({ code: 'US', exclude: false });
+    expect(component.targetsForm.valid).toEqual(true);
   });
 
   it('sorts episode options by publish date', () => {
-    component.targetOptions = {
-      inventoryId: 1234,
-      countries: [],
-      episodes: [
+    component.targetOptionsMap = {
+      episode: [
         { type: 'episode', code: 'A', label: 'Ep A', metadata: { publishedAt: '2020-02-12T00:00:00.000Z' } },
         { type: 'episode', code: 'B', label: 'Ep B', metadata: { releasedAt: '2020-01-22T00:00:00.000Z' } },
         { type: 'episode', code: 'C', label: 'Ep C', metadata: { publishedAt: '2020-02-02T00:00:00.000Z' } },
         { type: 'episode', code: 'D', label: 'Ep D', metadata: { publishedAt: '2020-02-22T00:00:00.000Z' } }
       ]
     };
-    parent.flightForm.reset({ targets: [{ type: 'episode', code: '', exclude: false }] });
-    expect(component.codeOptions[0].map(o => o.code)).toEqual(['D', 'A', 'C', 'B']);
+    expect(component.targetOptionsMap.episode.map(o => o.code)).toEqual(['D', 'A', 'C', 'B']);
+  });
+
+  it('prepends date string to episode options label', () => {
+    component.targetOptionsMap = {
+      episode: [{ type: 'episode', code: 'A', label: 'Ep A', metadata: { publishedAt: '2020-02-12T00:00:00.000Z' } }]
+    };
+    expect(component.targetOptionsMap.episode[0].label).toEqual('2/12/2020 - Ep A');
   });
 });

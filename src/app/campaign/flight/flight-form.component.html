@@ -59,7 +59,7 @@
         <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
       </mat-select>
     </mat-form-field>
-    <div class="flight-zones">
+    <div class="mat-form-field-wrapper flight-zones">
       <div class="flight-zones-header">
         <h2>Zones</h2>
         <mat-slide-toggle formControlName="isCompanion">Companions</mat-slide-toggle>
@@ -73,7 +73,14 @@
         (removeZone)="onRemoveZone($event)"
       ></grove-flight-zones>
     </div>
-    <grove-flight-targets formControlName="targets" [targetOptions]="targetOptions"> </grove-flight-targets>
+    <div class="mat-form-field-wrapper flight-targets">
+      <h2>Targets</h2>
+      <grove-flight-targets
+        formControlName="targets"
+        [targetTypes]="targetTypes"
+        [targetOptionsMap]="targetOptionsMap"
+      ></grove-flight-targets>
+    </div>
   </div>
   <div class="flight-controls-container">
     <button

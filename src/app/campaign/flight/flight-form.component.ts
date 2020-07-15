@@ -1,7 +1,16 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, AbstractControl, ControlContainer } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
-import { Flight, FlightZone, Inventory, InventoryZone, InventoryTargets } from '../store/models';
+import {
+  Flight,
+  FlightZone,
+  Inventory,
+  InventoryZone,
+  InventoryTargets,
+  InventoryTargetType,
+  FlightTarget,
+  InventoryTargetsMap
+} from '../store/models';
 
 export class FlightFormErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: AbstractControl): boolean {
@@ -18,7 +27,8 @@ export class FlightFormComponent implements OnInit {
   @Input() flight: Flight;
   @Input() inventory: Inventory[];
   @Input() zoneOptions: InventoryZone[];
-  @Input() targetOptions: InventoryTargets;
+  @Input() targetTypes: InventoryTargetType[];
+  @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);

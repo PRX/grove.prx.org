@@ -5,7 +5,7 @@ import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
 import { utc } from 'moment';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
-import { Flight, FlightZone } from '../models';
+import { Flight, FlightZone, FlightTarget } from '../models';
 import {
   selectCampaignId,
   selectCampaignWithFlightsForSave,
@@ -35,7 +35,8 @@ export class CampaignActionService implements OnDestroy {
       if (
         this.hasPreviewParams(formState.flight) &&
         this.isDateRangeValid(formState.flight) &&
-        this.havePreviewParamsChanged(flightState.localFlight, formState.flight)
+        this.havePreviewParamsChanged(flightState.localFlight, formState.flight) &&
+        this.allFlightTargetsHaveCode(formState.flight)
       ) {
         this.loadFlightPreview(formState.flight);
       }
@@ -119,10 +120,13 @@ export class CampaignActionService implements OnDestroy {
     const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
     return check.some(fld => {
       if (this.hasChanged(b[fld], a[fld])) {
-        // console.log(`previewing BECAUSE ${fld}:`, a[fld], '->', b[fld]);
         return true;
       }
     });
+  }
+
+  allFlightTargetsHaveCode({ targets }: Flight) {
+    return targets.reduce((a, { code }: FlightTarget) => a && !!code, true);
   }
 
   addFlight() {

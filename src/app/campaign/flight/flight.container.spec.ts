@@ -14,7 +14,8 @@ import {
   MatSelectModule,
   MatProgressSpinnerModule,
   MatSlideToggleModule,
-  MatCheckboxModule
+  MatCheckboxModule,
+  MatMenuModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -75,6 +76,7 @@ describe('FlightContainerComponent', () => {
     endAtFudged: moment.utc('2019-10-31'),
     set_inventory_uri: '/some/url',
     zones: [{ id: 'pre_1', label: 'Preroll 1' }],
+    targets: [],
     totalGoal: 999,
     deliveryMode: 'capped'
   };
@@ -98,6 +100,7 @@ describe('FlightContainerComponent', () => {
         MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatCheckboxModule,
+        MatMenuModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {

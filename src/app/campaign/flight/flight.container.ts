@@ -1,7 +1,16 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargets, FlightZone } from '../store/models';
+import {
+  Flight,
+  InventoryRollup,
+  Inventory,
+  InventoryZone,
+  FlightZone,
+  InventoryTargetType,
+  FlightTarget,
+  InventoryTargetsMap
+} from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -13,7 +22,8 @@ import {
   selectIsFlightPreviewLoading,
   selectAllInventoryOrderByName,
   selectCurrentInventoryZones,
-  selectCurrentInventoryTargets,
+  selectCurrentInventoryTargetTypes,
+  selectCurrentInventoryTargetsTypeMap,
   selectFlightActualsDateBoundaries
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
@@ -23,7 +33,8 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
     <grove-flight
       [inventory]="inventoryOptions$ | async"
       [zoneOptions]="zoneOptions$ | async"
-      [targetOptions]="targetOptions$ | async"
+      [targetTypes]="targetTypes$ | async"
+      [targetOptionsMap]="targetOptionsMap$ | async"
       [flight]="flightLocal$ | async"
       [softDeleted]="softDeleted$ | async"
       [rollup]="inventoryRollup$ | async"
@@ -51,7 +62,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
   zoneOptions$: Observable<InventoryZone[]>;
-  targetOptions$: Observable<InventoryTargets>;
+  targetTypes$: Observable<InventoryTargetType[]>;
+  targetOptionsMap$: Observable<InventoryTargetsMap>;
   flightActualsDateBoundaries$: Observable<{ startAt: Date; endAt: Date }>;
   flightSub: Subscription;
 
@@ -68,7 +80,8 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.store.pipe(select(selectIsFlightPreviewLoading));
     this.inventoryOptions$ = this.store.pipe(select(selectAllInventoryOrderByName));
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
-    this.targetOptions$ = this.store.pipe(select(selectCurrentInventoryTargets));
+    this.targetTypes$ = this.store.pipe(select(selectCurrentInventoryTargetTypes));
+    this.targetOptionsMap$ = this.store.pipe(select(selectCurrentInventoryTargetsTypeMap));
     this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
   }
 

@@ -11,6 +11,7 @@ import {
   MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatDatepickerModule,
+  MatMenuModule,
   DateAdapter,
   MAT_DATE_LOCALE,
   MAT_DATE_FORMATS
@@ -42,6 +43,7 @@ const flightFixture: Flight = {
   deliveryMode: 'capped',
   totalGoal: 123,
   zones: [{ id: 'pre_1' }],
+  targets: [],
   set_inventory_uri: '/some/inventory'
 };
 
@@ -66,6 +68,7 @@ describe('FlightFormControlContainerComponent', () => {
         MatCheckboxModule,
         MatProgressSpinnerModule,
         MatSlideToggleModule,
+        MatMenuModule,
         SharedModule
       ],
       declarations: [
