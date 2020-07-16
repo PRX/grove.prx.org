@@ -1,16 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatButtonModule, MatIconModule, MatMenuModule } from '@angular/material';
+import {
+  MatFormFieldModule,
+  MatSelectModule,
+  MatAutocompleteModule,
+  MatCheckboxModule,
+  MatButtonModule,
+  MatIconModule,
+  MatMenuModule
+} from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
-import { InventoryTargetsMap } from '../store/models';
+import { InventoryTargetsMap, InventoryTargetType } from '../store/models';
 
 @Component({
   template: `
     <form [formGroup]="flightForm">
-      <grove-flight-targets #childForm formControlName="targets" [targetOptionsMap]="optionsMap"> </grove-flight-targets>
+      <grove-flight-targets #childForm formControlName="targets" [targetTypes]="targetTypes" [targetOptionsMap]="optionsMap">
+      </grove-flight-targets>
     </form>
   `
 })
@@ -25,6 +34,7 @@ class ParentFormComponent {
     ],
     episode: [{ type: 'episode', code: 'AAAA', label: 'The Episoded' }]
   };
+  targetTypes: InventoryTargetType[] = [{ type: 'country', label: 'Country', labelPlural: 'Countries' }];
 }
 
 describe('FlightTargetsFormComponent', () => {
@@ -39,6 +49,7 @@ describe('FlightTargetsFormComponent', () => {
         NoopAnimationsModule,
         MatFormFieldModule,
         MatSelectModule,
+        MatAutocompleteModule,
         MatCheckboxModule,
         MatButtonModule,
         MatIconModule,
@@ -53,6 +64,14 @@ describe('FlightTargetsFormComponent', () => {
     parent = fixture.componentInstance;
     component = parent.childForm;
     fixture.detectChanges();
+  });
+
+  it("return a target type's label", () => {
+    const label = component.getTargetTypeLabel('country');
+    const labelPlural = component.getTargetTypeLabel('country', true);
+
+    expect(label).toBe('Country');
+    expect(labelPlural).toBe('Countries');
   });
 
   it('sets targets from the parent form', () => {
