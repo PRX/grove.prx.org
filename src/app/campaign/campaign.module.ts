@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCardModule } from '@angular/material/card';
@@ -40,6 +41,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatAutocompleteModule,
     MatCheckboxModule,
     MatSlideToggleModule,
     MatSidenavModule,
