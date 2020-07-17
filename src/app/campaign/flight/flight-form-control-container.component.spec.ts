@@ -33,6 +33,8 @@ import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
+import { PingbackFormComponent } from './pingbacks/pingback-form.component';
+import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { Flight } from '../store/models';
 import * as moment from 'moment';
 
@@ -78,6 +80,8 @@ describe('FlightFormControlContainerComponent', () => {
         FlightFormComponent,
         FlightTargetsFormComponent,
         FlightZonesFormComponent,
+        FlightZonePingbacksFormComponent,
+        PingbackFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent

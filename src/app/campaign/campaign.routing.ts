@@ -12,6 +12,8 @@ import { FlightFormControlContainerComponent } from './flight/flight-form-contro
 import { FlightFormComponent } from './flight/flight-form.component';
 import { FlightTargetsFormComponent } from './flight/flight-targets-form.component';
 import { FlightZonesFormComponent } from './flight/flight-zones-form.component';
+import { FlightZonePingbacksFormComponent } from './flight/pingbacks/flight-zone-pingbacks-form.component';
+import { PingbackFormComponent } from './flight/pingbacks/pingback-form.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
@@ -49,6 +51,8 @@ export const campaignComponents: any[] = [
   FlightFormComponent,
   FlightTargetsFormComponent,
   FlightZonesFormComponent,
+  FlightZonePingbacksFormComponent,
+  PingbackFormComponent,
   InventoryComponent,
   InventoryTableComponent,
   GoalFormComponent

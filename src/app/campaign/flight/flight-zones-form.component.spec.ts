@@ -4,8 +4,10 @@ import { FormBuilder } from '@angular/forms';
 import { MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, MatIconModule } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { PingbackFormComponent } from './pingbacks/pingback-form.component';
+import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
-import { FlightZone, InventoryZone, filterZones } from '../store/models';
+import { FlightZone, InventoryZone } from '../store/models';
 
 @Component({
   template: `
@@ -50,7 +52,7 @@ describe('FlightZonesFormComponent', () => {
         MatButtonModule,
         MatIconModule
       ],
-      declarations: [ParentFormComponent, FlightZonesFormComponent]
+      declarations: [ParentFormComponent, FlightZonesFormComponent, FlightZonePingbacksFormComponent, PingbackFormComponent]
     }).compileComponents();
   }));
 
@@ -74,9 +76,21 @@ describe('FlightZonesFormComponent', () => {
   it('adds zone from the top most available option', () => {
     component.onAddZone();
     expect(component.zones.value).toEqual([
-      { id: '', url: '' },
-      { id: component.zoneOptions[component.flightZones.length].id, url: '' }
+      { id: '', url: '', pingbacks: null },
+      { id: component.zoneOptions[component.flightZones.length].id, url: '', pingbacks: null }
     ]);
+  });
+
+  it('removes zones by index', () => {
+    parent.flightForm.reset({
+      zones: [{ id: 'pre_1' }, { id: 'pre_2' }]
+    });
+    expect(component.zones.value).toEqual([
+      { id: 'pre_1', url: '', pingbacks: null },
+      { id: 'pre_2', url: '', pingbacks: null }
+    ]);
+    component.onRemoveZone(0);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: null }]);
   });
 
   it('removes zones when there are more controls than zones', () => {
@@ -84,11 +98,11 @@ describe('FlightZonesFormComponent', () => {
       zones: [{ id: 'pre_1' }, { id: 'pre_2' }]
     });
     expect(component.zones.value).toEqual([
-      { id: 'pre_1', url: '' },
-      { id: 'pre_2', url: '' }
+      { id: 'pre_1', url: '', pingbacks: null },
+      { id: 'pre_2', url: '', pingbacks: null }
     ]);
-    component.onRemoveZone(0);
-    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '' }]);
+    component.writeValue([{ id: 'pre_2', url: '', pingbacks: null }]);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: null }]);
   });
 
   it('does very basic mp3 validations', () => {
