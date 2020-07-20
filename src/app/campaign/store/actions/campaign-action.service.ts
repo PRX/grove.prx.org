@@ -14,7 +14,7 @@ import {
   selectCampaignAndFlights,
   selectRoutedCampaignFlightDocs
 } from '../selectors';
-import { Moment } from 'moment';
+import { Moment, isMoment } from 'moment';
 
 interface FlightFormState {
   flight: Flight;
@@ -93,6 +93,8 @@ export class CampaignActionService implements OnDestroy {
         (a === undefined || a === null || a === '' || a.length === 0) &&
         (b === undefined || b === null || b === '' || b.length === 0)
       );
+    } else if (isMoment(a) && isMoment(b)) {
+      return a.valueOf() !== b.valueOf();
     } else if (a instanceof Object && b instanceof Object) {
       // objects - compare keys in A to B (ignoring keys missing from A)
       return Object.keys(a).some(key => this.hasChanged(a[key], b[key]));
@@ -103,6 +105,19 @@ export class CampaignActionService implements OnDestroy {
       // anything else - strict comparison
       return a !== b;
     }
+  }
+
+  haveZoneIdsChanged(a: FlightZone[], b: FlightZone[]) {
+    return (
+      a
+        .map(z => z.id)
+        .sort((z1, z2) => z1.localeCompare(z2))
+        .join(',') !==
+      b
+        .map(z => z.id)
+        .sort((z1, z2) => z1.localeCompare(z2))
+        .join(',')
+    );
   }
 
   hasPreviewParams(flight: Flight): boolean {
@@ -117,12 +132,15 @@ export class CampaignActionService implements OnDestroy {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
-    return check.some(fld => {
-      if (this.hasChanged(b[fld], a[fld])) {
-        return true;
-      }
-    });
+    const check = ['startAt', 'endAt', 'set_inventory_uri', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
+    return (
+      this.haveZoneIdsChanged(a.zones, b.zones) ||
+      check.some(fld => {
+        if (this.hasChanged(b[fld], a[fld])) {
+          return true;
+        }
+      })
+    );
   }
 
   allFlightTargetsHaveCode({ targets }: Flight) {
@@ -188,13 +206,5 @@ export class CampaignActionService implements OnDestroy {
     this.store
       .pipe(select(selectCampaignAndFlights), first())
       .subscribe(params => this.store.dispatch(campaignActions.CampaignDuplicate(params)));
-  }
-
-  addFlightZone({ flightId, zone }: { flightId: number; zone: FlightZone }) {
-    this.store.dispatch(campaignActions.CampaignFlightAddZone({ flightId, zone }));
-  }
-
-  removeFlightZone({ flightId, index }: { flightId: number; index: number }) {
-    this.store.dispatch(campaignActions.CampaignFlightRemoveZone({ flightId, index }));
   }
 }

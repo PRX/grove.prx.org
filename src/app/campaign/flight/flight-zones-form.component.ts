@@ -129,16 +129,13 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   onAddZone() {
-    // this will send an Add Zone action dispatch up thru the state to be added to the flight,
-    //  and the zone control will be added to the form in writeValue
-    // add the zone that's at the top of the options list
-    this.addZone.emit({ zone: filterZones(this.zoneOptions, this.flightZones as InventoryZone[]).shift() });
+    // this add a control to the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
+    this.zones.push(this.flightZoneFormGroup(filterZones(this.zoneOptions, this.flightZones as InventoryZone[]).shift()));
   }
 
   onRemoveZone(index: number) {
-    // sends an action dispatch up thru the state to be removed from the flight,
-    //  and the zone control will be removed from the form in writeValue
-    this.removeZone.emit({ index });
+    // thisremoves a control from the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
+    this.zones.removeAt(index);
   }
 
   // filters to the zone options remaining (each zone can only be selected once)

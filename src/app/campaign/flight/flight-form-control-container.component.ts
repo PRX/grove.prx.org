@@ -26,8 +26,6 @@ import { utc } from 'moment';
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
         (flightDuplicate)="flightDuplicate.emit($event)"
-        (addZone)="addZone.emit($event)"
-        (removeZone)="removeZone.emit($event)"
       ></grove-flight-form>
       <grove-inventory
         [flight]="flight"
@@ -57,8 +55,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
-  @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
-  @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
   formSubcription: Subscription;
   resetting = false;
 

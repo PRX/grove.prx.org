@@ -24,7 +24,7 @@ import { FlightZone, InventoryZone, filterZones } from '../store/models';
 class ParentFormComponent {
   @ViewChild('childForm', { static: true }) childForm: FlightZonesFormComponent;
   constructor(private fb: FormBuilder) {}
-  flightForm = this.fb.group({ zones: [''] });
+  flightForm = this.fb.group({ zones: '' });
   options: InventoryZone[] = [
     { id: 'pre_1', label: 'Preroll 1' },
     { id: 'pre_2', label: 'Preroll 2' },
@@ -72,21 +72,23 @@ describe('FlightZonesFormComponent', () => {
   });
 
   it('adds zone from the top most available option', () => {
-    spyOn(component.addZone, 'emit');
-    expect(parent.flightForm.value).toEqual({ zones: '' });
-
     component.onAddZone();
-    expect(component.addZone.emit).toHaveBeenCalledWith({
-      zone: filterZones(component.zoneOptions, component.flightZones as InventoryZone[])[0]
-    });
+    expect(component.zones.value).toEqual([
+      { id: '', url: '' },
+      { id: component.zoneOptions[component.flightZones.length].id, url: '' }
+    ]);
   });
 
   it('removes zones when there are more controls than zones', () => {
     parent.flightForm.reset({
-      zones: [{ id: 'pre_1' }]
+      zones: [{ id: 'pre_1' }, { id: 'pre_2' }]
     });
-
-    expect(parent.flightForm.value).toEqual({ zones: [{ id: 'pre_1' }] });
+    expect(component.zones.value).toEqual([
+      { id: 'pre_1', url: '' },
+      { id: 'pre_2', url: '' }
+    ]);
+    component.onRemoveZone(0);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '' }]);
   });
 
   it('does very basic mp3 validations', () => {

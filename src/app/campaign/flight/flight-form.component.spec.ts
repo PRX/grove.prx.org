@@ -64,8 +64,6 @@ export const cannotStartInPast = control => (control.value.valueOf() > Date.now(
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle($event)"
         (flightDuplicate)="flightDuplicate($event)"
-        (addZone)="onAddZone()"
-        (removeZone)="onRemoveZone($event)"
       ></grove-flight-form>
     </form>
   `
@@ -81,8 +79,6 @@ class ParentFormComponent {
   softDeleted = false;
   flightDeleteToggle = jest.fn(() => {});
   flightDuplicate = jest.fn(() => {});
-  addZone = jest.fn(() => {});
-  removeZone = jest.fn(() => {});
 
   flightForm = this.fb.group({
     id: [],
