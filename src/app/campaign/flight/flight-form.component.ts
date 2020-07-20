@@ -32,8 +32,6 @@ export class FlightFormComponent implements OnInit {
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
-  @Output() addZone = new EventEmitter<{ flightId: number; zone: FlightZone }>();
-  @Output() removeZone = new EventEmitter<{ flightId: number; index: number }>();
   flightForm: FormGroup;
   matcher = new FlightFormErrorStateMatcher();
 
@@ -53,14 +51,6 @@ export class FlightFormComponent implements OnInit {
 
   get canBeDeleted(): boolean {
     return this.flight && !this.flight.actualCount;
-  }
-
-  onAddZone({ zone }: { zone: FlightZone }) {
-    this.addZone.emit({ flightId: this.flight.id, zone });
-  }
-
-  onRemoveZone({ index }: { index: number }) {
-    this.removeZone.emit({ flightId: this.flight.id, index });
   }
 
   checkError(fieldName: string, type = 'error') {

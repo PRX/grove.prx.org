@@ -207,12 +207,4 @@ export class CampaignActionService implements OnDestroy {
       .pipe(select(selectCampaignAndFlights), first())
       .subscribe(params => this.store.dispatch(campaignActions.CampaignDuplicate(params)));
   }
-
-  addFlightZone({ flightId, zone }: { flightId: number; zone: FlightZone }) {
-    this.store.dispatch(campaignActions.CampaignFlightAddZone({ flightId, zone }));
-  }
-
-  removeFlightZone({ flightId, index }: { flightId: number; index: number }) {
-    this.store.dispatch(campaignActions.CampaignFlightRemoveZone({ flightId, index }));
-  }
 }
