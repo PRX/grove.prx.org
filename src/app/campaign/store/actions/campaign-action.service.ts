@@ -14,7 +14,7 @@ import {
   selectCampaignAndFlights,
   selectRoutedCampaignFlightDocs
 } from '../selectors';
-import { Moment } from 'moment';
+import { Moment, isMoment } from 'moment';
 
 interface FlightFormState {
   flight: Flight;
@@ -93,6 +93,8 @@ export class CampaignActionService implements OnDestroy {
         (a === undefined || a === null || a === '' || a.length === 0) &&
         (b === undefined || b === null || b === '' || b.length === 0)
       );
+    } else if (isMoment(a) && isMoment(b)) {
+      return a.valueOf() !== b.valueOf();
     } else if (a instanceof Object && b instanceof Object) {
       // objects - compare keys in A to B (ignoring keys missing from A)
       return Object.keys(a).some(key => this.hasChanged(a[key], b[key]));
