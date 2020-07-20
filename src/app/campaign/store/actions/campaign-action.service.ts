@@ -107,6 +107,19 @@ export class CampaignActionService implements OnDestroy {
     }
   }
 
+  haveZoneIdsChanged(a: FlightZone[], b: FlightZone[]) {
+    return (
+      a
+        .map(z => z.id)
+        .sort((z1, z2) => z1.localeCompare(z2))
+        .join(',') !==
+      b
+        .map(z => z.id)
+        .sort((z1, z2) => z1.localeCompare(z2))
+        .join(',')
+    );
+  }
+
   hasPreviewParams(flight: Flight): boolean {
     return (
       flight &&
@@ -119,12 +132,15 @@ export class CampaignActionService implements OnDestroy {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    const check = ['startAt', 'endAt', 'set_inventory_uri', 'zones', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
-    return check.some(fld => {
-      if (this.hasChanged(b[fld], a[fld])) {
-        return true;
-      }
-    });
+    const check = ['startAt', 'endAt', 'set_inventory_uri', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
+    return (
+      this.haveZoneIdsChanged(a.zones, b.zones) ||
+      check.some(fld => {
+        if (this.hasChanged(b[fld], a[fld])) {
+          return true;
+        }
+      })
+    );
   }
 
   allFlightTargetsHaveCode({ targets }: Flight) {
