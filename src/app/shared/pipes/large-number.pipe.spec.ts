@@ -17,4 +17,10 @@ describe('LargeNumberPipe', () => {
     expect(pipe.transform(null)).toEqual(undefined);
     expect(pipe.transform(0)).toEqual('0');
   });
+
+  it('returns default for null values', () => {
+    expect(pipe.transform(undefined, 'mydefault')).toEqual('mydefault');
+    expect(pipe.transform(null, 'mydefault')).toEqual('mydefault');
+    expect(pipe.transform(0, 'mydefault')).toEqual('0');
+  });
 });

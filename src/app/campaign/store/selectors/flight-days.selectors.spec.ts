@@ -59,7 +59,7 @@ describe('Flight Days/Preview Selectors', () => {
     expect(fromFlightDays.initWeeklyData(true, flightDay, fromFlightDays.getEndOfWeek(flightDay.date)).numbers.available).toEqual(
       flightDay.numbers.allocated + flightDay.numbers.available
     );
-    expect(fromFlightDays.initWeeklyData(false, flightDay, fromFlightDays.getEndOfWeek(flightDay.date)).numbers.available).toEqual(0);
+    expect(fromFlightDays.initWeeklyData(false, flightDay, fromFlightDays.getEndOfWeek(flightDay.date)).numbers.available).toBeNull();
   });
 
   it('should accumulate daily numbers onto weekly rollups', () => {
@@ -71,7 +71,7 @@ describe('Flight Days/Preview Selectors', () => {
     expect(fromFlightDays.accumulateOntoWeekly(true, weeklyRollup, flightDay1).numbers.available).toEqual(
       flightDay0.numbers.allocated + flightDay0.numbers.available + flightDay1.numbers.allocated + flightDay1.numbers.available
     );
-    expect(fromFlightDays.accumulateOntoWeekly(false, weeklyRollup, flightDay1).numbers.available).toEqual(0);
+    expect(fromFlightDays.accumulateOntoWeekly(false, weeklyRollup, flightDay1).numbers.available).toBeNull();
   });
 
   it('should get midnight UTC value for a given date', () => {

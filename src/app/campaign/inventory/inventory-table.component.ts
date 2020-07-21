@@ -41,12 +41,12 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
         </div>
 
         <ng-template [ngIf]="uncapped" [ngIfElse]="cappedWeek">
-          <div [class.preview]="isPreview">{{ week.numbers.available | largeNumber }}</div>
+          <div [class.preview]="isPreview">{{ week.numbers.available | largeNumber: '&mdash;' }}</div>
           <div [class.is-conflict]="numConflict(week) > 0">{{ numConflict(week) | largeNumber }}</div>
         </ng-template>
 
         <ng-template #cappedWeek>
-          <div>{{ week.numbers.available | largeNumber }}</div>
+          <div>{{ week.numbers.available | largeNumber: '&mdash;' }}</div>
           <div [class.preview]="isPreview">{{ week.numbers.allocated | largeNumber }}</div>
         </ng-template>
 
@@ -74,7 +74,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
 
               <ng-template [ngIf]="uncapped" [ngIfElse]="cappedDay">
                 <div class="expect" [class.preview]="isPreview">
-                  <span>{{ day.numbers.available | largeNumber }}</span>
+                  <span>{{ day.numbers.available | largeNumber: '&mdash;' }}</span>
                 </div>
                 <div class="conflict" [class.is-conflict]="numConflict(day) > 0">
                   <div>{{ numConflict(day) | largeNumber }}</div>
@@ -83,7 +83,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
 
               <ng-template #cappedDay>
                 <div class="avail">
-                  <span>{{ day.numbers.available | largeNumber }}</span>
+                  <span>{{ day.numbers.available | largeNumber: '&mdash;' }}</span>
                 </div>
                 <div class="goal" [class.preview]="isPreview">
                   <span>{{ day.numbers.allocated | largeNumber }}</span>
@@ -120,7 +120,7 @@ import { getMidnightUTC, getDateSlice } from '../store/selectors';
       </ng-template>
 
       <div>
-        {{ showActualsValue(flight.startAt.toDate()) ? rollup.totals.actuals : '&mdash;' }}
+        {{ showActualsValue(flight.startAt.toDate()) ? (rollup.totals.actuals | largeNumber) : '&mdash;' }}
       </div>
       <div class="edit"></div>
     </div>
