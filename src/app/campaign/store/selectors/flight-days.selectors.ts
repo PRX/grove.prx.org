@@ -43,14 +43,14 @@ export const initWeeklyData = (showAvailable: boolean, day: FlightDay, endOfWeek
     endDate: endOfWeek,
     numbers: {
       ...day.numbers,
-      available: showAvailable ? day.numbers.available + day.numbers.allocated : 0
+      available: showAvailable ? day.numbers.available + day.numbers.allocated : null
     },
     days: [
       {
         ...day,
         numbers: {
           ...day.numbers,
-          available: showAvailable ? day.numbers.available + day.numbers.allocated : 0
+          available: showAvailable ? day.numbers.available + day.numbers.allocated : null
         }
       }
     ]
@@ -62,7 +62,7 @@ export const accumulateOntoWeekly = (showAvailable: boolean, weekly: InventoryWe
   return {
     ...weekly,
     numbers: {
-      available: showAvailable ? sum(day.numbers.available + day.numbers.allocated, weekly.numbers.available) : 0,
+      available: showAvailable ? sum(day.numbers.available + day.numbers.allocated, weekly.numbers.available) : null,
       allocated: sum(day.numbers.allocated, weekly.numbers.allocated),
       actuals: sum(day.numbers.actuals, weekly.numbers.actuals),
       inventory: sum(day.numbers.inventory, weekly.numbers.inventory)
@@ -72,7 +72,7 @@ export const accumulateOntoWeekly = (showAvailable: boolean, weekly: InventoryWe
         ...day,
         numbers: {
           ...day.numbers,
-          available: showAvailable ? day.numbers.available + day.numbers.allocated : 0
+          available: showAvailable ? day.numbers.available + day.numbers.allocated : null
         }
       }
     ])
