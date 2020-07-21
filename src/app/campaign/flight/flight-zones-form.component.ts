@@ -76,8 +76,11 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   matcher = new ZonesErrorStateMatcher();
   zones = new FormArray([].map(this.flightZoneFormGroup));
   zonesSub = this.zones.valueChanges.subscribe(formZones => {
-    this.onChangeFn(formZones);
+    if (!this.emitGuard) {
+      this.onChangeFn(formZones);
+    }
   });
+  emitGuard = false;
   onChangeFn = (value: any) => {};
   onTouchedFn = (value: any) => {};
 
@@ -96,6 +99,8 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   writeValue(zones: FlightZone[]) {
+    // don't emit while manipulating FormArray with incoming update
+    this.emitGuard = true;
     // get the correct number of zone fields and patchValue
     const expectedLength = zones.length || 1;
     while (this.zones.controls.length > expectedLength) {
@@ -110,6 +115,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     }
     // patch all of the values onto the FormArray
     this.zones.patchValue(zones || [], { emitEvent: false });
+    this.emitGuard = false;
   }
 
   registerOnChange(fn: (value: any) => void) {
