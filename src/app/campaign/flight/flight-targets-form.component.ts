@@ -110,7 +110,6 @@ export class FlightTargetsFormComponent implements ControlValueAccessor, OnDestr
   targets: { type: string; options$: Observable<InventoryTarget[]> }[] = [];
   targetsForm: FormArray;
   targetsFormSub: Subscription;
-  emitGuard = false;
   onChangeFn = (value: any) => {};
   onTouchedFn = (value: any) => {};
 
@@ -130,8 +129,6 @@ export class FlightTargetsFormComponent implements ControlValueAccessor, OnDestr
     // there is something in the spec that could be done differently to not
     // require this check.
     if (Array.isArray(targets)) {
-      // don't emit while manipulating FormArray with incoming update
-      this.emitGuard = true;
       // Clean up subscriptions and previous form groups.
       if (this.targetsFormSub) {
         this.unsubscribeFromTargetsForm();
@@ -147,13 +144,10 @@ export class FlightTargetsFormComponent implements ControlValueAccessor, OnDestr
         formGroups.push(formGroup);
       });
       this.targetsForm = new FormArray(formGroups);
-      this.emitGuard = false;
       // Create new subscription for form changes.
       this.targetsFormSub = this.targetsForm.valueChanges.subscribe(formTargets => {
         const changes = formTargets.map(this.flightTargetOutput.bind(this));
-        if (!this.emitGuard) {
-          this.onChangeFn(changes);
-        }
+        this.onChangeFn(changes);
       });
     }
   }
