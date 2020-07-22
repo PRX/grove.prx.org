@@ -45,7 +45,13 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Creative Url</mat-label>
-          <input matInput formControlName="url" autocomplete="off" placeholder="Leave blank for a 0-second MP3" />
+          <input
+            matInput
+            [errorStateMatcher]="matcher"
+            formControlName="url"
+            autocomplete="off"
+            placeholder="Leave blank for a 0-second MP3"
+          />
           <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
           <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
         </mat-form-field>
