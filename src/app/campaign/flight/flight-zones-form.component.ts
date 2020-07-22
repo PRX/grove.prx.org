@@ -108,13 +108,13 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     // don't emit while manipulating FormArray with incoming update
     this.emitGuard = true;
     // get the correct number of zone fields and patchValue
-    const expectedLength = zones.length || 1;
-    while (this.zones.controls.length > expectedLength) {
+    zones = zones && zones.length ? zones : [{ id: '', url: '' }];
+    while (this.zones.controls.length > zones.length) {
       this.zones.removeAt(this.zones.controls.length - 1);
       this.zones.markAsPristine();
     }
     const addZones = [...zones];
-    while (this.zones.controls.length < expectedLength) {
+    while (this.zones.controls.length < zones.length) {
       // this only adds controls, doesnt reset controls already in form
       this.zones.push(this.flightZoneFormGroup(zones && addZones.pop()));
       this.zones.markAsPristine();
