@@ -120,7 +120,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
       this.zones.markAsPristine();
     }
     // patch all of the values onto the FormArray
-    this.zones.patchValue(zones || [], { emitEvent: false });
+    this.zones.patchValue(zones, { emitEvent: false, onlySelf: true });
     this.emitGuard = false;
   }
 
