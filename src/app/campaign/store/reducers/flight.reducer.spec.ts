@@ -42,6 +42,24 @@ describe('Flight Reducer', () => {
     expect(result.entities[flightFixture.id].localFlight).toMatchObject(flightFixture);
   });
 
+  it('should ensure nullable fields are on model', () => {
+    const { totalGoal, dailyMinimum, contractGoal, contractEndAt, contractEndAtFudged, contractStartAt, ...flight } = flightDocFixture;
+    const result = reducer(
+      initialState,
+      campaignActions.CampaignLoadSuccess({
+        campaignDoc: new MockHalDoc(campaignDocFixture),
+        flightDocs: [new MockHalDoc(flight)],
+        flightDaysDocs: { [flightDocFixture.id]: flightDaysDocFixture }
+      })
+    );
+    expect(result.entities[flightFixture.id].localFlight.totalGoal).toBeNull();
+    expect(result.entities[flightFixture.id].localFlight.dailyMinimum).toBeNull();
+    expect(result.entities[flightFixture.id].localFlight.contractGoal).toBeNull();
+    expect(result.entities[flightFixture.id].localFlight.contractEndAt).toBeNull();
+    expect(result.entities[flightFixture.id].localFlight.contractEndAtFudged).toBeNull();
+    expect(result.entities[flightFixture.id].localFlight.contractStartAt).toBeNull();
+  });
+
   it('should create a new flight', () => {
     const result = reducer(initialState, campaignActions.CampaignAddFlight({ campaignId: campaignFixture.id }));
     const newFlightState = selectAll(result).find(flight => !flight.remoteFlight);

@@ -18,7 +18,7 @@ import {
 import { MockHalDoc } from 'ngx-prx-styleguide';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { CampaignActionService } from './campaign-action.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 describe('CampaignActionService', () => {
   let router: Router;
@@ -171,6 +171,12 @@ describe('CampaignActionService', () => {
       expect(service.hasChanged({ one: 1, two: 2 }, { one: 1 })).toEqual(true);
     });
 
+    it('compares moments', () => {
+      const date1 = moment.utc();
+      const date2 = moment(date1.valueOf());
+      expect(service.hasChanged(date1, date2)).toEqual(false);
+    });
+
     it('compares other stuff', () => {
       expect(service.hasChanged('a', 'a')).toEqual(false);
       expect(service.hasChanged('a', 'b')).toEqual(true);
@@ -207,6 +213,11 @@ describe('CampaignActionService', () => {
     it('should load flight preview when total goal is changed', () => {
       service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
       expect(service.loadFlightPreview).toHaveBeenCalled();
+    });
+
+    it('should not load flight preview if routed flight id is different from form flight id (route transition)', () => {
+      service.updateFlightForm({ ...flightFixture, id: 1234, totalGoal: 10 }, true, true);
+      expect(service.loadFlightPreview).not.toHaveBeenCalled();
     });
 
     it('should load flight preview when delivery mode is changed', () => {
