@@ -31,6 +31,8 @@ export class CampaignActionService implements OnDestroy {
     map(this.transformFlightForm),
     // if preview params changed, dispatch loadFlightPreview
     withLatestFrom(this.store.pipe(select(selectRoutedFlight))),
+    // re-using the flight form, so check that ids match
+    filter(([formState, flightState]) => !flightState || !flightState.localFlight || formState.flight.id === flightState.localFlight.id),
     tap(([formState, flightState]) => {
       if (
         this.hasPreviewParams(formState.flight) &&

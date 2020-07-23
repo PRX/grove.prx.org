@@ -154,4 +154,10 @@ describe('FlightTargetsFormComponent', () => {
     };
     expect(component.targetOptionsMap.episode[0].label).toEqual('2/12/2020 - Ep A');
   });
+
+  it('does not emit while receiving incoming update', () => {
+    jest.spyOn(component, 'onChangeFn');
+    component.writeValue([{ type: 'country', code: 'US', exclude: false }]);
+    expect(component.onChangeFn).not.toHaveBeenCalled();
+  });
 });

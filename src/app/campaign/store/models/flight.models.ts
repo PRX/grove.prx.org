@@ -58,9 +58,14 @@ export const docToFlight = (doc: HalDoc): Flight => {
     endAtFudged: utc(flight.endAt).subtract(1, 'days'),
     createdAt: new Date(flight.createdAt),
     set_inventory_uri: doc.expand('prx:inventory'),
-    ...(flight.contractStartAt && { contractStartAt: utc(flight.contractStartAt) }),
-    ...(flight.contractEndAt && { contractEndAt: utc(flight.contractEndAt) }),
-    ...(flight.contractEndAt && { contractEndAtFudged: utc(flight.contractEndAt).subtract(1, 'days') })
+    contractStartAt: flight.contractStartAt ? utc(flight.contractStartAt) : null,
+    contractEndAt: flight.contractEndAt ? utc(flight.contractEndAt) : null,
+    contractEndAtFudged: flight.contractEndAt ? utc(flight.contractEndAt).subtract(1, 'days') : null,
+    // fields that are nullable are not present in the HalDoc
+    // the Flight model needs to have these fields in order to set up the flight form that is re-used between flights
+    totalGoal: flight.hasOwnProperty('totalGoal') ? flight.totalGoal : null,
+    dailyMinimum: flight.hasOwnProperty('dailyMinimum') ? flight.dailyMinimum : null,
+    contractGoal: flight.hasOwnProperty('contractGoal') ? flight.contractGoal : null
   };
   return flight;
 };

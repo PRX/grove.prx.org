@@ -45,7 +45,13 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Creative Url</mat-label>
-          <input matInput formControlName="url" autocomplete="off" placeholder="Leave blank for a 0-second MP3" />
+          <input
+            matInput
+            [errorStateMatcher]="matcher"
+            formControlName="url"
+            autocomplete="off"
+            placeholder="Leave blank for a 0-second MP3"
+          />
           <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
           <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
         </mat-form-field>
@@ -76,8 +82,11 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   matcher = new ZonesErrorStateMatcher();
   zones = new FormArray([].map(this.flightZoneFormGroup));
   zonesSub = this.zones.valueChanges.subscribe(formZones => {
-    this.onChangeFn(formZones);
+    if (!this.emitGuard) {
+      this.onChangeFn(formZones);
+    }
   });
+  emitGuard = false;
   onChangeFn = (value: any) => {};
   onTouchedFn = (value: any) => {};
 
@@ -96,20 +105,23 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   writeValue(zones: FlightZone[]) {
+    // don't emit while manipulating FormArray with incoming update
+    this.emitGuard = true;
     // get the correct number of zone fields and patchValue
-    const expectedLength = zones.length || 1;
-    while (this.zones.controls.length > expectedLength) {
+    zones = zones && zones.length ? zones : [{ id: '', url: '' }];
+    while (this.zones.controls.length > zones.length) {
       this.zones.removeAt(this.zones.controls.length - 1);
       this.zones.markAsPristine();
     }
     const addZones = [...zones];
-    while (this.zones.controls.length < expectedLength) {
+    while (this.zones.controls.length < zones.length) {
       // this only adds controls, doesnt reset controls already in form
       this.zones.push(this.flightZoneFormGroup(zones && addZones.pop()));
       this.zones.markAsPristine();
     }
     // patch all of the values onto the FormArray
-    this.zones.patchValue(zones || [], { emitEvent: false });
+    this.zones.patchValue(zones, { emitEvent: false, onlySelf: true });
+    this.emitGuard = false;
   }
 
   registerOnChange(fn: (value: any) => void) {

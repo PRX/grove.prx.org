@@ -113,4 +113,21 @@ describe('FlightZonesFormComponent', () => {
     expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
     expect(zone.get('url').hasError('notMp3')).toEqual(true);
   });
+
+  it('does not emit while receiving incoming update', () => {
+    jest.spyOn(component, 'onChangeFn');
+    component.writeValue([{ id: 'pre_1' }, { id: 'pre_2' }]);
+    expect(component.onChangeFn).not.toHaveBeenCalled();
+    component.writeValue([{ id: 'pre_1' }]);
+    expect(component.onChangeFn).not.toHaveBeenCalled();
+  });
+
+  it('clears controls for empty zone', () => {
+    component.writeValue([{ id: 'pre_1', url: 'http://this.looks/valid.mp3' }]);
+    expect(component.zones.controls[0].get('id').value).toEqual('pre_1');
+    expect(component.zones.controls[0].get('url').value).toEqual('http://this.looks/valid.mp3');
+    component.writeValue([]);
+    expect(component.zones.controls[0].get('id').value).toEqual('');
+    expect(component.zones.controls[0].get('url').value).toEqual('');
+  });
 });

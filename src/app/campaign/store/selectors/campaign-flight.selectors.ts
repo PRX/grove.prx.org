@@ -58,7 +58,7 @@ export const selectError = createSelector(
   selectCampaignError,
   selectFlightNotFoundError,
   (campaignError: any, flightNotFoundError: string) => {
-    return (campaignError && campaignError.body && campaignError.body.message) || flightNotFoundError;
+    return campaignError && campaignError.body && campaignError.body.message;
   }
 );
 
