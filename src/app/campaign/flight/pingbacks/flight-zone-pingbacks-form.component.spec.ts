@@ -6,7 +6,6 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PingbackFormComponent } from './pingback-form.component';
 import { FlightZonePingbacksFormComponent } from './flight-zone-pingbacks-form.component';
-import { campaignFixture, flightFixture } from '../../store/models/campaign-state.factory';
 
 @Component({
   template: `
@@ -27,10 +26,6 @@ class ParentFormComponent {
   @ViewChild('childForm', { static: true }) childForm: FlightZonePingbacksFormComponent;
   constructor(private fb: FormBuilder) {}
   form = this.fb.group({ pingbacks: '' });
-  // campaignId = campaignFixture.id;
-  // flightId = flightFixture.id;
-  // creative = flightFixture.zones[0].url;
-  // podcastId = flightFixture.set_inventory_uri.split('/').pop();
 }
 
 describe('FlightZonePingbacksFormComponent', () => {
