@@ -18,3 +18,10 @@
     }
   }
 }
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
+.button-row > * {
+  flex: initial;
+}

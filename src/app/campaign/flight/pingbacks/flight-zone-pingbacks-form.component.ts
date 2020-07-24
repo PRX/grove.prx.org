@@ -19,7 +19,14 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl, Fo
           </button>
         </div>
       </div>
-      <button mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
+      <div class="inline-fields">
+        <div class="button-row">
+          <button mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
+          <a href="https://github.com/PRX/analytics-ingest-lambda#uri-templates" target="_blank" rel="noopener noreferrer">
+            URI syntax help
+          </a>
+        </div>
+      </div>
     </fieldset>
   `,
   styleUrls: ['./flight-zone-pingbacks-form.component.scss'],
