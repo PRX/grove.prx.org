@@ -31,10 +31,10 @@ describe('CampaignCardComponent', () => {
       });
   }));
 
-  it('should show the advertiser and link to the campaign', () => {
+  it('should show the campaign name and link to the campaign', () => {
     const link = de.query(By.css('h3 > a'));
     expect(link).toBeDefined();
-    expect(link.nativeElement.textContent).toMatch(comp.campaign.advertiser.label);
+    expect(link.nativeElement.textContent).toMatch(comp.campaign.name);
     expect(link.nativeElement.href).toContain('/campaign/' + comp.campaign.id);
   });
 

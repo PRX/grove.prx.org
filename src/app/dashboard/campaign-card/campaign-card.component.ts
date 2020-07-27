@@ -12,9 +12,10 @@ import { Campaign, Target } from '../dashboard.service';
       <div class="content">
         <h3>
           <a routerLink="{{ '/campaign/' + campaign.id }}">
-            {{ campaign.advertiser && campaign.advertiser.label }}
+            {{ campaign.name }}
           </a>
         </h3>
+        <div>{{ campaign.advertiser && campaign.advertiser.label }}</div>
         <div>
           <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
           {{ campaign.type | titlecase }}
