@@ -53,9 +53,11 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
             <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
             <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
           </mat-form-field>
-          <button mat-button color="primary" class="toggle-pingbacks" (click)="togglePingbacks(zone)">
-            {{ togglePingbacksText(zone) }}
-          </button>
+          <div class="mat-form-field-wrapper">
+            <button mat-button color="primary" class="toggle-pingbacks" (click)="togglePingbacks(zone)">
+              {{ togglePingbacksText(zone) }}
+            </button>
+          </div>
           <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
             <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
               <mat-icon>delete</mat-icon>

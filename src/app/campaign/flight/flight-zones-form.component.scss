@@ -5,11 +5,9 @@
   display: grid;
   grid-template-columns: 1fr 2fr 1fr 40px;
   grid-column-gap: 0.5rem;
+  align-items: center;
 }
 .remove-zone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   button {
     color: mat-color($prx-gray, 300);
     &:hover {
