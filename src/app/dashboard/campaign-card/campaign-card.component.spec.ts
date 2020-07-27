@@ -7,13 +7,7 @@ import { MatIconModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 
 import { campaigns as campaignsFixture } from '../dashboard.service.mock';
-import {
-  CampaignCardComponent,
-  CampaignCardAbbreviateNumberPipe,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe
-} from '.';
+import { CampaignCardComponent, CampaignCardAbbreviateNumberPipe, CampaignFlightDatesPipe } from '.';
 
 describe('CampaignCardComponent', () => {
   let comp: CampaignCardComponent;
@@ -24,13 +18,7 @@ describe('CampaignCardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, SharedModule, MatIconModule],
-      declarations: [
-        CampaignCardComponent,
-        CampaignCardAbbreviateNumberPipe,
-        CampaignFlightDatesPipe,
-        CampaignFlightTargetsPipe,
-        CampaignFlightZonesPipe
-      ]
+      declarations: [CampaignCardComponent, CampaignCardAbbreviateNumberPipe, CampaignFlightDatesPipe]
     })
       .compileComponents()
       .then(() => {
@@ -43,10 +31,10 @@ describe('CampaignCardComponent', () => {
       });
   }));
 
-  it('should show the advertiser and link to the campaign', () => {
+  it('should show the campaign name and link to the campaign', () => {
     const link = de.query(By.css('h3 > a'));
     expect(link).toBeDefined();
-    expect(link.nativeElement.textContent).toMatch(comp.campaign.advertiser.label);
+    expect(link.nativeElement.textContent).toMatch(comp.campaign.name);
     expect(link.nativeElement.href).toContain('/campaign/' + comp.campaign.id);
   });
 

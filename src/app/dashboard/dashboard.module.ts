@@ -16,13 +16,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { SharedModule } from '../shared/shared.module';
 import { PagingModule } from 'ngx-prx-styleguide';
 
-import {
-  CampaignCardComponent,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe,
-  CampaignCardAbbreviateNumberPipe
-} from './campaign-card';
+import { CampaignCardComponent, CampaignFlightDatesPipe, CampaignCardAbbreviateNumberPipe } from './campaign-card';
 
 import { DashboardComponent } from './dashboard.component';
 import { dashboardRouting } from './dashboard.routing';
@@ -41,8 +35,6 @@ import { FlightTableContainerComponent, FlightTableComponent } from './flight-ta
     CampaignCardComponent,
     CampaignCardAbbreviateNumberPipe,
     CampaignFlightDatesPipe,
-    CampaignFlightTargetsPipe,
-    CampaignFlightZonesPipe,
     CampaignListSortComponent,
     CampaignListTotalPagesPipe,
     FlightTableContainerComponent,

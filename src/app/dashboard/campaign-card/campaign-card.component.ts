@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { Campaign } from '../dashboard.service';
+import { Campaign, Target } from '../dashboard.service';
 
 @Component({
   selector: 'grove-campaign-card',
@@ -12,18 +12,19 @@ import { Campaign } from '../dashboard.service';
       <div class="content">
         <h3>
           <a routerLink="{{ '/campaign/' + campaign.id }}">
-            {{ campaign.advertiser && campaign.advertiser.label }}
+            {{ campaign.name }}
           </a>
         </h3>
+        <div>{{ campaign.advertiser && campaign.advertiser.label }}</div>
         <div>
           <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
           {{ campaign.type | titlecase }}
         </div>
-        <div *ngIf="campaign.flights | campaignFlightTargets as targets">
+        <div *ngIf="campaign.flights | unique: 'targets':'code' | geoTargets as targets">
           <prx-icon size="1em" name="globe-americas"></prx-icon>
           {{ targets }}
         </div>
-        <div>{{ campaign.flights | campaignFlightZones }}</div>
+        <div>{{ campaign.flights | unique: 'zones':'id' | zoneLabel }}</div>
       </div>
       <footer>
         <div class="progress-ind" [style.width]="progressPercent"></div>

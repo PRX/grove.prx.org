@@ -11,10 +11,16 @@ interface KeyValue {
   label: string;
 }
 
-// export type Zone = KeyValue;
-export type Target = KeyValue;
 export type Advertiser = KeyValue;
 export type Facet = KeyValue;
+
+export interface Target {
+  type: string;
+  code: string;
+  label: string;
+  exclude?: boolean;
+}
+
 export interface DashboardParams {
   view?: 'flights' | 'campaigns';
   page?: number;
@@ -33,8 +39,6 @@ export interface DashboardParams {
   direction?: 'desc' | 'asc' | '';
 }
 
-// TODO: Omit is added in TS 3.5
-type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export interface DashboardRouteParams extends Omit<DashboardParams, 'geo' | 'zone' | 'before' | 'after'> {
   geo?: string;
   zone?: string;
@@ -246,9 +250,8 @@ export class DashboardService {
                 const zoneFacet = campaignFacets && campaignFacets.zone && campaignFacets.zone.find(facet => facet.id === zoneId);
                 return (zoneFacet && zoneFacet.label) || zoneId;
               }),
-              actualCount: doc['actualCount']
-              // TODO: no targets yet?
-              // targets: Target[];
+              actualCount: doc['actualCount'],
+              targets: doc['targets']
             }))
           };
 
@@ -308,6 +311,7 @@ export class DashboardService {
               const zoneFacet = flightFacets && flightFacets.zone && flightFacets.zone.find(facet => facet.id === zoneId);
               return (zoneFacet && zoneFacet.label) || zoneId;
             }),
+            targets: flightDoc['targets'],
             ...(flightDoc['_links'] &&
               flightDoc['_links']['prx:inventory'] &&
               flightDoc['_links']['prx:inventory']['title'] && {
