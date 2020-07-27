@@ -6,6 +6,7 @@ export interface FlightZone {
   id: string;
   label?: string;
   url?: string;
+  pingbacks?: string[];
   fileSize?: number;
   mimeType?: string;
 }

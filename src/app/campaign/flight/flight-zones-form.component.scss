@@ -3,13 +3,11 @@
 
 .inline-fields {
   display: grid;
-  grid-template-columns: 1fr 3fr 40px;
+  grid-template-columns: 1fr 2fr 1fr 40px;
   grid-column-gap: 0.5rem;
+  align-items: center;
 }
 .remove-zone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   button {
     color: mat-color($prx-gray, 300);
     &:hover {
@@ -17,4 +15,19 @@
       color: mat-color($prx-gray, 600);
     }
   }
+}
+
+.zone + .zone {
+  border-top: 1px dashed mat-color($prx-gray, 300);
+  padding-top: 20px;
+}
+
+.toggle-pingbacks {
+  text-align: left;
+  text-transform: uppercase;
+}
+
+grove-flight-zone-pingbacks {
+  display: block;
+  margin-left: 40px;
 }

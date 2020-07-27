@@ -1,0 +1,10 @@
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 0.5rem;
+}
+
+textarea[readonly] {
+  background-color: inherit;
+  border: none;
+}

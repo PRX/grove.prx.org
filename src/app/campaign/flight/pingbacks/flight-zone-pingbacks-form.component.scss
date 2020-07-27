@@ -1,0 +1,27 @@
+@import '~src/sass/variables';
+@import '~src/sass/colors';
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  grid-column-gap: 0.5rem;
+}
+.remove-pingback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  button {
+    color: mat-color($prx-gray, 300);
+    &:hover {
+      background-color: transparent;
+      color: mat-color($prx-gray, 600);
+    }
+  }
+}
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
+.button-row > * {
+  flex: initial;
+}

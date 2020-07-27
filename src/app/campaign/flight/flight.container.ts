@@ -24,7 +24,8 @@ import {
   selectCurrentInventoryZones,
   selectCurrentInventoryTargetTypes,
   selectCurrentInventoryTargetsTypeMap,
-  selectFlightActualsDateBoundaries
+  selectFlightActualsDateBoundaries,
+  selectCampaignId
 } from '../store/selectors';
 import { CampaignActionService } from '../store/actions/campaign-action.service';
 
@@ -42,6 +43,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       [isLoading]="isLoading$ | async"
       [previewError]="flightPreviewError$ | async"
       [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
+      [campaignId]="campaignId$ | async"
       (flightUpdate)="flightUpdateFromForm($event)"
       (flightDeleteToggle)="flightDeleteToggle()"
       (flightDuplicate)="flightDuplicate($event)"
@@ -63,6 +65,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   targetTypes$: Observable<InventoryTargetType[]>;
   targetOptionsMap$: Observable<InventoryTargetsMap>;
   flightActualsDateBoundaries$: Observable<{ startAt: Date; endAt: Date }>;
+  campaignId$: Observable<string | number>;
   flightSub: Subscription;
 
   constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
@@ -81,6 +84,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.targetTypes$ = this.store.pipe(select(selectCurrentInventoryTargetTypes));
     this.targetOptionsMap$ = this.store.pipe(select(selectCurrentInventoryTargetsTypeMap));
     this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
+    this.campaignId$ = this.store.pipe(select(selectCampaignId));
   }
 
   ngOnDestroy() {

@@ -1,7 +1,6 @@
 import { Component, Input, forwardRef, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormGroup,
-  FormGroupDirective,
   FormArray,
   Validators,
   NG_VALUE_ACCESSOR,
@@ -10,16 +9,8 @@ import {
   FormControl,
   AbstractControl
 } from '@angular/forms';
-import { ErrorStateMatcher } from '@angular/material';
 import { FlightZone, InventoryZone, filterZones } from '../store/models';
-
-export class ZonesErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: FormControl | null, form: FormGroupDirective): boolean {
-    // when url is invalid, the FormArray control is showing as dirty but not as touched
-    // so this ErrorStateMatcher overrides material to show errors when these controls are invalid and dirty
-    return control && control.invalid && (control.dirty || control.touched);
-  }
-}
+import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
 
 export const validateMp3 = (value: string): { [key: string]: any } | null => {
   if (value) {
@@ -32,34 +23,54 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
   return null;
 };
 
+export const validatePingbacks = (value: string[]): { [key: string]: any } | null => {
+  if (value && value.some(pingback => !pingback)) {
+    return { error: 'Invalid pingbacks' };
+  }
+  return null;
+};
 @Component({
   selector: 'grove-flight-zones',
   template: `
     <fieldset>
-      <div *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="inline-fields">
-        <mat-form-field appearance="outline">
-          <mat-label>Zone Name</mat-label>
-          <mat-select formControlName="id" required>
-            <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Creative Url</mat-label>
-          <input
-            matInput
-            [errorStateMatcher]="matcher"
-            formControlName="url"
-            autocomplete="off"
-            placeholder="Leave blank for a 0-second MP3"
-          />
-          <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
-          <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
-        </mat-form-field>
-        <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
-          <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
+      <div *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="zone">
+        <div class="inline-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Zone Name</mat-label>
+            <mat-select formControlName="id" required>
+              <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Creative Url</mat-label>
+            <input
+              matInput
+              [errorStateMatcher]="matcher"
+              formControlName="url"
+              autocomplete="off"
+              placeholder="Leave blank for a 0-second MP3"
+            />
+            <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
+            <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
+          </mat-form-field>
+          <div class="mat-form-field-wrapper">
+            <button mat-button color="primary" class="toggle-pingbacks" (click)="togglePingbacks(zone)">
+              {{ togglePingbacksText(zone) }}
+            </button>
+          </div>
+          <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
+            <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
+        <grove-flight-zone-pingbacks
+          *ngIf="zoneHasPingbacks(zone)"
+          [campaignId]="campaignId"
+          [flightId]="flightId"
+          [creative]="zone.get('url').value"
+          formControlName="pingbacks"
+        ></grove-flight-zone-pingbacks>
       </div>
     </fieldset>
     <div *ngIf="zones?.controls?.length < zoneOptions?.length">
@@ -77,9 +88,11 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   @Input() flightZones: FlightZone[];
   @Input() isCompanion: boolean;
   @Input() zoneOptions: InventoryZone[];
+  @Input() campaignId: number;
+  @Input() flightId: number;
   @Output() addZone = new EventEmitter<{ zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ index: number }>();
-  matcher = new ZonesErrorStateMatcher();
+  matcher = new FlightFormErrorStateMatcher();
   zones = new FormArray([].map(this.flightZoneFormGroup));
   zonesSub = this.zones.valueChanges.subscribe(formZones => {
     if (!this.emitGuard) {
@@ -97,10 +110,11 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   flightZoneFormGroup(zone: FlightZone = { id: '' }): FormGroup {
-    const { id, url } = zone;
+    const { id, url, pingbacks } = zone;
     return new FormGroup({
       id: new FormControl(id || '', Validators.required),
-      url: new FormControl(url || '', control => validateMp3(control.value))
+      url: new FormControl(url || '', control => validateMp3(control.value)),
+      pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value))
     });
   }
 
@@ -164,7 +178,20 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   get addCreativeLabel(): string {
-    const type = this.isCompanion ? 'companion' : 'creative';
+    const type = this.isCompanion ? 'companion' : 'zone';
     return `Add a ${type}`;
+  }
+
+  zoneHasPingbacks(zone: FormControl): boolean {
+    const pingbacks = zone.get('pingbacks');
+    return pingbacks.value && pingbacks.value.length;
+  }
+
+  togglePingbacks(zone: FormControl) {
+    this.zoneHasPingbacks(zone) ? zone.get('pingbacks').setValue([]) : zone.get('pingbacks').setValue(['']);
+  }
+
+  togglePingbacksText(zone: FormControl): string {
+    return this.zoneHasPingbacks(zone) ? 'Remove pingbacks' : 'Add pingbacks';
   }
 }
