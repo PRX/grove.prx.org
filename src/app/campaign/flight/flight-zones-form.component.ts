@@ -114,7 +114,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return new FormGroup({
       id: new FormControl(id || '', Validators.required),
       url: new FormControl(url || '', control => validateMp3(control.value)),
-      pingbacks: new FormControl(pingbacks, control => validatePingbacks(control.value))
+      pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value))
     });
   }
 

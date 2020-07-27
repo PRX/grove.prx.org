@@ -76,8 +76,8 @@ describe('FlightZonesFormComponent', () => {
   it('adds zone from the top most available option', () => {
     component.onAddZone();
     expect(component.zones.value).toEqual([
-      { id: '', url: '', pingbacks: null },
-      { id: component.zoneOptions[component.flightZones.length].id, url: '', pingbacks: null }
+      { id: '', url: '', pingbacks: [] },
+      { id: component.zoneOptions[component.flightZones.length].id, url: '', pingbacks: [] }
     ]);
   });
 
@@ -86,11 +86,11 @@ describe('FlightZonesFormComponent', () => {
       zones: [{ id: 'pre_1' }, { id: 'pre_2' }]
     });
     expect(component.zones.value).toEqual([
-      { id: 'pre_1', url: '', pingbacks: null },
-      { id: 'pre_2', url: '', pingbacks: null }
+      { id: 'pre_1', url: '', pingbacks: [] },
+      { id: 'pre_2', url: '', pingbacks: [] }
     ]);
     component.onRemoveZone(0);
-    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: null }]);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: [] }]);
   });
 
   it('removes zones when there are more controls than zones', () => {
@@ -98,11 +98,11 @@ describe('FlightZonesFormComponent', () => {
       zones: [{ id: 'pre_1' }, { id: 'pre_2' }]
     });
     expect(component.zones.value).toEqual([
-      { id: 'pre_1', url: '', pingbacks: null },
-      { id: 'pre_2', url: '', pingbacks: null }
+      { id: 'pre_1', url: '', pingbacks: [] },
+      { id: 'pre_2', url: '', pingbacks: [] }
     ]);
-    component.writeValue([{ id: 'pre_2', url: '', pingbacks: null }]);
-    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: null }]);
+    component.writeValue([{ id: 'pre_2', url: '', pingbacks: [] }]);
+    expect(component.zones.value).toEqual([{ id: 'pre_2', url: '', pingbacks: [] }]);
   });
 
   it('does very basic mp3 validations', () => {
