@@ -65,7 +65,8 @@ export const docToFlight = (doc: HalDoc): Flight => {
     // the Flight model needs to have these fields in order to set up the flight form that is re-used between flights
     totalGoal: flight.hasOwnProperty('totalGoal') ? flight.totalGoal : null,
     dailyMinimum: flight.hasOwnProperty('dailyMinimum') ? flight.dailyMinimum : null,
-    contractGoal: flight.hasOwnProperty('contractGoal') ? flight.contractGoal : null
+    contractGoal: flight.hasOwnProperty('contractGoal') ? flight.contractGoal : null,
+    zones: flight.zones.map(({ id, label, url, fileSize, mimeType }) => ({ id, label, url, fileSize, mimeType }))
   };
   return flight;
 };
