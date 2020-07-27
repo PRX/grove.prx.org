@@ -7,13 +7,7 @@ import { MatIconModule } from '@angular/material';
 import { SharedModule } from '../../shared/shared.module';
 
 import { campaigns as campaignsFixture } from '../dashboard.service.mock';
-import {
-  CampaignCardComponent,
-  CampaignCardAbbreviateNumberPipe,
-  CampaignFlightDatesPipe,
-  CampaignFlightTargetsPipe,
-  CampaignFlightZonesPipe
-} from '.';
+import { CampaignCardComponent, CampaignCardAbbreviateNumberPipe, CampaignFlightDatesPipe } from '.';
 
 describe('CampaignCardComponent', () => {
   let comp: CampaignCardComponent;
@@ -24,13 +18,7 @@ describe('CampaignCardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, SharedModule, MatIconModule],
-      declarations: [
-        CampaignCardComponent,
-        CampaignCardAbbreviateNumberPipe,
-        CampaignFlightDatesPipe,
-        CampaignFlightTargetsPipe,
-        CampaignFlightZonesPipe
-      ]
+      declarations: [CampaignCardComponent, CampaignCardAbbreviateNumberPipe, CampaignFlightDatesPipe]
     })
       .compileComponents()
       .then(() => {

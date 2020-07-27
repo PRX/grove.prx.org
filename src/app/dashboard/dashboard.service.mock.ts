@@ -15,13 +15,14 @@ export const flights: Flight[] = [
     totalGoal: 1234,
     zones: ['Preroll', 'Midroll'],
     targets: [
-      { id: 1, label: 'LAN' },
-      { id: 2, label: 'SAD' },
-      { id: 3, label: 'CA' },
-      { id: 4, label: 'NYC' },
-      { id: 5, label: 'NY' },
-      { id: 6, label: 'CHI' },
-      { id: 7, label: 'IL' }
+      { type: 'country', code: 'CA', label: 'Canada' },
+      { type: 'country', code: 'US', label: 'United States of America' },
+      { type: 'metro', code: '1', label: 'LAN' },
+      { type: 'metro', code: '2', label: 'SAD' },
+      { type: 'metro', code: '3', label: 'NYC' },
+      { type: 'metro', code: '4', label: 'CHI' },
+      { type: 'subdiv', code: 'IN', label: 'Indiana' },
+      { type: 'episode', code: '22222222-2222-2222-2222-222222222222', label: '22222222-2222-2222-2222-222222222222' }
     ]
   },
   {
@@ -33,7 +34,7 @@ export const flights: Flight[] = [
     endAt: new Date('2019-09-13 0:0:0'),
     totalGoal: 54321,
     zones: ['Midroll', 'Preroll'],
-    targets: [{ id: 1, label: 'Global' }]
+    targets: [{ type: 'country', code: '5', label: 'US' }]
   }
 ];
 

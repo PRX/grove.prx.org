@@ -8,13 +8,25 @@ import { MatButtonModule } from '@angular/material/button';
 import * as autocomplete from './autocomplete';
 import { CSSPropsDirective } from './css-props/css-props.directive';
 import { AuthGuard, DeactivateGuard, UnauthGuard, IconModule, ImageModule, SpinnerModule, ToastrModule } from 'ngx-prx-styleguide';
+import { GeoTargetsPipe } from './pipes/geo-targets.pipe';
 import { LargeNumberPipe } from './pipes/large-number.pipe';
+import { UniquePipe } from './pipes/unique.pipe';
 import { ZoneLabelPipe } from './pipes/zone-label.pipe';
 @NgModule({
-  declarations: [autocomplete.OptionsPipe, autocomplete.AutocompleteComponent, CSSPropsDirective, LargeNumberPipe, ZoneLabelPipe],
+  declarations: [
+    autocomplete.OptionsPipe,
+    autocomplete.AutocompleteComponent,
+    CSSPropsDirective,
+    GeoTargetsPipe,
+    LargeNumberPipe,
+    UniquePipe,
+    ZoneLabelPipe
+  ],
   imports: [CommonModule, MatAutocompleteModule, MatButtonModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule],
   exports: [
+    GeoTargetsPipe,
     LargeNumberPipe,
+    UniquePipe,
     ZoneLabelPipe,
     IconModule,
     ImageModule,
