@@ -188,28 +188,6 @@ export class DashboardService {
     return this._flightFacets.asObservable();
   }
 
-  transformTargets(targets: any[]): string {
-    return targets
-      .map(t => {
-        let target: string;
-        switch (t.type) {
-          case 'country':
-            target = t.code;
-            break;
-          case 'subdiv':
-          case 'metro':
-            target = t.label;
-            break;
-        }
-        if (target && t.exclude) {
-          target += ' (excluded)';
-        }
-        return target;
-      })
-      .filter(s => s)
-      .join(', ');
-  }
-
   loadCampaignList(params?: DashboardParams) {
     this.campaignCount = null;
     this._campaignsLoading.next(true);
@@ -333,7 +311,7 @@ export class DashboardService {
               const zoneFacet = flightFacets && flightFacets.zone && flightFacets.zone.find(facet => facet.id === zoneId);
               return (zoneFacet && zoneFacet.label) || zoneId;
             }),
-            targets: flightDoc['targets'], // this.transformTargets(flightDoc['targets']),
+            targets: flightDoc['targets'],
             ...(flightDoc['_links'] &&
               flightDoc['_links']['prx:inventory'] &&
               flightDoc['_links']['prx:inventory']['title'] && {
