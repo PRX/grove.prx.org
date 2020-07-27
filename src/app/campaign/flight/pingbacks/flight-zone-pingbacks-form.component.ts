@@ -14,7 +14,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl, Fo
           [creative]="creative"
         ></grove-pingback>
         <div *ngIf="formArray.controls.length > 1" class="remove-pingback mat-form-field-wrapper">
-          <button mat-icon-button aria-label="Remove zone" (click)="onRemovePingback(i)">
+          <button mat-icon-button aria-label="Remove pingback" (click)="onRemovePingback(i)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
