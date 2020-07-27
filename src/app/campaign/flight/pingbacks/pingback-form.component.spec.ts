@@ -10,14 +10,7 @@ import { campaignFixture, flightFixture } from '../../store/models/campaign-stat
 @Component({
   template: `
     <form [formGroup]="form">
-      <grove-pingback
-        #childForm
-        formControlName="pingback"
-        [campaignId]="campaignId"
-        [flightId]="flightId"
-        [creative]="creative"
-        [podcastId]="podcastId"
-      >
+      <grove-pingback #childForm formControlName="pingback" [campaignId]="campaignId" [flightId]="flightId" [creative]="creative">
       </grove-pingback>
     </form>
   `
@@ -29,7 +22,6 @@ class ParentFormComponent {
   campaignId = campaignFixture.id;
   flightId = flightFixture.id;
   creative = 'http://this.looks/valid.mp3';
-  podcastId = flightFixture.set_inventory_uri.split('/').pop();
 }
 
 describe('PingbackFormComponent', () => {
@@ -105,7 +97,6 @@ describe('PingbackFormComponent', () => {
     const preview = component.formGroup.get('preview').value;
     expect(preview).toEqual(component.previewValue(pingback));
     expect(preview).toContain(`c=${component.creative}`);
-    expect(preview).toContain(`p=${component.podcastId}`);
     expect(preview).toContain(`cid=${component.campaignId}`);
     expect(preview).toContain(`f=${component.flightId}`);
   });

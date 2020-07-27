@@ -6,13 +6,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl, Fo
   template: `
     <fieldset>
       <div *ngFor="let pb of formArray.controls; let i = index" class="inline-fields">
-        <grove-pingback
-          [formControl]="pb"
-          [campaignId]="campaignId"
-          [flightId]="flightId"
-          [podcastId]="podcastId"
-          [creative]="creative"
-        ></grove-pingback>
+        <grove-pingback [formControl]="pb" [campaignId]="campaignId" [flightId]="flightId" [creative]="creative"></grove-pingback>
         <div *ngIf="formArray.controls.length > 1" class="remove-pingback mat-form-field-wrapper">
           <button mat-icon-button aria-label="Remove pingback" (click)="onRemovePingback(i)">
             <mat-icon>delete</mat-icon>
@@ -40,7 +34,6 @@ export class FlightZonePingbacksFormComponent implements ControlValueAccessor, O
   @Input() campaignId: string | number;
   @Input() flightId: number;
   @Input() creative: string;
-  @Input() podcastId: string;
   formArray = new FormArray([].map(this.flightPingbackFormControl));
   valueChangesSub = this.formArray.valueChanges.subscribe(pingbacks => {
     if (this.formArray.valid && !this.emitGuard) {

@@ -68,7 +68,6 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
           *ngIf="zoneHasPingbacks(zone)"
           [campaignId]="campaignId"
           [flightId]="flightId"
-          [podcastId]="podcastId"
           [creative]="zone.get('url').value"
           formControlName="pingbacks"
         ></grove-flight-zone-pingbacks>
@@ -91,7 +90,6 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   @Input() zoneOptions: InventoryZone[];
   @Input() campaignId: number;
   @Input() flightId: number;
-  @Input() podcastId: string;
   @Output() addZone = new EventEmitter<{ zone: FlightZone }>();
   @Output() removeZone = new EventEmitter<{ index: number }>();
   matcher = new FlightFormErrorStateMatcher();

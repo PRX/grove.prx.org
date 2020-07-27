@@ -57,8 +57,4 @@ export class FlightFormComponent implements OnInit {
   checkError(fieldName: string, type = 'error') {
     return this.flightForm.get(fieldName).getError(type);
   }
-
-  get podcastId() {
-    return this.flight && this.flight.set_inventory_uri && this.flight.set_inventory_uri.split('/').pop();
-  }
 }

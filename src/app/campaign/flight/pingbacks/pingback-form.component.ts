@@ -68,7 +68,6 @@ export class PingbackFormComponent implements ControlValueAccessor, OnDestroy {
   @Input() campaignId: string | number;
   @Input() flightId: number;
   @Input() creative: string;
-  @Input() podcastId: string;
   matcher = new FlightFormErrorStateMatcher();
   formGroup = this.fb.group({
     template: ['', [Validators.required, this.validateTemplate.bind(this)]],
@@ -123,9 +122,6 @@ export class PingbackFormComponent implements ControlValueAccessor, OnDestroy {
           }
           if (param === 'creative' && this.creative) {
             preview = preview.replace('{creative}', this.creative);
-          }
-          if (param === 'podcast' && this.podcastId) {
-            preview = preview.replace('{podcast}', this.podcastId);
           }
         }
       }

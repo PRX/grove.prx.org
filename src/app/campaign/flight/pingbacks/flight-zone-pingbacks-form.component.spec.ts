@@ -16,7 +16,6 @@ import { FlightZonePingbacksFormComponent } from './flight-zone-pingbacks-form.c
         [campaignId]="campaignId"
         [flightId]="flightId"
         [creative]="creative"
-        [podcastId]="podcastId"
       >
       </grove-flight-zone-pingbacks>
     </form>
