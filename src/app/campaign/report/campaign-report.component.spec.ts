@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { CampaignReportComponent } from './campaign-report.component';
-import moment from 'Moment';
+import moment from 'moment';
 import { Flight } from '../store/models';
 import { campaignFixture, flightFixture } from '../store/models/campaign-state.factory';
 
