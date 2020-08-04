@@ -77,6 +77,7 @@ export const campaignDocFixture = {
 export const createCampaignState = () => ({
   campaign: {
     localCampaign: campaignFixture,
+    remoteCampaign: campaignFixture,
     changed: false,
     valid: true,
     loading: false,
@@ -105,6 +106,8 @@ export const flightFixture: Flight = {
   name: 'my flight name',
   startAt: moment.utc('2019-10-01'),
   endAt: moment.utc('2019-11-01'),
+  contractStartAt: moment.utc('2019-10-01'),
+  contractEndAt: moment.utc('2019-11-01'),
   totalGoal: 999,
   dailyMinimum: 99,
   deliveryMode: 'capped',

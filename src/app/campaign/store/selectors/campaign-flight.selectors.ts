@@ -1,13 +1,20 @@
 import { createSelector } from '@ngrx/store';
+import { Dictionary } from '@ngrx/entity';
+import { selectAllAdvertisers } from './advertiser.selectors';
 import { selectCampaign, selectCampaignLoaded, selectCampaignError, selectLocalCampaign } from './campaign.selectors';
 import {
   selectAllFlights,
   selectFlightEntities,
   selectRoutedFlightId,
+  selectRoutedFlight,
   selectAllLocalFlights,
-  selectRoutedFlight
+  selectRemoteFlightsOrderByContractStartAt
 } from './flight.selectors';
-import { Campaign, CampaignState, Flight, FlightState, CampaignFormSave } from '../models';
+import { selectFlightDaysEntities } from './flight-days.selectors';
+import { selectAllInventory } from './inventory.selectors';
+import { Advertiser, Campaign, CampaignState, Flight, FlightState, CampaignFormSave, FlightDays, Inventory } from '../models';
+import { GeoTargetsPipe } from '../../../shared/pipes/geo-targets.pipe';
+import { utc } from 'moment';
 
 export const selectCampaignWithFlightsForSave = createSelector(
   selectCampaign,
@@ -67,5 +74,87 @@ export const selectRoutedCampaignFlightDocs = createSelector(
   selectRoutedFlight,
   (campaign: CampaignState, flight: FlightState) => {
     return { campaignDoc: campaign.doc, flightDoc: flight.doc };
+  }
+);
+
+export const selectCampaignFlightInventoryReportData = createSelector(
+  selectCampaign,
+  selectAllInventory,
+  selectAllAdvertisers,
+  selectRemoteFlightsOrderByContractStartAt,
+  selectFlightDaysEntities,
+  (campaign: CampaignState, shows: Inventory[], advertisers: Advertiser[], flights: Flight[], inventory: Dictionary<FlightDays>) => {
+    // Flight Names
+    const reportData: any[][] = [['Flight Name'].concat(flights.map(flight => flight.name))];
+    // Show
+    reportData.push(
+      ['Show'].concat(
+        flights.map(flight => {
+          const show = shows.find(i => i.self_uri === flight.set_inventory_uri);
+          return show ? show.podcastTitle : '';
+        })
+      )
+    );
+    // Advertiser/Sponsor
+    reportData.push(
+      ['Sponsor'].concat(
+        flights.map(_ => {
+          const advertiser = advertisers.find(a => a.set_advertiser_uri === campaign.remoteCampaign.set_advertiser_uri);
+          return advertiser ? advertiser.name : '';
+        })
+      )
+    );
+    // Zones
+    reportData.push(['Zones'].concat(flights.map(flight => flight.zones.map(zone => zone.label).join('|'))));
+    // Contract Start and End Dates
+    reportData.push(
+      ['Start Date'].concat(flights.map(flight => (flight.contractStartAt ? flight.contractStartAt.format('MM-DD-YYYY') : '')))
+    );
+    reportData.push(
+      ['End Date'].concat(flights.map(flight => (flight.contractEndAtFudged ? flight.contractEndAtFudged.format('MM-DD-YYYY') : '')))
+    );
+    // Geo Targets
+    const geoTransform = new GeoTargetsPipe();
+    reportData.push(
+      ['Geotarget'].concat(
+        flights.map(flight =>
+          flight.targets
+            .map(t => geoTransform.transform(t))
+            .filter(t => t)
+            .join('|')
+        )
+      )
+    );
+    // Contract Goal
+    reportData.push((['Contract Goal'] as (string | number)[]).concat(flights.map(flight => flight.contractGoal)));
+    // Actuals
+    reportData.push((['Total Delivered'] as (string | number)[]).concat(flights.map(flight => flight.actualCount)));
+    // Inventory Days for each flight mapped by date
+    const inventoryDays = flights.reduce(
+      (days, flight) =>
+        inventory[flight.id].days.reduce((acc, day) => {
+          const date = day.date.toISOString().slice(0, 10);
+          return {
+            ...acc,
+            [date]: {
+              ...acc[date],
+              [flight.id]: day
+            }
+          };
+        }, days),
+      {}
+    );
+    // push each inventory date row
+    // if no data for flight on date, show '-'
+    Object.keys(inventoryDays)
+      .sort((a, b) => new Date(a).valueOf() - new Date(b).valueOf())
+      .forEach(date =>
+        reportData.push(
+          ([utc(date).format('MM-DD-YYYY')] as (string | number)[]).concat(
+            flights.map(flight => (inventoryDays[date][flight.id] ? inventoryDays[date][flight.id].numbers.actuals : '-'))
+          )
+        )
+      );
+    return reportData;
   }
 );

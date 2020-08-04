@@ -12,7 +12,8 @@ import {
   selectLocalCampaignName,
   selectValid,
   selectChanged,
-  selectLocalCampaignActualCount
+  selectLocalCampaignActualCount,
+  selectCampaignFlightInventoryReportData
 } from './store/selectors';
 import * as accountActions from './store/actions/account-action.creator';
 import * as advertiserActions from './store/actions/advertiser-action.creator';
@@ -30,6 +31,8 @@ import { CampaignErrorService } from './campaign-error.service';
       [changed]="changed$ | async"
       [actuals]="campaignActualCount$ | async"
       [isSaving]="campaignSaving$ | async"
+      [flights]="flights$ | async"
+      [reportData]="reportData$ | async"
       (save)="campaignSubmit()"
       (delete)="campaignDelete()"
       (duplicate)="campaignDuplicate()"
@@ -68,6 +71,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
   changed$: Observable<boolean>;
   campaignName$: Observable<string>;
   campaignActualCount$: Observable<number>;
+  reportData$: Observable<any[][]>;
   routeSub: Subscription;
 
   constructor(
@@ -105,6 +109,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     this.flights$ = this.store.pipe(select(selectAllFlightsOrderByCreatedAt));
     this.valid$ = this.store.pipe(select(selectValid));
     this.changed$ = this.store.pipe(select(selectChanged));
+    this.reportData$ = this.store.pipe(select(selectCampaignFlightInventoryReportData));
   }
 
   ngOnDestroy() {
