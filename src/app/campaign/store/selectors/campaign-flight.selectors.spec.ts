@@ -42,7 +42,11 @@ describe('Campaign-Flight Selectors', () => {
     expect(reportData[4][0]).toEqual('Start Date');
     expect(reportData[4][1]).toEqual(campaignStateFactory.flightFixture.contractStartAt.format('MM-DD-YYYY'));
     expect(reportData[7][0]).toEqual('Contract Goal');
-    expect(reportData[7][1]).toEqual(campaignStateFactory.flightFixture.contractGoal);
+    expect(reportData[7][1]).toEqual(
+      campaignStateFactory.flightFixture.contractGoal
+        ? campaignStateFactory.flightFixture.contractGoal
+        : campaignStateFactory.flightFixture.totalGoal
+    );
     expect(reportData[9][0]).toEqual(
       moment.utc(flightDaysState.flightDays.entities[campaignStateFactory.flightFixture.id].days[0].date).format('MM-DD-YYYY')
     );

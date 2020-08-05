@@ -43,11 +43,13 @@ export class CampaignReportComponent {
         (acc, flight) => {
           let startAt = acc.startAt;
           let endAt = acc.endAt;
-          if (flight.contractStartAt && (!acc.startAt || acc.startAt.valueOf() > flight.contractStartAt.valueOf())) {
-            startAt = new Date(flight.contractStartAt.valueOf());
+          const flightStartAt = flight.contractStartAt ? flight.contractStartAt : flight.startAt;
+          if (flightStartAt && (!acc.startAt || acc.startAt.valueOf() > flightStartAt.valueOf())) {
+            startAt = new Date(flightStartAt.valueOf());
           }
-          if (flight.contractEndAtFudged && (!acc.endAt || acc.endAt.valueOf() < flight.contractEndAtFudged.valueOf())) {
-            endAt = new Date(flight.contractEndAtFudged.valueOf());
+          const flightEndAt = flight.contractEndAtFudged ? flight.contractEndAtFudged : flight.endAtFudged;
+          if (flightEndAt && (!acc.endAt || acc.endAt.valueOf() < flightEndAt.valueOf())) {
+            endAt = new Date(flightEndAt.valueOf());
           }
           return { startAt, endAt };
         },

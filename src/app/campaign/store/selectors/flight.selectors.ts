@@ -55,8 +55,8 @@ export const selectRemoteFlightsOrderByContractStartAt = createSelector(selectAl
     .filter(flightState => flightState.remoteFlight)
     .sort(
       (a, b) =>
-        (a.remoteFlight.contractStartAt || a.remoteFlight.createdAt).valueOf() -
-        (b.remoteFlight.contractStartAt || b.remoteFlight.createdAt).valueOf()
+        (a.remoteFlight.contractStartAt || a.remoteFlight.startAt).valueOf() -
+        (b.remoteFlight.contractStartAt || b.remoteFlight.startAt).valueOf()
     )
     .map(flightState => flightState.remoteFlight)
 );

@@ -105,13 +105,23 @@ export const selectCampaignFlightInventoryReportData = createSelector(
       )
     );
     // Zones
-    reportData.push(['Zones'].concat(flights.map(flight => flight.zones.map(zone => zone.label).join('|'))));
-    // Contract Start and End Dates
+    reportData.push(['Zones'].concat(flights.map(flight => flight.zones.map(zone => zone.label).join(', '))));
+    // Contract Start and End Dates, fall back to Actual Start and/or End Dates if null
     reportData.push(
-      ['Start Date'].concat(flights.map(flight => (flight.contractStartAt ? flight.contractStartAt.format('MM-DD-YYYY') : '')))
+      ['Start Date'].concat(
+        flights.map(flight => {
+          const flightStartAt = flight.contractStartAt ? flight.contractStartAt : flight.startAt;
+          return flightStartAt ? flightStartAt.format('MM-DD-YYYY') : '';
+        })
+      )
     );
     reportData.push(
-      ['End Date'].concat(flights.map(flight => (flight.contractEndAtFudged ? flight.contractEndAtFudged.format('MM-DD-YYYY') : '')))
+      ['End Date'].concat(
+        flights.map(flight => {
+          const flightEndAt = flight.contractEndAtFudged ? flight.contractEndAtFudged : flight.endAtFudged;
+          return flightEndAt ? flightEndAt.format('MM-DD-YYYY') : '';
+        })
+      )
     );
     // Geo Targets
     const geoTransform = new GeoTargetsPipe();
@@ -121,12 +131,16 @@ export const selectCampaignFlightInventoryReportData = createSelector(
           flight.targets
             .map(t => geoTransform.transform(t))
             .filter(t => t)
-            .join('|')
+            .join(', ')
         )
       )
     );
-    // Contract Goal
-    reportData.push((['Contract Goal'] as (string | number)[]).concat(flights.map(flight => flight.contractGoal)));
+    // Contract Goal, falls back to totalGoal if null
+    reportData.push(
+      (['Contract Goal'] as (string | number)[]).concat(
+        flights.map(flight => (flight.contractGoal ? flight.contractGoal : flight.totalGoal))
+      )
+    );
     // Actuals
     reportData.push((['Total Delivered'] as (string | number)[]).concat(flights.map(flight => flight.actualCount)));
     // Inventory Days for each flight mapped by date
