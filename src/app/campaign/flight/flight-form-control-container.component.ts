@@ -136,9 +136,13 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
       endAt.value &&
       this.flightActualsDateBoundaries &&
       this.flightActualsDateBoundaries.endAt &&
+      // end date + 1 days:
+      //  * end date is fudged, i.e. actually stored as a cutoff of the next day at midnight
+      //  * actuals boundary (last day actuals served) should match fudged end date/datepicker value,
+      //  * BUT we're also allowing an extra day for straggling actuals
       this.flightActualsDateBoundaries.endAt.valueOf() > endAt.value.valueOf() + 24 * 60 * 60 * 1000
     ) {
-      return { error: `Cannot set end date before ${utc(this.flightActualsDateBoundaries.startAt).format('M/D/YYYY')} actuals` };
+      return { error: `Cannot set end date before ${utc(this.flightActualsDateBoundaries.endAt).format('M/D/YYYY')} actuals` };
     } else {
       return null;
     }
