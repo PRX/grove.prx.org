@@ -30,6 +30,14 @@ import { reducers, metaReducers } from './store/reducers';
 import { CustomRouterSerializer } from './store/router-store/custom-router-serializer';
 import { environment } from '../environments/environment';
 
+const PREFERRED_DATE_FORMATS = {
+  ...MAT_MOMENT_DATE_FORMATS,
+  display: {
+    ...MAT_MOMENT_DATE_FORMATS.display,
+    dateInput: 'MM/DD/YYYY'
+  }
+};
+
 @NgModule({
   declarations: [AppComponent, routingComponents],
   imports: [
@@ -53,7 +61,7 @@ import { environment } from '../environments/environment';
     { provide: ErrorHandler, useClass: ErrorService },
     { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS }
+    { provide: MAT_DATE_FORMATS, useValue: PREFERRED_DATE_FORMATS }
   ],
   bootstrap: [AppComponent]
 })
