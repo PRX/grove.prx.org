@@ -91,11 +91,10 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   flightForm = this.fb.group({
     id: [],
     name: ['', Validators.required],
-    startAt: ['', [Validators.required, this.validateStartAt.bind(this)]],
-    endAtFudged: ['', [Validators.required, this.validateEndAt.bind(this)]],
-    contractStartAt: [''],
-    contractEndAt: [''],
-    contractEndAtFudged: [''],
+    startAt: ['', { validators: [Validators.required, this.validateStartAt.bind(this)], updateOn: 'blur' }],
+    endAtFudged: ['', { validators: [Validators.required, this.validateEndAt.bind(this)], updateOn: 'blur' }],
+    contractStartAt: ['', { updateOn: 'blur' }],
+    contractEndAtFudged: ['', { updateOn: 'blur' }],
     isCompanion: [false],
     zones: [''],
     targets: [''],
@@ -122,6 +121,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
 
   validateStartAt(startAt: AbstractControl): { [key: string]: any } | null {
     if (
+      startAt.value &&
       this.flightActualsDateBoundaries &&
       this.flightActualsDateBoundaries.startAt &&
       this.flightActualsDateBoundaries.startAt.valueOf() < startAt.value.valueOf()
@@ -133,6 +133,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
 
   validateEndAt(endAt: AbstractControl): { [key: string]: any } | null {
     if (
+      endAt.value &&
       this.flightActualsDateBoundaries &&
       this.flightActualsDateBoundaries.endAt &&
       this.flightActualsDateBoundaries.endAt.valueOf() > endAt.value.valueOf() + 24 * 60 * 60 * 1000
