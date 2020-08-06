@@ -58,8 +58,8 @@ export interface Facets {
 export interface Flight {
   id: number;
   name: string;
-  status: string;
-  statusOk: boolean;
+  allocationStatus: string;
+  allocationStatusOk: boolean;
   startAt: Date;
   endAt: Date;
   zones: string[];
@@ -237,8 +237,8 @@ export class DashboardService {
             flights: flightDocs.map(doc => ({
               id: doc['id'],
               name: doc['name'],
-              status: doc['status'],
-              statusOk: doc['status'] === 'ok',
+              allocationStatus: doc['allocationStatus'],
+              allocationStatusOk: doc['allocationStatus'] === 'ok',
               startAt: doc['startAt'] && new Date(doc['startAt']),
               endAt:
                 doc['endAt'] &&
@@ -296,8 +296,8 @@ export class DashboardService {
           const flight: Flight = {
             id: flightDoc['id'],
             name: flightDoc['name'],
-            status: flightDoc['status'],
-            statusOk: flightDoc['status'] === 'ok',
+            allocationStatus: flightDoc['allocationStatus'],
+            allocationStatusOk: flightDoc['allocationStatus'] === 'ok',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
             endAt:
               flightDoc['endAt'] &&
