@@ -15,10 +15,10 @@ import { Campaign, FlightState } from '../store/models';
         [class.changed]="flight.changed"
         [class.valid]="flight.valid"
         [class.invalid]="!flight.valid"
-        [class.error]="!statusOk(flight)"
+        [class.error]="!allocationStatusOk(flight)"
       >
         <span matLine>{{ flight.localFlight?.name }}</span>
-        <mat-icon color="warn" *ngIf="!statusOk(flight)">priority_high</mat-icon>
+        <mat-icon color="warn" *ngIf="!allocationStatusOk(flight)">priority_high</mat-icon>
       </a>
     </mat-nav-list>
     <a class="secondary-link" routerLink="" (click)="createFlight.emit()"><mat-icon>add</mat-icon> Add a Flight</a>
@@ -34,7 +34,7 @@ export class CampaignNavComponent {
   @Input() isSaving: boolean;
   @Output() createFlight = new EventEmitter();
 
-  statusOk(flight: FlightState): boolean {
-    return !flight.localFlight.status || flight.localFlight.status === 'ok';
+  allocationStatusOk(flight: FlightState): boolean {
+    return !flight.localFlight.allocationStatus || flight.localFlight.allocationStatus === 'ok';
   }
 }

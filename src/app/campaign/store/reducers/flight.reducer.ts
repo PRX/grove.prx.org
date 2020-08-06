@@ -130,9 +130,12 @@ const _reducer = createReducer(
     return newState;
   }),
   on(flightPreviewActions.FlightPreviewCreateSuccess, (state, action) => {
-    const { flight, status, statusMessage } = action;
+    const { flight, allocationStatus, allocationStatusMessage } = action;
     const localFlight = state.entities[flight.id].localFlight;
-    return adapter.updateOne({ id: flight.id, changes: { localFlight: { ...localFlight, status, statusMessage } } }, state);
+    return adapter.updateOne(
+      { id: flight.id, changes: { localFlight: { ...localFlight, allocationStatus, allocationStatusMessage } } },
+      state
+    );
   })
 );
 

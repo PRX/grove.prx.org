@@ -289,7 +289,7 @@ describe('Flight Reducer', () => {
     expect(state.entities[timestamp].localFlight.createdAt).toBeUndefined();
   });
 
-  it('should update the flight status/message from preview', () => {
+  it('should update the flight allocation status/message from preview', () => {
     let result = reducer(
       initialState,
       campaignActions.CampaignLoadSuccess({
@@ -302,13 +302,13 @@ describe('Flight Reducer', () => {
       result,
       flightPreviewActions.FlightPreviewCreateSuccess({
         flight: flightFixture,
-        status: 'error',
-        statusMessage: 'something bad',
+        allocationStatus: 'error',
+        allocationStatusMessage: 'something bad',
         flightDaysDocs: []
       })
     );
     expect(result.entities[flightFixture.id].localFlight).toMatchObject(flightFixture);
-    expect(result.entities[flightFixture.id].localFlight.status).toBe('error');
-    expect(result.entities[flightFixture.id].localFlight.statusMessage).toBe('something bad');
+    expect(result.entities[flightFixture.id].localFlight.allocationStatus).toBe('error');
+    expect(result.entities[flightFixture.id].localFlight.allocationStatusMessage).toBe('something bad');
   });
 });

@@ -45,7 +45,7 @@ describe('FlightPreviewEffects', () => {
         {
           provide: FlightPreviewService,
           useValue: {
-            createFlightPreview: jest.fn(() => of({ status: 'ok', statusMessage: null, days: flightDaysDocFixture }))
+            createFlightPreview: jest.fn(() => of({ allocationStatus: 'ok', allocationStatusMessage: null, days: flightDaysDocFixture }))
           }
         },
         { provide: Actions, useFactory: getActions }
@@ -59,8 +59,8 @@ describe('FlightPreviewEffects', () => {
   it('should create flight preview', () => {
     const success = flightPreviewActions.FlightPreviewCreateSuccess({
       flight: flightFixture,
-      status: 'ok',
-      statusMessage: null,
+      allocationStatus: 'ok',
+      allocationStatusMessage: null,
       flightDaysDocs: flightDaysDocFixture,
       flightDoc,
       campaignDoc

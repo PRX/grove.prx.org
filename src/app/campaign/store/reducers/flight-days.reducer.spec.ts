@@ -112,8 +112,8 @@ describe('Flight Days/Preview Reducer', () => {
       result,
       flightPreviewActions.FlightPreviewCreateSuccess({
         flight: flightDocFixture,
-        status: 'ok',
-        statusMessage: null,
+        allocationStatus: 'ok',
+        allocationStatusMessage: null,
         flightDaysDocs: flightDaysDocFixture,
         flightDoc: new MockHalDoc(flightDocFixture),
         campaignDoc: new MockHalDoc(campaignDocFixture)

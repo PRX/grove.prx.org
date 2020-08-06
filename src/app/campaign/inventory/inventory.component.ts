@@ -40,7 +40,7 @@ export class InventoryComponent {
   zoneWeekExpanded = {};
 
   get errors() {
-    return [this.decodedPreviewError, this.flight.statusMessage].filter(error => !!error);
+    return [this.decodedPreviewError, this.flight.allocationStatusMessage].filter(error => !!error);
   }
 
   // TODO: Updated with discussed "nice_message" when available.

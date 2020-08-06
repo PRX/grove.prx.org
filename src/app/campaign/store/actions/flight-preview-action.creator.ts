@@ -15,8 +15,8 @@ export const FlightPreviewCreateSuccess = createAction(
   ActionTypes.CAMPAIGN_FLIGHT_PREVIEW_CREATE_SUCCESS,
   props<{
     flight: Flight;
-    status: string;
-    statusMessage: string;
+    allocationStatus: string;
+    allocationStatusMessage: string;
     flightDaysDocs: HalDoc[];
     flightDoc?: HalDoc;
     campaignDoc?: HalDoc;
