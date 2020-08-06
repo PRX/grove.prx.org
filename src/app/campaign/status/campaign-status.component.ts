@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from 
 import { Observable } from 'rxjs';
 import { DashboardService, DashboardRouteParams } from '../../dashboard/dashboard.service';
 import { ModalService } from 'ngx-prx-styleguide';
+import { FlightState } from '../store/models';
 
 @Component({
   selector: 'grove-campaign-status',
@@ -18,6 +19,7 @@ import { ModalService } from 'ngx-prx-styleguide';
       <prx-button [working]="isSaving" [disabled]="!valid || !changed" (click)="onSave()">Save</prx-button>
     </prx-status-bar>
     <mat-menu panelClass="menuPanel" #campaignMenu="matMenu">
+      <grove-campaign-report [campaignName]="campaignName" [flights]="flights" [reportData]="reportData"></grove-campaign-report>
       <button mat-menu-item [disabled]="!canDuplicate" (click)="onDuplicate()">
         <mat-icon aria-hidden>file_copy</mat-icon>
         <span>Duplicate</span>
@@ -37,6 +39,8 @@ export class CampaignStatusComponent {
   @Input() changed: boolean;
   @Input() isSaving: boolean;
   @Input() actuals: number;
+  @Input() flights: FlightState[];
+  @Input() reportData: any[][];
   @Output() save = new EventEmitter();
   @Output() delete = new EventEmitter();
   @Output() duplicate = new EventEmitter();

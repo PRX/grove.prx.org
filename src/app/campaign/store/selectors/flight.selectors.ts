@@ -49,3 +49,14 @@ export const selectFlightDocById = createSelector(
 export const selectAllLocalFlights = createSelector(selectAllFlights, (flights: FlightState[]): Flight[] =>
   flights.map((flight: FlightState): Flight => flight.localFlight)
 );
+
+export const selectRemoteFlightsOrderByContractStartAt = createSelector(selectAllFlights, flights =>
+  flights
+    .filter(flightState => flightState.remoteFlight)
+    .sort(
+      (a, b) =>
+        (a.remoteFlight.contractStartAt || a.remoteFlight.startAt).valueOf() -
+        (b.remoteFlight.contractStartAt || b.remoteFlight.startAt).valueOf()
+    )
+    .map(flightState => flightState.remoteFlight)
+);

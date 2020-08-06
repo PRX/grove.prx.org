@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { FancyFormModule, MockHalService, StatusBarModule } from 'ngx-prx-styleguide';
 import { CampaignStatusComponent } from './campaign-status.component';
+import { CampaignReportComponent } from '../report/campaign-report.component';
 import { DashboardServiceMock, params } from '../../dashboard/dashboard.service.mock';
 import { DashboardService } from '../../dashboard/dashboard.service';
 
@@ -25,7 +26,7 @@ describe('CampaignStatusComponent', () => {
           useValue: mockDashboardService
         }
       ],
-      declarations: [CampaignStatusComponent]
+      declarations: [CampaignStatusComponent, CampaignReportComponent]
     })
       .compileComponents()
       .then(() => {

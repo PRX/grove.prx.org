@@ -17,6 +17,7 @@ import { PingbackFormComponent } from './flight/pingbacks/pingback-form.componen
 import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
+import { CampaignReportComponent } from './report/campaign-report.component';
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
@@ -55,7 +56,8 @@ export const campaignComponents: any[] = [
   PingbackFormComponent,
   InventoryComponent,
   InventoryTableComponent,
-  GoalFormComponent
+  GoalFormComponent,
+  CampaignReportComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);

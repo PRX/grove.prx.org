@@ -18,6 +18,7 @@ import { CampaignActionService } from './store/actions/campaign-action.service';
 import * as campaignActions from './store/actions/campaign-action.creator';
 import { CampaignComponent } from './campaign.component';
 import { CampaignStatusComponent } from './status/campaign-status.component';
+import { CampaignReportComponent } from './report/campaign-report.component';
 import { CampaignNavComponent } from './nav/campaign-nav.component';
 import { CampaignErrorService } from './campaign-error.service';
 import { TestComponent, campaignRoutes } from '../../testing/test.component';
@@ -61,7 +62,7 @@ describe('CampaignComponent', () => {
         MatProgressSpinnerModule,
         MatSidenavModule
       ],
-      declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, TestComponent],
+      declarations: [CampaignComponent, CampaignNavComponent, CampaignStatusComponent, CampaignReportComponent, TestComponent],
       providers: [
         {
           provide: ActivatedRoute,
