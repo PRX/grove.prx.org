@@ -8,8 +8,8 @@ export const flights: Flight[] = [
   {
     id: 1,
     name: 'Flight 1',
-    status: 'ok',
-    statusOk: true,
+    allocationStatus: 'ok',
+    allocationStatusOk: true,
     startAt: new Date('2019-09-01 0:0:0'),
     endAt: new Date('2019-09-10 0:0:0'),
     totalGoal: 1234,
@@ -28,8 +28,8 @@ export const flights: Flight[] = [
   {
     id: 2,
     name: 'Flight 2',
-    status: 'error',
-    statusOk: false,
+    allocationStatus: 'error',
+    allocationStatusOk: false,
     startAt: new Date('2019-09-02 0:0:0'),
     endAt: new Date('2019-09-13 0:0:0'),
     totalGoal: 54321,

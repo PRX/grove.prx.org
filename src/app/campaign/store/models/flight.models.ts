@@ -30,8 +30,8 @@ export interface Flight {
   actualCount?: number;
   dailyMinimum?: number;
   deliveryMode: string;
-  status?: string;
-  statusMessage?: string;
+  allocationStatus?: string;
+  allocationStatusMessage?: string;
   createdAt?: Date;
   contractGoal?: number;
   contractStartAt?: Moment;

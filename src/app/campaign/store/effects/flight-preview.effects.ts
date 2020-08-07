@@ -13,11 +13,11 @@ export class FlightPreviewEffects {
       switchMap(action => {
         const { flight, flightDoc, campaignDoc } = action;
         return this.flightPreviewService.createFlightPreview(flight, flightDoc, campaignDoc).pipe(
-          map(({ status, statusMessage, days: flightDaysDocs }) => {
+          map(({ allocationStatus, allocationStatusMessage, days: flightDaysDocs }) => {
             return flightPreviewActions.FlightPreviewCreateSuccess({
               flight,
-              status,
-              statusMessage,
+              allocationStatus,
+              allocationStatusMessage,
               flightDaysDocs,
               flightDoc,
               campaignDoc

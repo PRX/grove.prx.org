@@ -20,7 +20,7 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   displayedColumns: string[] = [
     'name',
     'campaign_status',
-    'status',
+    'allocation_status',
     'campaign_name',
     'start_at',
     'end_at',

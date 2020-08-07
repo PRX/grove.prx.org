@@ -122,9 +122,9 @@ describe('InventoryComponent', () => {
   });
 
   describe('errors', () => {
-    it('has flight status messages', () => {
+    it('has flight allocation status messages', () => {
       expect(comp.errors).toEqual([]);
-      comp.flight = { ...flightFixture, statusMessage: 'something bad' };
+      comp.flight = { ...flightFixture, allocationStatusMessage: 'something bad' };
       expect(comp.errors).toEqual(['something bad']);
     });
 

@@ -12,7 +12,7 @@ export class FlightPreviewService {
     flight: {},
     flightDoc?: HalDoc,
     campaignDoc?: HalDoc
-  ): Observable<{ status: string; statusMessage: string; days: HalDoc[] }> {
+  ): Observable<{ allocationStatus: string; allocationStatusMessage: string; days: HalDoc[] }> {
     if (flightDoc) {
       return this.preview(flight, flightDoc, 'preview');
     } else if (campaignDoc) {
@@ -29,8 +29,8 @@ export class FlightPreviewService {
     return doc.create(link, {}, flight).pipe(
       mergeMap((flightPreviewDoc: HalDoc) => {
         return forkJoin({
-          status: of(flightPreviewDoc['status']),
-          statusMessage: of(flightPreviewDoc['statusMessage']),
+          allocationStatus: of(flightPreviewDoc['allocationStatus']),
+          allocationStatusMessage: of(flightPreviewDoc['allocationStatusMessage']),
           days: flightPreviewDoc.followList('prx:flight-days')
         });
       })
