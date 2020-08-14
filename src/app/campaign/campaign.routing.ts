@@ -18,10 +18,14 @@ import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
 import { CampaignReportComponent } from './report/campaign-report.component';
+import { CreativeFormContainerComponent } from './creative/creative-form-container.component';
+import { CreativeFormComponent } from './creative/creative-form.component';
+
+const flightChildRoutes: Routes = [{ path: 'creative/:creativeId', component: CreativeFormContainerComponent }];
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
-  { path: 'flight/:flightId', component: FlightContainerComponent }
+  { path: 'flight/:flightId', component: FlightContainerComponent, children: flightChildRoutes }
 ];
 
 export const campaignRoutes: Routes = [
@@ -57,7 +61,9 @@ export const campaignComponents: any[] = [
   InventoryComponent,
   InventoryTableComponent,
   GoalFormComponent,
-  CampaignReportComponent
+  CampaignReportComponent,
+  CreativeFormContainerComponent,
+  CreativeFormComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);

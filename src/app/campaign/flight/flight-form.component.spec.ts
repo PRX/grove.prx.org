@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import {
   MatCardModule,
   MatFormFieldModule,
@@ -105,6 +106,7 @@ describe('FlightFormComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule.withRoutes([]),
         ReactiveFormsModule,
         NoopAnimationsModule,
         MatCardModule,

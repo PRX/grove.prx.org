@@ -16,7 +16,8 @@ import {
   MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatCheckboxModule,
-  MatMenuModule
+  MatMenuModule,
+  MatSidenavModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -45,9 +46,10 @@ import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingba
 import { TestComponent } from '../../../testing/test.component';
 import * as moment from 'moment';
 
+const flightChildRoutes: Routes = [{ path: 'creative/:creativeId', component: TestComponent }];
 const campaignChildRoutes: Routes = [
-  { path: '', component: FlightContainerComponent },
-  { path: 'flight/:flightId', component: FlightContainerComponent }
+  { path: '', component: TestComponent },
+  { path: 'flight/:flightId', component: FlightContainerComponent, children: flightChildRoutes }
 ];
 const campaignRoutes: Routes = [
   {
@@ -105,6 +107,7 @@ describe('FlightContainerComponent', () => {
         MatSlideToggleModule,
         MatCheckboxModule,
         MatMenuModule,
+        MatSidenavModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {

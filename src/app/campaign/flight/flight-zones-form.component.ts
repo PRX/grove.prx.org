@@ -71,10 +71,16 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
           [creative]="zone.get('url').value"
           formControlName="pingbacks"
         ></grove-flight-zone-pingbacks>
+        <div>
+          <button mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu"><mat-icon>add</mat-icon> Add a creative</button>
+          <mat-menu #addCreativeMenu="matMenu" xPosition="after">
+            <a mat-menu-item routerLink="{{ '/campaign/' + campaignId + '/flight/' + flightId + '/creative/new' }}">Add New</a>
+          </mat-menu>
+        </div>
       </div>
     </fieldset>
     <div *ngIf="zones?.controls?.length < zoneOptions?.length">
-      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addCreativeLabel }}</button>
+      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addZoneLabel }}</button>
     </div>
   `,
   styleUrls: ['./flight-zones-form.component.scss'],
@@ -177,7 +183,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     });
   }
 
-  get addCreativeLabel(): string {
+  get addZoneLabel(): string {
     const type = this.isCompanion ? 'companion' : 'zone';
     return `Add a ${type}`;
   }

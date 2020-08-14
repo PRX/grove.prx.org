@@ -1,22 +1,17 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import {
-  Flight,
-  InventoryRollup,
-  Inventory,
-  InventoryZone,
-  FlightZone,
-  InventoryTargetType,
-  FlightTarget,
-  InventoryTargetsMap
-} from '../store/models';
+import { filter, withLatestFrom } from 'rxjs/operators';
+import { MatDrawer } from '@angular/material/sidenav';
+import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap } from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
   selectRoutedFlightChanged,
   selectCurrentInventoryUri,
   selectRoutedFlightPreviewError,
+  selectRoutedCreativeId,
   selectFlightDaysRollup,
   selectIsFlightPreview,
   selectIsFlightPreviewLoading,
@@ -31,23 +26,28 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
 
 @Component({
   template: `
-    <grove-flight
-      [inventory]="inventoryOptions$ | async"
-      [zoneOptions]="zoneOptions$ | async"
-      [targetTypes]="targetTypes$ | async"
-      [targetOptionsMap]="targetOptionsMap$ | async"
-      [flight]="flightLocal$ | async"
-      [softDeleted]="softDeleted$ | async"
-      [rollup]="inventoryRollup$ | async"
-      [isPreview]="isPreview$ | async"
-      [isLoading]="isLoading$ | async"
-      [previewError]="flightPreviewError$ | async"
-      [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
-      [campaignId]="campaignId$ | async"
-      (flightUpdate)="flightUpdateFromForm($event)"
-      (flightDeleteToggle)="flightDeleteToggle()"
-      (flightDuplicate)="flightDuplicate($event)"
-    ></grove-flight>
+    <mat-drawer-container hasBackdrop="true">
+      <mat-drawer mode="over" position="end" #creative><router-outlet></router-outlet></mat-drawer>
+      <mat-drawer-content>
+        <grove-flight
+          [inventory]="inventoryOptions$ | async"
+          [zoneOptions]="zoneOptions$ | async"
+          [targetTypes]="targetTypes$ | async"
+          [targetOptionsMap]="targetOptionsMap$ | async"
+          [flight]="flightLocal$ | async"
+          [softDeleted]="softDeleted$ | async"
+          [rollup]="inventoryRollup$ | async"
+          [isPreview]="isPreview$ | async"
+          [isLoading]="isLoading$ | async"
+          [previewError]="flightPreviewError$ | async"
+          [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
+          [campaignId]="campaignId$ | async"
+          (flightUpdate)="flightUpdateFromForm($event)"
+          (flightDeleteToggle)="flightDeleteToggle()"
+          (flightDuplicate)="flightDuplicate($event)"
+        ></grove-flight>
+      </mat-drawer-content>
+    </mat-drawer-container>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -66,9 +66,11 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   targetOptionsMap$: Observable<InventoryTargetsMap>;
   flightActualsDateBoundaries$: Observable<{ startAt: Date; endAt: Date }>;
   campaignId$: Observable<string | number>;
-  flightSub: Subscription;
+  @ViewChild('creative', { static: true }) creativeMatDrawer: MatDrawer;
+  creativeOpenedSubscription: Subscription;
+  creativeClosedSubscription: Subscription;
 
-  constructor(private store: Store<any>, private campaignAction: CampaignActionService) {}
+  constructor(private router: Router, private store: Store<any>, private campaignAction: CampaignActionService) {}
 
   ngOnInit() {
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
@@ -85,11 +87,34 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.targetOptionsMap$ = this.store.pipe(select(selectCurrentInventoryTargetsTypeMap));
     this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
+
+    // subscribe to creativeId route param and open drawer
+    this.creativeOpenedSubscription = this.store.pipe(select(selectRoutedCreativeId)).subscribe(creativeId => {
+      if (creativeId) {
+        this.creativeMatDrawer.open();
+      }
+    });
+
+    // if open changes to false (user clicked overlay closing drawer), navigate back to flight
+    this.creativeClosedSubscription = this.creativeMatDrawer.openedChange
+      .pipe(
+        filter(openChangeTo => !openChangeTo),
+        withLatestFrom(this.campaignId$),
+        withLatestFrom(this.flightLocal$)
+      )
+      .subscribe(([[_, campaignId], flight]) => {
+        if (flight) {
+          this.router.navigate(['/campaign', campaignId, 'flight', flight.id]);
+        }
+      });
   }
 
   ngOnDestroy() {
-    if (this.flightSub) {
-      this.flightSub.unsubscribe();
+    if (this.creativeOpenedSubscription) {
+      this.creativeOpenedSubscription.unsubscribe();
+    }
+    if (this.creativeClosedSubscription) {
+      this.creativeClosedSubscription.unsubscribe();
     }
   }
 
