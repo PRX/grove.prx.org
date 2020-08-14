@@ -21,16 +21,13 @@ import { Creative, Account, Advertiser } from '../store/models';
           <mat-option *ngFor="let acct of accounts" [value]="acct.self_uri">{{ acct.name }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <grove-autocomplete
-        *ngIf="advertisers"
-        class="campaign-form-field"
-        [formGroup]="creativeForm"
-        controlName="set_advertiser_uri"
-        label="Advertiser"
-        [options]="{ options: advertisers, name: 'name', value: 'set_advertiser_uri' } | optionsTransform"
-        (addOption)="onAddAdvertiser($event)"
-      >
-      </grove-autocomplete>
+      <mat-form-field appearance="outline">
+        <mat-label>Advertiser</mat-label>
+        <input matInput type="text" formControlName="set_advertiser_uri" [matAutocomplete]="advertiser" />
+        <mat-autocomplete #advertiser="matAutocomplete" [displayWith]="advertiserName.bind(this)">
+          <mat-option *ngFor="let adv of advertisers" [value]="adv.set_advertiser_uri">{{ adv.name }}</mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
       <grove-flight-zone-pingbacks [campaignId]="campaignId" [flightId]="flightId" [creative]="creative?.url"></grove-flight-zone-pingbacks>
     </form>
   `,
@@ -54,6 +51,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
   get creative() {
     return this._creative;
   }
+  @Output() creativeUpdate = new EventEmitter<{ creative: Creative; changed: boolean; valid: boolean }>();
   formSubcription: Subscription;
   urlSubscription: Subscription;
 
@@ -93,10 +91,8 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     this.creativeForm.setValue(creative, { emitEvent: false });
   }
 
-  onFormValueChanges(creative: Creative) {}
-
-  onAddAdvertiser(name: string) {
-    // this.store.dispatch(advertiserActions.AddAdvertiser({ name }));
+  onFormValueChanges(creative: Creative) {
+    this.creativeUpdate.emit({ creative, changed: this.creativeForm.dirty, valid: this.creativeForm.valid });
   }
 
   validateAdvertiser({ value }: AbstractControl) {
@@ -105,5 +101,12 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
       return null;
     }
     return { advertiserInvalid: true };
+  }
+
+  advertiserName(value?: string): string {
+    if (value && this.advertisers) {
+      const adv = this.advertisers.find(adv => adv.set_advertiser_uri === value);
+      return adv && adv.name;
+    }
   }
 }

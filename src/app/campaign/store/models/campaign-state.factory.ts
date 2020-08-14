@@ -87,6 +87,13 @@ export const createCampaignState = () => ({
   }
 });
 
+export const createCreativesState = () => ({
+  creatives: {
+    ids: [],
+    entities: {}
+  }
+});
+
 export const flightDaysData = new Array(30).fill(null).map((_, i) => ({
   allocated: Math.floor(Math.random() * 100),
   available: Math.floor(Math.random() * 1000),
@@ -209,6 +216,7 @@ export const createCampaignStoreState = ({
   account = createAccountState(),
   advertiser = createAdvertiserState(),
   campaignState = createCampaignState(),
+  creativesState = createCreativesState(),
   flightsState = createFlightsState(campaignState.campaign.doc),
   flightDaysState = createFlightDaysState(),
   inventoryState = createInventoryState()
@@ -216,6 +224,7 @@ export const createCampaignStoreState = ({
   ...account,
   ...advertiser,
   ...campaignState,
+  ...creativesState,
   ...flightsState,
   ...flightDaysState,
   ...inventoryState

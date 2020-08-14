@@ -40,12 +40,12 @@ export enum ActionTypes {
   CAMPAIGN_INVENTORY_TARGETS_LOAD = '[Campaign] Inventory Targets Load',
   CAMPAIGN_INVENTORY_TARGETS_LOAD_SUCCESS = '[Campaign] Inventory Targets Load Success',
   CAMPAIGN_INVENTORY_TARGETS_LOAD_FAILURE = '[Campaign] Inventory Targets Load Failure',
-  CAMPAIGN_CREATIVE_NEW = '[Campaign] Creative New',
-  CAMPAIGN_CREATIVE_LOAD = '[Campaign] Creative Load',
-  CAMPAIGN_CREATIVE_LOAD_SUCCESS = '[Campaign] Creative Load Success',
-  CAMPAIGN_CREATIVE_LOAD_FAILURE = '[Campaign] Creative Load Failure',
-  CAMPAIGN_CREATIVE_FORM_UPDATE = '[Campaign] Creative Form Update',
-  CAMPAIGN_CREATIVE_SAVE = '[Campaign] Creative Save',
-  CAMPAIGN_CREATIVE_SAVE_SUCCESS = '[Campaign] Creative Save Success',
-  CAMPAIGN_CREATIVE_SAVE_FAILURE = '[Campaign] Creative Save Failure'
+  CREATIVE_NEW = '[Creative] New',
+  CREATIVE_LOAD = '[Creative] Load',
+  CREATIVE_LOAD_SUCCESS = '[Creative] Load Success',
+  CREATIVE_LOAD_FAILURE = '[Creative] Load Failure',
+  CREATIVE_FORM_UPDATE = '[Creative] Form Update',
+  CREATIVE_SAVE = '[Creative] Save',
+  CREATIVE_SAVE_SUCCESS = '[Creative] Save Success',
+  CREATIVE_SAVE_FAILURE = '[Creative] Save Failure'
 }
