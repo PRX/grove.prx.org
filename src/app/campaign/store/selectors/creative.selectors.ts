@@ -10,15 +10,8 @@ export const selectCreativeIds = createSelector(selectCreativesState, selectIds)
 export const selectCreativeEntities = createSelector(selectCreativesState, selectEntities);
 export const selectAllCreatives = createSelector(selectCreativesState, selectAll);
 
-export const selectRoutedCreativeId = createSelector(selectRouterStateParams, (params): string | number => {
-  if (params) {
-    const id = +params.creativeId;
-    if (Number.isNaN(id)) {
-      return params.creativeId;
-    } else {
-      return id;
-    }
-  }
+export const selectRoutedCreativeId = createSelector(selectRouterStateParams, (params): string => {
+  return params && params.creativeId;
 });
 
 export const selectRoutedCreative = createSelector(

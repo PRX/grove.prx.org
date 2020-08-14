@@ -29,6 +29,10 @@ import { Creative, Account, Advertiser } from '../store/models';
         </mat-autocomplete>
       </mat-form-field>
       <grove-flight-zone-pingbacks [campaignId]="campaignId" [flightId]="flightId" [creative]="creative?.url"></grove-flight-zone-pingbacks>
+      <div class="form-submit">
+        <button mat-button (click)="save.emit(creative)" [disabled]="creativeForm.invalid">Save</button>
+        <button mat-button color="primary" (click)="cancel.emit()">Cancel</button>
+      </div>
     </form>
   `,
   styleUrls: ['./creative-form.component.scss'],
@@ -51,7 +55,9 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
   get creative() {
     return this._creative;
   }
-  @Output() creativeUpdate = new EventEmitter<{ creative: Creative; changed: boolean; valid: boolean }>();
+  @Output() formUpdate = new EventEmitter<{ creative: Creative; changed: boolean; valid: boolean }>();
+  @Output() save = new EventEmitter<Creative>();
+  @Output() cancel = new EventEmitter();
   formSubcription: Subscription;
   urlSubscription: Subscription;
 
@@ -61,7 +67,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     filename: ['', Validators.required],
     set_account_uri: ['', Validators.required],
     set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]],
-    pingbacks: ['', Validators.required]
+    pingbacks: [[], this.validatePingbacks.bind(this)]
   });
 
   constructor(private fb: FormBuilder) {}
@@ -92,7 +98,14 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
   }
 
   onFormValueChanges(creative: Creative) {
-    this.creativeUpdate.emit({ creative, changed: this.creativeForm.dirty, valid: this.creativeForm.valid });
+    this.formUpdate.emit({ creative, changed: this.creativeForm.dirty, valid: this.creativeForm.valid });
+  }
+
+  validatePingbacks({ value }: { value: string[] }): { [key: string]: any } | null {
+    if (value && value.some(pingback => !pingback)) {
+      return { error: 'Invalid pingbacks' };
+    }
+    return null;
   }
 
   validateAdvertiser({ value }: AbstractControl) {
@@ -105,8 +118,8 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
 
   advertiserName(value?: string): string {
     if (value && this.advertisers) {
-      const adv = this.advertisers.find(adv => adv.set_advertiser_uri === value);
-      return adv && adv.name;
+      const advertiser = this.advertisers.find(adv => adv.set_advertiser_uri === value);
+      return advertiser && advertiser.name;
     }
   }
 }

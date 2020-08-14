@@ -13,6 +13,10 @@ export class CreativeService {
     return this.augury.follow('prx:creative', { id });
   }
 
+  loadCreativeList(): Observable<HalDoc[]> {
+    return this.augury.followItems('prx:creatives');
+  }
+
   updateCreative(doc: HalDoc, creative: Creative): Observable<HalDoc> {
     return doc.update(creative);
   }

@@ -12,7 +12,23 @@ export const initialState: State = adapter.getInitialState({});
 // tslint:disable-next-line: variable-name
 const _reducer = createReducer(
   initialState,
-  // on(creativeActions.CampaignCreativeNew, (state, action) => adapter.upsertOne({})),
+  on(creativeActions.CreativeNew, (state, action) =>
+    adapter.upsertOne(
+      {
+        creative: {
+          id: getCreativeId(),
+          url: '',
+          filename: '',
+          set_account_uri: '',
+          set_advertiser_uri: '',
+          pingbacks: []
+        },
+        changed: false,
+        valid: false
+      },
+      state
+    )
+  ),
   on(creativeActions.CreativeLoad, (state, action) => ({ ...state, error: null })),
   on(creativeActions.CreativeLoadSuccess, creativeActions.CreativeSaveSuccess, (state, action) =>
     adapter.upsertOne(
