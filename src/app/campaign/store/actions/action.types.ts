@@ -47,5 +47,8 @@ export enum ActionTypes {
   CREATIVE_FORM_UPDATE = '[Creative] Form Update',
   CREATIVE_SAVE = '[Creative] Save',
   CREATIVE_SAVE_SUCCESS = '[Creative] Save Success',
-  CREATIVE_SAVE_FAILURE = '[Creative] Save Failure'
+  CREATIVE_SAVE_FAILURE = '[Creative] Save Failure',
+  CREATIVE_LOAD_LIST = '[Creative] Load List',
+  CREATIVE_LOAD_LIST_SUCCESS = '[Creative] Load List Success',
+  CREATIVE_LOAD_LIST_FAILURE = '[Creative] Load List Failure'
 }

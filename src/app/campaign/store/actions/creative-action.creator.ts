@@ -18,11 +18,21 @@ export const CreativeSave = createAction(ActionTypes.CREATIVE_SAVE, props<{ crea
 export const CreativeSaveSuccess = createAction(ActionTypes.CREATIVE_SAVE_SUCCESS, props<{ creativeDoc: HalDoc }>());
 export const CreativeSaveFailure = createAction(ActionTypes.CREATIVE_SAVE_FAILURE, props<{ error: any }>());
 
+export const CreativeLoadList = createAction(ActionTypes.CREATIVE_LOAD_LIST);
+export const CreativeLoadListSuccess = createAction(ActionTypes.CREATIVE_LOAD_LIST_SUCCESS, props<{ creativeDocs: HalDoc[] }>());
+export const CreativeLoadListFailure = createAction(ActionTypes.CREATIVE_LOAD_LIST_FAILURE, props<{ error }>());
+
 const all = union({
-  CampaignCreativeNew: CreativeNew,
-  CampaignCreativeLoad: CreativeLoad,
-  CampaignCreativeLoadSuccess: CreativeLoadSuccess,
-  CampaignCreativeLoadFailure: CreativeLoadFailure,
-  CampaignCreativeFormUpdate: CreativeFormUpdate
+  CreativeNew,
+  CreativeLoad,
+  CreativeLoadSuccess,
+  CreativeLoadFailure,
+  CreativeFormUpdate,
+  CreativeSave,
+  CreativeSaveSuccess,
+  CreativeSaveFailure,
+  CreativeLoadList,
+  CreativeLoadListSuccess,
+  CreativeLoadListFailure
 });
 export type CreativeActions = typeof all;

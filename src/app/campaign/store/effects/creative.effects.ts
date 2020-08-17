@@ -33,6 +33,18 @@ export class CreativeEffects {
     )
   );
 
+  creativeLoadList$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(creativeActions.CreativeLoadList),
+      mergeMap(_ =>
+        this.creativeService.loadCreativeList().pipe(
+          map(creativeDocs => creativeActions.CreativeLoadListSuccess({ creativeDocs })),
+          catchError(error => of(creativeActions.CreativeLoadListFailure({ error })))
+        )
+      )
+    )
+  );
+
   constructor(
     private actions$: Actions<creativeActions.CreativeActions>,
     private creativeService: CreativeService,

@@ -3,7 +3,7 @@ import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
 import { Creative, CreativeState } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/creative.reducer';
-import { selectRouterStateParams } from '../../../store/router-store/router.selectors';
+import { selectRouterStateParams, selectRouterState } from '../../../store/router-store/router.selectors';
 
 export const selectCreativesState = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.creatives);
 export const selectCreativeIds = createSelector(selectCreativesState, selectIds);
@@ -18,4 +18,12 @@ export const selectRoutedCreative = createSelector(
   selectCreativeEntities,
   selectRoutedCreativeId,
   (creatives, id): CreativeState => creatives && creatives[id]
+);
+
+export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state.url.indexOf('creative/list') > -1);
+export const selectAllCreativesOrderedByCreatedAt = createSelector(selectAllCreatives, states =>
+  states
+    .filter(state => state.creative && state.creative.createdAt)
+    .map(state => state.creative)
+    .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
 );

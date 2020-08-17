@@ -25,5 +25,9 @@ export const getCreativeId = (state?: CreativeState): string => {
 };
 
 export const docToCreative = (doc: HalDoc): Creative => {
-  return filterUnderscores(doc) as Creative;
+  const creative = filterUnderscores(doc) as Creative;
+  return {
+    ...creative,
+    createdAt: new Date(creative.createdAt)
+  };
 };

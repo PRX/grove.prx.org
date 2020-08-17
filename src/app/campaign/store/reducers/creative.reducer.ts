@@ -24,12 +24,13 @@ const _reducer = createReducer(
           pingbacks: []
         },
         changed: false,
-        valid: false
+        valid: false,
+        error: null
       },
       state
     )
   ),
-  on(creativeActions.CreativeLoad, (state, action) => ({ ...state, error: null })),
+  on(creativeActions.CreativeLoad, creativeActions.CreativeLoadList, (state, action) => ({ ...state, error: null })),
   on(creativeActions.CreativeLoadSuccess, creativeActions.CreativeSaveSuccess, (state, action) =>
     adapter.upsertOne(
       {
@@ -41,7 +42,18 @@ const _reducer = createReducer(
       state
     )
   ),
-  on(creativeActions.CreativeLoadFailure, creativeActions.CreativeSaveFailure, (state, action) => ({ ...state, error: action.error })),
+  on(creativeActions.CreativeLoadListSuccess, (state, action) =>
+    adapter.upsertMany(
+      action.creativeDocs.map(doc => ({ doc, creative: docToCreative(doc), changed: false, valid: true })),
+      state
+    )
+  ),
+  on(
+    creativeActions.CreativeLoadFailure,
+    creativeActions.CreativeSaveFailure,
+    creativeActions.CreativeLoadListFailure,
+    (state, action) => ({ ...state, error: action.error })
+  ),
   on(creativeActions.CreativeFormUpdate, (state, action) => {
     const { creative, changed, valid } = action;
     return adapter.upsertOne({ creative, changed, valid }, state);

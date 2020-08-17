@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { StatusBarModule, FancyFormModule } from 'ngx-prx-styleguide';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -50,6 +51,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     MatProgressSpinnerModule,
     MatMenuModule,
     MatSnackBarModule,
+    MatToolbarModule,
     CommonModule,
     ReactiveFormsModule,
     StatusBarModule,

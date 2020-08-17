@@ -75,6 +75,7 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
           <button mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu"><mat-icon>add</mat-icon> Add a creative</button>
           <mat-menu #addCreativeMenu="matMenu" xPosition="after">
             <a mat-menu-item routerLink="{{ '/campaign/' + campaignId + '/flight/' + flightId + '/creative/new' }}">Add New</a>
+            <a mat-menu-item routerLink="{{ '/campaign/' + campaignId + '/flight/' + flightId + '/creative/list' }}">Add Existing</a>
           </mat-menu>
         </div>
       </div>
