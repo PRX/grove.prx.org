@@ -9,7 +9,8 @@ import {
   selectAllAccounts,
   selectAllAdvertisersOrderByName,
   selectCampaignId,
-  selectRoutedFlightId
+  selectRoutedFlightId,
+  selectRoutedFlightZoneId
 } from '../store/selectors';
 import * as creativeActions from '../store/actions/creative-action.creator';
 
@@ -41,6 +42,7 @@ export class CreativeFormContainerComponent implements OnInit, OnDestroy {
   advertisers$: Observable<Advertiser[]>;
   campaignId$: Observable<string | number>;
   flightId$: Observable<number>;
+  zoneId$: Observable<string>;
   routeSubscription: Subscription;
 
   constructor(private store: Store<any>, private route: ActivatedRoute, private router: Router) {}
@@ -51,6 +53,7 @@ export class CreativeFormContainerComponent implements OnInit, OnDestroy {
     this.advertisers$ = this.store.pipe(select(selectAllAdvertisersOrderByName));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
+    this.zoneId$ = this.store.pipe(select(selectRoutedFlightZoneId));
 
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const creativeIdParam = params.get('creativeId');
@@ -77,8 +80,14 @@ export class CreativeFormContainerComponent implements OnInit, OnDestroy {
 
   onSave(creative) {
     this.creativeState$
-      .pipe(first())
-      .subscribe(state => this.store.dispatch(creativeActions.CreativeSave({ creativeDoc: state && state.doc, creative })));
+      .pipe(withLatestFrom(this.campaignId$, this.flightId$, this.zoneId$), first())
+      .subscribe(([state, campaignId, flightId, zoneId]) => {
+        if (state && state.doc) {
+          this.store.dispatch(creativeActions.CreativeUpdate({ campaignId, flightId, zoneId, creativeDoc: state && state.doc, creative }));
+        } else {
+          this.store.dispatch(creativeActions.CreativeCreate({ campaignId, flightId, zoneId, creative }));
+        }
+      });
   }
 
   onCancel() {

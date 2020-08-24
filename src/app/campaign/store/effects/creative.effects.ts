@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-prx-styleguide';
+import * as campaignActions from '../actions/campaign-action.creator';
 import * as creativeActions from '../actions/creative-action.creator';
 import { CreativeService } from '../../../core';
 
@@ -17,19 +19,51 @@ export class CreativeEffects {
     )
   );
 
-  creativeSave$ = createEffect(() =>
+  creativeCreate$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(creativeActions.CreativeSave),
-      mergeMap(action => {
-        const save = action.creativeDoc
-          ? this.creativeService.updateCreative(action.creativeDoc, action.creative)
-          : this.creativeService.createCreative(action.creative);
-        return save.pipe(
-          map(creativeDoc => creativeActions.CreativeSaveSuccess({ creativeDoc })),
-          tap(_ => this.toastr.success('Creative saved')),
-          catchError(error => of(creativeActions.CreativeSaveFailure({ error })))
-        );
-      })
+      ofType(creativeActions.CreativeCreate),
+      mergeMap(action =>
+        this.creativeService.createCreative(action.creative).pipe(
+          mergeMap(creativeDoc => {
+            const { campaignId, flightId, zoneId, creative } = action;
+            if (campaignId && flightId) {
+              // route back to flight (if there is one in the original action)
+              this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+            }
+            // save creative success and save creative to flight
+            return [
+              creativeActions.CreativeCreateSuccess({ campaignId, flightId, zoneId, creativeDoc }),
+              campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId: creativeDoc.id })
+            ];
+          }),
+          tap(_ => {
+            this.toastr.success('Creative saved');
+          }),
+          catchError(error => of(creativeActions.CreativeCreateFailure({ error })))
+        )
+      )
+    )
+  );
+
+  creativeUpdate$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(creativeActions.CreativeUpdate),
+      mergeMap(action =>
+        this.creativeService.updateCreative(action.creativeDoc, action.creative).pipe(
+          map(creativeDoc => {
+            const { campaignId, flightId, zoneId } = action;
+            if (campaignId && flightId) {
+              // route back to flight (if there is one in the original action)
+              this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+            }
+            return creativeActions.CreativeUpdateSuccess({ campaignId, flightId, zoneId, creativeDoc });
+          }),
+          tap(_ => {
+            this.toastr.success('Creative saved');
+          }),
+          catchError(error => of(creativeActions.CreativeUpdateFailure({ error })))
+        )
+      )
     )
   );
 
@@ -48,6 +82,7 @@ export class CreativeEffects {
   constructor(
     private actions$: Actions<creativeActions.CreativeActions>,
     private creativeService: CreativeService,
+    private router: Router,
     private toastr: ToastrService
   ) {}
 }

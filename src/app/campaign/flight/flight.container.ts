@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ViewChild } from
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
-import { filter, withLatestFrom, tap } from 'rxjs/operators';
+import { filter, withLatestFrom } from 'rxjs/operators';
 import { MatDrawer } from '@angular/material/sidenav';
 import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap } from '../store/models';
 import {
@@ -89,7 +89,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
 
-    // subscribe to creativeId route param and open drawer
+    // subscribe to creativeId route param/creative list route and open drawer
     this.creativeOpenedSubscription = combineLatest([
       this.store.pipe(select(selectRoutedCreativeId)),
       this.store.pipe(select(selectShowCreativeListRoute))
@@ -104,12 +104,10 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     // if open changes to false (user clicked overlay closing drawer), navigate back to flight
     this.creativeClosedSubscription = this.creativeMatDrawer.openedChange
       .pipe(
-        tap(console.log),
         filter(openChangeTo => !openChangeTo),
-        withLatestFrom(this.campaignId$),
-        withLatestFrom(this.flightLocal$)
+        withLatestFrom(this.campaignId$, this.flightLocal$)
       )
-      .subscribe(([[_, campaignId], flight]) => {
+      .subscribe(([_, campaignId, flight]) => {
         if (flight) {
           this.router.navigate(['/campaign', campaignId, 'flight', flight.id]);
         }

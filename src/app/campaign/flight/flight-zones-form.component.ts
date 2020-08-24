@@ -41,7 +41,7 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
               <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field appearance="outline">
+          <!-- <mat-form-field appearance="outline">
             <mat-label>Creative Url</mat-label>
             <input
               matInput
@@ -52,30 +52,39 @@ export const validatePingbacks = (value: string[]): { [key: string]: any } | nul
             />
             <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
             <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
-          </mat-form-field>
-          <div class="mat-form-field-wrapper">
+          </mat-form-field> -->
+          <!-- <div class="mat-form-field-wrapper">
             <button mat-button color="primary" class="toggle-pingbacks" (click)="togglePingbacks(zone)">
               {{ togglePingbacksText(zone) }}
             </button>
-          </div>
+          </div> -->
           <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
             <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
-        <grove-flight-zone-pingbacks
+        <div *ngIf="zoneHasCreatives(zone)" class="flight-zone-creatives">
+          <grove-creative-card
+            [formGroup]="creativeFormGroup(zone, creativeIndex)"
+            *ngFor="let creative of flightZones[i].creativeFlightZones; trackBy: trackByIndex"
+            creativeLink="{{ creative.id ? getZoneCreativeRoute(zone) + creative.id : '' }}"
+          ></grove-creative-card>
+        </div>
+        <!-- <grove-flight-zone-pingbacks
           *ngIf="zoneHasPingbacks(zone)"
           [campaignId]="campaignId"
           [flightId]="flightId"
           [creative]="zone.get('url').value"
           formControlName="pingbacks"
-        ></grove-flight-zone-pingbacks>
+        ></grove-flight-zone-pingbacks> -->
         <div>
-          <button mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu"><mat-icon>add</mat-icon> Add a creative</button>
+          <button [disabled]="!zone.get('id').value" mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu">
+            <mat-icon>add</mat-icon> Add a creative
+          </button>
           <mat-menu #addCreativeMenu="matMenu" xPosition="after">
-            <a mat-menu-item routerLink="{{ '/campaign/' + campaignId + '/flight/' + flightId + '/creative/new' }}">Add New</a>
-            <a mat-menu-item routerLink="{{ '/campaign/' + campaignId + '/flight/' + flightId + '/creative/list' }}">Add Existing</a>
+            <a mat-menu-item color="primary" routerLink="{{ getZoneCreativeRoute(zone) + 'new' }}">Add New</a>
+            <a mat-menu-item color="primary" routerLink="{{ getZoneCreativeRoute(zone) + 'list' }}">Add Existing</a>
           </mat-menu>
         </div>
       </div>
@@ -103,7 +112,12 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   zones = new FormArray([].map(this.flightZoneFormGroup));
   zonesSub = this.zones.valueChanges.subscribe(formZones => {
     if (!this.emitGuard) {
-      this.onChangeFn(formZones);
+      this.onChangeFn(
+        formZones.map(zone => ({
+          ...zone,
+          creativeFlightZones: zone.creativeFlightZones.map(creative => ({ ...creative, disabled: !creative.enabled }))
+        }))
+      );
     }
   });
   emitGuard = false;
@@ -117,11 +131,23 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   flightZoneFormGroup(zone: FlightZone = { id: '' }): FormGroup {
-    const { id, url, pingbacks } = zone;
+    const { id, url, pingbacks, creativeFlightZones } = zone;
     return new FormGroup({
       id: new FormControl(id || '', Validators.required),
       url: new FormControl(url || '', control => validateMp3(control.value)),
-      pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value))
+      pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value)),
+      creativeFlightZones: new FormArray(
+        (creativeFlightZones || []).map(creative => this.buildCreativeFormGroup(creative)),
+        this.zoneHasCreatives.bind(this)
+      )
+    });
+  }
+
+  buildCreativeFormGroup(creative): FormGroup {
+    return new FormGroup({
+      id: new FormControl(creative.creativeId),
+      weight: new FormControl(creative.weight, [Validators.required, Validators.min(1), Validators.pattern(/[0-9]+/)]),
+      enabled: new FormControl(!creative.disabled)
     });
   }
 
@@ -140,6 +166,22 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
       this.zones.push(this.flightZoneFormGroup(zones && addZones.pop()));
       this.zones.markAsPristine();
     }
+
+    // set creativeFlightZones controls
+    this.zones.controls.forEach((zone, i) => {
+      const zoneCreativesArray = zone.get('creativeFlightZones') as FormArray;
+      if (zones[i].creativeFlightZones && zoneCreativesArray.controls.length !== zones[i].creativeFlightZones.length) {
+        while (zoneCreativesArray.controls.length > zones[i].creativeFlightZones.length) {
+          zoneCreativesArray.removeAt(zoneCreativesArray.controls.length - 1);
+          zoneCreativesArray.markAsPristine();
+        }
+        const addCreatives = [...zones[i].creativeFlightZones];
+        while (zoneCreativesArray.controls.length < zones[i].creativeFlightZones.length) {
+          zoneCreativesArray.push(this.buildCreativeFormGroup(addCreatives.pop()));
+        }
+      }
+    });
+
     // patch all of the values onto the FormArray
     this.zones.patchValue(zones, { emitEvent: false, onlySelf: true });
     this.emitGuard = false;
@@ -200,5 +242,22 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
 
   togglePingbacksText(zone: FormControl): string {
     return this.zoneHasPingbacks(zone) ? 'Remove pingbacks' : 'Add pingbacks';
+  }
+
+  getZoneCreativeRoute(zone: FormControl): string {
+    return `/campaign/${this.campaignId}/flight/${this.flightId}/zone/${zone.get('id').value}/creative/`;
+  }
+
+  zoneHasCreatives(zone: FormControl): boolean {
+    const creatives = zone.get('creativeFlightZones') as FormArray;
+    return creatives && creatives.controls && !!creatives.controls.length;
+  }
+
+  creativeFormGroup(zone: FormControl, index) {
+    return (zone.get('creativeFlightZones') as FormArray).controls[index || 0];
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 }

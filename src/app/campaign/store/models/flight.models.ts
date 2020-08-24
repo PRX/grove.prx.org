@@ -5,6 +5,7 @@ import { Moment, utc } from 'moment';
 export interface FlightZone {
   id: string;
   label?: string;
+  creativeFlightZones?: { creativeId: number; weight: number; disabled?: boolean }[];
   url?: string;
   pingbacks?: string[];
   fileSize?: number;

@@ -31,7 +31,7 @@ const _reducer = createReducer(
     )
   ),
   on(creativeActions.CreativeLoad, creativeActions.CreativeLoadList, (state, action) => ({ ...state, error: null })),
-  on(creativeActions.CreativeLoadSuccess, creativeActions.CreativeSaveSuccess, (state, action) =>
+  on(creativeActions.CreativeLoadSuccess, creativeActions.CreativeCreateSuccess, creativeActions.CreativeUpdateSuccess, (state, action) =>
     adapter.upsertOne(
       {
         doc: action.creativeDoc,
@@ -50,7 +50,8 @@ const _reducer = createReducer(
   ),
   on(
     creativeActions.CreativeLoadFailure,
-    creativeActions.CreativeSaveFailure,
+    creativeActions.CreativeCreateFailure,
+    creativeActions.CreativeUpdateFailure,
     creativeActions.CreativeLoadListFailure,
     (state, action) => ({ ...state, error: action.error })
   ),

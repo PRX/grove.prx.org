@@ -14,6 +14,8 @@ export const selectRoutedCreativeId = createSelector(selectRouterStateParams, (p
   return params && params.creativeId;
 });
 
+export const selectRoutedFlightZoneId = createSelector(selectRouterStateParams, (params): string => params && params.zoneId);
+
 export const selectRoutedCreative = createSelector(
   selectCreativeEntities,
   selectRoutedCreativeId,
@@ -21,8 +23,9 @@ export const selectRoutedCreative = createSelector(
 );
 
 export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state.url.indexOf('creative/list') > -1);
-export const selectAllCreativesOrderedByCreatedAt = createSelector(selectAllCreatives, states =>
+export const selectCreativesOrderedByCreatedAt = createSelector(selectAllCreatives, states =>
   states
+    // filter out any 'new' temp creatives on the state
     .filter(state => state.creative && state.creative.createdAt)
     .map(state => state.creative)
     .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())

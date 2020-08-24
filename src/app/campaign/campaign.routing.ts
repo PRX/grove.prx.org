@@ -21,10 +21,11 @@ import { CampaignReportComponent } from './report/campaign-report.component';
 import { CreativeFormContainerComponent } from './creative/creative-form-container.component';
 import { CreativeFormComponent } from './creative/creative-form.component';
 import { CreativeListComponent } from './creative/creative-list.component';
+import { CreativeCardComponent } from './creative/creative-card.component';
 
 const flightChildRoutes: Routes = [
-  { path: 'creative/list', component: CreativeListComponent },
-  { path: 'creative/:creativeId', component: CreativeFormContainerComponent }
+  { path: 'zone/:zoneId/creative/list', component: CreativeListComponent },
+  { path: 'zone/:zoneId/creative/:creativeId', component: CreativeFormContainerComponent }
 ];
 
 const campaignChildRoutes: Routes = [
@@ -68,7 +69,8 @@ export const campaignComponents: any[] = [
   CampaignReportComponent,
   CreativeFormContainerComponent,
   CreativeFormComponent,
-  CreativeListComponent
+  CreativeListComponent,
+  CreativeCardComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);

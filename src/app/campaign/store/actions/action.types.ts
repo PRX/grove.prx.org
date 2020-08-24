@@ -45,10 +45,14 @@ export enum ActionTypes {
   CREATIVE_LOAD_SUCCESS = '[Creative] Load Success',
   CREATIVE_LOAD_FAILURE = '[Creative] Load Failure',
   CREATIVE_FORM_UPDATE = '[Creative] Form Update',
-  CREATIVE_SAVE = '[Creative] Save',
-  CREATIVE_SAVE_SUCCESS = '[Creative] Save Success',
-  CREATIVE_SAVE_FAILURE = '[Creative] Save Failure',
+  CREATIVE_CREATE = '[Creative] Create',
+  CREATIVE_CREATE_SUCCESS = '[Creative] Create Success',
+  CREATIVE_CREATE_FAILURE = '[Creative] Create Failure',
+  CREATIVE_UPDATE = '[Creative] Update',
+  CREATIVE_UPDATE_SUCCESS = '[Creative] Update Success',
+  CREATIVE_UPDATE_FAILURE = '[Creative] Update Failure',
   CREATIVE_LOAD_LIST = '[Creative] Load List',
   CREATIVE_LOAD_LIST_SUCCESS = '[Creative] Load List Success',
-  CREATIVE_LOAD_LIST_FAILURE = '[Creative] Load List Failure'
+  CREATIVE_LOAD_LIST_FAILURE = '[Creative] Load List Failure',
+  CAMPAIGN_FLIGHT_ZONE_ADD_CREATIVE = '[Campaign] Flight Zone Add Creative'
 }

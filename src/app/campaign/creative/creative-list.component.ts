@@ -4,7 +4,8 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first, withLatestFrom } from 'rxjs/operators';
 import { Creative } from '../store/models';
-import { selectAllCreativesOrderedByCreatedAt, selectCampaignId, selectRoutedFlightId } from '../store/selectors';
+import { selectCreativesOrderedByCreatedAt, selectCampaignId, selectRoutedFlightId, selectRoutedFlightZoneId } from '../store/selectors';
+import * as campaignActions from '../store/actions/campaign-action.creator';
 import * as creativeActions from '../store/actions/creative-action.creator';
 
 @Component({
@@ -16,7 +17,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
       </mat-toolbar-row>
     </mat-toolbar>
     <div *ngFor="let creative of creativeList$ | async">
-      <button mat-button color="primary">{{ creative.filename }}</button>
+      <button mat-button color="primary" (click)="onAdd(creative.id)">{{ creative.filename }}</button>
     </div>
   `,
   styleUrls: ['./creative-list.component.scss'],
@@ -25,14 +26,23 @@ import * as creativeActions from '../store/actions/creative-action.creator';
 export class CreativeListComponent implements OnInit {
   campaignId$: Observable<string | number>;
   flightId$: Observable<number>;
+  zoneId$: Observable<string>;
   creativeList$: Observable<Creative[]>;
   constructor(private store: Store<any>, private router: Router) {}
 
   ngOnInit() {
-    this.creativeList$ = this.store.pipe(select(selectAllCreativesOrderedByCreatedAt));
+    this.creativeList$ = this.store.pipe(select(selectCreativesOrderedByCreatedAt));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
+    this.zoneId$ = this.store.pipe(select(selectRoutedFlightZoneId));
     this.store.dispatch(creativeActions.CreativeLoadList());
+  }
+
+  onAdd(creativeId: number) {
+    this.campaignId$.pipe(withLatestFrom(this.flightId$, this.zoneId$), first()).subscribe(([campaignId, flightId, zoneId]) => {
+      this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId }));
+    });
   }
 
   onCancel() {

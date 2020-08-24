@@ -114,6 +114,13 @@ export const CampaignFlightFormUpdate = createAction(
   props<{ flight: Flight; changed: boolean; valid: boolean }>()
 );
 
+// TODO: I hate this, but is it possible to get this to add to the flight directly on the form?
+// Otherwise, there is no way to get the form's valid(and changed) status into the store after the add creative change is applied
+export const CampaignFlightZoneAddCreative = createAction(
+  ActionTypes.CAMPAIGN_FLIGHT_ZONE_ADD_CREATIVE,
+  props<{ flightId: number; zoneId?: string; creativeId: number }>()
+);
+
 const all = union({
   CampaignNew,
   CampaignDupFromForm,
@@ -134,6 +141,7 @@ const all = union({
   CampaignFlightFormUpdate,
   CampaignAddFlight,
   CampaignDupFlight,
-  CampaignDeleteFlight
+  CampaignDeleteFlight,
+  CampaignFlightZoneAddCreative
 });
 export type CampaignActions = typeof all;
