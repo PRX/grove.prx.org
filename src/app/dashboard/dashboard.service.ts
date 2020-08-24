@@ -58,6 +58,7 @@ export interface Facets {
 export interface Flight {
   id: number;
   name: string;
+  status: string;
   allocationStatus: string;
   allocationStatusOk: boolean;
   startAt: Date;
@@ -76,7 +77,6 @@ export interface Campaign {
   name: string;
   advertiser?: Advertiser;
   type: string;
-  status: string;
   repName: string;
   notes: string;
   flights?: Flight[];
@@ -227,7 +227,6 @@ export class DashboardService {
               }),
             name: campaignDoc['name'],
             type: campaignDoc['type'],
-            status: campaignDoc['status'],
             repName: campaignDoc['repName'],
             notes: campaignDoc['notes'],
             actualCount: campaignDoc['actualCount'],
@@ -237,6 +236,7 @@ export class DashboardService {
             flights: flightDocs.map(doc => ({
               id: doc['id'],
               name: doc['name'],
+              status: doc['status'],
               allocationStatus: doc['allocationStatus'],
               allocationStatusOk: doc['allocationStatus'] === 'ok',
               startAt: doc['startAt'] && new Date(doc['startAt']),
@@ -296,6 +296,7 @@ export class DashboardService {
           const flight: Flight = {
             id: flightDoc['id'],
             name: flightDoc['name'],
+            status: flightDoc['status'],
             allocationStatus: flightDoc['allocationStatus'],
             allocationStatusOk: flightDoc['allocationStatus'] === 'ok',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
@@ -325,7 +326,6 @@ export class DashboardService {
                 }),
               name: campaignDoc['name'],
               type: campaignDoc['type'],
-              status: campaignDoc['status'],
               repName: campaignDoc['repName'],
               notes: campaignDoc['notes'],
               advertiser: { id: advertiserDoc['id'], label: advertiserDoc['name'] }
@@ -373,11 +373,7 @@ export class DashboardService {
       filters += `${filters ? ',' : ''}podcast=${params.podcast}`;
     }
     if (params.status) {
-      if (params.view === 'campaigns') {
-        filters += `${filters ? ',' : ''}status=${params.status}`;
-      } else if (params.view === 'flights') {
-        filters += `${filters ? ',' : ''}campaign_status=${params.status}`;
-      }
+      filters += `${filters ? ',' : ''}status=${params.status}`;
     }
     if (params.type) {
       if (params.view === 'campaigns') {

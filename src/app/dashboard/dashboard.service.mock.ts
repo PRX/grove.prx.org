@@ -8,6 +8,7 @@ export const flights: Flight[] = [
   {
     id: 1,
     name: 'Flight 1',
+    status: 'canceled',
     allocationStatus: 'ok',
     allocationStatusOk: true,
     startAt: new Date('2019-09-01 0:0:0'),
@@ -28,6 +29,7 @@ export const flights: Flight[] = [
   {
     id: 2,
     name: 'Flight 2',
+    status: 'approved',
     allocationStatus: 'error',
     allocationStatusOk: false,
     startAt: new Date('2019-09-02 0:0:0'),
@@ -44,7 +46,6 @@ export const campaigns: Campaign[] = [
     accountId: 2,
     name: 'New Campaign',
     advertiser: { id: 1, label: 'Adidas' },
-    status: 'canceled',
     type: 'paid',
     repName: 'John',
     notes: '',
@@ -58,7 +59,6 @@ export const campaigns: Campaign[] = [
     accountId: 2,
     name: 'Another Campaign',
     advertiser: { id: 2, label: 'Griddy' },
-    status: 'approved',
     type: 'paid',
     repName: 'Jacob',
     notes: '',
@@ -72,7 +72,6 @@ export const campaigns: Campaign[] = [
     accountId: 2,
     name: 'Third Campaign',
     advertiser: { id: 3, label: 'Toyota' },
-    status: 'sold',
     type: 'house',
     repName: 'Jingleheimer',
     notes: '',
@@ -98,8 +97,7 @@ export const facets: Facets = {
   ],
   status: [
     { id: 'canceled', label: 'Canceled' },
-    { id: 'approved', label: 'Approved' },
-    { id: 'sold', label: 'Sold' }
+    { id: 'approved', label: 'Approved' }
   ],
   type: [
     { id: 'house', label: 'House' },

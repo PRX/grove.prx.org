@@ -101,12 +101,12 @@
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>
 
-    <ng-container matColumnDef="campaign_status" cssClassFriendlyName>
+    <ng-container matColumnDef="status" cssClassFriendlyName>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>
         Status
       </th>
       <td mat-cell *matCellDef="let element">
-        <span class="status {{ element?.parent?.status }}">{{ element?.parent?.status | titlecase }}</span>
+        <span class="status {{ element?.status }}">{{ element?.status | titlecase }}</span>
       </td>
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>
