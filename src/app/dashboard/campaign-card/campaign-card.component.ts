@@ -4,7 +4,7 @@ import { Campaign, Target } from '../dashboard.service';
 @Component({
   selector: 'grove-campaign-card',
   template: `
-    <section class="{{ campaign?.status }}" *ngIf="campaign">
+    <section *ngIf="campaign">
       <header>
         {{ campaign.flights | campaignFlightDates }}
         <a routerLink="/campaign/new" [state]="duplicateCampaignState" title="Dupicate Campaign"><mat-icon>file_copy</mat-icon></a>
@@ -17,7 +17,6 @@ import { Campaign, Target } from '../dashboard.service';
         </h3>
         <div>{{ campaign.advertiser && campaign.advertiser.label }}</div>
         <div>
-          <span class="status {{ campaign.status }}">{{ campaign.status | titlecase }}</span>
           {{ campaign.type | titlecase }}
         </div>
         <div *ngIf="campaign.flights | unique: 'targets':'code' | geoTargets as targets">

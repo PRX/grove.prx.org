@@ -38,10 +38,6 @@ describe('CampaignCardComponent', () => {
     expect(link.nativeElement.href).toContain('/campaign/' + comp.campaign.id);
   });
 
-  it('should show campaign status', () => {
-    expect(de.query(By.css('span.status')).nativeElement.textContent.toLowerCase()).toMatch(comp.campaign.status);
-  });
-
   it('should return formatted campaign progress percentage', () => {
     comp.campaign = campaignsFixture[0];
     fix.detectChanges();
