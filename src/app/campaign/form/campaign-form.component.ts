@@ -34,20 +34,10 @@ export class CampaignFormComponent implements OnInit {
     { name: 'House', value: 'house' }
   ];
 
-  readonly statusOptions = [
-    { name: 'Draft', value: 'draft' },
-    { name: 'Hold', value: 'hold' },
-    { name: 'Sold', value: 'sold' },
-    { name: 'Approved', value: 'approved' },
-    { name: 'Paused', value: 'paused' },
-    { name: 'Canceled', value: 'canceled' }
-  ];
-
   campaignForm = this.fb.group({
     set_account_uri: ['', Validators.required],
     name: ['', Validators.required],
     type: ['', Validators.required],
-    status: ['', Validators.required],
     repName: ['', Validators.required],
     notes: [''],
     set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]]
@@ -61,9 +51,6 @@ export class CampaignFormComponent implements OnInit {
   }
   get type() {
     return this.campaignForm.get('type');
-  }
-  get status() {
-    return this.campaignForm.get('status');
   }
   get repName() {
     return this.campaignForm.get('repName');
@@ -99,7 +86,7 @@ export class CampaignFormComponent implements OnInit {
   }
 
   updateCampaignForm(campaign: Campaign) {
-    const { name, type, status, repName, notes, set_account_uri, set_advertiser_uri } = campaign;
+    const { name, type, repName, notes, set_account_uri, set_advertiser_uri } = campaign;
     const findAdvertiserByURI =
       set_advertiser_uri && this.advertisers && this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
     // only set fields that are present, but allow fields to be explicitly set to null or empty string (new campaign)
@@ -107,7 +94,6 @@ export class CampaignFormComponent implements OnInit {
       {
         ...(campaign.hasOwnProperty('name') && { name }),
         ...(campaign.hasOwnProperty('type') && { type }),
-        ...(campaign.hasOwnProperty('status') && { status }),
         ...(campaign.hasOwnProperty('repName') && { repName }),
         ...(campaign.hasOwnProperty('notes') && { notes }),
         ...(campaign.hasOwnProperty('set_account_uri') && { set_account_uri }),
