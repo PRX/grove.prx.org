@@ -4,6 +4,14 @@
       <mat-label>Flight Name</mat-label>
       <input matInput placeholder="Flight Name" formControlName="name" required />
     </mat-form-field>
+
+    <mat-form-field class="flight-form-field" appearance="outline">
+      <mat-label>Flight Status</mat-label>
+      <mat-select formControlName="status" required>
+        <mat-option *ngFor="let status of statusOptions" [value]="status.value">{{ status.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <div class="inline-fields">
       <mat-form-field appearance="outline">
         <mat-label>Actual Start Date</mat-label>

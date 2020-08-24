@@ -43,6 +43,7 @@ const inventoryFixture: Inventory[] = [
 ];
 const flightFixture: Flight = {
   name: 'my-flight',
+  status: 'approved',
   startAt: moment.utc(),
   endAt: moment.utc(),
   endAtFudged: moment.utc().subtract(1, 'days'),
@@ -85,6 +86,7 @@ class ParentFormComponent {
   flightForm = this.fb.group({
     id: [],
     name: ['', Validators.required],
+    status: ['', Validators.required],
     startAt: ['', [Validators.required, cannotStartInPast]],
     endAtFudged: ['', Validators.required],
     contractStartAt: [''],

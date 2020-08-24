@@ -74,6 +74,7 @@ describe('FlightContainerComponent', () => {
   const flight = {
     id: 123,
     name: 'my-flight',
+    status: 'approved',
     startAt: moment.utc('2019-10-01'),
     endAt: moment.utc('2019-11-01'),
     endAtFudged: moment.utc('2019-10-31'),
