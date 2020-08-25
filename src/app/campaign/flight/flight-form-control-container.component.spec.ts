@@ -36,6 +36,7 @@ import { InventoryTableComponent } from '../inventory/inventory-table.component'
 import { GoalFormComponent } from '../inventory/goal-form.component';
 import { PingbackFormComponent } from './pingbacks/pingback-form.component';
 import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { Flight } from '../store/models';
 import * as moment from 'moment';
 
@@ -86,7 +87,8 @@ describe('FlightFormControlContainerComponent', () => {
         PingbackFormComponent,
         InventoryComponent,
         InventoryTableComponent,
-        GoalFormComponent
+        GoalFormComponent,
+        CreativeCardComponent
       ],
       providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },

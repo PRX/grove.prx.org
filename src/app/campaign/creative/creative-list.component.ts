@@ -17,7 +17,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
       </mat-toolbar-row>
     </mat-toolbar>
     <div *ngFor="let creative of creativeList$ | async">
-      <button mat-button color="primary" (click)="onAdd(creative.id)">{{ creative.filename }}</button>
+      <button mat-button color="primary" (click)="onAdd(creative)">{{ creative.filename }}</button>
     </div>
   `,
   styleUrls: ['./creative-list.component.scss'],
@@ -38,10 +38,10 @@ export class CreativeListComponent implements OnInit {
     this.store.dispatch(creativeActions.CreativeLoadList());
   }
 
-  onAdd(creativeId: number) {
+  onAdd(creative: Creative) {
     this.campaignId$.pipe(withLatestFrom(this.flightId$, this.zoneId$), first()).subscribe(([campaignId, flightId, zoneId]) => {
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId }));
+      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creative }));
     });
   }
 

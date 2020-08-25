@@ -15,7 +15,7 @@ import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl, Fo
       </div>
       <div class="inline-fields">
         <div class="button-row">
-          <button mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
+          <button type="button" mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
           <a
             *ngIf="formArray.controls.length"
             href="https://github.com/PRX/analytics-ingest-lambda#uri-templates"

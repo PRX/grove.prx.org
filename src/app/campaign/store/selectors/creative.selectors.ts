@@ -22,11 +22,11 @@ export const selectRoutedCreative = createSelector(
   (creatives, id): CreativeState => creatives && creatives[id]
 );
 
-export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state.url.indexOf('creative/list') > -1);
+export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state && state.url.indexOf('creative/list') > -1);
 export const selectCreativesOrderedByCreatedAt = createSelector(selectAllCreatives, states =>
   states
     // filter out any 'new' temp creatives on the state
-    .filter(state => state.creative && state.creative.createdAt)
+    .filter(state => state && state.creative && state.creative.createdAt)
     .map(state => state.creative)
     .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
 );

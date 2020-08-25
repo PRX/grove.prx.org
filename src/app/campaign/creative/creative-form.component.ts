@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators, AbstractControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
 import { Creative, Account, Advertiser } from '../store/models';
 
 @Component({
@@ -15,17 +16,17 @@ import { Creative, Account, Advertiser } from '../store/models';
         <mat-label>Filename</mat-label>
         <input matInput placeholder="Creative File Label" formControlName="filename" required />
       </mat-form-field>
-      <mat-form-field class="campaign-form-field" appearance="outline">
+      <mat-form-field class="campaign-form-field" appearance="outline" *ngIf="accounts">
         <mat-label>Owner</mat-label>
         <mat-select formControlName="set_account_uri" required>
           <mat-option *ngFor="let acct of accounts" [value]="acct.self_uri">{{ acct.name }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" *ngIf="advertisers">
         <mat-label>Advertiser</mat-label>
         <input matInput type="text" formControlName="set_advertiser_uri" [matAutocomplete]="advertiser" />
         <mat-autocomplete #advertiser="matAutocomplete" [displayWith]="advertiserName.bind(this)">
-          <mat-option *ngFor="let adv of advertisers" [value]="adv.set_advertiser_uri">{{ adv.name }}</mat-option>
+          <mat-option *ngFor="let adv of filteredAdvertisers$ | async" [value]="adv.set_advertiser_uri">{{ adv.name }}</mat-option>
         </mat-autocomplete>
       </mat-form-field>
       <grove-flight-zone-pingbacks [campaignId]="campaignId" [flightId]="flightId" [creative]="creative?.url"></grove-flight-zone-pingbacks>
@@ -58,6 +59,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
   @Output() formUpdate = new EventEmitter<{ creative: Creative; changed: boolean; valid: boolean }>();
   @Output() save = new EventEmitter<Creative>();
   @Output() cancel = new EventEmitter();
+  filteredAdvertisers$: Observable<Advertiser[]>;
   formSubcription: Subscription;
   urlSubscription: Subscription;
 
@@ -78,10 +80,28 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     });
     this.urlSubscription = this.creativeForm.get('url').valueChanges.subscribe(url => {
       const creativeControl = this.creativeForm.get('filename');
-      if (!creativeControl.value || creativeControl.untouched) {
+      // if the creative has not yet been created and filename has no value or is untouched, fill it with url
+      if (!this.creative.createdAt && (!creativeControl.value || creativeControl.untouched)) {
         creativeControl.setValue(url, { emitEvent: false });
       }
     });
+    this.filteredAdvertisers$ = this.creativeForm.get('set_advertiser_uri').valueChanges.pipe(
+      // startWith empty value to populate filtered options
+      startWith(''),
+      map(value => {
+        if (this.advertisers) {
+          // if no value or valueChange matches one of the existing options, list is unfiltered
+          if (!value || this.advertisers.find(adv => adv.set_advertiser_uri === value)) {
+            return this.advertisers;
+          } else {
+            return this.advertisers.filter(adv => {
+              // partial match: advertiser name starts with value
+              return adv.name.toLowerCase().indexOf(value.toLowerCase()) === 0;
+            });
+          }
+        }
+      })
+    );
   }
 
   ngOnDestroy() {
@@ -94,7 +114,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
   }
 
   setCreativeFormValue(creative: Creative) {
-    this.creativeForm.setValue(creative, { emitEvent: false });
+    this.creativeForm.patchValue(creative, { emitEvent: false });
   }
 
   onFormValueChanges(creative: Creative) {
@@ -118,8 +138,8 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
 
   advertiserName(value?: string): string {
     if (value && this.advertisers) {
-      const advertiser = this.advertisers.find(adv => adv.set_advertiser_uri === value);
-      return advertiser && advertiser.name;
+      const advertiser = this.advertisers.find(adv => adv.set_advertiser_uri === value || adv.set_advertiser_uri === value);
+      return (advertiser && advertiser.name) || value;
     }
   }
 }

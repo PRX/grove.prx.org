@@ -33,6 +33,7 @@ export class FlightFormComponent implements OnInit {
   @Input() campaignId: number;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
+
   flightForm: FormGroup;
   matcher = new FlightFormErrorStateMatcher();
 

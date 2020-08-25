@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
 import * as creativeActions from '../actions/creative-action.creator';
 import { CreativeService } from '../../../core';
+import { docToCreative } from '../models';
 
 @Injectable()
 export class CreativeEffects {
@@ -33,7 +34,7 @@ export class CreativeEffects {
             // save creative success and save creative to flight
             return [
               creativeActions.CreativeCreateSuccess({ campaignId, flightId, zoneId, creativeDoc }),
-              campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId: creativeDoc.id })
+              campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creative: docToCreative(creativeDoc) })
             ];
           }),
           tap(_ => {

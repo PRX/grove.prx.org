@@ -1,6 +1,6 @@
 import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
-import { Campaign, Flight, FlightZone, CampaignFormSave, FlightTarget } from '../models';
+import { Campaign, Flight, CampaignFormSave, Creative } from '../models';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { utc, Moment } from 'moment';
 
@@ -118,7 +118,7 @@ export const CampaignFlightFormUpdate = createAction(
 // Otherwise, there is no way to get the form's valid(and changed) status into the store after the add creative change is applied
 export const CampaignFlightZoneAddCreative = createAction(
   ActionTypes.CAMPAIGN_FLIGHT_ZONE_ADD_CREATIVE,
-  props<{ flightId: number; zoneId?: string; creativeId: number }>()
+  props<{ flightId: number; zoneId?: string; creative: Creative }>()
 );
 
 const all = union({

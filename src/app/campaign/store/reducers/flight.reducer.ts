@@ -138,7 +138,7 @@ const _reducer = createReducer(
     );
   }),
   on(campaignActions.CampaignFlightZoneAddCreative, (state, action) => {
-    const { flightId, zoneId, creativeId } = action;
+    const { flightId, zoneId, creative } = action;
     const localFlight = state.entities[flightId].localFlight;
     const zones =
       localFlight &&
@@ -147,8 +147,8 @@ const _reducer = createReducer(
           ? {
               ...zone,
               creativeFlightZones: zone.creativeFlightZones
-                ? [...zone.creativeFlightZones, { creativeId, weight: null }]
-                : [{ creativeId, weight: null }]
+                ? [...zone.creativeFlightZones, { creative, creativeId: creative.id }]
+                : [{ creative, creativeId: creative.id }]
             }
           : zone
       );

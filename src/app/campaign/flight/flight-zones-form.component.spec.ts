@@ -8,6 +8,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PingbackFormComponent } from './pingbacks/pingback-form.component';
 import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { FlightZone, InventoryZone } from '../store/models';
 
 @Component({
@@ -55,7 +56,13 @@ describe('FlightZonesFormComponent', () => {
         MatIconModule,
         MatMenuModule
       ],
-      declarations: [ParentFormComponent, FlightZonesFormComponent, FlightZonePingbacksFormComponent, PingbackFormComponent]
+      declarations: [
+        ParentFormComponent,
+        FlightZonesFormComponent,
+        FlightZonePingbacksFormComponent,
+        PingbackFormComponent,
+        CreativeCardComponent
+      ]
     }).compileComponents();
   }));
 

@@ -1,5 +1,7 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
+import { Env } from '../../../core/core.env';
+
 export interface Creative {
   id?: number | string;
   url?: string;
@@ -28,6 +30,8 @@ export const docToCreative = (doc: HalDoc): Creative => {
   const creative = filterUnderscores(doc) as Creative;
   return {
     ...creative,
-    createdAt: new Date(creative.createdAt)
+    createdAt: new Date(creative.createdAt),
+    set_account_uri: doc['_links'] && doc['_links']['prx:account'] && doc['_links']['prx:account'].href,
+    set_advertiser_uri: doc['_links'] && doc['_links']['prx:advertiser'] && Env.AUGURY_HOST + doc['_links']['prx:advertiser'].href
   };
 };

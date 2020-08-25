@@ -43,6 +43,7 @@ import { InventoryTableComponent } from '../inventory/inventory-table.component'
 import { GoalFormComponent } from '../inventory/goal-form.component';
 import { PingbackFormComponent } from './pingbacks/pingback-form.component';
 import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { TestComponent } from '../../../testing/test.component';
 import * as moment from 'moment';
 
@@ -131,6 +132,7 @@ describe('FlightContainerComponent', () => {
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent,
+        CreativeCardComponent,
         TestComponent
       ],
       providers: [

@@ -11,11 +11,11 @@ import { Creative } from '../store/models';
         <mat-slide-toggle formControlName="enabled" aria-label="disable"></mat-slide-toggle>
       </div>
       <div>
-        <a *ngIf="creative" mat-button [routerLink]="creativeLink">{{ creative.filename }}</a>
+        <a *ngIf="creativeLink" mat-button [routerLink]="creativeLink">{{ creative.filename || creative.url }}</a>
       </div>
       <mat-form-field appearance="outline">
         <mat-label>Weight</mat-label>
-        <input type="number" min="1" matInput formControlName="weight" />
+        <input type="number" required min="1" matInput formControlName="weight" />
       </mat-form-field>
     </div>
   `,
