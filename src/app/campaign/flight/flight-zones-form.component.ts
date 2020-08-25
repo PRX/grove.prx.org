@@ -131,7 +131,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
   }
 
   flightZoneFormGroup(zone: FlightZone = { id: '' }): FormGroup {
-    const { id, url, pingbacks, creativeFlightZones } = zone;
+    const { id, creativeFlightZones } = zone;
     return new FormGroup({
       id: new FormControl(id || '', Validators.required),
       // url: new FormControl(url || '', control => validateMp3(control.value)),
@@ -156,7 +156,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     // don't emit while manipulating FormArray with incoming update
     this.emitGuard = true;
     // get the correct number of zone fields and patchValue
-    zones = zones && zones.length ? zones : [{ id: '', url: '' }];
+    zones = zones && zones.length ? zones : [{ id: '', creativeFlightZones: [] }];
     while (this.zones.controls.length > zones.length) {
       this.zones.removeAt(this.zones.controls.length - 1);
       this.zones.markAsPristine();

@@ -6,11 +6,7 @@ import { Creative } from './creative.models';
 export interface FlightZone {
   id: string;
   label?: string;
-  creativeFlightZones?: { creative: Creative; weight?: number; disabled?: boolean }[];
-  url?: string;
-  pingbacks?: string[];
-  fileSize?: number;
-  mimeType?: string;
+  creativeFlightZones?: { creative?: Creative; weight?: number; disabled?: boolean }[];
 }
 export interface FlightTarget {
   type: string;
