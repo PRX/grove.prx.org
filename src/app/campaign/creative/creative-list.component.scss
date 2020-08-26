@@ -1,5 +1,13 @@
-.creative-list {
+:host {
+  display: block;
+  min-width: 200px;
+  max-width: 400px;
+}
+ul {
   margin: 20px;
-  display: flex;
-  flex-direction: column;
+}
+.mat-button {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

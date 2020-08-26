@@ -16,9 +16,11 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         <button mat-button aria-label="cancel" (click)="onCancel()"><mat-icon>clear</mat-icon></button>
       </mat-toolbar-row>
     </mat-toolbar>
-    <div *ngFor="let creative of creativeList$ | async">
-      <button mat-button color="primary" (click)="onAdd(creative)">{{ creative.filename }}</button>
-    </div>
+    <ul>
+      <li *ngFor="let creative of creativeList$ | async">
+        <button mat-button color="primary" (click)="onAdd(creative)">{{ creative.filename }}</button>
+      </li>
+    </ul>
   `,
   styleUrls: ['./creative-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
