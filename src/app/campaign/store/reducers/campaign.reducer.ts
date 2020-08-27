@@ -8,7 +8,6 @@ export const initialState: CampaignState = {
   localCampaign: {
     name: null,
     type: null,
-    status: null,
     repName: null,
     notes: null,
     set_account_uri: null,

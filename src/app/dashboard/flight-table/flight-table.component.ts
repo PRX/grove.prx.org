@@ -19,7 +19,7 @@ export class FlightTableComponent implements AfterViewInit, OnInit, OnDestroy {
   pageSizeOptions = [25, 50, 100];
   displayedColumns: string[] = [
     'name',
-    'campaign_status',
+    'status',
     'allocation_status',
     'campaign_name',
     'start_at',

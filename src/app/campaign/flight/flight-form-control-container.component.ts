@@ -91,6 +91,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   flightForm = this.fb.group({
     id: [],
     name: ['', Validators.required],
+    status: ['', Validators.required],
     startAt: ['', { validators: [Validators.required, this.validateStartAt.bind(this)], updateOn: 'blur' }],
     endAtFudged: ['', { validators: [Validators.required, this.validateEndAt.bind(this)], updateOn: 'blur' }],
     contractStartAt: ['', { updateOn: 'blur' }],

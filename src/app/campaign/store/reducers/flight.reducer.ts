@@ -53,6 +53,7 @@ const _reducer = createReducer(
       localFlight: {
         id,
         name: 'New Flight ' + (state.ids.length + 1),
+        status: 'draft',
         startAt,
         endAt,
         endAtFudged: utc(endAt.valueOf()).subtract(1, 'days'),

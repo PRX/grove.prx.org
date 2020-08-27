@@ -36,6 +36,15 @@ export class FlightFormComponent implements OnInit {
   flightForm: FormGroup;
   matcher = new FlightFormErrorStateMatcher();
 
+  readonly statusOptions = [
+    { name: 'Draft', value: 'draft' },
+    { name: 'Hold', value: 'hold' },
+    { name: 'Sold', value: 'sold' },
+    { name: 'Approved', value: 'approved' },
+    { name: 'Paused', value: 'paused' },
+    { name: 'Canceled', value: 'canceled' }
+  ];
+
   ngOnInit() {
     this.flightForm = this.formContainer.control as FormGroup;
   }

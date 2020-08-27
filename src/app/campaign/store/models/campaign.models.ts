@@ -5,7 +5,6 @@ export interface Campaign {
   id?: number;
   name: string;
   type: string;
-  status: string;
   repName: string;
   notes: string;
   createdAt?: Date;
@@ -36,11 +35,7 @@ export const docToCampaign = (doc: HalDoc): Campaign => {
 };
 
 export const duplicateCampaign = (campaign: Campaign): Campaign => {
-  // remove id from dup campaign and set to Draft
+  // remove id from dup campaign
   const { id, name, ...dupCampaign } = campaign;
-  return {
-    ...dupCampaign,
-    name: `Copy of ${name}`,
-    status: 'draft'
-  } as Campaign;
+  return { ...dupCampaign, name: `Copy of ${name}` } as Campaign;
 };
