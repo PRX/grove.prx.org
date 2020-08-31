@@ -1,4 +1,4 @@
-import { Component, Input, forwardRef, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, forwardRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormGroup,
   FormArray,
@@ -132,15 +132,15 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
 
   flightZoneFormGroup(zone: FlightZone = { id: '' }): FormGroup {
     const { id, creativeFlightZones } = zone;
-    return new FormGroup({
-      id: new FormControl(id || '', Validators.required),
-      // url: new FormControl(url || '', control => validateMp3(control.value)),
-      // pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value)),
-      creativeFlightZones: new FormArray(
-        (creativeFlightZones || []).map(zoneCreative => this.buildCreativeFormGroup(zoneCreative)),
-        this.zoneHasCreatives.bind(this)
-      )
-    });
+    return new FormGroup(
+      {
+        id: new FormControl(id || '', Validators.required),
+        // url: new FormControl(url || '', control => validateMp3(control.value)),
+        // pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value)),
+        creativeFlightZones: new FormArray((creativeFlightZones || []).map(zoneCreative => this.buildCreativeFormGroup(zoneCreative)))
+      },
+      (zoneControl: FormControl) => (this.zoneHasCreatives(zoneControl) ? null : { error: 'Zone must have at least one creative' })
+    );
   }
 
   buildCreativeFormGroup(zoneCreative): FormGroup {
