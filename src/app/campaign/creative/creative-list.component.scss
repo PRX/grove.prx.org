@@ -1,13 +1,38 @@
+@import '~src/sass/variables';
+
 :host {
   display: block;
   min-width: 200px;
   max-width: 400px;
+
+  ::ng-deep {
+    .mat-form-field-outline {
+      .mat-form-field-outline-start,
+      .mat-form-field-outline-end {
+        background-color: prx-theme-background(card);
+      }
+    }
+  }
 }
-ul {
-  margin: 20px;
+section {
+  margin: 10px;
 }
-.mat-button {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+h3 {
+  color: prx-theme-foreground(text);
+}
+mat-list-option {
+  background-color: mat-color($prx-blue, 100);
+}
+mat-list-option + mat-list-option {
+  margin-top: 5px;
+}
+h4 {
+  color: prx-theme-foreground(tab);
+}
+p.mat-line span {
+  margin-left: 10px;
+  color: prx-theme-foreground(secondary-text);
+}
+mat-paginator {
+  background-color: transparent;
 }

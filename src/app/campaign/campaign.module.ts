@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
@@ -48,6 +49,7 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     MatSlideToggleModule,
     MatSidenavModule,
     MatListModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatMenuModule,
     MatSnackBarModule,

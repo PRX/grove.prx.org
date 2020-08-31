@@ -50,6 +50,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
       </mat-drawer-content>
     </mat-drawer-container>
   `,
+  styleUrls: ['./flight.container.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightContainerComponent implements OnInit, OnDestroy {
