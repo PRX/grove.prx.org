@@ -1,13 +1,23 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 import * as creativeActions from '../actions/creative-action.creator';
-import { CreativeState, docToCreative, getCreativeId } from '../models';
+import { CreativeState, CreativeParams, docToCreative, getCreativeId } from '../models';
 
-export type State = EntityState<CreativeState>;
+export interface State extends EntityState<CreativeState> {
+  params?: CreativeParams;
+  total?: number;
+}
 
 export const adapter: EntityAdapter<CreativeState> = createEntityAdapter<CreativeState>({ selectId: getCreativeId });
 
-export const initialState: State = adapter.getInitialState({});
+export const initialState: State = adapter.getInitialState({
+  params: {
+    page: 1,
+    per: 5,
+    sorts: 'filename',
+    direction: 'asc'
+  }
+});
 
 // tslint:disable-next-line: variable-name
 const _reducer = createReducer(
@@ -43,9 +53,14 @@ const _reducer = createReducer(
     )
   ),
   on(creativeActions.CreativeLoadListSuccess, (state, action) =>
-    adapter.upsertMany(
-      action.creativeDocs.map(doc => ({ doc, creative: docToCreative(doc), changed: false, valid: true })),
-      state
+    adapter.addAll(
+      action.docs.map(doc => ({
+        doc: doc.creativeDoc,
+        creative: docToCreative(doc.creativeDoc, doc.advertiserDoc),
+        changed: false,
+        valid: true
+      })),
+      { ...state, params: action.params, total: action.total }
     )
   ),
   on(

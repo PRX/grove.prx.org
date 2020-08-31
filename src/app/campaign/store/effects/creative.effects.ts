@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { map, mergeMap, catchError, tap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-prx-styleguide';
+import { Store, select } from '@ngrx/store';
+import { of, forkJoin } from 'rxjs';
+import { map, mergeMap, catchError, tap, withLatestFrom } from 'rxjs/operators';
+import { ToastrService, HalDoc } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
 import * as creativeActions from '../actions/creative-action.creator';
+import { selectCreativeParams } from '../selectors';
 import { CreativeService } from '../../../core';
-import { docToCreative } from '../models';
+import { docToCreative, CreativeParams } from '../models';
 
 @Injectable()
 export class CreativeEffects {
@@ -71,17 +73,39 @@ export class CreativeEffects {
   creativeLoadList$ = createEffect(() =>
     this.actions$.pipe(
       ofType(creativeActions.CreativeLoadList),
-      mergeMap(_ =>
-        this.creativeService.loadCreativeList().pipe(
-          map(creativeDocs => creativeActions.CreativeLoadListSuccess({ creativeDocs })),
-          catchError(error => of(creativeActions.CreativeLoadListFailure({ error })))
-        )
-      )
+      withLatestFrom(this.store.pipe(select(selectCreativeParams))),
+      mergeMap(([action, prevParams]) => {
+        const params = { ...prevParams, ...action.params };
+        return this.creativeService.loadCreativeList(params).pipe(map(creativeDocs => ({ params, creativeDocs })));
+      }),
+      mergeMap(({ params, creativeDocs }) =>
+        forkJoin(
+          creativeDocs.map(creativeDoc => creativeDoc.follow('prx:advertiser').pipe(map(advertiserDoc => ({ creativeDoc, advertiserDoc }))))
+        ).pipe(map(docs => ({ params, docs })))
+      ),
+      // map(({params, docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]}) =>
+      // map((docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]) =>
+      map(({ params, docs }: { params: CreativeParams; docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[] }) =>
+        creativeActions.CreativeLoadListSuccess({
+          params,
+          total: docs.length && docs[0].creativeDoc.total(),
+          docs
+        })
+      ),
+      // map(({params, docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]}) =>
+      //   creativeActions.CreativeLoadListSuccess({
+      //     params,
+      //     total: docs.length && docs[0].creativeDoc.total(),
+      //     docs: docs
+      //   })
+      // ),
+      catchError(error => of(creativeActions.CreativeLoadListFailure({ error })))
     )
   );
 
   constructor(
     private actions$: Actions<creativeActions.CreativeActions>,
+    private store: Store<any>,
     private creativeService: CreativeService,
     private router: Router,
     private toastr: ToastrService

@@ -13,8 +13,18 @@ export class CreativeService {
     return this.augury.follow('prx:creative', { id });
   }
 
-  loadCreativeList(): Observable<HalDoc[]> {
-    return this.augury.followItems('prx:creatives');
+  loadCreativeList(params: {
+    page?: number;
+    per?: number;
+    text?: string;
+    sorts?: string;
+    direction?: 'desc' | 'asc' | '';
+  }): Observable<HalDoc[]> {
+    return this.augury.followItems('prx:creatives', {
+      ...params,
+      sorts: `${params.sorts}:${params.direction}`,
+      ...(params.text && { filters: `text:${params.text}` })
+    });
   }
 
   updateCreative(doc: HalDoc, creative: Creative): Observable<HalDoc> {

@@ -1,7 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
-import { Creative, CreativeState } from '../models';
+import { CreativeState } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/creative.reducer';
 import { selectRouterStateParams, selectRouterState } from '../../../store/router-store/router.selectors';
 
@@ -9,6 +9,9 @@ export const selectCreativesState = createSelector(selectCampaignStoreState, (st
 export const selectCreativeIds = createSelector(selectCreativesState, selectIds);
 export const selectCreativeEntities = createSelector(selectCreativesState, selectEntities);
 export const selectAllCreatives = createSelector(selectCreativesState, selectAll);
+
+export const selectCreativeParams = createSelector(selectCreativesState, state => state && state.params);
+export const selectCreativeTotal = createSelector(selectCreativesState, state => state && state.total);
 
 export const selectRoutedCreativeId = createSelector(selectRouterStateParams, (params): string => {
   return params && params.creativeId;

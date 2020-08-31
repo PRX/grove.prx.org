@@ -1,6 +1,6 @@
 import { HalDoc } from 'ngx-prx-styleguide';
+import { Advertiser, docToAdvertiser } from './advertiser.models';
 import { filterUnderscores } from './haldoc.utils';
-import { Env } from '../../../core/core.env';
 
 export interface Creative {
   id?: number | string;
@@ -8,6 +8,7 @@ export interface Creative {
   filename?: string;
   set_account_uri?: string;
   set_advertiser_uri?: string;
+  advertiser?: Advertiser;
   pingbacks?: string[];
   fileSize?: number;
   mimeType?: string;
@@ -22,16 +23,27 @@ export interface CreativeState {
   error?: any;
 }
 
+export interface CreativeParams {
+  page?: number;
+  per?: number;
+  // advertiser?: number;
+  // filename contains `text`
+  text?: string;
+  sort?: string;
+  direction?: 'desc' | 'asc' | '';
+}
+
 export const getCreativeId = (state?: CreativeState): string => {
   return (state && state.creative && state.creative.id && state.creative.id.toString()) || 'new';
 };
 
-export const docToCreative = (doc: HalDoc): Creative => {
-  const creative = filterUnderscores(doc) as Creative;
+export const docToCreative = (creativeDoc: HalDoc, advertiserDoc?: HalDoc): Creative => {
+  const creative = filterUnderscores(creativeDoc) as Creative;
   return {
     ...creative,
     createdAt: new Date(creative.createdAt),
-    set_account_uri: doc['_links'] && doc['_links']['prx:account'] && doc['_links']['prx:account'].href,
-    set_advertiser_uri: doc['_links'] && doc['_links']['prx:advertiser'] && Env.AUGURY_HOST + doc['_links']['prx:advertiser'].href
+    set_account_uri: creativeDoc.expand('prx:account'),
+    set_advertiser_uri: creativeDoc.expand('prx:advertiser'),
+    advertiser: advertiserDoc && docToAdvertiser(advertiserDoc)
   };
 };

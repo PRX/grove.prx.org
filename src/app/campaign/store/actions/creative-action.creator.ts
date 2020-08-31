@@ -1,7 +1,7 @@
 import { createAction, props, union } from '@ngrx/store';
 import { ActionTypes } from './action.types';
 import { HalDoc } from 'ngx-prx-styleguide';
-import { Creative } from '../models';
+import { Creative, CreativeParams } from '../models';
 
 export const CreativeNew = createAction(ActionTypes.CREATIVE_NEW);
 
@@ -35,8 +35,11 @@ export const CreativeUpdateSuccess = createAction(
 );
 export const CreativeUpdateFailure = createAction(ActionTypes.CREATIVE_UPDATE_FAILURE, props<{ error: any }>());
 
-export const CreativeLoadList = createAction(ActionTypes.CREATIVE_LOAD_LIST);
-export const CreativeLoadListSuccess = createAction(ActionTypes.CREATIVE_LOAD_LIST_SUCCESS, props<{ creativeDocs: HalDoc[] }>());
+export const CreativeLoadList = createAction(ActionTypes.CREATIVE_LOAD_LIST, props<{ params?: CreativeParams }>());
+export const CreativeLoadListSuccess = createAction(
+  ActionTypes.CREATIVE_LOAD_LIST_SUCCESS,
+  props<{ params: CreativeParams; total: number; docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[] }>()
+);
 export const CreativeLoadListFailure = createAction(ActionTypes.CREATIVE_LOAD_LIST_FAILURE, props<{ error }>());
 
 const all = union({
