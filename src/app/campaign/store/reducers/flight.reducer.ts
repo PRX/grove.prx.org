@@ -2,8 +2,9 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 import { utc } from 'moment';
 import * as campaignActions from '../actions/campaign-action.creator';
+import * as creativeActions from '../actions/creative-action.creator';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
-import { docToFlight, duplicateFlightState, FlightState, getFlightId } from '../models';
+import { docToFlight, duplicateFlightState, FlightState, getFlightId, docToCreative } from '../models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection
@@ -11,6 +12,8 @@ export interface State extends EntityState<FlightState> {
 }
 
 export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>({ selectId: getFlightId });
+
+export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();
 
 export const initialState: State = adapter.getInitialState({});
 
@@ -153,11 +156,36 @@ const _reducer = createReducer(
           : zone
       );
     return adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state);
+  }),
+  on(creativeActions.CreativeUpdateSuccess, (state, action) => {
+    const creative = docToCreative(action.creativeDoc);
+    const flights = selectAll(state)
+      .filter(flightState =>
+        flightState.localFlight.zones.some(zone =>
+          zone.creativeFlightZones.some(creativeFlightZone => creativeFlightZone.creative.id === creative.id)
+        )
+      )
+      .map(flightState => {
+        return {
+          id: flightState.localFlight.id,
+          changes: {
+            localFlight: {
+              ...flightState.localFlight,
+              zones: flightState.localFlight.zones.map(zone => ({
+                ...zone,
+                creativeFlightZones: zone.creativeFlightZones.map(creativeFlightZone => ({
+                  ...creativeFlightZone,
+                  creative: creativeFlightZone.creative.id === creative.id ? creative : creativeFlightZone.creative
+                }))
+              }))
+            }
+          }
+        };
+      });
+    return adapter.updateMany(flights, state);
   })
 );
 
 export function reducer(state, action) {
   return _reducer(state, action);
 }
-
-export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();
