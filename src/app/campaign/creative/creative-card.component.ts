@@ -6,13 +6,11 @@ import { Creative } from '../store/models';
   selector: 'grove-creative-card',
   template: `
     <div [formGroup]="creativeForm">
-      <div>
-        {{ creative ? 'Creative' : 'Silent File' }}
+      <h3>
+        {{ creative?.id ? 'Creative' : 'Silent File' }}
         <mat-slide-toggle formControlName="enabled" aria-label="disable"></mat-slide-toggle>
-      </div>
-      <div>
-        <a *ngIf="creativeLink" mat-button [routerLink]="creativeLink">{{ creative.filename || creative.url }}</a>
-      </div>
+      </h3>
+      <a *ngIf="creativeLink" class="creative" [routerLink]="creativeLink">{{ creative.filename || creative.url }}</a>
       <mat-form-field appearance="outline">
         <mat-label>Weight</mat-label>
         <input type="number" required min="1" matInput formControlName="weight" />

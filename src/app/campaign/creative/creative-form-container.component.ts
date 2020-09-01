@@ -18,7 +18,8 @@ import * as creativeActions from '../store/actions/creative-action.creator';
   template: `
     <mat-toolbar color="primary">
       <mat-toolbar-row>
-        <mat-icon>attach_file</mat-icon> Creative Management
+        <mat-icon>attach_file</mat-icon>
+        <h2>Creative Management</h2>
         <button mat-button aria-label="cancel" (click)="onCancel()"><mat-icon>clear</mat-icon></button>
       </mat-toolbar-row>
     </mat-toolbar>
@@ -34,6 +35,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
       (cancel)="onCancel($event)"
     ></grove-creative-form>
   `,
+  styleUrls: ['./creative-form-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreativeFormContainerComponent implements OnInit, OnDestroy {

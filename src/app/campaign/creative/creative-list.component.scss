@@ -1,5 +1,16 @@
 @import '~src/sass/variables';
 
+mat-toolbar-row {
+  display: flex;
+  align-items: center;
+}
+h2 {
+  color: white;
+}
+mat-toolbar-row button {
+  margin-left: auto;
+}
+
 :host {
   display: block;
   min-width: 200px;
@@ -29,7 +40,11 @@ mat-list-option + mat-list-option {
 h4 {
   color: prx-theme-foreground(tab);
 }
-p.mat-line span {
+.advertiser {
+  font-weight: 700;
+  color: prx-theme-foreground(secondary-text);
+}
+.uploaded {
   margin-left: 10px;
   color: prx-theme-foreground(secondary-text);
 }

@@ -39,7 +39,8 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         >
           <h4 matLine>{{ creative.filename }}</h4>
           <p matLine>
-            {{ creative.advertiser?.name }} <span>Uploaded {{ creative.createdAt | date: 'MM/dd/yyyy':'UTC' }}</span>
+            <span class="advertiser">{{ creative.advertiser?.name }}</span>
+            <span class="uploaded">Uploaded {{ creative.createdAt | date: 'MM/dd/yyyy':'UTC' }}</span>
           </p>
         </mat-list-option>
       </mat-selection-list>
