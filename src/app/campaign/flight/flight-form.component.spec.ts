@@ -29,8 +29,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FlightFormComponent } from './flight-form.component';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { CreativeCardComponent } from '../creative/creative-card.component';
 import { Flight, Inventory } from '../store/models';
 import * as moment from 'moment';
@@ -123,15 +121,7 @@ describe('FlightFormComponent', () => {
         MatSlideToggleModule,
         MatMenuModule
       ],
-      declarations: [
-        ParentFormComponent,
-        FlightFormComponent,
-        FlightTargetsFormComponent,
-        FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent,
-        CreativeCardComponent
-      ],
+      declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent, FlightZonesFormComponent, CreativeCardComponent],
       providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
         { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },

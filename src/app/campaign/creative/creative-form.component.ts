@@ -29,7 +29,12 @@ import { Creative, Account, Advertiser } from '../store/models';
           <mat-option *ngFor="let adv of filteredAdvertisers$ | async" [value]="adv.set_advertiser_uri">{{ adv.name }}</mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <grove-flight-zone-pingbacks [campaignId]="campaignId" [flightId]="flightId" [creative]="creative?.url"></grove-flight-zone-pingbacks>
+      <grove-creative-pingbacks
+        formControlName="pingbacks"
+        [campaignId]="campaignId"
+        [flightId]="flightId"
+        [creative]="creative?.url"
+      ></grove-creative-pingbacks>
       <div class="form-submit">
         <button mat-button (click)="save.emit(creative)" [disabled]="creativeForm.invalid">Save</button>
         <button mat-button color="primary" (click)="cancel.emit()">Cancel</button>
@@ -69,7 +74,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     filename: ['', Validators.required],
     set_account_uri: ['', Validators.required],
     set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]],
-    pingbacks: [[], this.validatePingbacks.bind(this)]
+    pingbacks: [[]]
   });
 
   constructor(private fb: FormBuilder) {}
@@ -121,13 +126,6 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     this.formUpdate.emit({ creative, changed: this.creativeForm.dirty, valid: this.creativeForm.valid });
   }
 
-  validatePingbacks({ value }: { value: string[] }): { [key: string]: any } | null {
-    if (value && value.some(pingback => !pingback)) {
-      return { error: 'Invalid pingbacks' };
-    }
-    return null;
-  }
-
   validateAdvertiser({ value }: AbstractControl) {
     // valid: advertiser exists in advertiser list
     if (value && this.advertisers && !!this.advertisers.find(advertiser => advertiser.set_advertiser_uri === value)) {
@@ -138,7 +136,8 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
 
   advertiserName(value?: string): string {
     if (value && this.advertisers) {
-      const advertiser = this.advertisers.find(adv => adv.set_advertiser_uri === value || adv.set_advertiser_uri === value);
+      // wat? should this be adv.name === value???
+      const advertiser = this.advertisers.find(adv => adv.name === value || adv.set_advertiser_uri === value);
       return (advertiser && advertiser.name) || value;
     }
   }

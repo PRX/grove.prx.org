@@ -34,8 +34,6 @@ import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { CreativeCardComponent } from '../creative/creative-card.component';
 import { Flight } from '../store/models';
 import * as moment from 'moment';
@@ -47,7 +45,7 @@ const flightFixture: Flight = {
   endAtFudged: moment.utc().subtract(1, 'days'),
   deliveryMode: 'capped',
   totalGoal: 123,
-  zones: [{ id: 'pre_1' }],
+  zones: [{ id: 'pre_1', creativeFlightZones: [{ creative: { id: null }, weight: 1 }] }],
   targets: [],
   set_inventory_uri: '/some/inventory'
 };
@@ -83,8 +81,6 @@ describe('FlightFormControlContainerComponent', () => {
         FlightFormComponent,
         FlightTargetsFormComponent,
         FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent,

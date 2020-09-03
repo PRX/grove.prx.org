@@ -18,7 +18,7 @@
 }
 
 .zone + .zone {
-  border-top: 1px dashed mat-color($prx-gray, 300);
+  border: 1px dashed prx-theme-foreground(divider);
   padding-top: 20px;
 }
 

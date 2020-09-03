@@ -23,12 +23,6 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
   return null;
 };
 
-export const validatePingbacks = (value: string[]): { [key: string]: any } | null => {
-  if (value && value.some(pingback => !pingback)) {
-    return { error: 'Invalid pingbacks' };
-  }
-  return null;
-};
 @Component({
   selector: 'grove-flight-zones',
   template: `

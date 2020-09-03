@@ -13,8 +13,6 @@ import {
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { CreativeCardComponent } from '../creative/creative-card.component';
 import { FlightZone, InventoryZone } from '../store/models';
@@ -65,13 +63,7 @@ describe('FlightZonesFormComponent', () => {
         MatMenuModule,
         MatSlideToggleModule
       ],
-      declarations: [
-        ParentFormComponent,
-        FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent,
-        CreativeCardComponent
-      ]
+      declarations: [ParentFormComponent, FlightZonesFormComponent, CreativeCardComponent]
     }).compileComponents();
   }));
 
@@ -161,8 +153,6 @@ describe('FlightZonesFormComponent', () => {
     expect((component.zones.controls[0].get('creativeFlightZones') as FormArray).controls[0].get('weight').value).toEqual(1);
     component.writeValue([]);
     expect(component.zones.controls[0].get('id').value).toEqual('');
-    expect(component.zones.controls[0].get('creativeFlightZones').value).toEqual([
-      { creative: null, creativeId: null, enabled: true, weight: 1 }
-    ]);
+    expect(component.zones.controls[0].get('creativeFlightZones').value).toEqual([]);
   });
 });

@@ -12,10 +12,6 @@ mat-toolbar-row button {
 }
 
 :host {
-  display: block;
-  min-width: 200px;
-  max-width: 400px;
-
   ::ng-deep {
     .mat-form-field-outline {
       .mat-form-field-outline-start,

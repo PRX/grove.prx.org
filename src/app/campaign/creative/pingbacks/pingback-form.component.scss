@@ -1,11 +1,28 @@
 @import '~src/sass/variables';
 @import '~src/sass/colors';
 
+:host {
+  max-width: 360px;
+  display: block;
+}
+
+mat-form-field {
+  width: 100%;
+
+  ::ng-deep .mat-form-field-wrapper {
+    padding-bottom: 5px;
+  }
+}
+mat-form-field.ng-invalid {
+  color: $warn;
+}
+
 .inline-fields {
   display: grid;
   grid-template-columns: 1fr 40px;
   grid-column-gap: 0.5rem;
 }
+
 .remove-pingback {
   display: flex;
   align-items: center;
@@ -18,10 +35,8 @@
     }
   }
 }
-.button-row {
-  display: flex;
-  justify-content: space-between;
-}
-.button-row > * {
-  flex: initial;
+
+p {
+  word-wrap: break-word;
+  white-space: normal;
 }

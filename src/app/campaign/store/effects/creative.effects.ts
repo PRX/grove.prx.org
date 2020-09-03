@@ -26,7 +26,7 @@ export class CreativeEffects {
     this.actions$.pipe(
       ofType(creativeActions.CreativeCreate),
       mergeMap(action =>
-        this.creativeService.createCreative(action.creative).pipe(
+        this.creativeService.createCreative({ ...action.creative, pingbacks: this.filterPingbacks(action.creative.pingbacks) }).pipe(
           mergeMap(creativeDoc => {
             const { campaignId, flightId, zoneId, creative } = action;
             if (campaignId && flightId) {
@@ -52,20 +52,22 @@ export class CreativeEffects {
     this.actions$.pipe(
       ofType(creativeActions.CreativeUpdate),
       mergeMap(action =>
-        this.creativeService.updateCreative(action.creativeDoc, action.creative).pipe(
-          map(creativeDoc => {
-            const { campaignId, flightId, zoneId } = action;
-            if (campaignId && flightId) {
-              // route back to flight (if there is one in the original action)
-              this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-            }
-            return creativeActions.CreativeUpdateSuccess({ campaignId, flightId, zoneId, creativeDoc });
-          }),
-          tap(_ => {
-            this.toastr.success('Creative saved');
-          }),
-          catchError(error => of(creativeActions.CreativeUpdateFailure({ error })))
-        )
+        this.creativeService
+          .updateCreative(action.creativeDoc, { ...action.creative, pingbacks: this.filterPingbacks(action.creative.pingbacks) })
+          .pipe(
+            map(creativeDoc => {
+              const { campaignId, flightId, zoneId } = action;
+              if (campaignId && flightId) {
+                // route back to flight (if there is one in the original action)
+                this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
+              }
+              return creativeActions.CreativeUpdateSuccess({ campaignId, flightId, zoneId, creativeDoc });
+            }),
+            tap(_ => {
+              this.toastr.success('Creative saved');
+            }),
+            catchError(error => of(creativeActions.CreativeUpdateFailure({ error })))
+          )
       )
     )
   );
@@ -83,8 +85,6 @@ export class CreativeEffects {
           creativeDocs.map(creativeDoc => creativeDoc.follow('prx:advertiser').pipe(map(advertiserDoc => ({ creativeDoc, advertiserDoc }))))
         ).pipe(map(docs => ({ params, docs })))
       ),
-      // map(({params, docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]}) =>
-      // map((docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]) =>
       map(({ params, docs }: { params: CreativeParams; docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[] }) =>
         creativeActions.CreativeLoadListSuccess({
           params,
@@ -92,16 +92,13 @@ export class CreativeEffects {
           docs
         })
       ),
-      // map(({params, docs: { creativeDoc: HalDoc; advertiserDoc: HalDoc }[]}) =>
-      //   creativeActions.CreativeLoadListSuccess({
-      //     params,
-      //     total: docs.length && docs[0].creativeDoc.total(),
-      //     docs: docs
-      //   })
-      // ),
       catchError(error => of(creativeActions.CreativeLoadListFailure({ error })))
     )
   );
+
+  filterPingbacks(pingbacks: string[]) {
+    return pingbacks.filter(p => p);
+  }
 
   constructor(
     private actions$: Actions<creativeActions.CreativeActions>,

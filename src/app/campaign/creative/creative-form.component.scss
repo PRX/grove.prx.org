@@ -6,6 +6,10 @@ form {
   display: flex;
   flex-direction: column;
 }
+mat-form-field,
+grove-creative-pingbacks {
+  width: 100%;
+}
 .form-submit {
   display: flex;
   justify-content: space-between;
