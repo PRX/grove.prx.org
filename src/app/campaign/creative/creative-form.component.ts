@@ -9,8 +9,11 @@ import { Creative, Account, Advertiser } from '../store/models';
   template: `
     <form [formGroup]="creativeForm">
       <mat-form-field class="campaign-form-field" appearance="outline">
-        <mat-label>File</mat-label>
-        <input matInput placeholder="Creative File URL" formControlName="url" required />
+        <mat-label>Creative File URL</mat-label>
+        <input matInput placeholder="Creative File URL" formControlName="url" autocomplete="off" required />
+        <mat-error *ngIf="checkInvalidUrl('invalidUrl')">Invalid URL</mat-error>
+        <mat-error *ngIf="checkInvalidUrl('notMp3')">Must end in mp3</mat-error>
+        <mat-error *ngIf="checkInvalidUrl('error') as error">{{ error }}</mat-error>
       </mat-form-field>
       <mat-form-field class="campaign-form-field" appearance="outline">
         <mat-label>Filename</mat-label>
@@ -70,7 +73,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
 
   creativeForm = this.fb.group({
     id: [],
-    url: ['', Validators.required],
+    url: ['', [Validators.required, this.validateMp3.bind(this)]],
     filename: ['', Validators.required],
     set_account_uri: ['', Validators.required],
     set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]],
@@ -126,7 +129,29 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     this.formUpdate.emit({ creative, changed: this.creativeForm.dirty, valid: this.creativeForm.valid });
   }
 
-  validateAdvertiser({ value }: AbstractControl) {
+  validateMp3({ value }: AbstractControl): { [key: string]: any } | null {
+    if (value) {
+      try {
+        // try parsing as URL, throws Error if invalid
+        const url = new URL(value);
+        // if (!url.protocol.match(/^http(s)?:\/\//)) {
+        if (!url.protocol.match(/^http(s)?:/)) {
+          return { invalidUrl: { value } };
+        } else if (!url.pathname.endsWith('.mp3')) {
+          return { notMp3: { value } };
+        }
+      } catch (error) {
+        return { error };
+      }
+    }
+    return null;
+  }
+
+  checkInvalidUrl(type: string) {
+    return this.creativeForm.get('url').getError(type);
+  }
+
+  validateAdvertiser({ value }: AbstractControl): { [key: string]: any } | null {
     // valid: advertiser exists in advertiser list
     if (value && this.advertisers && !!this.advertisers.find(advertiser => advertiser.set_advertiser_uri === value)) {
       return null;

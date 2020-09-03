@@ -1,31 +1,14 @@
 import { Component, Input, forwardRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import {
-  FormGroup,
-  FormArray,
-  Validators,
-  NG_VALUE_ACCESSOR,
-  NG_VALIDATORS,
-  ControlValueAccessor,
-  FormControl,
-  AbstractControl
-} from '@angular/forms';
+import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
 import { FlightZone, InventoryZone, filterZones } from '../store/models';
 import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
-
-export const validateMp3 = (value: string): { [key: string]: any } | null => {
-  if (value) {
-    if (!value.match(/^http(s)?:\/\//)) {
-      return { invalidUrl: { value } };
-    } else if (!value.endsWith('.mp3')) {
-      return { notMp3: { value } };
-    }
-  }
-  return null;
-};
 
 @Component({
   selector: 'grove-flight-zones',
   template: `
+    <div *ngIf="zones?.controls?.length < zoneOptions?.length">
+      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addZoneLabel }}</button>
+    </div>
     <fieldset>
       <div *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="zone">
         <div class="inline-fields">
@@ -35,23 +18,6 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
               <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
             </mat-select>
           </mat-form-field>
-          <!-- <mat-form-field appearance="outline">
-            <mat-label>Creative Url</mat-label>
-            <input
-              matInput
-              [errorStateMatcher]="matcher"
-              formControlName="url"
-              autocomplete="off"
-              placeholder="Leave blank for a 0-second MP3"
-            />
-            <mat-error *ngIf="checkInvalidUrl(zone, 'invalidUrl')">Invalid URL</mat-error>
-            <mat-error *ngIf="checkInvalidUrl(zone, 'notMp3')">Must end in mp3</mat-error>
-          </mat-form-field> -->
-          <!-- <div class="mat-form-field-wrapper">
-            <button mat-button color="primary" class="toggle-pingbacks" (click)="togglePingbacks(zone)">
-              {{ togglePingbacksText(zone) }}
-            </button>
-          </div> -->
           <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
             <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
               <mat-icon>delete</mat-icon>
@@ -63,16 +29,9 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
             *ngFor="let zoneCreative of flightZones[i]?.creativeFlightZones; let creativeIndex = index; trackBy: trackByIndex"
             [formGroup]="creativeFormGroup(zone, creativeIndex)"
             [creative]="zoneCreative?.creative"
-            creativeLink="{{ zoneCreative?.creative?.id ? getZoneCreativeRoute(zone) + zoneCreative.creative.id : '' }}"
+            creativeLink="{{ zoneCreative?.creative?.id ? getZoneCreativeRoute(zone) + zoneCreative.creative.id.toString() : '' }}"
           ></grove-creative-card>
         </div>
-        <!-- <grove-flight-zone-pingbacks
-          *ngIf="zoneHasPingbacks(zone)"
-          [campaignId]="campaignId"
-          [flightId]="flightId"
-          [creative]="zone.get('url').value"
-          formControlName="pingbacks"
-        ></grove-flight-zone-pingbacks> -->
         <div>
           <button [disabled]="!zone.get('id').value" mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu">
             <mat-icon>add</mat-icon> Add a creative
@@ -85,9 +44,6 @@ export const validateMp3 = (value: string): { [key: string]: any } | null => {
         </div>
       </div>
     </fieldset>
-    <div *ngIf="zones?.controls?.length < zoneOptions?.length">
-      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addZoneLabel }}</button>
-    </div>
   `,
   styleUrls: ['./flight-zones-form.component.scss'],
   providers: [
@@ -129,8 +85,6 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return new FormGroup(
       {
         id: new FormControl(id || '', Validators.required),
-        // url: new FormControl(url || '', control => validateMp3(control.value)),
-        // pingbacks: new FormControl(pingbacks || [], control => validatePingbacks(control.value)),
         creativeFlightZones: new FormArray((creativeFlightZones || []).map(zoneCreative => this.buildCreativeFormGroup(zoneCreative)))
       },
       (zoneControl: FormControl) => (this.zoneHasCreatives(zoneControl) ? null : { error: 'Zone must have at least one creative' })
@@ -194,17 +148,13 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return this.zones.valid ? null : { error: 'Invalid zones' };
   }
 
-  checkInvalidUrl(zone: AbstractControl, type: string): boolean {
-    return zone.get('url').hasError(type);
-  }
-
   onAddZone() {
     // this add a control to the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
     this.zones.push(this.flightZoneFormGroup(filterZones(this.zoneOptions, this.flightZones as InventoryZone[]).shift()));
   }
 
   onRemoveZone(index: number) {
-    // thisremoves a control from the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
+    // removes a control from the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
     this.zones.removeAt(index);
   }
 
@@ -226,19 +176,6 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return `Add a ${type}`;
   }
 
-  zoneHasPingbacks(zone: FormControl): boolean {
-    const pingbacks = zone.get('pingbacks');
-    return pingbacks.value && pingbacks.value.length;
-  }
-
-  togglePingbacks(zone: FormControl) {
-    this.zoneHasPingbacks(zone) ? zone.get('pingbacks').setValue([]) : zone.get('pingbacks').setValue(['']);
-  }
-
-  togglePingbacksText(zone: FormControl): string {
-    return this.zoneHasPingbacks(zone) ? 'Remove pingbacks' : 'Add pingbacks';
-  }
-
   getZoneCreativeRoute(zone: FormControl): string {
     return `/campaign/${this.campaignId}/flight/${this.flightId}/zone/${zone.get('id').value}/creative/`;
   }
@@ -252,8 +189,10 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return (zone.get('creativeFlightZones') as FormArray).controls[index];
   }
 
-  trackByIndex(index, creative) {
-    return index + '_' + creative.id;
+  trackByIndex(index) {
+    // use a trackBy on the creative cards ngFor or else
+    // the cards are re-rendered when the weight is changed and UI loses focus as you type
+    return index;
   }
 
   onAddSilentCreative(zone: FormControl) {
