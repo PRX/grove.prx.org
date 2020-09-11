@@ -9,9 +9,6 @@ import { FlightZone, InventoryZone, filterZones, Creative } from '../store/model
 @Component({
   selector: 'grove-flight-zones',
   template: `
-    <div *ngIf="zones?.controls?.length < zoneOptions?.length">
-      <button mat-button color="primary" (click)="onAddZone()"><mat-icon>add</mat-icon> {{ addZoneLabel }}</button>
-    </div>
     <fieldset>
       <div *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="zone">
         <div class="inline-fields">
@@ -35,7 +32,7 @@ import { FlightZone, InventoryZone, filterZones, Creative } from '../store/model
             creativeLink="{{ zoneCreative?.creativeId ? (getZoneCreativeRoute(zone) | async) + zoneCreative.creativeId.toString() : '' }}"
           ></grove-creative-card>
         </div>
-        <div>
+        <div class="add-creative">
           <button [disabled]="!zone.get('id').value" mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu">
             <mat-icon>add</mat-icon> Add a creative
           </button>
@@ -178,6 +175,10 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
 
   validate(_: FormControl) {
     return this.zones.valid ? null : { error: 'Invalid zones' };
+  }
+
+  get showAddZone() {
+    return this.zones.controls && this.zoneOptions && this.zones.controls.length < this.zoneOptions.length;
   }
 
   onAddZone() {

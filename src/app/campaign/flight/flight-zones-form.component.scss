@@ -22,18 +22,13 @@
   padding-top: 20px;
 }
 
-.toggle-pingbacks {
-  text-align: left;
-  text-transform: uppercase;
-}
-
-grove-flight-zone-pingbacks {
-  display: block;
-  margin-left: 40px;
-}
 .flight-zone-creatives {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: 1fr;
   grid-gap: 20px;
+}
+
+.add-creative {
+  margin: 5px 0;
 }
