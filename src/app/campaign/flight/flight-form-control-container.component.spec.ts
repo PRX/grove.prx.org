@@ -26,6 +26,10 @@ import {
 } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { reducers } from '../store';
 import { SharedModule } from '../../shared/shared.module';
 import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
 import { FlightFormComponent } from './flight-form.component';
@@ -45,7 +49,7 @@ const flightFixture: Flight = {
   endAtFudged: moment.utc().subtract(1, 'days'),
   deliveryMode: 'capped',
   totalGoal: 123,
-  zones: [{ id: 'pre_1', creativeFlightZones: [{ creative: { id: null }, weight: 1 }] }],
+  zones: [{ id: 'pre_1', creativeFlightZones: [{ creativeId: null, weight: 1 }] }],
   targets: [],
   set_inventory_uri: '/some/inventory'
 };
@@ -74,7 +78,18 @@ describe('FlightFormControlContainerComponent', () => {
         MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatMenuModule,
-        SharedModule
+        SharedModule,
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
       ],
       declarations: [
         FlightFormControlContainerComponent,

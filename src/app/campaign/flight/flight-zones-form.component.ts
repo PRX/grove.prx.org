@@ -1,7 +1,10 @@
-import { Component, Input, forwardRef, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, forwardRef, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormArray, Validators, NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl } from '@angular/forms';
-import { FlightZone, InventoryZone, filterZones } from '../store/models';
-import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
+import { Observable } from 'rxjs';
+import { withLatestFrom, map } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import { selectCampaignId, selectRoutedFlightId, selectCreativeById } from '../store/selectors';
+import { FlightZone, InventoryZone, filterZones, Creative } from '../store/models';
 
 @Component({
   selector: 'grove-flight-zones',
@@ -28,8 +31,8 @@ import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
           <grove-creative-card
             *ngFor="let zoneCreative of flightZones[i]?.creativeFlightZones; let creativeIndex = index; trackBy: trackByIndex"
             [formGroup]="creativeFormGroup(zone, creativeIndex)"
-            [creative]="zoneCreative?.creative"
-            creativeLink="{{ zoneCreative?.creative?.id ? getZoneCreativeRoute(zone) + zoneCreative.creative.id.toString() : '' }}"
+            [creative]="creatives$[zoneCreative.creativeId] | async"
+            creativeLink="{{ zoneCreative?.creativeId ? (getZoneCreativeRoute(zone) | async) + zoneCreative.creativeId.toString() : '' }}"
           ></grove-creative-card>
         </div>
         <div>
@@ -37,8 +40,8 @@ import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
             <mat-icon>add</mat-icon> Add a creative
           </button>
           <mat-menu #addCreativeMenu="matMenu" xPosition="after">
-            <a mat-menu-item routerLink="{{ getZoneCreativeRoute(zone) + 'new' }}">Add New</a>
-            <a mat-menu-item routerLink="{{ getZoneCreativeRoute(zone) + 'list' }}">Add Existing</a>
+            <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'new' }}">Add New</a>
+            <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'list' }}">Add Existing</a>
             <button mat-menu-item color="primary" (click)="onAddSilentCreative(zone)">Add Silent</button>
           </mat-menu>
         </div>
@@ -52,13 +55,32 @@ import { FlightFormErrorStateMatcher } from './flight-form.error-state-matcher';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy {
-  @Input() flightZones: FlightZone[];
+export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, OnDestroy {
   @Input() isCompanion: boolean;
   @Input() zoneOptions: InventoryZone[];
-  @Input() campaignId: number;
-  @Input() flightId: number;
-  matcher = new FlightFormErrorStateMatcher();
+  // tslint:disable-next-line: variable-name
+  _flightZones: FlightZone[];
+  @Input()
+  set flightZones(flightZones: FlightZone[]) {
+    this._flightZones = flightZones;
+    if (flightZones) {
+      flightZones
+        .filter(zone => zone.creativeFlightZones)
+        .forEach(zone =>
+          zone.creativeFlightZones
+            .filter(creativeFlightZone => creativeFlightZone.creativeId)
+            .forEach(
+              creativeFlightZone =>
+                (this.creatives$[creativeFlightZone.creativeId] = this.store.pipe(
+                  select(selectCreativeById, { id: creativeFlightZone.creativeId })
+                ))
+            )
+        );
+    }
+  }
+  get flightZones(): FlightZone[] {
+    return this._flightZones;
+  }
   zones = new FormArray([].map(this.flightZoneFormGroup));
   zonesSub = this.zones.valueChanges.subscribe(formZones => {
     if (!this.emitGuard) {
@@ -71,8 +93,18 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     }
   });
   emitGuard = false;
+  campaignId$: Observable<string | number>;
+  flightId$: Observable<number>;
+  creatives$: { [id: number]: Observable<Creative> } = {};
   onChangeFn = (value: any) => {};
   onTouchedFn = (value: any) => {};
+
+  constructor(private store: Store<any>) {}
+
+  ngOnInit() {
+    this.campaignId$ = this.store.pipe(select(selectCampaignId));
+    this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
+  }
 
   ngOnDestroy() {
     if (this.zonesSub) {
@@ -176,8 +208,11 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnDestroy
     return `Add a ${type}`;
   }
 
-  getZoneCreativeRoute(zone: FormControl): string {
-    return `/campaign/${this.campaignId}/flight/${this.flightId}/zone/${zone.get('id').value}/creative/`;
+  getZoneCreativeRoute(zone: FormControl): Observable<string> {
+    return this.campaignId$.pipe(
+      withLatestFrom(this.flightId$),
+      map(([campaignId, flightId]) => `/campaign/${campaignId}/flight/${flightId}/zone/${zone.get('id').value}/creative/`)
+    );
   }
 
   zoneHasCreatives(zone: FormControl): boolean {

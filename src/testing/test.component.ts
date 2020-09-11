@@ -6,9 +6,13 @@ import { Routes } from '@angular/router';
   template: ``
 })
 export class TestComponent {}
+const flightChildRoutes: Routes = [
+  { path: 'zone/:zoneId/creative/:id', component: TestComponent },
+  { path: 'zone/:zoneId/creative/list', component: TestComponent }
+];
 const campaignChildRoutes: Routes = [
   { path: '', component: TestComponent },
-  { path: 'flight/:flightId', component: TestComponent }
+  { path: 'flight/:flightId', component: TestComponent, children: flightChildRoutes }
 ];
 export const campaignRoutes: Routes = [
   {

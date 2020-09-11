@@ -30,7 +30,6 @@ export class FlightFormComponent implements OnInit {
   @Input() targetTypes: InventoryTargetType[];
   @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() softDeleted: boolean;
-  @Input() campaignId: number;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
 

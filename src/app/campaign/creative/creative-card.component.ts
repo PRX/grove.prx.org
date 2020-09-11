@@ -10,7 +10,7 @@ import { Creative } from '../store/models';
         {{ creative?.id ? 'Creative' : 'Silent File' }}
         <mat-slide-toggle formControlName="enabled" aria-label="disable"></mat-slide-toggle>
       </h3>
-      <a *ngIf="creativeLink" class="creative" [routerLink]="creativeLink">{{ creative.filename || creative.url }}</a>
+      <a *ngIf="creativeLink" class="creative" [routerLink]="creativeLink">{{ creative?.filename || creative?.url }}</a>
       <mat-form-field appearance="outline">
         <mat-label>Weight</mat-label>
         <input type="number" required min="1" matInput formControlName="weight" />

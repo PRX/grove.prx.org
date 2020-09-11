@@ -42,7 +42,6 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
           [isLoading]="isLoading$ | async"
           [previewError]="flightPreviewError$ | async"
           [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
-          [campaignId]="campaignId$ | async"
           (flightUpdate)="flightUpdateFromForm($event)"
           (flightDeleteToggle)="flightDeleteToggle()"
           (flightDuplicate)="flightDuplicate($event)"

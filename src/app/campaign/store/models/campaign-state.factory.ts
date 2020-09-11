@@ -87,10 +87,31 @@ export const createCampaignState = () => ({
   }
 });
 
+export const creativesFixture = [
+  {
+    id: 1,
+    url: 'some/url',
+    filename: 'somefile',
+    set_account_uri: 'some/account/id',
+    set_advertiser_uri: 'some/advertiser/id',
+    createdAt: new Date()
+  },
+  {
+    id: 2,
+    url: 'other/url',
+    filename: 'otherfile',
+    set_account_uri: 'some/account/id',
+    set_advertiser_uri: 'some/advertiser/id',
+    createdAt: new Date()
+  }
+];
 export const createCreativesState = () => ({
   creatives: {
-    ids: [],
-    entities: {}
+    ids: creativesFixture.map(c => c.id),
+    entities: {
+      1: { creative: creativesFixture[0] },
+      2: { creative: creativesFixture[1] }
+    }
   }
 });
 

@@ -26,6 +26,10 @@ import {
 } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { reducers } from '../store';
 import { FlightFormComponent } from './flight-form.component';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
@@ -119,7 +123,18 @@ describe('FlightFormComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatSlideToggleModule,
-        MatMenuModule
+        MatMenuModule,
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
       ],
       declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent, FlightZonesFormComponent, CreativeCardComponent],
       providers: [

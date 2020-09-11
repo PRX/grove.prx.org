@@ -5,7 +5,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Creative, CreativeParams } from '../store/models';
 import {
-  selectCreativesOrderedByCreatedAt,
+  selectCreativeListPageOrderedByCreatedAt,
   selectCampaignId,
   selectRoutedFlightId,
   selectRoutedFlightZoneId,
@@ -34,7 +34,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         <mat-list-option
           *ngFor="let creative of creativeList$ | async"
           checkboxPosition="before"
-          [value]="creative"
+          [value]="creative.id"
           [title]="creative.filename"
         >
           <h4 matLine>{{ creative.filename }}</h4>
@@ -70,8 +70,8 @@ export class CreativeListComponent implements OnInit, OnDestroy {
   constructor(private store: Store<any>, private router: Router) {}
 
   ngOnInit() {
-    this.creativeList$ = this.store.pipe(select(selectCreativesOrderedByCreatedAt));
     this.creativeParams$ = this.store.pipe(select(selectCreativeParams));
+    this.creativeList$ = this.store.pipe(select(selectCreativeListPageOrderedByCreatedAt));
     this.creativeTotal$ = this.store.pipe(select(selectCreativeTotal));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
@@ -106,10 +106,10 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     this.store.dispatch(creativeActions.CreativeLoadList({ params: { page, per } }));
   }
 
-  onAdd(creative: Creative) {
+  onAdd(creativeId: number) {
     this.campaignId$.pipe(withLatestFrom(this.flightId$, this.zoneId$), first()).subscribe(([campaignId, flightId, zoneId]) => {
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creative }));
+      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId }));
     });
   }
 

@@ -13,6 +13,7 @@ import { TestComponent, campaignRoutes } from '../../../../testing/test.componen
 import { reducers } from '../';
 import { campaignFixture, flightFixture, flightDocFixture, flightDaysData } from '../models/campaign-state.factory';
 import * as campaignActions from '../actions/campaign-action.creator';
+import * as creativeActions from '../actions/creative-action.creator';
 import { CampaignEffects } from './campaign.effects';
 
 describe('CampaignEffects', () => {
@@ -85,6 +86,40 @@ describe('CampaignEffects', () => {
 
     actions$.stream = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
+    expect(effects.campaignLoad$).toBeObservable(expected);
+  });
+
+  it('should load creatives with campaign and flights', () => {
+    const flightWithCreativeDocs = [
+      new MockHalDoc({
+        ...flightDocFixture,
+        zones: flightDocFixture.zones.map(zone => ({
+          ...zone,
+          creativeFlightZones: [
+            { creativeId: null, weight: 1 },
+            { creativeId: 1, weight: 1 },
+            { creativeId: 2, weight: 1 }
+          ]
+        }))
+      })
+    ];
+    campaignService.loadCampaignZoomFlightsAndFlightDays = jest.fn(() =>
+      of({
+        campaignDoc,
+        flightDocs: flightWithCreativeDocs,
+        flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+      })
+    );
+    actions$.stream = hot('-a', { a: campaignActions.CampaignLoad({ id: 1 }) });
+    const expected = cold('-(bcd)', {
+      b: campaignActions.CampaignLoadSuccess({
+        campaignDoc,
+        flightDocs: flightWithCreativeDocs,
+        flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
+      }),
+      c: creativeActions.CreativeLoad({ id: 1 }),
+      d: creativeActions.CreativeLoad({ id: 2 })
+    });
     expect(effects.campaignLoad$).toBeObservable(expected);
   });
 

@@ -13,6 +13,10 @@ import {
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { reducers } from '../store';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { CreativeCardComponent } from '../creative/creative-card.component';
 import { FlightZone, InventoryZone } from '../store/models';
@@ -61,7 +65,18 @@ describe('FlightZonesFormComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatMenuModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
       ],
       declarations: [ParentFormComponent, FlightZonesFormComponent, CreativeCardComponent]
     }).compileComponents();
@@ -115,29 +130,6 @@ describe('FlightZonesFormComponent', () => {
     component.writeValue([{ id: 'pre_2' }]);
     expect(component.zones.value).toEqual([{ id: 'pre_2', creativeFlightZones: [] }]);
   });
-
-  // it('does very basic mp3 validations', () => {
-  //   component.flightZones = [{ id: 'pre_1' }];
-
-  //   const zone = component.zones.at(0);
-  //   const urlField = zone.get('url');
-
-  //   urlField.setValue('');
-  //   expect(urlField.errors).toEqual(null);
-
-  //   urlField.setValue('http://this.looks/valid.mp3');
-  //   expect(urlField.errors).toEqual(null);
-  //   expect(zone.get('url').hasError('invalidUrl')).toEqual(false);
-  //   expect(zone.get('url').hasError('notMp3')).toEqual(false);
-
-  //   urlField.setValue('ftp://this.is/invalid.mp3');
-  //   expect(urlField.errors).toEqual({ invalidUrl: { value: 'ftp://this.is/invalid.mp3' } });
-  //   expect(zone.get('url').hasError('invalidUrl')).toEqual(true);
-
-  //   urlField.setValue('http://this.is/notaudio.jpg');
-  //   expect(urlField.errors).toEqual({ notMp3: { value: 'http://this.is/notaudio.jpg' } });
-  //   expect(zone.get('url').hasError('notMp3')).toEqual(true);
-  // });
 
   it('does not emit while receiving incoming update', () => {
     jest.spyOn(component, 'onChangeFn');

@@ -2,9 +2,8 @@ import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 import { utc } from 'moment';
 import * as campaignActions from '../actions/campaign-action.creator';
-import * as creativeActions from '../actions/creative-action.creator';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
-import { docToFlight, duplicateFlightState, FlightState, getFlightId, docToCreative } from '../models';
+import { docToFlight, duplicateFlightState, FlightState, getFlightId } from '../models';
 
 export interface State extends EntityState<FlightState> {
   // additional entities state properties for the collection
@@ -141,7 +140,7 @@ const _reducer = createReducer(
     );
   }),
   on(campaignActions.CampaignFlightZoneAddCreative, (state, action) => {
-    const { flightId, zoneId, creative } = action;
+    const { flightId, zoneId, creativeId } = action;
     const localFlight = state.entities[flightId].localFlight;
     const zones =
       localFlight &&
@@ -149,40 +148,11 @@ const _reducer = createReducer(
         zone.id === zoneId
           ? {
               ...zone,
-              creativeFlightZones: zone.creativeFlightZones
-                ? [...zone.creativeFlightZones, { creative, creativeId: creative.id }]
-                : [{ creative, creativeId: creative.id }]
+              creativeFlightZones: zone.creativeFlightZones ? [...zone.creativeFlightZones, { creativeId }] : [{ creativeId }]
             }
           : zone
       );
     return adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state);
-  }),
-  on(creativeActions.CreativeUpdateSuccess, (state, action) => {
-    const creative = docToCreative(action.creativeDoc);
-    const flights = selectAll(state)
-      .filter(flightState =>
-        flightState.localFlight.zones.some(zone =>
-          zone.creativeFlightZones.some(creativeFlightZone => creativeFlightZone.creative.id === creative.id)
-        )
-      )
-      .map(flightState => {
-        return {
-          id: flightState.localFlight.id,
-          changes: {
-            localFlight: {
-              ...flightState.localFlight,
-              zones: flightState.localFlight.zones.map(zone => ({
-                ...zone,
-                creativeFlightZones: zone.creativeFlightZones.map(creativeFlightZone => ({
-                  ...creativeFlightZone,
-                  creative: creativeFlightZone.creative.id === creative.id ? creative : creativeFlightZone.creative
-                }))
-              }))
-            }
-          }
-        };
-      });
-    return adapter.updateMany(flights, state);
   })
 );
 

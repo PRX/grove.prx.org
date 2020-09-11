@@ -18,19 +18,20 @@ export interface Creative {
 export interface CreativeState {
   doc?: HalDoc;
   creative: Creative;
-  changed: boolean;
-  valid: boolean;
-  error?: any;
+  page?: number;
+  changed?: boolean;
+  valid?: boolean;
 }
 
 export interface CreativeParams {
   page?: number;
   per?: number;
+  // advertiser filter not supported yet
   // advertiser?: number;
   // filename contains `text`
   text?: string;
   sort?: string;
-  direction?: 'desc' | 'asc' | '';
+  direction?: string;
 }
 
 export const getCreativeId = (state?: CreativeState): string => {
@@ -44,6 +45,6 @@ export const docToCreative = (creativeDoc: HalDoc, advertiserDoc?: HalDoc): Crea
     createdAt: new Date(creative.createdAt),
     set_account_uri: creativeDoc.expand('prx:account'),
     set_advertiser_uri: creativeDoc.expand('prx:advertiser'),
-    advertiser: advertiserDoc && docToAdvertiser(advertiserDoc)
+    ...(advertiserDoc && { advertiser: docToAdvertiser(advertiserDoc) })
   };
 };

@@ -4,20 +4,20 @@ import * as creativeActions from '../actions/creative-action.creator';
 import { CreativeState, CreativeParams, docToCreative, getCreativeId } from '../models';
 
 export interface State extends EntityState<CreativeState> {
+  error?: any;
   params?: CreativeParams;
   total?: number;
 }
 
 export const adapter: EntityAdapter<CreativeState> = createEntityAdapter<CreativeState>({ selectId: getCreativeId });
 
-export const initialState: State = adapter.getInitialState({
-  params: {
-    page: 1,
-    per: 5,
-    sorts: 'filename',
-    direction: 'asc'
-  }
-});
+export const initialParams = {
+  page: 1,
+  per: 5,
+  sorts: 'filename',
+  direction: 'asc'
+};
+export const initialState: State = adapter.getInitialState({ params: initialParams });
 
 // tslint:disable-next-line: variable-name
 const _reducer = createReducer(
@@ -34,13 +34,18 @@ const _reducer = createReducer(
           pingbacks: []
         },
         changed: false,
-        valid: false,
-        error: null
+        valid: false
       },
       state
     )
   ),
-  on(creativeActions.CreativeLoad, creativeActions.CreativeLoadList, (state, action) => ({ ...state, error: null })),
+  on(
+    creativeActions.CreativeLoad,
+    creativeActions.CreativeCreate,
+    creativeActions.CreativeUpdate,
+    creativeActions.CreativeLoadList,
+    (state, action) => ({ ...state, error: null })
+  ),
   on(creativeActions.CreativeLoadSuccess, creativeActions.CreativeCreateSuccess, creativeActions.CreativeUpdateSuccess, (state, action) =>
     adapter.upsertOne(
       {
@@ -53,12 +58,11 @@ const _reducer = createReducer(
     )
   ),
   on(creativeActions.CreativeLoadListSuccess, (state, action) =>
-    adapter.addAll(
+    adapter.upsertMany(
       action.docs.map(doc => ({
         doc: doc.creativeDoc,
         creative: docToCreative(doc.creativeDoc, doc.advertiserDoc),
-        changed: false,
-        valid: true
+        page: action.params.page
       })),
       { ...state, params: action.params, total: action.total }
     )

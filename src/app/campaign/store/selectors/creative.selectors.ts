@@ -25,11 +25,17 @@ export const selectRoutedCreative = createSelector(
   (creatives, id): CreativeState => creatives && creatives[id]
 );
 
+export const selectCreativeById = createSelector(
+  selectCreativeEntities,
+  (creatives, props): CreativeState => creatives && creatives[props.id] && creatives[props.id].creative
+);
+
 export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state && state.url.indexOf('creative/list') > -1);
-export const selectCreativesOrderedByCreatedAt = createSelector(selectAllCreatives, states =>
+export const selectCreativeListCurrentPage = createSelector(selectCreativeParams, params => params && params.page);
+export const selectCreativeListPageOrderedByCreatedAt = createSelector(selectAllCreatives, selectCreativeListCurrentPage, (states, page) =>
   states
     // filter out any 'new' temp creatives on the state
-    .filter(state => state && state.creative && state.creative.createdAt)
+    .filter(state => state && state.creative && state.creative.createdAt && state.page === page)
     .map(state => state.creative)
     .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
 );

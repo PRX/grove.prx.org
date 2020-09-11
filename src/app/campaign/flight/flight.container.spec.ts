@@ -45,10 +45,9 @@ import { CreativeCardComponent } from '../creative/creative-card.component';
 import { TestComponent } from '../../../testing/test.component';
 import * as moment from 'moment';
 
-const flightChildRoutes: Routes = [{ path: 'creative/:creativeId', component: TestComponent }];
 const campaignChildRoutes: Routes = [
   { path: '', component: TestComponent },
-  { path: 'flight/:flightId', component: FlightContainerComponent, children: flightChildRoutes }
+  { path: 'flight/:flightId', component: FlightContainerComponent }
 ];
 const campaignRoutes: Routes = [
   {

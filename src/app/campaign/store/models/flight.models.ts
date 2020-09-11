@@ -6,7 +6,7 @@ import { Creative } from './creative.models';
 export interface FlightZone {
   id: string;
   label?: string;
-  creativeFlightZones?: { creative?: Creative; weight?: number; disabled?: boolean }[];
+  creativeFlightZones?: { creativeId?: number | string; weight?: number; disabled?: boolean }[];
 }
 export interface FlightTarget {
   type: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { Observable, forkJoin } from 'rxjs';
+import { mergeMap, map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
 import { Creative } from '../../campaign/store/models';
@@ -18,13 +18,24 @@ export class CreativeService {
     per?: number;
     text?: string;
     sorts?: string;
-    direction?: 'desc' | 'asc' | '';
-  }): Observable<HalDoc[]> {
-    return this.augury.followItems('prx:creatives', {
-      ...params,
-      sorts: `${params.sorts}:${params.direction}`,
-      ...(params.text && { filters: `text:${params.text}` })
-    });
+    direction?: string;
+  }): Observable<{ creativeDoc: HalDoc; advertiserDoc: HalDoc }[]> {
+    return this.augury
+      .followItems('prx:creatives', {
+        ...params,
+        zoom: 'prx:advertiser',
+        sorts: `${params.sorts}:${params.direction}`,
+        ...(params.text && { filters: `text:${params.text}` })
+      })
+      .pipe(
+        mergeMap((creativeDocs: HalDoc[]) =>
+          forkJoin(
+            creativeDocs.map(creativeDoc =>
+              creativeDoc.follow('prx:advertiser').pipe(map(advertiserDoc => ({ creativeDoc, advertiserDoc })))
+            )
+          )
+        )
+      );
   }
 
   updateCreative(doc: HalDoc, creative: Creative): Observable<HalDoc> {
