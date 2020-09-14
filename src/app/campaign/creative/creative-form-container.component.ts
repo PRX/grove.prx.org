@@ -8,7 +8,7 @@ import {
   selectRoutedCreative,
   selectAllAccounts,
   selectAllAdvertisersOrderByName,
-  selectCampaignId,
+  selectRoutedCampaignId,
   selectRoutedFlightId,
   selectRoutedFlightZoneId
 } from '../store/selectors';
@@ -53,7 +53,7 @@ export class CreativeFormContainerComponent implements OnInit, OnDestroy {
     this.creativeState$ = this.store.pipe(select(selectRoutedCreative));
     this.accounts$ = this.store.pipe(select(selectAllAccounts));
     this.advertisers$ = this.store.pipe(select(selectAllAdvertisersOrderByName));
-    this.campaignId$ = this.store.pipe(select(selectCampaignId));
+    this.campaignId$ = this.store.pipe(select(selectRoutedCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
     this.zoneId$ = this.store.pipe(select(selectRoutedFlightZoneId));
 

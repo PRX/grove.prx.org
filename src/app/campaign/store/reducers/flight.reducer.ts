@@ -141,7 +141,7 @@ const _reducer = createReducer(
   }),
   on(campaignActions.CampaignFlightZoneAddCreative, (state, action) => {
     const { flightId, zoneId, creativeId } = action;
-    const localFlight = state.entities[flightId].localFlight;
+    const localFlight = state.entities[flightId] && state.entities[flightId].localFlight;
     const zones =
       localFlight &&
       localFlight.zones.map(zone =>
@@ -152,7 +152,7 @@ const _reducer = createReducer(
             }
           : zone
       );
-    return adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state);
+    return localFlight ? adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state) : state;
   })
 );
 

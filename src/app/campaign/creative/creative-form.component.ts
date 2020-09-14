@@ -89,7 +89,7 @@ export class CreativeFormComponent implements OnInit, OnDestroy {
     this.urlSubscription = this.creativeForm.get('url').valueChanges.subscribe(url => {
       const creativeControl = this.creativeForm.get('filename');
       // if the creative has not yet been created and filename has no value or is untouched, fill it with url
-      if (!this.creative.createdAt && (!creativeControl.value || creativeControl.untouched)) {
+      if (this.creative && !this.creative.createdAt && (!creativeControl.value || creativeControl.untouched)) {
         creativeControl.setValue(url, { emitEvent: false });
       }
     });

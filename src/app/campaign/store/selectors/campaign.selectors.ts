@@ -1,11 +1,17 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
 import { Campaign, CampaignState } from '../models';
+import { selectRouterStateParams } from '../../../store/router-store/router.selectors';
 import { HalDoc } from 'ngx-prx-styleguide';
 
 export const selectCampaignStoreState = createFeatureSelector('campaignState');
 export const selectCampaign = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.campaign);
 
+export const selectRoutedCampaignId = createSelector(
+  selectCampaign,
+  selectRouterStateParams,
+  (state: CampaignState, params): number | string => (params && +params.id) || 'new'
+);
 export const selectCampaignId = createSelector(
   selectCampaign,
   (state: CampaignState): number | string => (state && state.remoteCampaign && state.remoteCampaign.id) || 'new'

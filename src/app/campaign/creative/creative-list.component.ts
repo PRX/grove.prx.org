@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { Creative, CreativeParams } from '../store/models';
 import {
   selectCreativeListPageOrderedByCreatedAt,
-  selectCampaignId,
+  selectRoutedCampaignId,
   selectRoutedFlightId,
   selectRoutedFlightZoneId,
   selectCreativeParams,
@@ -66,6 +66,16 @@ export class CreativeListComponent implements OnInit, OnDestroy {
   creativeTotal$: Observable<number>;
   searchStream = new Subject<string>();
   searchSubcription: Subscription;
+  searchOutput$ = this.searchStream.pipe(
+    // binding the input to what the user has typed rather than what gets thru
+    // tap(value => this._inputValue = value),
+    // value must be > 2 chars or empty for clearing search
+    filter(value => value.length > 2 || value === ''),
+    // are they done typing?
+    debounceTime(300),
+    // only if changed
+    distinctUntilChanged()
+  );
 
   constructor(private store: Store<any>, private router: Router) {}
 
@@ -73,23 +83,14 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     this.creativeParams$ = this.store.pipe(select(selectCreativeParams));
     this.creativeList$ = this.store.pipe(select(selectCreativeListPageOrderedByCreatedAt));
     this.creativeTotal$ = this.store.pipe(select(selectCreativeTotal));
-    this.campaignId$ = this.store.pipe(select(selectCampaignId));
+    this.campaignId$ = this.store.pipe(select(selectRoutedCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
     this.zoneId$ = this.store.pipe(select(selectRoutedFlightZoneId));
     this.store.dispatch(creativeActions.CreativeLoadList({}));
 
-    this.searchSubcription = this.searchStream
-      .pipe(
-        // binding the input to what the user has typed rather than what gets thru
-        // tap(value => this._inputValue = value),
-        // value must be > 2 chars or empty for clearing search
-        filter(value => value.length > 2 || value === ''),
-        // are they done typing?
-        debounceTime(300),
-        // only if changed
-        distinctUntilChanged()
-      )
-      .subscribe(text => this.store.dispatch(creativeActions.CreativeLoadList({ params: { text } })));
+    this.searchSubcription = this.searchOutput$.subscribe(text =>
+      this.store.dispatch(creativeActions.CreativeLoadList({ params: { text } }))
+    );
   }
 
   ngOnDestroy() {
