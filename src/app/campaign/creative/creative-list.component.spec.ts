@@ -108,10 +108,11 @@ describe('CreativeListComponent', () => {
     comp.onSearch('abcdefghi');
   });
 
-  it('dispatches action to add flight zone creative', () => {
-    comp.onAdd(1);
+  it('dispatches action to add flight zone creatives', () => {
+    comp.selectedCreativeIds = { 1: [1, 2], 2: [3, 4] };
+    comp.onSave();
     expect(store.dispatch).toHaveBeenCalledWith(
-      campaignActions.CampaignFlightZoneAddCreative({ flightId: 1, zoneId: 'pre_1', creativeId: 1 })
+      campaignActions.CampaignFlightZoneAddCreatives({ flightId: 1, zoneId: 'pre_1', creativeIds: [1, 2, 3, 4] })
     );
   });
 

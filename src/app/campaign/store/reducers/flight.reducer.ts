@@ -140,16 +140,17 @@ const _reducer = createReducer(
       state
     );
   }),
-  on(campaignActions.CampaignFlightZoneAddCreative, (state, action) => {
-    const { flightId, zoneId, creativeId } = action;
+  on(campaignActions.CampaignFlightZoneAddCreatives, (state, action) => {
+    const { flightId, zoneId, creativeIds } = action;
     const localFlight = state.entities[flightId] && state.entities[flightId].localFlight;
+    const creativeFlightZones = creativeIds.map(creativeId => ({ creativeId }));
     const zones =
       localFlight &&
       localFlight.zones.map(zone =>
         zone.id === zoneId
           ? {
               ...zone,
-              creativeFlightZones: zone.creativeFlightZones ? [...zone.creativeFlightZones, { creativeId }] : [{ creativeId }]
+              creativeFlightZones: zone.creativeFlightZones ? [...zone.creativeFlightZones, ...creativeFlightZones] : creativeFlightZones
             }
           : zone
       );

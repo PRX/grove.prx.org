@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatSelectionListChange } from '@angular/material';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter, tap } from 'rxjs/operators';
+import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { Creative, CreativeParams } from '../store/models';
 import {
   selectCreativeListPageOrderedByCreatedAt,
@@ -24,18 +25,19 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         <button mat-button aria-label="cancel" (click)="onCancel()"><mat-icon>clear</mat-icon></button>
       </mat-toolbar-row>
     </mat-toolbar>
-    <section>
+    <section *ngIf="creativeParams$ | async as params">
       <h3>Filter Creatives</h3>
       <mat-form-field appearance="outline">
         <input matInput type="text" placeholder="Search by filename" (keyup)="onSearch($event.target.value)" />
       </mat-form-field>
       <h3>Add Creative</h3>
-      <mat-selection-list (selectionChange)="onAdd($event.option.value)" multiple="">
+      <mat-selection-list (selectionChange)="onSelectCreatives($event)" multiple="true">
         <mat-list-option
           *ngFor="let creative of creativeList$ | async"
           checkboxPosition="before"
           [value]="creative.id"
           [title]="creative.filename"
+          [selected]="selectedCreativeIds[params.page] && selectedCreativeIds[params.page].indexOf(creative.id) > -1"
         >
           <h4 matLine>{{ creative.filename }}</h4>
           <p matLine>
@@ -45,13 +47,16 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         </mat-list-option>
       </mat-selection-list>
       <mat-paginator
-        *ngIf="creativeParams$ | async as params"
         [length]="creativeTotal$ | async"
         [pageIndex]="params.page - 1"
         [pageSize]="params.per"
         [pageSizeOptions]="[5, 10, 20]"
         (page)="onPage({ page: $event.pageIndex + 1, per: $event.pageSize })"
       ></mat-paginator>
+      <div class="form-submit">
+        <button mat-button (click)="onSave()">Use Selected</button>
+        <button mat-button color="primary" (click)="onCancel()">Cancel</button>
+      </div>
     </section>
   `,
   styleUrls: ['./creative-list.component.scss'],
@@ -76,6 +81,7 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     // only if changed
     distinctUntilChanged()
   );
+  selectedCreativeIds: { [page: number]: number[] } = {};
 
   constructor(private store: Store<any>, private router: Router) {}
 
@@ -86,7 +92,7 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     this.campaignId$ = this.store.pipe(select(selectRoutedCampaignId));
     this.flightId$ = this.store.pipe(select(selectRoutedFlightId));
     this.zoneId$ = this.store.pipe(select(selectRoutedFlightZoneId));
-    this.store.dispatch(creativeActions.CreativeLoadList({}));
+    this.store.dispatch(creativeActions.CreativeLoadList({ params: { page: 1 } }));
 
     this.searchSubcription = this.searchOutput$.subscribe(text =>
       this.store.dispatch(creativeActions.CreativeLoadList({ params: { text } }))
@@ -107,10 +113,19 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     this.store.dispatch(creativeActions.CreativeLoadList({ params: { page, per } }));
   }
 
-  onAdd(creativeId: number) {
+  onSave() {
     this.campaignId$.pipe(withLatestFrom(this.flightId$, this.zoneId$), first()).subscribe(([campaignId, flightId, zoneId]) => {
       this.router.navigate(['/campaign', campaignId, 'flight', flightId]);
-      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId }));
+      const creativeIds = Object.keys(this.selectedCreativeIds)
+        .map(page => this.selectedCreativeIds[page])
+        .reduce((acc, val) => acc.concat(val), []);
+      this.store.dispatch(campaignActions.CampaignFlightZoneAddCreatives({ flightId, zoneId, creativeIds }));
+    });
+  }
+
+  onSelectCreatives(event: MatSelectionListChange) {
+    this.creativeParams$.pipe(first()).subscribe(params => {
+      this.selectedCreativeIds[params.page || 1] = event.source.selectedOptions.selected.map(option => option.value);
     });
   }
 

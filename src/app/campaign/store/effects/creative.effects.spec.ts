@@ -90,7 +90,11 @@ describe('CreativeEffects', () => {
   it('should create a new creative and add it to the flight', () => {
     const createAction = creativeActions.CreativeCreate({ campaignId: 1, flightId: 1, zoneId: 'pre_1', creative: creativesFixture[0] });
     const createSuccess = creativeActions.CreativeCreateSuccess({ campaignId: 1, flightId: 1, zoneId: 'pre_1', creativeDoc: docs[0] });
-    const addCreative = campaignActions.CampaignFlightZoneAddCreative({ flightId: 1, zoneId: 'pre_1', creativeId: creativesFixture[0].id });
+    const addCreative = campaignActions.CampaignFlightZoneAddCreatives({
+      flightId: 1,
+      zoneId: 'pre_1',
+      creativeIds: [creativesFixture[0].id]
+    });
     actions$.stream = hot('-a', { a: createAction });
     const expected = cold('-(bc)', { b: createSuccess, c: addCreative });
     expect(effects.creativeCreate$).toBeObservable(expected);

@@ -47,3 +47,23 @@ h4 {
 mat-paginator {
   background-color: transparent;
 }
+.form-submit {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+
+  button:first-child {
+    color: white;
+    background-color: mat-color($prx-primary, 500);
+
+    &:hover,
+    &:focus {
+      background-color: mat-color($prx-primary, 600);
+    }
+
+    &[disabled] {
+      background-color: mat-color($prx-gray, 500);
+    }
+  }
+}

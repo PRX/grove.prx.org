@@ -43,7 +43,7 @@ export class CreativeEffects {
               // save creative success and save creative to flight
               return [
                 creativeActions.CreativeCreateSuccess({ campaignId, flightId, zoneId, creativeDoc }),
-                campaignActions.CampaignFlightZoneAddCreative({ flightId, zoneId, creativeId: creativeDoc.id })
+                campaignActions.CampaignFlightZoneAddCreatives({ flightId, zoneId, creativeIds: [creativeDoc.id] })
               ];
             }),
             tap(_ => {

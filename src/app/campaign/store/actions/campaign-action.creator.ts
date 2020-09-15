@@ -114,9 +114,9 @@ export const CampaignFlightFormUpdate = createAction(
   props<{ flight: Flight; changed: boolean; valid: boolean }>()
 );
 
-export const CampaignFlightZoneAddCreative = createAction(
+export const CampaignFlightZoneAddCreatives = createAction(
   ActionTypes.CAMPAIGN_FLIGHT_ZONE_ADD_CREATIVE,
-  props<{ flightId: number; zoneId?: string; creativeId: number }>()
+  props<{ flightId: number; zoneId?: string; creativeIds: number[] }>()
 );
 
 const all = union({
@@ -140,6 +140,6 @@ const all = union({
   CampaignAddFlight,
   CampaignDupFlight,
   CampaignDeleteFlight,
-  CampaignFlightZoneAddCreative
+  CampaignFlightZoneAddCreatives
 });
 export type CampaignActions = typeof all;
