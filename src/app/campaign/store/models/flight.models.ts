@@ -18,6 +18,7 @@ export interface FlightTarget {
 export interface Flight {
   id?: number;
   name: string;
+  status: string;
   startAt: Moment;
   endAt: Moment;
   endAtFudged?: Moment;
@@ -78,7 +79,8 @@ export const duplicateFlightState = (flight: Flight, tempId: number, changed: bo
     localFlight: {
       ...dupFlight,
       id: tempId,
-      name: `Copy of ${name}`
+      name: `Copy of ${name}`,
+      status: 'draft'
     } as Flight,
     changed,
     valid

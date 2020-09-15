@@ -11,21 +11,15 @@
       [formGroup]="campaignForm"
       controlName="set_advertiser_uri"
       label="Advertiser"
-      [options]="{options: advertisers, name: 'name', value: 'set_advertiser_uri'} | optionsTransform"
-      (addOption)="onAddAdvertiser($event)">
+      [options]="{ options: advertisers, name: 'name', value: 'set_advertiser_uri' } | optionsTransform"
+      (addOption)="onAddAdvertiser($event)"
+    >
     </grove-autocomplete>
 
     <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Campaign Type</mat-label>
       <mat-select formControlName="type" required>
         <mat-option *ngFor="let type of typeOptions" [value]="type.value">{{ type.name }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field class="campaign-form-field" appearance="outline">
-      <mat-label>Campaign Status</mat-label>
-      <mat-select formControlName="status" required>
-        <mat-option *ngFor="let status of statusOptions" [value]="status.value">{{ status.name }}</mat-option>
       </mat-select>
     </mat-form-field>
 

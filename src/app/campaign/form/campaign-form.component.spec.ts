@@ -31,7 +31,6 @@ describe('CampaignFormComponent', () => {
     campaignFixture = {
       name: 'my campaign name',
       type: 'paid',
-      status: 'draft',
       repName: 'my rep name',
       notes: 'my notes',
       set_account_uri: '/some/account',

@@ -44,6 +44,7 @@ import * as moment from 'moment';
 
 const flightFixture: Flight = {
   name: 'my-flight',
+  status: 'approved',
   startAt: moment.utc(),
   endAt: moment.utc(),
   endAtFudged: moment.utc().subtract(1, 'days'),
