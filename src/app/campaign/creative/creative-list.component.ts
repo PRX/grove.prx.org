@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { MatSelectionListChange } from '@angular/material';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { first, withLatestFrom, debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { Creative, CreativeParams } from '../store/models';
 import {
   selectCreativeListPageOrderedByCreatedAt,
@@ -25,7 +25,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         <button mat-button aria-label="cancel" (click)="onCancel()"><mat-icon>clear</mat-icon></button>
       </mat-toolbar-row>
     </mat-toolbar>
-    <section *ngIf="creativeParams$ | async as params">
+    <section>
       <h3>Filter Creatives</h3>
       <mat-form-field appearance="outline">
         <input matInput type="text" placeholder="Search by filename" (keyup)="onSearch($event.target.value)" />
@@ -37,7 +37,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
           checkboxPosition="before"
           [value]="creative.id"
           [title]="creative.filename"
-          [selected]="selectedCreativeIds[params.page] && selectedCreativeIds[params.page].indexOf(creative.id) > -1"
+          [selected]="isCreativeSelected(creative.id) | async"
         >
           <h4 matLine>{{ creative.filename }}</h4>
           <p matLine>
@@ -47,6 +47,7 @@ import * as creativeActions from '../store/actions/creative-action.creator';
         </mat-list-option>
       </mat-selection-list>
       <mat-paginator
+        *ngIf="creativeParams$ | async as params"
         [length]="creativeTotal$ | async"
         [pageIndex]="params.page - 1"
         [pageSize]="params.per"
@@ -127,6 +128,12 @@ export class CreativeListComponent implements OnInit, OnDestroy {
     this.creativeParams$.pipe(first()).subscribe(params => {
       this.selectedCreativeIds[params.page || 1] = event.source.selectedOptions.selected.map(option => option.value);
     });
+  }
+
+  isCreativeSelected(creativeId: number): Observable<boolean> {
+    return this.creativeParams$.pipe(
+      map(params => this.selectedCreativeIds[params.page] && this.selectedCreativeIds[params.page].indexOf(creativeId) > -1)
+    );
   }
 
   onCancel() {
