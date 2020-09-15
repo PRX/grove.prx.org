@@ -73,8 +73,6 @@ export class CreativeListComponent implements OnInit, OnDestroy {
   searchStream = new Subject<string>();
   searchSubcription: Subscription;
   searchOutput$ = this.searchStream.pipe(
-    // binding the input to what the user has typed rather than what gets thru
-    // tap(value => this._inputValue = value),
     // value must be > 2 chars or empty for clearing search
     filter(value => value.length > 2 || value === ''),
     // are they done typing?
