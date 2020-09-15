@@ -123,7 +123,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
   buildCreativeFormGroup(zoneCreative): FormGroup {
     return new FormGroup({
       creativeId: new FormControl(zoneCreative.creative && zoneCreative.creativeId),
-      weight: new FormControl(zoneCreative.weight, [Validators.required, Validators.min(1), Validators.pattern(/[0-9]+/)]),
+      weight: new FormControl(zoneCreative.weight, [Validators.required, Validators.min(1), Validators.pattern(/^[0-9]+$/)]),
       enabled: new FormControl(!zoneCreative.disabled)
     });
   }
