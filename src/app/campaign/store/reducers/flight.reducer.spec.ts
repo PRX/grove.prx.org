@@ -106,7 +106,7 @@ describe('Flight Reducer', () => {
       initialState,
       campaignActions.CampaignDupFlight({ campaignId: campaignFixture.id, flightId: Date.now(), flight: flightFixture })
     );
-    const dupFlight = selectAll(result).find(flight => flight.localFlight.name.indexOf('(Copy)') > -1);
+    const dupFlight = selectAll(result).find(flight => flight.localFlight.name.indexOf('Copy of') > -1);
     expect(dupFlight.localFlight.zones).toBe(flightFixture.zones);
   });
 
