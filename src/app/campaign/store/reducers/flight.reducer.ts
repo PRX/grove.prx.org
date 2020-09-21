@@ -68,7 +68,7 @@ const _reducer = createReducer(
   }),
   on(campaignActions.CampaignDupFlight, (state, action) => {
     const { flight, flightId } = action;
-    return adapter.addOne(duplicateFlightState({ ...flight, name: `${flight.name} (Copy)` }, flightId, true, true), state);
+    return adapter.addOne(duplicateFlightState({ ...flight, name: `${flight.name}` }, flightId, true, true), state);
   }),
   on(campaignActions.CampaignDeleteFlight, (state, action) => {
     const { id, softDeleted } = action;
