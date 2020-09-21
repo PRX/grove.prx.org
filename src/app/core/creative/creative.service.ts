@@ -25,7 +25,7 @@ export class CreativeService {
         ...params,
         zoom: 'prx:advertiser',
         sorts: `${params.sorts}:${params.direction}`,
-        ...(params.text && { filters: `text:${params.text}` })
+        ...(params.text && { filters: `text=${params.text}` })
       })
       .pipe(
         mergeMap((creativeDocs: HalDoc[]) =>
