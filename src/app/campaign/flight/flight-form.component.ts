@@ -42,7 +42,9 @@ export class FlightFormComponent implements OnInit {
     { name: 'Sold', value: 'sold' },
     { name: 'Approved', value: 'approved' },
     { name: 'Paused', value: 'paused' },
-    { name: 'Canceled', value: 'canceled' }
+    { name: 'Canceled', value: 'canceled' },
+    { name: 'Completed', value: 'completed' },
+    { name: 'Unfulfilled', value: 'unfulfilled' }
   ];
 
   ngOnInit() {
