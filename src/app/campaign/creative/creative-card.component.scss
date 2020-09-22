@@ -1,0 +1,32 @@
+@import '~src/sass/variables';
+
+:host {
+  border: 1px solid prx-theme-foreground(divider);
+  border-radius: 5px;
+  padding: 10px;
+
+  ::ng-deep {
+    .mat-form-field-infix {
+      width: initial;
+    }
+  }
+}
+
+h3 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.creative {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  margin: 5px 0;
+}
+
+mat-form-field {
+  margin-top: 5px;
+}

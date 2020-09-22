@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 import {
   MatCardModule,
   MatFormFieldModule,
@@ -25,11 +26,14 @@ import {
 } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { reducers } from '../store';
 import { FlightFormComponent } from './flight-form.component';
 import { FlightTargetsFormComponent } from './flight-targets-form.component';
 import { FlightZonesFormComponent } from './flight-zones-form.component';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { Flight, Inventory } from '../store/models';
 import * as moment from 'moment';
 
@@ -107,6 +111,7 @@ describe('FlightFormComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule.withRoutes([]),
         ReactiveFormsModule,
         NoopAnimationsModule,
         MatCardModule,
@@ -120,16 +125,20 @@ describe('FlightFormComponent', () => {
         MatButtonModule,
         MatIconModule,
         MatSlideToggleModule,
-        MatMenuModule
+        MatMenuModule,
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
       ],
-      declarations: [
-        ParentFormComponent,
-        FlightFormComponent,
-        FlightTargetsFormComponent,
-        FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent
-      ],
+      declarations: [ParentFormComponent, FlightFormComponent, FlightTargetsFormComponent, FlightZonesFormComponent, CreativeCardComponent],
       providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },
         { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },

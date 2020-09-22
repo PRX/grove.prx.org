@@ -1,0 +1,12 @@
+@import '~src/sass/variables';
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+grove-pingback + grove-pingback {
+  border-top: 1px dashed prx-theme-foreground(divider);
+  padding-top: 10px;
+  margin-top: 5px;
+}

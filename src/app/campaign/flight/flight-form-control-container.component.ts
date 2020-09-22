@@ -24,7 +24,6 @@ import { utc } from 'moment';
         [targetOptionsMap]="targetOptionsMap"
         [flight]="flight"
         [softDeleted]="softDeleted"
-        [campaignId]="campaignId"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
         (flightDuplicate)="flightDuplicate.emit($event)"
       ></grove-flight-form>
@@ -53,7 +52,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() isLoading: boolean;
   @Input() previewError: any;
   @Input() flightActualsDateBoundaries: { startAt: Date; endAt: Date };
-  @Input() campaignId: number;
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);

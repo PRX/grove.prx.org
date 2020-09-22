@@ -12,6 +12,8 @@ export interface State extends EntityState<FlightState> {
 
 export const adapter: EntityAdapter<FlightState> = createEntityAdapter<FlightState>({ selectId: getFlightId });
 
+export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();
+
 export const initialState: State = adapter.getInitialState({});
 
 // tslint:disable-next-line: variable-name
@@ -137,11 +139,25 @@ const _reducer = createReducer(
       { id: flight.id, changes: { localFlight: { ...localFlight, allocationStatus, allocationStatusMessage } } },
       state
     );
+  }),
+  on(campaignActions.CampaignFlightZoneAddCreatives, (state, action) => {
+    const { flightId, zoneId, creativeIds } = action;
+    const localFlight = state.entities[flightId] && state.entities[flightId].localFlight;
+    const creativeFlightZones = creativeIds.map(creativeId => ({ creativeId }));
+    const zones =
+      localFlight &&
+      localFlight.zones.map(zone =>
+        zone.id === zoneId
+          ? {
+              ...zone,
+              creativeFlightZones: zone.creativeFlightZones ? [...zone.creativeFlightZones, ...creativeFlightZones] : creativeFlightZones
+            }
+          : zone
+      );
+    return localFlight ? adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state) : state;
   })
 );
 
 export function reducer(state, action) {
   return _reducer(state, action);
 }
-
-export const { selectIds, selectEntities, selectAll, selectTotal } = adapter.getSelectors();

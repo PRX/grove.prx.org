@@ -12,16 +12,25 @@ import { FlightFormControlContainerComponent } from './flight/flight-form-contro
 import { FlightFormComponent } from './flight/flight-form.component';
 import { FlightTargetsFormComponent } from './flight/flight-targets-form.component';
 import { FlightZonesFormComponent } from './flight/flight-zones-form.component';
-import { FlightZonePingbacksFormComponent } from './flight/pingbacks/flight-zone-pingbacks-form.component';
-import { PingbackFormComponent } from './flight/pingbacks/pingback-form.component';
+import { CreativePingbacksFormComponent } from './creative/pingbacks/creative-pingbacks-form.component';
+import { PingbackFormComponent } from './creative/pingbacks/pingback-form.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { InventoryTableComponent } from './inventory/inventory-table.component';
 import { GoalFormComponent } from './inventory/goal-form.component';
 import { CampaignReportComponent } from './report/campaign-report.component';
+import { CreativeFormContainerComponent } from './creative/creative-form-container.component';
+import { CreativeFormComponent } from './creative/creative-form.component';
+import { CreativeListComponent } from './creative/creative-list.component';
+import { CreativeCardComponent } from './creative/creative-card.component';
+
+const flightChildRoutes: Routes = [
+  { path: 'zone/:zoneId/creative/list', component: CreativeListComponent },
+  { path: 'zone/:zoneId/creative/:creativeId', component: CreativeFormContainerComponent }
+];
 
 const campaignChildRoutes: Routes = [
   { path: '', component: CampaignFormContainerComponent },
-  { path: 'flight/:flightId', component: FlightContainerComponent }
+  { path: 'flight/:flightId', component: FlightContainerComponent, children: flightChildRoutes }
 ];
 
 export const campaignRoutes: Routes = [
@@ -52,12 +61,16 @@ export const campaignComponents: any[] = [
   FlightFormComponent,
   FlightTargetsFormComponent,
   FlightZonesFormComponent,
-  FlightZonePingbacksFormComponent,
+  CreativePingbacksFormComponent,
   PingbackFormComponent,
   InventoryComponent,
   InventoryTableComponent,
   GoalFormComponent,
-  CampaignReportComponent
+  CampaignReportComponent,
+  CreativeFormContainerComponent,
+  CreativeFormComponent,
+  CreativeListComponent,
+  CreativeCardComponent
 ];
 
 export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);

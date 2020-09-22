@@ -3,7 +3,7 @@
 
 .inline-fields {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr 40px;
+  grid-template-columns: 1fr 40px;
   grid-column-gap: 0.5rem;
   align-items: center;
 }
@@ -18,16 +18,17 @@
 }
 
 .zone + .zone {
-  border-top: 1px dashed mat-color($prx-gray, 300);
+  border-top: 1px dashed prx-theme-foreground(divider);
   padding-top: 20px;
 }
 
-.toggle-pingbacks {
-  text-align: left;
-  text-transform: uppercase;
+.flight-zone-creatives {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-rows: 1fr;
+  grid-gap: 20px;
 }
 
-grove-flight-zone-pingbacks {
-  display: block;
-  margin-left: 40px;
+.add-creative {
+  margin: 5px 0;
 }

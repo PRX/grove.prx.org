@@ -1,8 +1,10 @@
+import { Dictionary } from '@ngrx/entity';
 import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
+import { selectCreativeEntities } from './creative.selectors';
 import { selectRouterStateParams } from '../../../store/router-store/router.selectors';
-import { Flight, FlightState } from '../models';
+import { Flight, FlightState, CreativeState } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/flight.reducer';
 import { HalDoc } from 'ngx-prx-styleguide';
 
@@ -25,6 +27,28 @@ export const selectRoutedFlight = createSelector(
 export const selectRoutedLocalFlight = createSelector(
   selectRoutedFlight,
   (flightState: FlightState): Flight => flightState && flightState.localFlight
+);
+export const selectRoutedLocalFlightWithCreatives = createSelector(
+  selectRoutedFlight,
+  selectCreativeEntities,
+  (flightState: FlightState, creativeEntities: Dictionary<CreativeState>): Flight =>
+    flightState &&
+    flightState.localFlight && {
+      ...flightState.localFlight,
+      zones: flightState.localFlight.zones.map(zone => ({
+        ...zone,
+        ...(zone.creativeFlightZones && {
+          creativeFlightZones:
+            zone.creativeFlightZones &&
+            zone.creativeFlightZones.map(creative => ({
+              ...creative,
+              ...(creativeEntities &&
+                creative.creativeId &&
+                creativeEntities[creative.creativeId] && { creative: creativeEntities[creative.creativeId].creative })
+            }))
+        })
+      }))
+    }
 );
 export const selectRoutedLocalFlightZones = createSelector(
   selectRoutedLocalFlight,

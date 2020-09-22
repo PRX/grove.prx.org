@@ -1,0 +1,32 @@
+@import '~src/sass/variables';
+@import '~src/sass/colors';
+
+form {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+}
+mat-form-field,
+grove-creative-pingbacks {
+  width: 100%;
+}
+.form-submit {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+
+  button:first-child {
+    color: white;
+    background-color: mat-color($prx-primary, 500);
+
+    &:hover,
+    &:focus {
+      background-color: mat-color($prx-primary, 600);
+    }
+
+    &[disabled] {
+      background-color: mat-color($prx-gray, 500);
+    }
+  }
+}

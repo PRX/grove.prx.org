@@ -58,7 +58,7 @@ describe('Flight Reducer', () => {
     expect(result.entities[flightFixture.id].localFlight.contractEndAt).toBeNull();
     expect(result.entities[flightFixture.id].localFlight.contractEndAtFudged).toBeNull();
     expect(result.entities[flightFixture.id].localFlight.contractStartAt).toBeNull();
-    expect(result.entities[flightFixture.id].localFlight.zones[0].hasOwnProperty('url')).toBeTruthy();
+    expect(result.entities[flightFixture.id].localFlight.zones[0].hasOwnProperty('creativeFlightZones')).toBeTruthy();
   });
 
   it('should create a new flight', () => {

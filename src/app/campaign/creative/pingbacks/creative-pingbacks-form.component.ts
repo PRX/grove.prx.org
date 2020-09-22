@@ -2,41 +2,40 @@ import { Component, Input, forwardRef, OnDestroy, ChangeDetectionStrategy } from
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, FormControl, FormArray } from '@angular/forms';
 
 @Component({
-  selector: 'grove-flight-zone-pingbacks',
+  selector: 'grove-creative-pingbacks',
   template: `
     <fieldset>
-      <div *ngFor="let pb of formArray.controls; let i = index" class="inline-fields">
-        <grove-pingback [formControl]="pb" [campaignId]="campaignId" [flightId]="flightId" [creative]="creative"></grove-pingback>
-        <div *ngIf="formArray.controls.length > 1" class="remove-pingback mat-form-field-wrapper">
-          <button mat-icon-button aria-label="Remove pingback" (click)="onRemovePingback(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
+      <div *ngIf="formArray.controls.length" class="heading">
+        <h3>Pingbacks</h3>
+        <a href="https://github.com/PRX/analytics-ingest-lambda#uri-templates" target="_blank" rel="noopener noreferrer">
+          URI syntax help
+        </a>
       </div>
-      <div class="inline-fields">
-        <div class="button-row">
-          <button mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
-          <a href="https://github.com/PRX/analytics-ingest-lambda#uri-templates" target="_blank" rel="noopener noreferrer">
-            URI syntax help
-          </a>
-        </div>
-      </div>
+      <grove-pingback
+        *ngFor="let pb of formArray.controls; let i = index"
+        [formControl]="pb"
+        [campaignId]="campaignId"
+        [flightId]="flightId"
+        [creative]="creative"
+        (removePingback)="onRemovePingback(i)"
+      ></grove-pingback>
+      <button type="button" mat-button color="primary" (click)="onAddPingback()"><mat-icon>add</mat-icon> Add a pingback</button>
     </fieldset>
   `,
-  styleUrls: ['./flight-zone-pingbacks-form.component.scss'],
+  styleUrls: ['./creative-pingbacks-form.component.scss'],
   providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FlightZonePingbacksFormComponent), multi: true },
-    { provide: NG_VALIDATORS, useExisting: FlightZonePingbacksFormComponent, multi: true }
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CreativePingbacksFormComponent), multi: true },
+    { provide: NG_VALIDATORS, useExisting: CreativePingbacksFormComponent, multi: true }
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FlightZonePingbacksFormComponent implements ControlValueAccessor, OnDestroy {
+export class CreativePingbacksFormComponent implements ControlValueAccessor, OnDestroy {
   @Input() campaignId: string | number;
   @Input() flightId: number;
   @Input() creative: string;
-  formArray = new FormArray([].map(this.flightPingbackFormControl));
+  formArray = new FormArray([].map(this.pingbackFormControl));
   valueChangesSub = this.formArray.valueChanges.subscribe(pingbacks => {
-    if (this.formArray.valid && !this.emitGuard) {
+    if (!this.emitGuard) {
       this.onChangeFn(pingbacks);
     }
   });
@@ -50,7 +49,7 @@ export class FlightZonePingbacksFormComponent implements ControlValueAccessor, O
     }
   }
 
-  flightPingbackFormControl(pingback = ''): FormControl {
+  pingbackFormControl(pingback = ''): FormControl {
     return new FormControl(pingback);
   }
 
@@ -67,7 +66,7 @@ export class FlightZonePingbacksFormComponent implements ControlValueAccessor, O
     const addPingbacks = [...pingbacks];
     while (this.formArray.controls.length < expectedLength) {
       // this only adds controls, doesnt reset controls already in form
-      this.formArray.push(this.flightPingbackFormControl(pingbacks && addPingbacks.pop()));
+      this.formArray.push(this.pingbackFormControl(pingbacks && addPingbacks.pop()));
       this.formArray.markAsPristine();
     }
     this.formArray.patchValue(pingbacks, { emitEvent: false, onlySelf: true });

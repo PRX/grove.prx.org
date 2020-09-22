@@ -16,7 +16,8 @@ import {
   MatProgressSpinnerModule,
   MatSlideToggleModule,
   MatCheckboxModule,
-  MatMenuModule
+  MatMenuModule,
+  MatSidenavModule
 } from '@angular/material';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, Routes } from '@angular/router';
@@ -40,13 +41,12 @@ import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { TestComponent } from '../../../testing/test.component';
 import * as moment from 'moment';
 
 const campaignChildRoutes: Routes = [
-  { path: '', component: FlightContainerComponent },
+  { path: '', component: TestComponent },
   { path: 'flight/:flightId', component: FlightContainerComponent }
 ];
 const campaignRoutes: Routes = [
@@ -106,6 +106,7 @@ describe('FlightContainerComponent', () => {
         MatSlideToggleModule,
         MatCheckboxModule,
         MatMenuModule,
+        MatSidenavModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {
@@ -124,11 +125,10 @@ describe('FlightContainerComponent', () => {
         FlightFormComponent,
         FlightTargetsFormComponent,
         FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent,
         InventoryComponent,
         InventoryTableComponent,
         GoalFormComponent,
+        CreativeCardComponent,
         TestComponent
       ],
       providers: [

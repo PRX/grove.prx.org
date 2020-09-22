@@ -5,31 +5,31 @@ import { MatFormFieldModule, MatSelectModule, MatInputModule, MatButtonModule, M
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PingbackFormComponent } from './pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './flight-zone-pingbacks-form.component';
+import { CreativePingbacksFormComponent } from './creative-pingbacks-form.component';
 
 @Component({
   template: `
     <form [formGroup]="form">
-      <grove-flight-zone-pingbacks
+      <grove-creative-pingbacks
         #childForm
         formControlName="pingbacks"
         [campaignId]="campaignId"
         [flightId]="flightId"
         [creative]="creative"
       >
-      </grove-flight-zone-pingbacks>
+      </grove-creative-pingbacks>
     </form>
   `
 })
 class ParentFormComponent {
-  @ViewChild('childForm', { static: true }) childForm: FlightZonePingbacksFormComponent;
+  @ViewChild('childForm', { static: true }) childForm: CreativePingbacksFormComponent;
   constructor(private fb: FormBuilder) {}
   form = this.fb.group({ pingbacks: '' });
 }
 
 describe('FlightZonePingbacksFormComponent', () => {
   let parent: ParentFormComponent;
-  let component: FlightZonePingbacksFormComponent;
+  let component: CreativePingbacksFormComponent;
   let fixture: ComponentFixture<ParentFormComponent>;
 
   beforeEach(async(() => {
@@ -43,7 +43,7 @@ describe('FlightZonePingbacksFormComponent', () => {
         MatButtonModule,
         MatIconModule
       ],
-      declarations: [ParentFormComponent, FlightZonePingbacksFormComponent, PingbackFormComponent]
+      declarations: [ParentFormComponent, CreativePingbacksFormComponent, PingbackFormComponent]
     }).compileComponents();
   }));
 

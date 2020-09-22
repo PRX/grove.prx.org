@@ -1,0 +1,69 @@
+@import '~src/sass/variables';
+
+mat-toolbar-row {
+  display: flex;
+  align-items: center;
+}
+h2 {
+  color: white;
+}
+mat-toolbar-row button {
+  margin-left: auto;
+}
+
+:host {
+  ::ng-deep {
+    .mat-form-field-outline {
+      .mat-form-field-outline-start,
+      .mat-form-field-outline-end {
+        background-color: prx-theme-background(card);
+      }
+    }
+  }
+}
+section {
+  margin: 10px;
+}
+h3 {
+  color: prx-theme-foreground(text);
+}
+mat-list-option {
+  background-color: mat-color($prx-blue, 100);
+}
+mat-list-option + mat-list-option {
+  margin-top: 5px;
+}
+h4 {
+  color: prx-theme-foreground(tab);
+}
+.advertiser {
+  font-weight: 700;
+  color: prx-theme-foreground(secondary-text);
+}
+.uploaded {
+  margin-left: 10px;
+  color: prx-theme-foreground(secondary-text);
+}
+mat-paginator {
+  background-color: transparent;
+}
+.form-submit {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+
+  button:first-child {
+    color: white;
+    background-color: mat-color($prx-primary, 500);
+
+    &:hover,
+    &:focus {
+      background-color: mat-color($prx-primary, 600);
+    }
+
+    &[disabled] {
+      background-color: mat-color($prx-gray, 500);
+    }
+  }
+}

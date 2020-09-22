@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import {
   MatButtonModule,
   MatCardModule,
@@ -25,6 +26,10 @@ import {
 } from '@angular/material-moment-adapter';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
+import { CustomRouterSerializer } from '../../store/router-store/custom-router-serializer';
+import { reducers } from '../store';
 import { SharedModule } from '../../shared/shared.module';
 import { FlightFormControlContainerComponent } from './flight-form-control-container.component';
 import { FlightFormComponent } from './flight-form.component';
@@ -33,8 +38,7 @@ import { FlightZonesFormComponent } from './flight-zones-form.component';
 import { InventoryComponent } from '../inventory/inventory.component';
 import { InventoryTableComponent } from '../inventory/inventory-table.component';
 import { GoalFormComponent } from '../inventory/goal-form.component';
-import { PingbackFormComponent } from './pingbacks/pingback-form.component';
-import { FlightZonePingbacksFormComponent } from './pingbacks/flight-zone-pingbacks-form.component';
+import { CreativeCardComponent } from '../creative/creative-card.component';
 import { Flight } from '../store/models';
 import * as moment from 'moment';
 
@@ -46,7 +50,7 @@ const flightFixture: Flight = {
   endAtFudged: moment.utc().subtract(1, 'days'),
   deliveryMode: 'capped',
   totalGoal: 123,
-  zones: [{ id: 'pre_1' }],
+  zones: [{ id: 'pre_1', creativeFlightZones: [{ creativeId: null, weight: 1 }] }],
   targets: [],
   set_inventory_uri: '/some/inventory'
 };
@@ -58,6 +62,7 @@ describe('FlightFormControlContainerComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule.withRoutes([]),
         ReactiveFormsModule,
         NoopAnimationsModule,
         MatCardModule,
@@ -74,18 +79,28 @@ describe('FlightFormControlContainerComponent', () => {
         MatProgressSpinnerModule,
         MatSlideToggleModule,
         MatMenuModule,
-        SharedModule
+        SharedModule,
+        StoreModule.forRoot(
+          { router: routerReducer },
+          {
+            runtimeChecks: {
+              strictStateImmutability: true,
+              strictActionImmutability: true
+            }
+          }
+        ),
+        StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
+        StoreModule.forFeature('campaignState', reducers)
       ],
       declarations: [
         FlightFormControlContainerComponent,
         FlightFormComponent,
         FlightTargetsFormComponent,
         FlightZonesFormComponent,
-        FlightZonePingbacksFormComponent,
-        PingbackFormComponent,
         InventoryComponent,
         InventoryTableComponent,
-        GoalFormComponent
+        GoalFormComponent,
+        CreativeCardComponent
       ],
       providers: [
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] },

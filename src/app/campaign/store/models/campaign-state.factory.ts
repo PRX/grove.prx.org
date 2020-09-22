@@ -86,6 +86,34 @@ export const createCampaignState = () => ({
   }
 });
 
+export const creativesFixture = [
+  {
+    id: 1,
+    url: 'some/url',
+    filename: 'somefile',
+    set_account_uri: 'some/account/id',
+    set_advertiser_uri: 'some/advertiser/id',
+    createdAt: new Date()
+  },
+  {
+    id: 2,
+    url: 'other/url',
+    filename: 'otherfile',
+    set_account_uri: 'some/account/id',
+    set_advertiser_uri: 'some/advertiser/id',
+    createdAt: new Date()
+  }
+];
+export const createCreativesState = () => ({
+  creatives: {
+    ids: creativesFixture.map(c => c.id),
+    entities: {
+      1: { creative: creativesFixture[0] },
+      2: { creative: creativesFixture[1] }
+    }
+  }
+});
+
 export const flightDaysData = new Array(30).fill(null).map((_, i) => ({
   allocated: Math.floor(Math.random() * 100),
   available: Math.floor(Math.random() * 1000),
@@ -209,6 +237,7 @@ export const createCampaignStoreState = ({
   account = createAccountState(),
   advertiser = createAdvertiserState(),
   campaignState = createCampaignState(),
+  creativesState = createCreativesState(),
   flightsState = createFlightsState(campaignState.campaign.doc),
   flightDaysState = createFlightDaysState(),
   inventoryState = createInventoryState()
@@ -216,6 +245,7 @@ export const createCampaignStoreState = ({
   ...account,
   ...advertiser,
   ...campaignState,
+  ...creativesState,
   ...flightsState,
   ...flightDaysState,
   ...inventoryState

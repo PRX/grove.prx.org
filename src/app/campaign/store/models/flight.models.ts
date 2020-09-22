@@ -1,14 +1,12 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
 import { Moment, utc } from 'moment';
+import { Creative } from './creative.models';
 
 export interface FlightZone {
   id: string;
   label?: string;
-  url?: string;
-  pingbacks?: string[];
-  fileSize?: number;
-  mimeType?: string;
+  creativeFlightZones?: { creativeId?: number | string; weight?: number; disabled?: boolean }[];
 }
 export interface FlightTarget {
   type: string;
@@ -68,7 +66,7 @@ export const docToFlight = (doc: HalDoc): Flight => {
     totalGoal: flight.hasOwnProperty('totalGoal') ? flight.totalGoal : null,
     dailyMinimum: flight.hasOwnProperty('dailyMinimum') ? flight.dailyMinimum : null,
     contractGoal: flight.hasOwnProperty('contractGoal') ? flight.contractGoal : null,
-    zones: flight.zones.map(({ id, label, url, fileSize, mimeType }) => ({ id, label, url, fileSize, mimeType }))
+    zones: flight.zones.map(({ id, label, creativeFlightZones }) => ({ id, label, creativeFlightZones }))
   };
   return flight;
 };
