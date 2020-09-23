@@ -19,7 +19,7 @@ import { FlightState } from '../store/models';
       <prx-button [working]="isSaving" [disabled]="!valid || !changed" (click)="onSave()">Save</prx-button>
     </prx-status-bar>
     <mat-menu panelClass="menuPanel" #campaignMenu="matMenu">
-      <grove-campaign-report [campaignName]="campaignName" [flights]="flights" [reportData]="reportData"></grove-campaign-report>
+      <grove-campaign-report [campaignName]="campaignName" [flights]="flights"></grove-campaign-report>
       <button mat-menu-item [disabled]="!canDuplicate" (click)="onDuplicate()">
         <mat-icon aria-hidden>file_copy</mat-icon>
         <span>Duplicate</span>
@@ -40,7 +40,6 @@ export class CampaignStatusComponent {
   @Input() isSaving: boolean;
   @Input() actuals: number;
   @Input() flights: FlightState[];
-  @Input() reportData: any[][];
   @Output() save = new EventEmitter();
   @Output() delete = new EventEmitter();
   @Output() duplicate = new EventEmitter();

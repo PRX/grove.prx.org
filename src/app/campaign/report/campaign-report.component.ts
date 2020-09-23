@@ -1,39 +1,41 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Store, select } from '@ngrx/store';
+import { first } from 'rxjs/operators';
+import { selectCampaignFlightInventoryReportData } from '../store/selectors';
 import { FlightState, Flight } from '../store/models';
 import moment from 'moment';
 
 @Component({
   selector: 'grove-campaign-report',
   template: `
-    <a [href]="reportDataCsv" download="{{ reportFilename }}.csv" mat-menu-item>Download CSV</a>
+    <a (click)="selectAndDownloadReportData($event.target)" mat-menu-item>Download CSV</a>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CampaignReportComponent {
   @Input() campaignName: string;
   @Input() flights: FlightState[];
-  reportDataCsv: SafeUrl;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private store: Store<any>) {}
 
-  @Input()
-  set reportData(data: any[][]) {
-    const joinedCsvArray =
-      data &&
-      'data:text/csv;charset=utf-8,' +
-        data
-          .map(
-            row =>
-              row &&
-              row
-                .map(v => {
-                  return v && typeof v === 'string' && v.indexOf(',') > -1 ? `"${v}"` : v;
-                })
-                .join(',')
-          )
-          .join('\r\n');
-    this.reportDataCsv = this.sanitizer.bypassSecurityTrustUrl(joinedCsvArray);
+  selectAndDownloadReportData(linkElement: HTMLAnchorElement) {
+    this.store.pipe(select(selectCampaignFlightInventoryReportData), first()).subscribe(data => {
+      linkElement.href =
+        data &&
+        'data:text/csv;charset=utf-8,' +
+          data
+            .map(
+              row =>
+                row &&
+                row
+                  .map(v => {
+                    return v && typeof v === 'string' && v.indexOf(',') > -1 ? `"${v}"` : v;
+                  })
+                  .join(',')
+            )
+            .join('\r\n');
+      linkElement.download = `${this.reportFilename}.csv`;
+    });
   }
 
   getFlightDates(flights: Flight[]): { startAt: Date; endAt: Date } {
