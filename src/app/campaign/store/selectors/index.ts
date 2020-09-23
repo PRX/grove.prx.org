@@ -6,3 +6,4 @@ export * from './creative.selectors';
 export * from './flight.selectors';
 export * from './flight-days.selectors';
 export * from './inventory.selectors';
+export * from './inventory-targets.selectors';

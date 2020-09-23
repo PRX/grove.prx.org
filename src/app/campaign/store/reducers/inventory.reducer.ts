@@ -18,15 +18,15 @@ const _reducer = createReducer(
     ...adapter.addAll(action.docs.map(docToInventory), state),
     error: null
   })),
-  on(inventoryActions.InventoryLoadFailure, (state, action) => ({ ...state, error: action.error })),
-  on(inventoryActions.InventoryTargetsLoadSuccess, (state, action) => {
-    const targets = docToInventoryTargets(action.doc);
-    return {
-      ...adapter.updateOne({ id: targets.inventoryId, changes: { targets } }, state),
-      error: null
-    };
-  }),
-  on(inventoryActions.InventoryTargetsLoadFailure, (state, action) => ({ ...state, error: action.error }))
+  on(inventoryActions.InventoryLoadFailure, (state, action) => ({ ...state, error: action.error }))
+  // on(inventoryActions.InventoryTargetsLoadSuccess, (state, action) => {
+  //   const targets = docToInventoryTargets(action.doc);
+  //   return {
+  //     ...adapter.updateOne({ id: targets.inventoryId, changes: { targets } }, state),
+  //     error: null
+  //   };
+  // }),
+  // on(inventoryActions.InventoryTargetsLoadFailure, (state, action) => ({ ...state, error: action.error }))
 );
 export function reducer(state: any, action: any) {
   return _reducer(state, action);

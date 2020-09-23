@@ -6,7 +6,7 @@ export interface Inventory {
   podcastTitle: string;
   zones: InventoryZone[];
   self_uri: string;
-  targets?: InventoryTargets;
+  // targets?: InventoryTargets;
   _doc?: HalDoc;
 }
 
@@ -15,30 +15,30 @@ export interface InventoryZone {
   label: string;
 }
 
-export interface InventoryTargetType {
-  type: string;
-  label: string;
-  labelPlural: string;
-}
+// export interface InventoryTargetType {
+//   type: string;
+//   label: string;
+//   labelPlural: string;
+// }
 
-export interface InventoryTarget {
-  type: string;
-  code: string;
-  label: string;
-  metadata?: any;
-}
+// export interface InventoryTarget {
+//   type: string;
+//   code: string;
+//   label: string;
+//   metadata?: any;
+// }
 
-export interface InventoryTargets {
-  inventoryId: number;
-  episodes?: InventoryTarget[];
-  countries?: InventoryTarget[];
-  types?: InventoryTargetType[];
-  targets?: InventoryTarget[];
-}
+// export interface InventoryTargets {
+//   inventoryId: number;
+//   episodes?: InventoryTarget[];
+//   countries?: InventoryTarget[];
+//   types?: InventoryTargetType[];
+//   targets?: InventoryTarget[];
+// }
 
-export interface InventoryTargetsMap {
-  [k: string]: InventoryTarget[];
-}
+// export interface InventoryTargetsMap {
+//   [k: string]: InventoryTarget[];
+// }
 
 export const docToInventory = (doc: HalDoc): Inventory => {
   const inventory = filterUnderscores(doc) as Inventory;
@@ -47,9 +47,9 @@ export const docToInventory = (doc: HalDoc): Inventory => {
   return inventory;
 };
 
-export const docToInventoryTargets = (doc: HalDoc): InventoryTargets => {
-  return filterUnderscores(doc) as InventoryTargets;
-};
+// export const docToInventoryTargets = (doc: HalDoc): InventoryTargets => {
+//   return filterUnderscores(doc) as InventoryTargets;
+// };
 
 // filter zone options to the control at an index
 export const filterZones = (allZones: InventoryZone[], selectedFlightZones: InventoryZone[], zoneIndex?: number) => {

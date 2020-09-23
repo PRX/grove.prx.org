@@ -6,3 +6,4 @@ export * from './creative.models';
 export * from './flight.models';
 export * from './flight-days.models';
 export * from './inventory.models';
+export * from './inventory-targets.models';

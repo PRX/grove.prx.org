@@ -143,11 +143,12 @@ export const selectCampaignFlightInventoryReportData = createSelector(
     );
     // Actuals
     reportData.push((['Total Delivered'] as (string | number)[]).concat(flights.map(flight => flight.actualCount)));
+    console.log('selectCampaignFlightInventoryReportData', Date.now());
     // Inventory Days for each flight mapped by date
     const inventoryDays = flights.reduce(
       (days, flight) =>
         inventory[flight.id].days.reduce((acc, day) => {
-          const date = day.date.toISOString().slice(0, 10);
+          const date = day.date.valueOf();
           return {
             ...acc,
             [date]: {
@@ -158,13 +159,14 @@ export const selectCampaignFlightInventoryReportData = createSelector(
         }, days),
       {}
     );
+    console.log('selectCampaignFlightInventoryReportData', Date.now(), inventoryDays);
     // push each inventory date row
     // if no data for flight on date, show '-'
     Object.keys(inventoryDays)
-      .sort((a, b) => new Date(a).valueOf() - new Date(b).valueOf())
+      .sort((a, b) => +a - +b)
       .forEach(date =>
         reportData.push(
-          ([utc(date).format('MM-DD-YYYY')] as (string | number)[]).concat(
+          ([utc(+date).format('MM-DD-YYYY')] as (string | number)[]).concat(
             flights.map(flight => (inventoryDays[date][flight.id] ? inventoryDays[date][flight.id].numbers.actuals : '-'))
           )
         )

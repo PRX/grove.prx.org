@@ -2,9 +2,8 @@ import { createSelector } from '@ngrx/store';
 import { CampaignStoreState } from '..';
 import { selectCampaignStoreState } from './campaign.selectors';
 import { selectCurrentInventoryUri } from './flight.selectors';
-import { Inventory, InventoryZone, InventoryTargets } from '../models';
+import { Inventory, InventoryZone } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/inventory.reducer';
-import { InventoryTargetType, InventoryTarget, InventoryTargetsMap } from '../models/inventory.models';
 
 export const selectInventoryState = createSelector(selectCampaignStoreState, (state: CampaignStoreState) => state && state.inventory);
 export const selectInventoryIds = createSelector(selectInventoryState, selectIds);
@@ -25,32 +24,4 @@ export const selectCurrentInventory = createSelector(
 export const selectCurrentInventoryZones = createSelector(
   selectCurrentInventory,
   (inventory): InventoryZone[] => inventory && inventory.zones
-);
-
-export const selectCurrentInventoryTargets = createSelector(
-  selectCurrentInventory,
-  (inventory): InventoryTargets => inventory && inventory.targets
-);
-
-export const selectCurrentInventoryTargetTypes = createSelector(
-  selectCurrentInventoryTargets,
-  (targets): InventoryTargetType[] => targets && targets.types
-);
-
-export const selectCurrentInventoryAllTargets = createSelector(
-  selectCurrentInventoryTargets,
-  (targets): InventoryTarget[] => targets && targets.targets
-);
-
-export const selectCurrentInventoryTargetsTypeMap = createSelector(
-  selectCurrentInventoryAllTargets,
-  (targets): InventoryTargetsMap =>
-    targets &&
-    targets.reduce(
-      (a, target) => ({
-        ...a,
-        [target.type]: [...(a[target.type] || []), target]
-      }),
-      {}
-    )
 );

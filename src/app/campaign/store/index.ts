@@ -8,6 +8,7 @@ import * as fromCreative from './reducers/creative.reducer';
 import * as fromFlight from './reducers/flight.reducer';
 import * as fromFlightDays from './reducers/flight-days.reducer';
 import * as fromInventory from './reducers/inventory.reducer';
+import * as fromInventoryTargets from './reducers/inventory-targets.reducer';
 
 export interface CampaignStoreState {
   account: fromAccount.State;
@@ -17,6 +18,7 @@ export interface CampaignStoreState {
   flights: fromFlight.State;
   flightDays: fromFlightDays.State;
   inventory: fromInventory.State;
+  inventoryTargets: fromInventoryTargets.State;
 }
 
 export const reducers: ActionReducerMap<CampaignStoreState> = {
@@ -26,7 +28,8 @@ export const reducers: ActionReducerMap<CampaignStoreState> = {
   creatives: fromCreative.reducer,
   flights: fromFlight.reducer,
   flightDays: fromFlightDays.reducer,
-  inventory: fromInventory.reducer
+  inventory: fromInventory.reducer,
+  inventoryTargets: fromInventoryTargets.reducer
 };
 
 export const metaReducers: MetaReducer<CampaignStoreState>[] = !environment.production ? [] : [];
