@@ -12,7 +12,7 @@ import {
 } from './flight.selectors';
 import { selectFlightDaysEntities } from './flight-days.selectors';
 import { selectAllInventory } from './inventory.selectors';
-import { Advertiser, Campaign, CampaignState, Flight, FlightState, CampaignFormSave, FlightDays, Inventory } from '../models';
+import { Advertiser, Campaign, CampaignState, Flight, FlightState, CampaignFormSave, FlightDay, FlightDays, Inventory } from '../models';
 import { GeoTargetsPipe } from '../../../shared/pipes/geo-targets.pipe';
 import { utc } from 'moment';
 
@@ -147,24 +147,22 @@ export const selectCampaignFlightInventoryReportData = createSelector(
     const inventoryDays = flights.reduce(
       (days, flight) =>
         inventory[flight.id].days.reduce((acc, day) => {
-          const date = day.date.toISOString().slice(0, 10);
-          return {
-            ...acc,
-            [date]: {
-              ...acc[date],
-              [flight.id]: day
-            }
+          const date = day.date.valueOf();
+          acc[date] = {
+            ...acc[date],
+            [flight.id]: day
           };
+          return acc;
         }, days),
-      {}
+      {} as { [date: number]: { [flightId: number]: FlightDay } }
     );
     // push each inventory date row
     // if no data for flight on date, show '-'
     Object.keys(inventoryDays)
-      .sort((a, b) => new Date(a).valueOf() - new Date(b).valueOf())
+      .sort((a, b) => +a - +b)
       .forEach(date =>
         reportData.push(
-          ([utc(date).format('MM-DD-YYYY')] as (string | number)[]).concat(
+          ([utc(+date).format('MM-DD-YYYY')] as (string | number)[]).concat(
             flights.map(flight => (inventoryDays[date][flight.id] ? inventoryDays[date][flight.id].numbers.actuals : '-'))
           )
         )
