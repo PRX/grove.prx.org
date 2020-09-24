@@ -72,15 +72,24 @@ export const docToFlight = (doc: HalDoc): Flight => {
 };
 
 export const duplicateFlightState = (flight: Flight, tempId: number, changed: boolean, valid: boolean): FlightState => {
-  // remove createdAt, startAt, endAt, and set temp id
-  const { createdAt, startAt, endAt, name, ...dupFlight } = flight;
+  // remove createdAt
+  const { createdAt, name, ...dupFlight } = flight;
 
   return {
     localFlight: {
       ...dupFlight,
+      // set the temp id
       id: tempId,
       name: `Copy of ${name}`,
-      status: 'draft'
+      // duplicated status becomes Draft
+      status: 'draft',
+      // clear all flight dates (dates must be present on flight model to reset form controls from the duplicated flight)
+      startAt: undefined,
+      endAt: undefined,
+      endAtFudged: undefined,
+      contractStartAt: undefined,
+      contractEndAt: undefined,
+      contractEndAtFudged: undefined
     } as Flight,
     changed,
     valid

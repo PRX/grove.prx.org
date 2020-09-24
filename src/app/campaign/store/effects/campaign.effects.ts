@@ -281,8 +281,15 @@ export class CampaignEffects {
             campaign,
             flights: flights.map(flight => ({
               ...flight,
+              // TWO THINGS:
+              // * Clear all flight dates on duplication
+              // * Moments cannot be serialized into state on the router, so the dates error unless translated to a string type or whatever
               startAt: undefined,
-              endAt: undefined
+              endAt: undefined,
+              endAtFudged: undefined,
+              contractStartAt: undefined,
+              contractEndAt: undefined,
+              contractEndAtFudged: undefined
             }))
           };
           this.router.navigate(['/campaign', 'new'], { state });
