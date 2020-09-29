@@ -70,7 +70,7 @@ describe('CreativeCardComponent', () => {
     expect(de.query(By.css('a'))).toBeNull();
   });
 
-  it('shows as silent file if creative id is not set', () => {
+  it('shows as silent file if creative link is not set', () => {
     expect(de.query(By.css('h3')).nativeElement.textContent).toContain('Creative');
     parent.creative = null;
     fix.detectChanges();
