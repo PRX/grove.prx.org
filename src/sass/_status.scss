@@ -15,9 +15,13 @@
   background-color: mat-color($prx-yellow-palette, default);
 }
 .error,
-.canceled {
+.unfulfilled {
   color: mat-color($prx-red-palette, default-contrast);
   background-color: mat-color($prx-red-palette, default);
+}
+.completed {
+  color: mat-color($prx-blue-palette, default-contrast);
+  background-color: mat-color($prx-blue-palette, default);
 }
 .hold {
   color: mat-color($prx-orange-palette, default-contrast);

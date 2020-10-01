@@ -238,7 +238,7 @@ export class DashboardService {
               name: doc['name'],
               status: doc['status'],
               allocationStatus: doc['allocationStatus'],
-              allocationStatusOk: doc['allocationStatus'] === 'ok',
+              allocationStatusOk: doc['allocationStatus'] === 'ok' && doc['status'] !== 'canceled',
               startAt: doc['startAt'] && new Date(doc['startAt']),
               endAt:
                 doc['endAt'] &&
@@ -298,7 +298,7 @@ export class DashboardService {
             name: flightDoc['name'],
             status: flightDoc['status'],
             allocationStatus: flightDoc['allocationStatus'],
-            allocationStatusOk: flightDoc['allocationStatus'] === 'ok',
+            allocationStatusOk: flightDoc['allocationStatus'] === 'ok' || flightDoc['status'] === 'canceled',
             startAt: flightDoc['startAt'] && new Date(flightDoc['startAt']),
             endAt:
               flightDoc['endAt'] &&
