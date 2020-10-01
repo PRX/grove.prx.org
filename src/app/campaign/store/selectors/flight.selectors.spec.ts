@@ -35,6 +35,20 @@ describe('Flight Selectors', () => {
     expect(uri).toEqual(campaignStateFactory.flightFixture.set_inventory_uri);
   });
 
+  it('should select current/routed remote flight status options', () => {
+    const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
+      campaignStateFactory.flightFixture.id
+    ];
+
+    expect(flightState.remoteFlight.status).toEqual('hold');
+    const opts = flightSelectors.selectCurrentStatusOptions.projector(flightState);
+    expect(opts.map(o => o.value)).toEqual(['hold', 'draft', 'sold', 'approved']);
+
+    const flightState2 = { ...flightState, localFlight: { ...flightState.localFlight, status: 'approved' } };
+    const opts2 = flightSelectors.selectCurrentStatusOptions.projector(flightState2);
+    expect(opts2.map(o => o.value)).toEqual(['hold', 'draft', 'sold', 'approved']);
+  });
+
   it('should select routed flight deleted', () => {
     const flightState = campaignStateFactory.createFlightsState(new MockHalDoc(campaignStateFactory.campaignDocFixture)).flights.entities[
       campaignStateFactory.flightFixture.id

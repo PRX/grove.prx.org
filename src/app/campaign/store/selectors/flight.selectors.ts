@@ -4,7 +4,7 @@ import { CampaignStoreState } from '../';
 import { selectCampaignStoreState } from './campaign.selectors';
 import { selectCreativeEntities } from './creative.selectors';
 import { selectRouterStateParams } from '../../../store/router-store/router.selectors';
-import { Flight, FlightState, CreativeState } from '../models';
+import { Flight, FlightState, CreativeState, FlightStatusOption, flightStatusOptions } from '../models';
 import { selectIds, selectEntities, selectAll } from '../reducers/flight.reducer';
 import { HalDoc } from 'ngx-prx-styleguide';
 
@@ -57,6 +57,9 @@ export const selectRoutedLocalFlightZones = createSelector(
 export const selectCurrentInventoryUri = createSelector(
   selectRoutedLocalFlight,
   (flight: Flight): string => flight && flight.set_inventory_uri
+);
+export const selectCurrentStatusOptions = createSelector(selectRoutedFlight, (flightState: FlightState): FlightStatusOption[] =>
+  flightStatusOptions(flightState && flightState.remoteFlight && flightState.remoteFlight.status)
 );
 export const selectRoutedFlightDeleted = createSelector(
   selectRoutedFlight,
