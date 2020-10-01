@@ -1,16 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, AbstractControl, ControlContainer } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material';
-import {
-  Flight,
-  FlightZone,
-  Inventory,
-  InventoryZone,
-  InventoryTargets,
-  InventoryTargetType,
-  FlightTarget,
-  InventoryTargetsMap
-} from '../store/models';
+import { Flight, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap, FlightStatusOption } from '../store/models';
 
 export class FlightFormErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: AbstractControl): boolean {
@@ -29,23 +20,13 @@ export class FlightFormComponent implements OnInit {
   @Input() zoneOptions: InventoryZone[];
   @Input() targetTypes: InventoryTargetType[];
   @Input() targetOptionsMap: InventoryTargetsMap;
+  @Input() statusOptions: FlightStatusOption[];
   @Input() softDeleted: boolean;
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
 
   flightForm: FormGroup;
   matcher = new FlightFormErrorStateMatcher();
-
-  readonly statusOptions = [
-    { name: 'Draft', value: 'draft' },
-    { name: 'Hold', value: 'hold' },
-    { name: 'Sold', value: 'sold' },
-    { name: 'Approved', value: 'approved' },
-    { name: 'Paused', value: 'paused' },
-    { name: 'Canceled', value: 'canceled' },
-    { name: 'Completed', value: 'completed' },
-    { name: 'Unfulfilled', value: 'unfulfilled' }
-  ];
 
   ngOnInit() {
     this.flightForm = this.formContainer.control as FormGroup;
