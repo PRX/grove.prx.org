@@ -5,4 +5,5 @@ export * from './campaign-flight.models';
 export * from './creative.models';
 export * from './flight.models';
 export * from './flight-days.models';
+export * from './flight-status.models';
 export * from './inventory.models';
