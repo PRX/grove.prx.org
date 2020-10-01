@@ -3,13 +3,13 @@ import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import {
   Flight,
-  FlightZone,
   InventoryRollup,
   Inventory,
   InventoryZone,
   InventoryTargets,
   InventoryTargetType,
-  InventoryTargetsMap
+  InventoryTargetsMap,
+  FlightStatusOption
 } from '../store/models';
 import { utc } from 'moment';
 
@@ -22,6 +22,7 @@ import { utc } from 'moment';
         [zoneOptions]="zoneOptions"
         [targetTypes]="targetTypes"
         [targetOptionsMap]="targetOptionsMap"
+        [statusOptions]="statusOptions"
         [flight]="flight"
         [softDeleted]="softDeleted"
         (flightDeleteToggle)="flightDeleteToggle.emit($event)"
@@ -47,6 +48,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() targetOptions: InventoryTargets;
   @Input() targetTypes: InventoryTargetType[];
   @Input() targetOptionsMap: InventoryTargetsMap;
+  @Input() statusOptions: FlightStatusOption[];
   @Input() rollup: InventoryRollup;
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;

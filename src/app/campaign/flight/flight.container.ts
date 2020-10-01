@@ -4,7 +4,15 @@ import { Store, select } from '@ngrx/store';
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { filter, withLatestFrom } from 'rxjs/operators';
 import { MatDrawer } from '@angular/material/sidenav';
-import { Flight, InventoryRollup, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap } from '../store/models';
+import {
+  Flight,
+  InventoryRollup,
+  Inventory,
+  InventoryZone,
+  InventoryTargetType,
+  InventoryTargetsMap,
+  FlightStatusOption
+} from '../store/models';
 import {
   selectRoutedLocalFlight,
   selectRoutedFlightDeleted,
@@ -19,6 +27,7 @@ import {
   selectCurrentInventoryZones,
   selectCurrentInventoryTargetTypes,
   selectCurrentInventoryTargetsTypeMap,
+  selectCurrentStatusOptions,
   selectFlightActualsDateBoundaries,
   selectCampaignId,
   selectShowCreativeListRoute
@@ -35,6 +44,7 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
           [zoneOptions]="zoneOptions$ | async"
           [targetTypes]="targetTypes$ | async"
           [targetOptionsMap]="targetOptionsMap$ | async"
+          [statusOptions]="statusOptions$ | async"
           [flight]="flightLocal$ | async"
           [softDeleted]="softDeleted$ | async"
           [rollup]="inventoryRollup$ | async"
@@ -65,6 +75,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   zoneOptions$: Observable<InventoryZone[]>;
   targetTypes$: Observable<InventoryTargetType[]>;
   targetOptionsMap$: Observable<InventoryTargetsMap>;
+  statusOptions$: Observable<FlightStatusOption[]>;
   flightActualsDateBoundaries$: Observable<{ startAt: Date; endAt: Date }>;
   campaignId$: Observable<string | number>;
   @ViewChild('creative', { static: true }) creativeMatDrawer: MatDrawer;
@@ -86,6 +97,7 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.zoneOptions$ = this.store.pipe(select(selectCurrentInventoryZones));
     this.targetTypes$ = this.store.pipe(select(selectCurrentInventoryTargetTypes));
     this.targetOptionsMap$ = this.store.pipe(select(selectCurrentInventoryTargetsTypeMap));
+    this.statusOptions$ = this.store.pipe(select(selectCurrentStatusOptions));
     this.flightActualsDateBoundaries$ = this.store.pipe(select(selectFlightActualsDateBoundaries));
     this.campaignId$ = this.store.pipe(select(selectCampaignId));
 
