@@ -17,6 +17,11 @@ h3 {
   justify-content: space-between;
 }
 
+.creative.disabled {
+  color: prx-theme-foreground(disabled-button);
+  text-decoration: line-through;
+}
+
 .creative {
   display: block;
   max-width: 100%;
