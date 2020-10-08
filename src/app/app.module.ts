@@ -51,8 +51,8 @@ const PREFERRED_DATE_FORMATS = {
     BrowserAnimationsModule,
     DashboardModule,
     MatMomentDateModule,
-    StoreModule.forRoot(reducers, { metaReducers }),
-    StoreModule.forRoot({ router: routerReducer }),
+    StoreModule.forRoot(reducers, { metaReducers, runtimeChecks: { strictStateImmutability: false, strictActionImmutability: false } }),
+    StoreModule.forRoot({ router: routerReducer }, { runtimeChecks: { strictStateImmutability: false, strictActionImmutability: false } }),
     StoreRouterConnectingModule.forRoot({ serializer: CustomRouterSerializer }),
     EffectsModule.forRoot([]),
     !environment.production ? StoreDevtoolsModule.instrument() : []
