@@ -73,4 +73,4 @@ export const campaignComponents: any[] = [
   CreativeCardComponent
 ];
 
-export const campaignRouting: ModuleWithProviders = RouterModule.forChild(campaignRoutes);
+export const campaignRouting: ModuleWithProviders<RouterModule> = RouterModule.forChild(campaignRoutes);
