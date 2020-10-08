@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, AbstractControl, ControlContainer } from '@angular/forms';
-import { ErrorStateMatcher } from '@angular/material';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { Flight, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap, FlightStatusOption } from '../store/models';
 
 export class FlightFormErrorStateMatcher implements ErrorStateMatcher {

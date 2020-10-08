@@ -4,7 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatFormFieldModule, MatInputModule, MatSlideToggleModule } from '@angular/material';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { SharedModule } from '../../shared/shared.module';
 import { CreativeCardComponent } from './creative-card.component';
 @Component({
