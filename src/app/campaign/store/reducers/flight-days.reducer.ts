@@ -15,7 +15,7 @@ const _reducer = createReducer(
   initialState,
   on(campaignActions.CampaignNew, campaignActions.CampaignLoad, (state, action) => adapter.removeAll(state)),
   on(campaignActions.CampaignLoadSuccess, (state, action) =>
-    adapter.addAll(
+    adapter.setAll(
       action.flightDocs.map(flightDoc => docToFlightDays(flightDoc, flightDoc.id, action.flightDaysDocs[flightDoc.id])),
       state
     )

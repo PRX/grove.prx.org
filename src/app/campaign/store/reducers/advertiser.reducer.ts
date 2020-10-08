@@ -15,7 +15,7 @@ export const initialState: State = adapter.getInitialState({});
 const _reducer = createReducer(
   initialState,
   on(advertiserActions.AdvertisersLoadSuccess, (state, action) => ({
-    ...adapter.addAll(action.docs.map(docToAdvertiser), state),
+    ...adapter.setAll(action.docs.map(docToAdvertiser), state),
     error: null
   })),
   on(advertiserActions.AddAdvertiserSuccess, (state, action) => adapter.addOne(docToAdvertiser(action.doc), state)),
