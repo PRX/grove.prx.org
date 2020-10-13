@@ -26,7 +26,6 @@ export class FlightFormComponent implements OnInit {
   @Output() flightDeleteToggle = new EventEmitter(true);
 
   flightForm: FormGroup;
-  matcher = new FlightFormErrorStateMatcher();
 
   ngOnInit() {
     this.flightForm = this.formContainer.control as FormGroup;
