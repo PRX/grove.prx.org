@@ -1,14 +1,13 @@
-import { Actions } from '@ngrx/effects';
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Action } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { of, Observable } from 'rxjs';
 import { HalHttpError, MockHalDoc, ToastrService, MockHalService } from 'ngx-prx-styleguide';
 import { CampaignService, AuguryService } from '../../../core';
-import { getActions, TestActions } from '../../../store/test.actions';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
 import { reducers } from '../';
 import { campaignFixture, flightFixture, flightDocFixture, flightDaysData } from '../models/campaign-state.factory';
@@ -18,7 +17,7 @@ import { CampaignEffects } from './campaign.effects';
 
 describe('CampaignEffects', () => {
   let effects: CampaignEffects;
-  let actions$: TestActions;
+  let actions$ = new Observable<Action>();
   let campaignService: CampaignService;
   let router: Router;
   let fixture: ComponentFixture<TestComponent>;
@@ -58,18 +57,17 @@ describe('CampaignEffects', () => {
             createFlight: jest.fn()
           }
         },
-        { provide: Actions, useFactory: getActions },
         {
           provide: AuguryService,
           userValue: new MockHalService()
-        }
+        },
+        provideMockActions(() => actions$)
       ]
     });
     fixture = TestBed.createComponent(TestComponent);
-    effects = TestBed.get(CampaignEffects);
-    actions$ = TestBed.get(Actions);
-    campaignService = TestBed.get(CampaignService);
-    router = TestBed.get(Router);
+    effects = TestBed.inject(CampaignEffects);
+    campaignService = TestBed.inject(CampaignService);
+    router = TestBed.inject(Router);
     jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
   }));
 
@@ -84,7 +82,7 @@ describe('CampaignEffects', () => {
       flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
     });
 
-    actions$.stream = hot('-a', { a: action });
+    actions$ = hot('-a', { a: action });
     const expected = cold('-r', { r: success });
     expect(effects.campaignLoad$).toBeObservable(expected);
   });
@@ -110,7 +108,7 @@ describe('CampaignEffects', () => {
         flightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
       })
     );
-    actions$.stream = hot('-a', { a: campaignActions.CampaignLoad({ id: 1 }) });
+    actions$ = hot('-a', { a: campaignActions.CampaignLoad({ id: 1 }) });
     const expected = cold('-(bcd)', {
       b: campaignActions.CampaignLoadSuccess({
         campaignDoc,
@@ -131,7 +129,7 @@ describe('CampaignEffects', () => {
     const action = campaignActions.CampaignLoad({ id: 1 });
     const outcome = campaignActions.CampaignLoadFailure({ error: halError });
 
-    actions$.stream = hot('-a', { a: action });
+    actions$ = hot('-a', { a: action });
     const expected = cold('-(b|)', { b: outcome });
     expect(effects.campaignLoad$).toBeObservable(expected);
   });
@@ -165,7 +163,7 @@ describe('CampaignEffects', () => {
       createdFlightDaysDocs: {}
     });
 
-    actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
+    actions$ = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('-r-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);
   });
@@ -194,7 +192,7 @@ describe('CampaignEffects', () => {
       tempDeletedFlights: []
     });
     const outcome = campaignActions.CampaignSaveFailure({ error: halError });
-    actions$.stream = hot('-a-b', { a: createAction, b: updateAction });
+    actions$ = hot('-a-b', { a: createAction, b: updateAction });
     const expected = cold('--r-r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);
   });
@@ -218,7 +216,7 @@ describe('CampaignEffects', () => {
       createdFlightDocs: undefined,
       createdFlightDaysDocs: {}
     });
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
@@ -241,7 +239,7 @@ describe('CampaignEffects', () => {
       tempDeletedFlights: []
     });
     const outcome = campaignActions.CampaignSaveFailure({ error: halError });
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('--r', { r: outcome });
     expect(effects.campaignFormSave$).toBeObservable(expected);
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', id]);
@@ -273,7 +271,7 @@ describe('CampaignEffects', () => {
           createdFlightDocs: { [tempFlightId]: flightDocs[0] },
           createdFlightDaysDocs: { [flightFixture.id]: (flightDaysData as any[]) as MockHalDoc[] }
         });
-        actions$.stream = hot('-a', { a: createAction });
+        actions$ = hot('-a', { a: createAction });
         const expected = cold('-r', { r: success });
         expect(effects.campaignFormSave$).toBeObservable(expected);
         expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id, 'flight', flightFixture.id]);
@@ -303,7 +301,7 @@ describe('CampaignEffects', () => {
           createdFlightDocs: undefined,
           createdFlightDaysDocs: {}
         });
-        actions$.stream = hot('-a', { a: deleteAction });
+        actions$ = hot('-a', { a: deleteAction });
         const expected = cold('-r', { r: success });
         expect(effects.campaignFormSave$).toBeObservable(expected);
         expect(router.navigate).toHaveBeenCalledWith(['/campaign', campaignFixture.id]);
@@ -333,14 +331,14 @@ describe('CampaignEffects', () => {
       createdFlightDocs: undefined,
       createdFlightDaysDocs: {}
     });
-    actions$.stream = hot('-a', { a: updateAction });
+    actions$ = hot('-a', { a: updateAction });
     const expected = cold('-r', { r: success });
     expect(effects.campaignFormSave$).toBeObservable(expected);
   });
 
   it('should navigate to flight added with temporary id', () => {
     const action = campaignActions.CampaignAddFlight({ campaignId: 1 });
-    actions$.stream = hot('a', { a: action });
+    actions$ = hot('a', { a: action });
     const expected = cold('r', { r: undefined });
     expect(effects.addFlight$).toBeObservable(expected);
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1, 'flight', action.flightId]);
@@ -348,7 +346,7 @@ describe('CampaignEffects', () => {
 
   it('should navigate to flight duplicated with a temporary id', () => {
     const action = campaignActions.CampaignDupFlight({ campaignId: 1, flight: flightFixture });
-    actions$.stream = hot('a', { a: action });
+    actions$ = hot('a', { a: action });
     const expected = cold('r', { r: undefined });
     expect(effects.dupFlight$).toBeObservable(expected);
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1, 'flight', action.flightId]);
@@ -359,7 +357,7 @@ describe('CampaignEffects', () => {
     campaignService.loadCampaignZoomFlights = jest.fn(() => of({ campaignDoc, flightDocs }));
     const action = campaignActions.CampaignDupById({ id: campaignFixture.id, timestamp });
     const success = campaignActions.CampaignDupByIdSuccess({ campaignDoc, flightDocs, timestamp });
-    actions$.stream = hot('a', { a: action });
+    actions$ = hot('a', { a: action });
     const expected = cold('r', { r: success });
     expect(effects.dupCampaignById$).toBeObservable(expected);
   });

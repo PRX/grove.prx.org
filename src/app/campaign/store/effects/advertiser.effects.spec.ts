@@ -1,19 +1,18 @@
-import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
 import { cold, hot } from 'jasmine-marbles';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Action } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { of, Observable } from 'rxjs';
 import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
 import { AdvertiserService } from '../../../core';
-import { getActions, TestActions } from '../../../store/test.actions';
 import * as advertiserActions from '../actions/advertiser-action.creator';
 import { AdvertiserEffects } from './advertiser.effects';
 import { advertisersFixture } from '../models/campaign-state.factory';
 
 describe('AdvertiserEffects', () => {
   let effects: AdvertiserEffects;
-  let actions$: TestActions;
+  let actions$ = new Observable<Action>();
   let advertiserService: AdvertiserService;
 
   // load action received by the effect
@@ -44,18 +43,17 @@ describe('AdvertiserEffects', () => {
             addAdvertiser: jest.fn(name => of(newAdvertiserDoc))
           }
         },
-        { provide: Actions, useFactory: getActions }
+        provideMockActions(() => actions$)
       ]
     });
-    effects = TestBed.get(AdvertiserEffects);
-    actions$ = TestBed.get(Actions);
-    advertiserService = TestBed.get(AdvertiserService);
+    effects = TestBed.inject(AdvertiserEffects);
+    advertiserService = TestBed.inject(AdvertiserService);
   }));
 
   it('should load advertisers', () => {
     const success = advertiserActions.AdvertisersLoadSuccess({ docs });
 
-    actions$.stream = hot('-a', { a: loadAction });
+    actions$ = hot('-a', { a: loadAction });
     const expected = cold('-r', { r: success });
     expect(effects.loadAdvertisers$).toBeObservable(expected);
   });
@@ -70,7 +68,7 @@ describe('AdvertiserEffects', () => {
     const outcome = advertiserActions.AdvertisersLoadFailure({ error: halError });
 
     // emit the load action
-    actions$.stream = hot('-a', { a: loadAction });
+    actions$ = hot('-a', { a: loadAction });
     // expect to see the error action
     const expected = cold('-(b|)', { b: outcome });
     // subscribe to the stream to process the load action, call the AllocationPreviewService, and get the result
@@ -81,7 +79,7 @@ describe('AdvertiserEffects', () => {
     const success = advertiserActions.AddAdvertiserSuccess({ doc: newAdvertiserDoc });
     const addAction = advertiserActions.AddAdvertiser({ name: 'Nooks Cranny' });
 
-    actions$.stream = hot('-a', { a: addAction });
+    actions$ = hot('-a', { a: addAction });
     const expected = cold('-r', { r: success });
     expect(effects.addAdvertiser$).toBeObservable(expected);
   });
