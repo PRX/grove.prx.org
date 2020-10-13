@@ -49,7 +49,7 @@ describe('DashboardFilterComponent', () => {
         comp = fix.componentInstance;
         de = fix.debugElement;
         el = de.nativeElement;
-        dashboardService = TestBed.get(DashboardService);
+        dashboardService = TestBed.inject(DashboardService);
         dashboardService.setParamsFromRoute({ page: 1, per: 2 }, 'flights');
         comp.params = { page: 1, per: 2 };
         comp.facets = facets;

@@ -51,11 +51,11 @@ describe('UserService', () => {
       imports: [HttpClientTestingModule]
     });
 
-    userService = TestBed.get(UserService);
+    userService = TestBed.inject(UserService);
     authToken.next('thetoken');
   });
 
-  it('should load the user doc', (done) => {
+  it('should load the user doc', done => {
     userService.userDoc.subscribe(userDoc => {
       expect(userDoc['login']).toBeDefined();
       expect(userDoc['login']).toEqual(mockUser['login']);

@@ -73,8 +73,8 @@ describe('CreativeListComponent', () => {
         fix = TestBed.createComponent(CreativeListComponent);
         comp = fix.componentInstance;
         de = fix.debugElement;
-        router = TestBed.get(Router);
-        store = TestBed.get(Store);
+        router = TestBed.inject(Router);
+        store = TestBed.inject(Store);
 
         store.dispatch(
           creativeActions.CreativeLoadListSuccess({

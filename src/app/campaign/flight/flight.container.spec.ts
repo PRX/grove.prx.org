@@ -144,9 +144,9 @@ describe('FlightContainerComponent', () => {
         de = fix.debugElement;
         el = de.nativeElement;
         fix.detectChanges();
-        router = TestBed.get(Router);
-        store = TestBed.get(Store);
-        campaignActionService = TestBed.get(CampaignActionService);
+        router = TestBed.inject(Router);
+        store = TestBed.inject(Store);
+        campaignActionService = TestBed.inject(CampaignActionService);
 
         store.dispatch(
           campaignActions.CampaignLoadSuccess({

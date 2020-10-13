@@ -53,7 +53,7 @@ describe('CampaignFormContainerComponent', () => {
         el = de.nativeElement;
         fix.detectChanges();
 
-        store = TestBed.get(Store);
+        store = TestBed.inject(Store);
         jest.spyOn(store, 'dispatch');
       });
   }));

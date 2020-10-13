@@ -34,7 +34,7 @@ describe('CampaignStatusComponent', () => {
         fix = TestBed.createComponent(CampaignStatusComponent);
         comp = fix.componentInstance;
         de = fix.debugElement;
-        dashboardService = TestBed.get(DashboardService);
+        dashboardService = TestBed.inject(DashboardService);
         dashboardService.setParamsFromRoute(params, 'flights');
         fix.detectChanges();
       });

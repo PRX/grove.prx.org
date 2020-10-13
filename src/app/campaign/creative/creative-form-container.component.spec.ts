@@ -98,8 +98,8 @@ describe('CreativeFormContainerComponent', () => {
       .then(() => {
         fix = TestBed.createComponent(CreativeFormContainerComponent);
         comp = fix.componentInstance;
-        router = TestBed.get(Router);
-        store = TestBed.get(Store);
+        router = TestBed.inject(Router);
+        store = TestBed.inject(Store);
         fix.detectChanges();
 
         fix.ngZone.run(() => router.navigateByUrl(`/campaign/1/flight/1/zone/pre_1/creative/1`));
