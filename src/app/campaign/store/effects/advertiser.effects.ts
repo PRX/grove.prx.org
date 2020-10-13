@@ -10,18 +10,24 @@ export class AdvertiserEffects {
   loadAdvertisers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(advertiserActions.AdvertisersLoad),
-      switchMap(() => this.advertiserService.loadAdvertisers()),
-      map(docs => advertiserActions.AdvertisersLoadSuccess({ docs })),
-      catchError(error => of(advertiserActions.AdvertisersLoadFailure({ error })))
+      switchMap(() =>
+        this.advertiserService.loadAdvertisers().pipe(
+          map(docs => advertiserActions.AdvertisersLoadSuccess({ docs })),
+          catchError(error => of(advertiserActions.AdvertisersLoadFailure({ error })))
+        )
+      )
     )
   );
 
   addAdvertiser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(advertiserActions.AddAdvertiser),
-      switchMap(action => this.advertiserService.addAdvertiser(action.name)),
-      map(doc => advertiserActions.AddAdvertiserSuccess({ doc })),
-      catchError(error => of(advertiserActions.AddAdvertiserFailure({ error })))
+      switchMap(action =>
+        this.advertiserService.addAdvertiser(action.name).pipe(
+          map(doc => advertiserActions.AddAdvertiserSuccess({ doc })),
+          catchError(error => of(advertiserActions.AddAdvertiserFailure({ error })))
+        )
+      )
     )
   );
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of, forkJoin, Observable } from 'rxjs';
+import { of, forkJoin, Observable, pipe } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { HalDoc, ToastrService } from 'ngx-prx-styleguide';
 import * as campaignActions from '../actions/campaign-action.creator';
@@ -16,31 +16,34 @@ export class CampaignEffects {
   campaignLoad$ = createEffect(() =>
     this.actions$.pipe(
       ofType(campaignActions.CampaignLoad),
-      mergeMap(action => this.campaignService.loadCampaignZoomFlightsAndFlightDays(action.id)),
-      mergeMap(({ campaignDoc, flightDocs, flightDaysDocs }) => {
-        // also return actions to load the creatives on the flight zones
-        const creativesLoad = Object.values(
-          flightDocs
-            .map(flight =>
-              flight['zones']
-                .filter(zone => zone['creativeFlightZones'])
-                .map(zone =>
-                  zone['creativeFlightZones']
-                    .filter(creative => creative.creativeId)
-                    .map(creative => creativeActions.CreativeLoad({ id: creative.creativeId }))
+      mergeMap(action =>
+        this.campaignService.loadCampaignZoomFlightsAndFlightDays(action.id).pipe(
+          mergeMap(({ campaignDoc, flightDocs, flightDaysDocs }) => {
+            // also return actions to load the creatives on the flight zones
+            const creativesLoad = Object.values(
+              flightDocs
+                .map(flight =>
+                  flight['zones']
+                    .filter(zone => zone['creativeFlightZones'])
+                    .map(zone =>
+                      zone['creativeFlightZones']
+                        .filter(creative => creative.creativeId)
+                        .map(creative => creativeActions.CreativeLoad({ id: creative.creativeId }))
+                    )
                 )
-            )
-            // Array.flat not supported even with tsconfig lib updated to es2019
-            // .flat(2)
-            // reduce to flatten the array of arrays of arrays
-            .reduce((acc, val) => acc.concat(val), [])
-            .reduce((acc, val) => acc.concat(val), [])
-            // reduce for uniques by creative id
-            .reduce((acc, val) => ({ ...acc, [val.id]: val }), {})
-        ) as Action[];
-        return [campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }), ...creativesLoad];
-      }),
-      catchError(error => of(campaignActions.CampaignLoadFailure({ error })))
+                // Array.flat not supported even with tsconfig lib updated to es2019
+                // .flat(2)
+                // reduce to flatten the array of arrays of arrays
+                .reduce((acc, val) => acc.concat(val), [])
+                .reduce((acc, val) => acc.concat(val), [])
+                // reduce for uniques by creative id
+                .reduce((acc, val) => ({ ...acc, [val.id]: val }), {})
+            ) as Action[];
+            return [campaignActions.CampaignLoadSuccess({ campaignDoc, flightDocs, flightDaysDocs }), ...creativesLoad];
+          }),
+          catchError(error => of(campaignActions.CampaignLoadFailure({ error })))
+        )
+      )
     )
   );
 

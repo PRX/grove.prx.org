@@ -130,7 +130,7 @@ describe('CampaignEffects', () => {
     const outcome = campaignActions.CampaignLoadFailure({ error: halError });
 
     actions$ = hot('-a', { a: action });
-    const expected = cold('-(b|)', { b: outcome });
+    const expected = cold('-b', { b: outcome });
     expect(effects.campaignLoad$).toBeObservable(expected);
   });
 

@@ -59,7 +59,7 @@ describe('InventoryEffects', () => {
 
     const outcome = inventoryActions.InventoryLoadFailure({ error });
     actions$ = hot('-a', { a: inventoryActions.InventoryLoad() });
-    const expected = cold('-(b|)', { b: outcome });
+    const expected = cold('-b', { b: outcome });
     expect(effects.loadInventory$).toBeObservable(expected);
   });
 
@@ -77,7 +77,7 @@ describe('InventoryEffects', () => {
 
     const outcome = inventoryActions.InventoryTargetsLoadFailure({ error });
     actions$ = hot('-a', { a: inventoryActions.InventoryTargetsLoad({ inventory: 1 }) });
-    const expected = cold('-(b|)', { b: outcome });
+    const expected = cold('-b', { b: outcome });
     expect(effects.loadInventoryTargets$).toBeObservable(expected);
   });
 });

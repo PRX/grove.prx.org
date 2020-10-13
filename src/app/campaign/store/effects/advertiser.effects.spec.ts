@@ -70,7 +70,7 @@ describe('AdvertiserEffects', () => {
     // emit the load action
     actions$ = hot('-a', { a: loadAction });
     // expect to see the error action
-    const expected = cold('-(b|)', { b: outcome });
+    const expected = cold('-b', { b: outcome });
     // subscribe to the stream to process the load action, call the AllocationPreviewService, and get the result
     expect(effects.loadAdvertisers$).toBeObservable(expected);
   });

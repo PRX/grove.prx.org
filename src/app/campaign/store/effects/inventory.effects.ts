@@ -13,18 +13,24 @@ export class InventoryEffects {
   loadInventory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(inventoryActions.InventoryLoad),
-      switchMap(() => this.inventoryService.loadInventory()),
-      map(docs => inventoryActions.InventoryLoadSuccess({ docs })),
-      catchError(error => of(inventoryActions.InventoryLoadFailure({ error })))
+      switchMap(() =>
+        this.inventoryService.loadInventory().pipe(
+          map(docs => inventoryActions.InventoryLoadSuccess({ docs })),
+          catchError(error => of(inventoryActions.InventoryLoadFailure({ error })))
+        )
+      )
     )
   );
 
   loadInventoryTargets$ = createEffect(() =>
     this.actions$.pipe(
       ofType(inventoryActions.InventoryTargetsLoad),
-      switchMap(action => this.inventoryService.loadInventoryTargets(action.inventory)),
-      map(doc => inventoryActions.InventoryTargetsLoadSuccess({ doc })),
-      catchError(error => of(inventoryActions.InventoryTargetsLoadFailure({ error })))
+      switchMap(action =>
+        this.inventoryService.loadInventoryTargets(action.inventory).pipe(
+          map(doc => inventoryActions.InventoryTargetsLoadSuccess({ doc })),
+          catchError(error => of(inventoryActions.InventoryTargetsLoadFailure({ error })))
+        )
+      )
     )
   );
 
