@@ -21,13 +21,13 @@ const _reducer = createReducer(
   initialState,
   on(campaignActions.CampaignNew, (state, action) => ({ ...adapter.removeAll(state), campaignId: undefined })),
   on(campaignActions.CampaignDupFromForm, (state, action) =>
-    adapter.addAll(
+    adapter.setAll(
       action.flights.map((flight, i) => duplicateFlightState(flight, action.timestamp + i, true, false)),
       state
     )
   ),
   on(campaignActions.CampaignDupByIdSuccess, (state, action) =>
-    adapter.addAll(
+    adapter.setAll(
       action.flightDocs.map(doc => docToFlight(doc)).map((flight, i) => duplicateFlightState(flight, action.timestamp + i, true, false)),
       state
     )
@@ -47,7 +47,7 @@ const _reducer = createReducer(
         valid: true
       };
     });
-    return adapter.addAll(flights, state);
+    return adapter.setAll(flights, state);
   }),
   on(campaignActions.CampaignAddFlight, (state, action) => {
     const { flightId: id, startAt, endAt } = action;

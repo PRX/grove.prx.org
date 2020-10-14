@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
-import { MatIconModule, MatMenuModule } from '@angular/material';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { FancyFormModule, MockHalService, StatusBarModule } from 'ngx-prx-styleguide';
@@ -33,7 +34,7 @@ describe('CampaignStatusComponent', () => {
         fix = TestBed.createComponent(CampaignStatusComponent);
         comp = fix.componentInstance;
         de = fix.debugElement;
-        dashboardService = TestBed.get(DashboardService);
+        dashboardService = TestBed.inject(DashboardService);
         dashboardService.setParamsFromRoute(params, 'flights');
         fix.detectChanges();
       });

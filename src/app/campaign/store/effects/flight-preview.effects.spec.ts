@@ -1,19 +1,18 @@
-import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
 import { cold, hot } from 'jasmine-marbles';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Action } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { of, Observable } from 'rxjs';
 import { HalHttpError, MockHalDoc } from 'ngx-prx-styleguide';
 import { FlightPreviewService } from '../../../core';
-import { getActions, TestActions } from '../../../store/test.actions';
 import * as flightPreviewActions from '../actions/flight-preview-action.creator';
 import { FlightPreviewEffects } from './flight-preview.effects';
 import { campaignDocFixture, flightFixture, flightDocFixture, flightDaysDocFixture } from '../models/campaign-state.factory';
 
 describe('FlightPreviewEffects', () => {
   let effects: FlightPreviewEffects;
-  let actions$: TestActions;
+  let actions$ = new Observable<Action>();
   let flightPreviewService: FlightPreviewService;
 
   const flightDoc = new MockHalDoc(flightDocFixture);
@@ -48,12 +47,11 @@ describe('FlightPreviewEffects', () => {
             createFlightPreview: jest.fn(() => of({ allocationStatus: 'ok', allocationStatusMessage: null, days: flightDaysDocFixture }))
           }
         },
-        { provide: Actions, useFactory: getActions }
+        provideMockActions(() => actions$)
       ]
     });
-    effects = TestBed.get(FlightPreviewEffects);
-    actions$ = TestBed.get(Actions);
-    flightPreviewService = TestBed.get(FlightPreviewService);
+    effects = TestBed.inject(FlightPreviewEffects);
+    flightPreviewService = TestBed.inject(FlightPreviewService);
   }));
 
   it('should create flight preview', () => {
@@ -66,7 +64,7 @@ describe('FlightPreviewEffects', () => {
       campaignDoc
     });
 
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('-r', { r: success });
     expect(effects.createFlightPreview$).toBeObservable(expected);
   });
@@ -77,7 +75,7 @@ describe('FlightPreviewEffects', () => {
     flightPreviewService.createFlightPreview = jest.fn(() => errorResponse);
     const outcome = flightPreviewActions.FlightPreviewCreateFailure({ flight: flightFixture, error: halError });
 
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('-b', { b: outcome });
     expect(effects.createFlightPreview$).toBeObservable(expected);
   });

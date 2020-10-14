@@ -47,9 +47,9 @@ describe('CampaignActionService', () => {
       providers: [CampaignActionService]
     });
     fixture = TestBed.createComponent(TestComponent);
-    service = TestBed.get(CampaignActionService);
-    router = TestBed.get(Router);
-    store = TestBed.get(Store);
+    service = TestBed.inject(CampaignActionService);
+    router = TestBed.inject(Router);
+    store = TestBed.inject(Store);
 
     const flightIds = [flightFixture.id, flightFixture.id + 1, flightFixture.id + 2, flightFixture.id + 3];
     const campaignDoc = new MockHalDoc(campaignDocFixture);

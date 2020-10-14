@@ -10,6 +10,7 @@ import {
   flightDocFixture,
   flightDaysDocFixture
 } from '../models/campaign-state.factory';
+import { CampaignState } from '../models';
 
 describe('Campaign Reducer', () => {
   describe('an unknown action', () => {
@@ -87,7 +88,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign from campaign load success', () => {
-    const result = reducer(
+    const result: CampaignState = reducer(
       initialState,
       campaignActions.CampaignLoadSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),
@@ -133,7 +134,7 @@ describe('Campaign Reducer', () => {
   });
 
   it('should set campaign state from campaign form save success', () => {
-    const result = reducer(
+    const result: CampaignState = reducer(
       initialState,
       campaignActions.CampaignSaveSuccess({
         campaignDoc: new MockHalDoc(campaignDocFixture),

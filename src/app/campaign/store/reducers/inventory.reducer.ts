@@ -15,7 +15,7 @@ export const initialState: State = adapter.getInitialState({});
 const _reducer = createReducer(
   initialState,
   on(inventoryActions.InventoryLoadSuccess, (state, action) => ({
-    ...adapter.addAll(action.docs.map(docToInventory), state),
+    ...adapter.setAll(action.docs.map(docToInventory), state),
     error: null
   })),
   on(inventoryActions.InventoryLoadFailure, (state, action) => ({ ...state, error: action.error })),

@@ -61,9 +61,9 @@ describe('DashboardService', () => {
       ]
     });
 
-    auguryService = TestBed.get(AuguryService);
-    router = TestBed.get(Router);
-    dashboardService = TestBed.get(DashboardService);
+    auguryService = TestBed.inject(AuguryService);
+    router = TestBed.inject(Router);
+    dashboardService = TestBed.inject(DashboardService);
     dashboardService.loadCampaignList();
     dashboardService.loadFlightList();
   });

@@ -1,14 +1,13 @@
-import { Actions } from '@ngrx/effects';
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Action } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { of, Observable } from 'rxjs';
 import { HalHttpError, MockHalDoc, ToastrService } from 'ngx-prx-styleguide';
 import { CreativeService } from '../../../core';
 import { TestComponent, campaignRoutes } from '../../../../testing/test.component';
-import { getActions, TestActions } from '../../../store/test.actions';
 import { reducers } from '../';
 import { initialParams as params } from '../reducers/creative.reducer';
 import * as creativeActions from '../actions/creative-action.creator';
@@ -18,7 +17,7 @@ import { creativesFixture, advertisersFixture } from '../models/campaign-state.f
 
 describe('CreativeEffects', () => {
   let effects: CreativeEffects;
-  let actions$: TestActions;
+  let actions$ = new Observable<Action>();
   let creativeService: CreativeService;
   const toastrService: ToastrService = { success: jest.fn() } as any;
   const docs = creativesFixture.map(doc => {
@@ -61,18 +60,17 @@ describe('CreativeEffects', () => {
             createCreative: jest.fn(creative => of(docs[0]))
           }
         },
-        { provide: Actions, useFactory: getActions }
+        provideMockActions(() => actions$)
       ]
     });
-    effects = TestBed.get(CreativeEffects);
-    actions$ = TestBed.get(Actions);
-    creativeService = TestBed.get(CreativeService);
+    effects = TestBed.inject(CreativeEffects);
+    creativeService = TestBed.inject(CreativeService);
   }));
 
   it('should load creative by id', () => {
     const loadAction = creativeActions.CreativeLoad({ id: creativesFixture[0].id });
     const success = creativeActions.CreativeLoadSuccess({ creativeDoc: docs[0] });
-    actions$.stream = hot('-a', { a: loadAction });
+    actions$ = hot('-a', { a: loadAction });
     const expected = cold('-r', { r: success });
     expect(effects.creativeLoad$).toBeObservable(expected);
   });
@@ -82,7 +80,7 @@ describe('CreativeEffects', () => {
     const errorResponse = cold('#', {}, error);
     creativeService.loadCreative = jest.fn(() => errorResponse);
     const outcome = creativeActions.CreativeLoadFailure({ error });
-    actions$.stream = hot('-a', { a: loadAction });
+    actions$ = hot('-a', { a: loadAction });
     const expected = cold('-b', { b: outcome });
     expect(effects.creativeLoad$).toBeObservable(expected);
   });
@@ -95,7 +93,7 @@ describe('CreativeEffects', () => {
       zoneId: 'pre_1',
       creativeIds: [creativesFixture[0].id]
     });
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('-(bc)', { b: createSuccess, c: addCreative });
     expect(effects.creativeCreate$).toBeObservable(expected);
   });
@@ -105,7 +103,7 @@ describe('CreativeEffects', () => {
     const errorResponse = cold('#', {}, error);
     creativeService.createCreative = jest.fn(() => errorResponse);
     const outcome = creativeActions.CreativeCreateFailure({ error });
-    actions$.stream = hot('-a', { a: createAction });
+    actions$ = hot('-a', { a: createAction });
     const expected = cold('-b', { b: outcome });
     expect(effects.creativeCreate$).toBeObservable(expected);
   });
@@ -124,7 +122,7 @@ describe('CreativeEffects', () => {
       zoneId: 'pre_1',
       creativeDoc: docs[0]
     });
-    actions$.stream = hot('-a', { a: updateAction });
+    actions$ = hot('-a', { a: updateAction });
     const expected = cold('-r', { r: success });
     expect(effects.creativeUpdate$).toBeObservable(expected);
   });
@@ -134,7 +132,7 @@ describe('CreativeEffects', () => {
     const errorResponse = cold('#', {}, error);
     creativeService.updateCreative = jest.fn(() => errorResponse);
     const outcome = creativeActions.CreativeUpdateFailure({ error });
-    actions$.stream = hot('-a', { a: updateAction });
+    actions$ = hot('-a', { a: updateAction });
     const expected = cold('-b', { b: outcome });
     expect(effects.creativeUpdate$).toBeObservable(expected);
   });
@@ -147,7 +145,7 @@ describe('CreativeEffects', () => {
       docs: docs.map(doc => ({ creativeDoc: doc, advertiserDoc }))
     });
 
-    actions$.stream = hot('-a', { a: loadListAction });
+    actions$ = hot('-a', { a: loadListAction });
     const expected = cold('-r', { r: success });
     expect(effects.creativeLoadList$).toBeObservable(expected);
   });
@@ -157,7 +155,7 @@ describe('CreativeEffects', () => {
     const errorResponse = cold('#', {}, error);
     creativeService.loadCreativeList = jest.fn(() => errorResponse);
     const outcome = creativeActions.CreativeLoadListFailure({ error });
-    actions$.stream = hot('-a', { a: loadListAction });
+    actions$ = hot('-a', { a: loadListAction });
     const expected = cold('-b', { b: outcome });
     expect(effects.creativeLoadList$).toBeObservable(expected);
   });

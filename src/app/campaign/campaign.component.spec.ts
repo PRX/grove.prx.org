@@ -2,7 +2,11 @@ import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { DebugElement } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { MatIconModule, MatListModule, MatMenuModule, MatProgressSpinnerModule, MatSidenavModule } from '@angular/material';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StoreModule, Store } from '@ngrx/store';
 import { StoreRouterConnectingModule, routerReducer } from '@ngrx/router-store';
@@ -91,9 +95,9 @@ describe('CampaignComponent', () => {
         el = de.nativeElement;
         fix.detectChanges();
 
-        router = TestBed.get(Router);
-        store = TestBed.get(Store);
-        campaignActionService = TestBed.get(CampaignActionService);
+        router = TestBed.inject(Router);
+        store = TestBed.inject(Store);
+        campaignActionService = TestBed.inject(CampaignActionService);
       });
   }));
 

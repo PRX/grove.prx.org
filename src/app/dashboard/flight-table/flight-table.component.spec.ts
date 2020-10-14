@@ -43,7 +43,7 @@ describe('FlightTableComponent', () => {
         comp.routedParams = { page: 1, per: 1 };
         comp.pageSizeOptions = [1, 25, 50, 100];
         fix.detectChanges();
-        dashboardService = TestBed.get(DashboardService);
+        dashboardService = TestBed.inject(DashboardService);
         dashboardService.setParamsFromRoute({ page: 1, per: 1 }, 'flights');
       });
   }));

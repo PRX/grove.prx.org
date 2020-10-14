@@ -5,7 +5,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Subject } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatProgressSpinnerModule, MatIconModule } from '@angular/material';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MockHalService, PagingModule } from 'ngx-prx-styleguide';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -51,7 +52,7 @@ describe('CampaignListComponent', () => {
         comp = fix.componentInstance;
         de = fix.debugElement;
         el = de.nativeElement;
-        dashboardService = TestBed.get(DashboardService);
+        dashboardService = TestBed.inject(DashboardService);
         dashboardService.setParamsFromRoute({ page: 1 }, 'campaigns');
         fix.detectChanges();
       });
