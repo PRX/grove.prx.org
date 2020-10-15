@@ -15,21 +15,14 @@
     <div class="inline-fields">
       <mat-form-field appearance="outline">
         <mat-label>Actual Start Date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="startPicker"
-          [max]="flight?.endAtFudged"
-          placeholder="Actual Start Date"
-          formControlName="startAt"
-          [errorStateMatcher]="matcher"
-        />
+        <input matInput [matDatepicker]="startPicker" placeholder="Actual Start Date" formControlName="startAt" required />
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
         <mat-error *ngIf="checkError('startAt') as error">{{ error }}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Actual End Date</mat-label>
-        <input matInput [matDatepicker]="endPicker" [min]="flight?.startAt" placeholder="Actual End Date" formControlName="endAtFudged" />
+        <input matInput [matDatepicker]="endPicker" placeholder="Actual End Date" formControlName="endAtFudged" required />
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
         <mat-error *ngIf="checkError('endAtFudged') as error">{{ error }}</mat-error>
@@ -38,27 +31,17 @@
     <div class="inline-fields">
       <mat-form-field appearance="outline">
         <mat-label>Contract Start Date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="contractStartPicker"
-          [max]="flight?.contractEndAtFudged"
-          placeholder="Contract Start Date"
-          formControlName="contractStartAt"
-        />
+        <input matInput [matDatepicker]="contractStartPicker" placeholder="Contract Start Date" formControlName="contractStartAt" />
         <mat-datepicker-toggle matSuffix [for]="contractStartPicker"></mat-datepicker-toggle>
         <mat-datepicker #contractStartPicker></mat-datepicker>
+        <mat-error *ngIf="checkError('contractStartAt') as error">{{ error }}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Contract End Date</mat-label>
-        <input
-          matInput
-          [matDatepicker]="contractEndPicker"
-          [min]="flight?.contractStartAt"
-          placeholder="Contract End Date"
-          formControlName="contractEndAtFudged"
-        />
+        <input matInput [matDatepicker]="contractEndPicker" placeholder="Contract End Date" formControlName="contractEndAtFudged" />
         <mat-datepicker-toggle matSuffix [for]="contractEndPicker"></mat-datepicker-toggle>
         <mat-datepicker #contractEndPicker></mat-datepicker>
+        <mat-error *ngIf="checkError('contractEndAtFudged') as error">{{ error }}</mat-error>
       </mat-form-field>
     </div>
     <mat-form-field class="flight-form-field" appearance="outline">

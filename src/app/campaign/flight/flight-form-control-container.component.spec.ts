@@ -41,7 +41,7 @@ import * as moment from 'moment';
 const flightFixture: Flight = {
   name: 'my-flight',
   status: 'approved',
-  startAt: moment.utc(),
+  startAt: moment.utc().subtract(14, 'days'),
   endAt: moment.utc(),
   endAtFudged: moment.utc().subtract(1, 'days'),
   deliveryMode: 'capped',
@@ -166,8 +166,18 @@ describe('FlightFormControlContainerComponent', () => {
     component.flightForm.get('startAt').markAsTouched();
     component.flightForm.get('endAtFudged').setValue(moment.utc().subtract(2, 'days'));
     component.flightForm.get('endAtFudged').markAsTouched();
+    component.flightForm.get('contractStartAt').setValue(moment.utc().subtract(4, 'days'));
+    component.flightForm.get('contractStartAt').markAsTouched();
+    component.flightForm.get('contractEndAtFudged').setValue(moment.utc().subtract(2, 'days'));
+    component.flightForm.get('contractEndAtFudged').markAsTouched();
     expect(component.validateStartAt(component.flightForm.get('startAt')).error).toBeDefined();
+    expect(component.validateStartAt(component.flightForm.get('startAt')).error).toContain('actuals');
     expect(component.validateEndAt(component.flightForm.get('endAtFudged')).error).toBeDefined();
+    expect(component.validateEndAt(component.flightForm.get('endAtFudged')).error).toContain('actuals');
+    expect(component.validateStartAt(component.flightForm.get('contractStartAt')).error).toBeDefined();
+    expect(component.validateStartAt(component.flightForm.get('contractStartAt')).error).toContain('actuals');
+    expect(component.validateEndAt(component.flightForm.get('contractEndAtFudged')).error).toBeDefined();
+    expect(component.validateEndAt(component.flightForm.get('contractEndAtFudged')).error).toContain('actuals');
     expect(component.flightForm.invalid).toBeTruthy();
   });
 });

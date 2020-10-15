@@ -11,7 +11,7 @@ import {
   InventoryTargetsMap,
   FlightStatusOption
 } from '../store/models';
-import { utc } from 'moment';
+import moment from 'moment';
 
 @Component({
   selector: 'grove-flight',
@@ -94,8 +94,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     status: ['', Validators.required],
     startAt: ['', { validators: [Validators.required, this.validateStartAt.bind(this)], updateOn: 'blur' }],
     endAtFudged: ['', { validators: [Validators.required, this.validateEndAt.bind(this)], updateOn: 'blur' }],
-    contractStartAt: ['', { updateOn: 'blur' }],
-    contractEndAtFudged: ['', { updateOn: 'blur' }],
+    contractStartAt: ['', { validators: [this.validateContractStartAt.bind(this)], updateOn: 'blur' }],
+    contractEndAtFudged: ['', { validators: [this.validateContractEndAt.bind(this)], updateOn: 'blur' }],
     isCompanion: [false],
     zones: [''],
     targets: [''],
@@ -120,30 +120,50 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  validateStartAt(startAt: AbstractControl): { [key: string]: any } | null {
-    if (
-      startAt.value &&
+  validateContractStartAt(startAtCtrl: AbstractControl): { [key: string]: any } | null {
+    return this.validateStartAtDate(startAtCtrl.value, this.flightForm && this.flightForm.get('contractEndAtFudged').value);
+  }
+
+  validateContractEndAt(endAtCtrl: AbstractControl): { [key: string]: any } | null {
+    return this.validateEndAtDate(this.flightForm && this.flightForm.get('contractStartAt').value, endAtCtrl.value);
+  }
+
+  validateStartAt(startAtCtrl: AbstractControl): { [key: string]: any } | null {
+    return this.validateStartAtDate(startAtCtrl.value, this.flightForm && this.flightForm.get('endAtFudged').value);
+  }
+
+  validateEndAt(endAtCtrl: AbstractControl): { [key: string]: any } | null {
+    return this.validateEndAtDate(this.flightForm && this.flightForm.get('startAt').value, endAtCtrl.value);
+  }
+
+  validateStartAtDate(startAt: moment.Moment, endAt: moment.Moment): { [key: string]: any } | null {
+    if (startAt && endAt && startAt.valueOf() > endAt.valueOf()) {
+      return { error: `Cannot set start date after ${moment.utc(endAt).format('M/D/YYYY')} end date` };
+    } else if (
+      startAt &&
       this.flightActualsDateBoundaries &&
       this.flightActualsDateBoundaries.startAt &&
-      this.flightActualsDateBoundaries.startAt.valueOf() < startAt.value.valueOf()
+      this.flightActualsDateBoundaries.startAt.valueOf() < startAt.valueOf()
     ) {
-      return { error: `Cannot set start date after ${utc(this.flightActualsDateBoundaries.startAt).format('M/D/YYYY')} actuals` };
+      return { error: `Cannot set start date after ${moment.utc(this.flightActualsDateBoundaries.startAt).format('M/D/YYYY')} actuals` };
     }
     return null;
   }
 
-  validateEndAt(endAt: AbstractControl): { [key: string]: any } | null {
-    if (
-      endAt.value &&
+  validateEndAtDate(startAt: moment.Moment, endAt: moment.Moment): { [key: string]: any } | null {
+    if (endAt && startAt && endAt.valueOf() < startAt.valueOf()) {
+      return { error: `Cannot set end date before ${moment.utc(startAt).format('M/D/YYYY')} start date` };
+    } else if (
+      endAt &&
       this.flightActualsDateBoundaries &&
       this.flightActualsDateBoundaries.endAt &&
       // end date + 1 days:
       //  * end date is fudged, i.e. actually stored as a cutoff of the next day at midnight
       //  * actuals boundary (last day actuals served) should match fudged end date/datepicker value,
       //  * BUT we're also allowing an extra day for straggling actuals
-      this.flightActualsDateBoundaries.endAt.valueOf() > endAt.value.valueOf() + 24 * 60 * 60 * 1000
+      this.flightActualsDateBoundaries.endAt.valueOf() > endAt.valueOf() + 24 * 60 * 60 * 1000
     ) {
-      return { error: `Cannot set end date before ${utc(this.flightActualsDateBoundaries.endAt).format('M/D/YYYY')} actuals` };
+      return { error: `Cannot set end date before ${moment.utc(this.flightActualsDateBoundaries.endAt).format('M/D/YYYY')} actuals` };
     } else {
       return null;
     }
