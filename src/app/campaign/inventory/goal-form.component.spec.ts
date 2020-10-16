@@ -24,6 +24,7 @@ class ParentFormComponent {
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
     dailyMinimum: ['', Validators.min(0)],
+    velocity: [''],
     deliveryMode: ['', Validators.required]
   });
 }
