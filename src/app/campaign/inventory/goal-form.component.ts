@@ -1,5 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ControlContainer, FormGroup } from '@angular/forms';
+import { combineLatest, Subscription } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { getVelocity } from '../store/models';
 
 @Component({
   selector: 'grove-goal-form',
@@ -31,9 +34,9 @@ import { ControlContainer, FormGroup } from '@angular/forms';
 
       <mat-form-field appearance="outline" *ngIf="isCapped">
         <mat-label>Velocity</mat-label>
-        <mat-select [value]="getVelocity()" (selectionChange)="setVelocity($event.value)">
+        <mat-select formControlName="velocity">
           <mat-option value="evenly">Deliver Evenly</mat-option>
-          <mat-option value="fastly">Deliver Fast</mat-option>
+          <mat-option *ngIf="dailyMinimum > 0" value="fastly">Deliver Fast</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -61,8 +64,10 @@ import { ControlContainer, FormGroup } from '@angular/forms';
   styleUrls: ['goal-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GoalFormComponent implements OnInit {
+export class GoalFormComponent implements OnInit, OnDestroy {
   goalForm: FormGroup;
+  velocitySub: Subscription;
+  goalMinSub: Subscription;
 
   readonly deliveryModeOptions = [
     { name: 'Capped', value: 'capped' },
@@ -98,24 +103,29 @@ export class GoalFormComponent implements OnInit {
 
   ngOnInit() {
     this.goalForm = this.formController.control as FormGroup;
+    this.velocitySub = this.goalForm.get('velocity').valueChanges.subscribe(velocity => this.setDailyMinimum(velocity));
+    this.goalMinSub = combineLatest([this.goalForm.get('totalGoal').valueChanges, this.goalForm.get('dailyMinimum').valueChanges])
+      .pipe(distinctUntilChanged())
+      .subscribe(([goal, min]) => this.setVelocity(goal, min));
   }
 
-  getVelocity(): string {
-    const min = this.dailyMinimum;
-    const goal = this.totalGoal;
-    if (min && min >= goal) {
-      return 'fastly';
-    } else if (min) {
-      return '';
-    } else {
-      return 'evenly';
+  ngOnDestroy() {
+    if (this.velocitySub) {
+      this.velocitySub.unsubscribe();
+    }
+    if (this.goalMinSub) {
+      this.goalMinSub.unsubscribe();
     }
   }
 
-  setVelocity(val: string) {
-    if (val === 'fastly') {
+  setVelocity(totalGoal: number, dailyMinimum: number) {
+    this.goalForm.get('velocity').setValue(getVelocity(totalGoal, dailyMinimum), { emitEvent: false });
+  }
+
+  setDailyMinimum(velocity: string) {
+    if (velocity === 'fastly') {
       this.goalForm.get('dailyMinimum').setValue(this.totalGoal);
-    } else if (val === 'evenly') {
+    } else if (velocity === 'evenly') {
       this.goalForm.get('dailyMinimum').setValue('');
     }
   }

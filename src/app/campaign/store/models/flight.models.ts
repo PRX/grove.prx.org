@@ -28,6 +28,7 @@ export interface Flight {
   totalGoal?: number;
   actualCount?: number;
   dailyMinimum?: number;
+  velocity?: string;
   deliveryMode: string;
   allocationStatus?: string;
   allocationStatusMessage?: string;
@@ -48,8 +49,21 @@ export interface FlightState {
   softDeleted?: boolean;
 }
 
+export const getVelocity = (goal: number, min: number): string => {
+  if (min && min >= goal) {
+    return 'fastly';
+  } else if (min) {
+    return '';
+  } else {
+    return 'evenly';
+  }
+};
+
 export const docToFlight = (doc: HalDoc): Flight => {
   let flight = filterUnderscores(doc) as Flight;
+  const totalGoal = flight.hasOwnProperty('totalGoal') ? flight.totalGoal : null;
+  const dailyMinimum = flight.hasOwnProperty('dailyMinimum') ? flight.dailyMinimum : null;
+  const velocity = getVelocity(totalGoal, dailyMinimum);
   flight = {
     ...flight,
     startAt: utc(flight.startAt),
@@ -63,8 +77,9 @@ export const docToFlight = (doc: HalDoc): Flight => {
     contractEndAtFudged: flight.contractEndAt ? utc(flight.contractEndAt).subtract(1, 'days') : null,
     // fields that are nullable are not present in the HalDoc
     // the Flight model needs to have these fields in order to set up the flight form that is re-used between flights
-    totalGoal: flight.hasOwnProperty('totalGoal') ? flight.totalGoal : null,
-    dailyMinimum: flight.hasOwnProperty('dailyMinimum') ? flight.dailyMinimum : null,
+    totalGoal,
+    dailyMinimum,
+    velocity,
     contractGoal: flight.hasOwnProperty('contractGoal') ? flight.contractGoal : null,
     zones: flight.zones.map(({ id, label, creativeFlightZones }) => ({ id, label, creativeFlightZones }))
   };

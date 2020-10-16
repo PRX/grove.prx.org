@@ -103,7 +103,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
     dailyMinimum: ['', Validators.min(0)],
-    deliveryMode: ['', Validators.required]
+    deliveryMode: ['', Validators.required],
+    velocity: ['']
   });
 
   constructor(private fb: FormBuilder) {}
