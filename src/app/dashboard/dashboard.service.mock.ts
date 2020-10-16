@@ -49,7 +49,6 @@ export const campaigns: Campaign[] = [
     type: 'paid',
     repName: 'John',
     notes: '',
-    flights,
     loading: false,
     actualCount: 10000,
     totalGoal: 100000
@@ -62,7 +61,6 @@ export const campaigns: Campaign[] = [
     type: 'paid',
     repName: 'Jacob',
     notes: '',
-    flights,
     loading: false,
     actualCount: 60000,
     totalGoal: 100000
@@ -75,14 +73,11 @@ export const campaigns: Campaign[] = [
     type: 'house',
     repName: 'Jingleheimer',
     notes: '',
-    flights,
     loading: false,
     actualCount: 125000,
     totalGoal: 100000
   }
 ];
-
-flights.forEach(flight => (flight.parent = campaigns[0]));
 
 export const facets: Facets = {
   advertiser: [
@@ -141,7 +136,7 @@ export class DashboardServiceMock {
   constructor(private augury: MockHalService) {}
 
   get campaigns(): Observable<Campaign[]> {
-    return of(campaigns);
+    return of(campaigns.map(c => ({ ...c, flights })));
   }
 
   get loadedCampaigns(): Observable<Campaign[]> {
@@ -149,7 +144,7 @@ export class DashboardServiceMock {
   }
 
   get flights(): Observable<Flight[]> {
-    return of(flights);
+    return of(flights.map(f => ({ ...f, parent: campaigns[0] })));
   }
 
   get campaignFacets(): Observable<Facets> {
