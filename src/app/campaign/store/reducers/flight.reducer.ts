@@ -125,7 +125,7 @@ const _reducer = createReducer(
       newState = adapter.addMany(
         newFlightIds.map(newId => {
           const flight = docToFlight(createdFlightDocs[newId]);
-          return { localFlight: flight, remoteFlight: flight, changed: false, valid: true };
+          return { doc: createdFlightDocs[newId], localFlight: flight, remoteFlight: flight, changed: false, valid: true };
         }),
         newState
       );
