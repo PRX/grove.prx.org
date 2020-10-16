@@ -86,7 +86,11 @@ describe('CreativeListComponent', () => {
             }))
           })
         );
-        fix.ngZone.run(() => router.navigateByUrl('/campaign/1/flight/1/zone/pre_1/creative/list'));
+        fix.ngZone.run(() =>
+          router
+            .navigateByUrl('/campaign/1/flight/1/zone/pre_1/creative/list')
+            .then(() => jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true)))
+        );
         fix.detectChanges();
 
         jest.spyOn(store, 'dispatch');
@@ -122,7 +126,6 @@ describe('CreativeListComponent', () => {
   });
 
   it('navigates back to flight on cancel', () => {
-    jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
     comp.onCancel();
     expect(router.navigate).toHaveBeenCalledWith(['/campaign', 1, 'flight', 1]);
   });
