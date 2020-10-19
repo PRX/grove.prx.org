@@ -240,6 +240,8 @@ describe('Flight Reducer', () => {
     expect(result.entities[newFlightIds[1]]).toBeUndefined();
     expect(result.entities[createdFlightIds[0]].localFlight).toMatchObject(docToFlight(createdFlightDocs[0]));
     expect(result.entities[createdFlightIds[1]].localFlight).toMatchObject(docToFlight(createdFlightDocs[1]));
+    expect(result.entities[createdFlightIds[0]].doc.id).toEqual(createdFlightIds[0]);
+    expect(result.entities[createdFlightIds[1]].doc.id).toEqual(createdFlightIds[1]);
   });
 
   it('should set flight state from campaign duplicate from form', () => {
