@@ -36,7 +36,7 @@ import { getVelocity } from '../store/models';
         <mat-label>Velocity</mat-label>
         <mat-select formControlName="velocity">
           <mat-option value="evenly">Deliver Evenly</mat-option>
-          <mat-option *ngIf="dailyMinimum > 0" value="fastly">Deliver Fast</mat-option>
+          <mat-option value="fastly">Deliver Fast</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -67,7 +67,8 @@ import { getVelocity } from '../store/models';
 export class GoalFormComponent implements OnInit, OnDestroy {
   goalForm: FormGroup;
   velocitySub: Subscription;
-  goalMinSub: Subscription;
+  totalGoalSub: Subscription;
+  dailyMinimumSub: Subscription;
 
   readonly deliveryModeOptions = [
     { name: 'Capped', value: 'capped' },
@@ -104,17 +105,23 @@ export class GoalFormComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.goalForm = this.formController.control as FormGroup;
     this.velocitySub = this.goalForm.get('velocity').valueChanges.subscribe(velocity => this.setDailyMinimum(velocity));
-    this.goalMinSub = combineLatest([this.goalForm.get('totalGoal').valueChanges, this.goalForm.get('dailyMinimum').valueChanges])
-      .pipe(distinctUntilChanged())
-      .subscribe(([goal, min]) => this.setVelocity(goal, min));
+    this.totalGoalSub = this.goalForm.get('totalGoal').valueChanges.subscribe(goal => {
+      this.setVelocity(goal, this.goalForm.get('dailyMinimum').value);
+    });
+    this.dailyMinimumSub = this.goalForm.get('dailyMinimum').valueChanges.subscribe(min => {
+      this.setVelocity(this.goalForm.get('totalGoal').value, min);
+    });
   }
 
   ngOnDestroy() {
     if (this.velocitySub) {
       this.velocitySub.unsubscribe();
     }
-    if (this.goalMinSub) {
-      this.goalMinSub.unsubscribe();
+    if (this.totalGoalSub) {
+      this.totalGoalSub.unsubscribe();
+    }
+    if (this.dailyMinimumSub) {
+      this.dailyMinimumSub.unsubscribe();
     }
   }
 
