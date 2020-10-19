@@ -1,4 +1,5 @@
 import { TestBed, async } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { cold, hot } from 'jasmine-marbles';
 import { StoreModule, Action } from '@ngrx/store';
@@ -19,6 +20,7 @@ describe('CreativeEffects', () => {
   let effects: CreativeEffects;
   let actions$ = new Observable<Action>();
   let creativeService: CreativeService;
+  let router;
   const toastrService: ToastrService = { success: jest.fn() } as any;
   const docs = creativesFixture.map(doc => {
     const mock = new MockHalDoc(doc);
@@ -65,6 +67,8 @@ describe('CreativeEffects', () => {
     });
     effects = TestBed.inject(CreativeEffects);
     creativeService = TestBed.inject(CreativeService);
+    router = TestBed.inject(Router);
+    jest.spyOn(router, 'navigate').mockImplementation(() => Promise.resolve(true));
   }));
 
   it('should load creative by id', () => {
