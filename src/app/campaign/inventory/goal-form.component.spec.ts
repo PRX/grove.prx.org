@@ -24,6 +24,7 @@ class ParentFormComponent {
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
     dailyMinimum: ['', Validators.min(0)],
+    velocity: [''],
     deliveryMode: ['', Validators.required]
   });
 }
@@ -70,22 +71,22 @@ describe('GoalFormComponent', () => {
     comp.goalForm.get('totalGoal').setValue(100);
     comp.goalForm.get('dailyMinimum').setValue(10);
 
-    comp.setVelocity('fastly');
+    comp.setDailyMinimum('fastly');
     expect(comp.dailyMinimum).toEqual(100);
 
-    comp.setVelocity('evenly');
+    comp.setDailyMinimum('evenly');
     expect(comp.dailyMinimum).toEqual('');
   });
 
   it('changes velocity based on daily minimum', () => {
     comp.goalForm.get('totalGoal').setValue(100);
     comp.goalForm.get('dailyMinimum').setValue(10);
-    expect(comp.getVelocity()).toEqual('');
+    expect(comp.goalForm.get('velocity').value).toEqual('');
 
     comp.goalForm.get('dailyMinimum').setValue(100);
-    expect(comp.getVelocity()).toEqual('fastly');
+    expect(comp.goalForm.get('velocity').value).toEqual('fastly');
 
     comp.goalForm.get('dailyMinimum').setValue(0);
-    expect(comp.getVelocity()).toEqual('evenly');
+    expect(comp.goalForm.get('velocity').value).toEqual('evenly');
   });
 });
