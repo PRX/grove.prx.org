@@ -1,0 +1,56 @@
+<fieldset>
+  <mat-card *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="zone">
+    <mat-card-header>
+      <mat-card-title>{{ zoneLabel(zone) }}</mat-card-title>
+
+      <div class="add-creative">
+        <button mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu"><mat-icon>add</mat-icon> Add a creative</button>
+        <mat-menu #addCreativeMenu="matMenu" xPosition="after">
+          <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'new' }}">Add New</a>
+          <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'list' }}">Add Existing</a>
+          <button mat-menu-item color="primary" (click)="onAddSilentCreative(zone)">Add Silent</button>
+        </mat-menu>
+      </div>
+
+      <div class="remove-zone">
+        <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-form-field class="zone-id">
+        <input matInput type="text" formControlName="id" required />
+      </mat-form-field>
+
+      <div *ngIf="zoneHasCreatives(zone)" class="flight-zone-creatives">
+        <grove-creative-card
+          *ngFor="let zoneCreative of flightZones[i]?.creativeFlightZones; let creativeIndex = index; trackBy: trackByIndex"
+          [formGroup]="creativeFormGroup(zone, creativeIndex)"
+          [creative]="creatives$[zoneCreative.creativeId] | async"
+          creativeLink="{{ zoneCreative?.creativeId ? (getZoneCreativeRoute(zone) | async) + zoneCreative.creativeId.toString() : '' }}"
+        ></grove-creative-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-error *ngIf="validateHasZones()">
+    Must have at least one zone.
+  </mat-error>
+  <mat-error *ngIf="zoneError('noCreatives')">
+    All zones must have at least one creative.
+  </mat-error>
+  <mat-error *ngIf="zoneError('noEnabledCreatives')">
+    All zones must have at least one enabled creative.
+  </mat-error>
+
+  <div class="add-zone">
+    <button mat-button color="primary" [matMenuTriggerFor]="addZoneMenu" [disabled]="!canAddZone">
+      <mat-icon>add</mat-icon> {{ addZoneLabel }}
+    </button>
+    <mat-menu #addZoneMenu="matMenu" xPosition="after">
+      <button mat-menu-item *ngFor="let opt of zoneOptionsFiltered" (click)="onAddZone(opt)">{{ opt.label }}</button>
+    </mat-menu>
+  </div>
+</fieldset>

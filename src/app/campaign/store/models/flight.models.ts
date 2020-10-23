@@ -49,6 +49,8 @@ export interface FlightState {
   softDeleted?: boolean;
 }
 
+export const DRAFT_STATES = ['draft', 'hold', 'sold'];
+
 export const getVelocity = (goal: number, min: number): string => {
   if (min && min >= goal) {
     return 'fastly';

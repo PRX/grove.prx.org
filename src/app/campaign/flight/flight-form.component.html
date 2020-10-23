@@ -53,15 +53,13 @@
     <div class="mat-form-field-wrapper flight-zones">
       <div class="flight-zones-header">
         <h2>Zones</h2>
-        <div *ngIf="zones.showAddZone">
-          <button mat-button color="primary" (click)="zones.onAddZone()"><mat-icon>add</mat-icon> {{ zones.addZoneLabel }}</button>
-        </div>
         <mat-slide-toggle formControlName="isCompanion">Companions</mat-slide-toggle>
       </div>
       <grove-flight-zones
         #zones
         formControlName="zones"
         [flightZones]="flight?.zones"
+        [flightStatus]="flight?.status"
         [isCompanion]="flight?.isCompanion"
         [zoneOptions]="zoneOptions"
       ></grove-flight-zones>

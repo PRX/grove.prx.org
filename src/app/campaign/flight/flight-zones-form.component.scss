@@ -1,25 +1,31 @@
 @import '~src/sass/variables';
 @import '~src/sass/colors';
 
-.inline-fields {
-  display: grid;
-  grid-template-columns: 1fr 40px;
-  grid-column-gap: 0.5rem;
-  align-items: center;
+.zone {
+  margin: 0.5em 0;
+  background-color: prx-theme-background(background);
 }
+
+.mat-card-title {
+  margin: 8px 0 8px -16px;
+}
+
+.add-creative {
+  flex: 1;
+}
+
 .remove-zone {
   button {
     color: mat-color($prx-gray, 300);
     &:hover {
       background-color: transparent;
-      color: mat-color($prx-gray, 600);
+      color: mat-color($prx-warn);
     }
   }
 }
 
-.zone + .zone {
-  border-top: 1px dashed prx-theme-foreground(divider);
-  padding-top: 20px;
+.zone-id {
+  display: none;
 }
 
 .flight-zone-creatives {
@@ -27,8 +33,4 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-auto-rows: 1fr;
   grid-gap: 20px;
-}
-
-.add-creative {
-  margin: 5px 0;
 }
