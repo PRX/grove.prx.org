@@ -13,9 +13,10 @@ import { Creative } from '../store/models';
       <a *ngIf="creativeLink" class="creative" [routerLink]="creativeLink" [class.disabled]="isDisabled()">
         {{ creative?.filename || creative?.url }}
       </a>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="weight">
         <mat-label>Weight</mat-label>
         <input type="number" required min="1" matInput formControlName="weight" />
+        <span class="suffix" matSuffix>%</span>
       </mat-form-field>
     </div>
   `,

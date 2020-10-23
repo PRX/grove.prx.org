@@ -33,6 +33,14 @@ h3 {
   margin: 5px 0;
 }
 
+.weight {
+  .suffix {
+    top: -0.25em;
+    padding-left: 0.25em;
+    position: relative;
+  }
+}
+
 mat-form-field {
   margin-top: 5px;
 }
