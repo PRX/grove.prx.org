@@ -17,7 +17,8 @@
 .remove-zone {
   button {
     color: mat-color($prx-gray, 300);
-    &:hover {
+    &:hover,
+    &:focus {
       background-color: transparent;
       color: mat-color($prx-warn);
     }

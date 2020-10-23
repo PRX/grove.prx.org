@@ -180,6 +180,10 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     this.zones.removeAt(index);
   }
 
+  onRemoveCreative(zone: FormControl, index: number) {
+    (zone.get('creativeFlightZones') as FormArray).removeAt(index);
+  }
+
   // filters to the zone options remaining (each zone can only be selected once)
   get zoneOptionsFiltered(): InventoryZone[] {
     const flightZones = this.flightZones || [];
@@ -216,14 +220,17 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     return creatives && creatives.controls && !!creatives.controls.length;
   }
 
-  creativeFormGroup(zone: FormControl, index) {
+  creativeFormGroup(zone: FormControl, index: number) {
     return (zone.get('creativeFlightZones') as FormArray).controls[index];
   }
 
-  trackByIndex(index) {
-    // use a trackBy on the creative cards ngFor or else
-    // the cards are re-rendered when the weight is changed and UI loses focus as you type
-    return index;
+  getCreative(zoneIndex: number, creativeIndex: number): Observable<Creative> {
+    if (this.flightZones && this.flightZones[zoneIndex]) {
+      const creatives = this.flightZones[zoneIndex].creativeFlightZones;
+      if (creatives && creatives[creativeIndex] && creatives[creativeIndex].creativeId) {
+        return this.creatives$[creatives[creativeIndex].creativeId];
+      }
+    }
   }
 
   onAddSilentCreative(zone: FormControl) {

@@ -1,23 +1,28 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { FormGroup, ControlContainer } from '@angular/forms';
 import { Creative } from '../store/models';
 
 @Component({
   selector: 'grove-creative-card',
   template: `
-    <div [formGroup]="creativeForm">
+    <div [formGroup]="creativeForm" class="form">
       <h3>
         {{ creative?.id ? 'Creative' : 'Silent File' }}
         <mat-slide-toggle formControlName="enabled" aria-label="disable"></mat-slide-toggle>
       </h3>
-      <a *ngIf="creativeLink" class="creative" [routerLink]="creativeLink" [class.disabled]="isDisabled()">
+      <a *ngIf="creative?.id" class="creative" [routerLink]="creativeLink + creative.id" [class.disabled]="isDisabled()">
         {{ creative?.filename || creative?.url }}
       </a>
-      <mat-form-field appearance="outline" class="weight">
-        <mat-label>Weight</mat-label>
-        <input type="number" required min="1" matInput formControlName="weight" />
-        <span class="suffix" matSuffix>%</span>
-      </mat-form-field>
+      <fieldset>
+        <mat-form-field appearance="outline" class="weight">
+          <mat-label>Weight</mat-label>
+          <input type="number" required min="1" matInput formControlName="weight" />
+          <span class="suffix" matSuffix>%</span>
+        </mat-form-field>
+      </fieldset>
+    </div>
+    <div *ngIf="canRemove()" class="remove">
+      <button mat-button color="warn" (click)="onRemoveCreative()"><mat-icon>close</mat-icon> Remove</button>
     </div>
   `,
   styleUrls: ['./creative-card.component.scss'],
@@ -26,6 +31,7 @@ import { Creative } from '../store/models';
 export class CreativeCardComponent implements OnInit {
   @Input() creative: Creative;
   @Input() creativeLink: string;
+  @Output() remove = new EventEmitter();
   creativeForm: FormGroup;
 
   ngOnInit() {
@@ -36,5 +42,14 @@ export class CreativeCardComponent implements OnInit {
 
   isDisabled() {
     return !this.creativeForm.get('enabled').value;
+  }
+
+  canRemove() {
+    // TODO: check if creative-flight-zone actuals > 0
+    return true;
+  }
+
+  onRemoveCreative() {
+    this.remove.emit();
   }
 }

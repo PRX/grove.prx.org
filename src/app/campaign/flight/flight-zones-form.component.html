@@ -26,10 +26,11 @@
 
       <div *ngIf="zoneHasCreatives(zone)" class="flight-zone-creatives">
         <grove-creative-card
-          *ngFor="let zoneCreative of flightZones[i]?.creativeFlightZones; let creativeIndex = index; trackBy: trackByIndex"
-          [formGroup]="creativeFormGroup(zone, creativeIndex)"
-          [creative]="creatives$[zoneCreative.creativeId] | async"
-          creativeLink="{{ zoneCreative?.creativeId ? (getZoneCreativeRoute(zone) | async) + zoneCreative.creativeId.toString() : '' }}"
+          *ngFor="let ctrl of zone.get('creativeFlightZones').controls; index as index"
+          [formGroup]="ctrl"
+          [creative]="getCreative(i, index) | async"
+          [creativeLink]="getZoneCreativeRoute(zone) | async"
+          (remove)="onRemoveCreative(zone, index)"
         ></grove-creative-card>
       </div>
     </mat-card-content>

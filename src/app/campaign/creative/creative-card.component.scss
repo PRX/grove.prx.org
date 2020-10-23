@@ -5,6 +5,8 @@
   border-radius: 5px;
   padding: 10px;
   background: white;
+  display: flex;
+  flex-direction: column;
 
   ::ng-deep {
     .mat-form-field-infix {
@@ -33,7 +35,15 @@ h3 {
   margin: 5px 0;
 }
 
+.form {
+  flex: 1;
+}
+
 .weight {
+  text-align: right;
+  input {
+    direction: rtl;
+  }
   .suffix {
     top: -0.25em;
     padding-left: 0.25em;
@@ -43,4 +53,21 @@ h3 {
 
 mat-form-field {
   margin-top: 5px;
+}
+
+.remove {
+  text-align: center;
+  margin: 0 -10px -10px;
+  button {
+    display: block;
+    width: 100%;
+    border-radius: 0;
+    color: mat-color($prx-gray, 300);
+    border-top: 1px solid mat-color($prx-gray, 300);
+    &:hover,
+    &:focus {
+      color: $warn;
+      border-color: $warn;
+    }
+  }
 }
