@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCardModule } from '@angular/material/card';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
@@ -27,7 +28,8 @@ import { FlightZone, InventoryZone } from '../store/models';
         formControlName="zones"
         [flightZones]="flightZones"
         [zoneOptions]="options"
-        [isCompanion]="isCompanion"
+        [flightIsCompanion]="isCompanion"
+        [flightStatus]="status"
       >
       </grove-flight-zones>
     </form>
@@ -44,6 +46,7 @@ class ParentFormComponent {
   ];
   flightZones: FlightZone[] = [{ id: 'pre_1' }, { id: 'pre_2' }];
   isCompanion = false;
+  status = 'hold';
 }
 
 describe('FlightZonesFormComponent', () => {
@@ -64,6 +67,7 @@ describe('FlightZonesFormComponent', () => {
         MatIconModule,
         MatMenuModule,
         MatSlideToggleModule,
+        MatCardModule,
         StoreModule.forRoot(
           { router: routerReducer },
           {
@@ -88,21 +92,17 @@ describe('FlightZonesFormComponent', () => {
   });
 
   it('sets zones from the parent form', () => {
-    // adds a single empty zone if no flight zones
     parent.flightForm.setValue({ zones: [] });
-    expect(component.zones.length).toEqual(1);
+    expect(component.zones.length).toEqual(0);
     parent.flightForm.setValue({ zones: [{}] });
     expect(component.zones.length).toEqual(1);
     parent.flightForm.reset({ zones: [{}, {}] });
     expect(component.zones.length).toEqual(2);
   });
 
-  it('adds zone from the top most available option', () => {
-    component.onAddZone();
-    expect(component.zones.value).toEqual([
-      { id: '', creativeFlightZones: [] },
-      { id: component.zoneOptions[component.flightZones.length].id, creativeFlightZones: [] }
-    ]);
+  it('adds zones', () => {
+    component.onAddZone({ id: 'mid_1' });
+    expect(component.zones.value).toEqual([{ id: 'mid_1', creativeFlightZones: [] }]);
   });
 
   it('removes zones by index', () => {
@@ -137,12 +137,48 @@ describe('FlightZonesFormComponent', () => {
     expect(component.onChangeFn).not.toHaveBeenCalled();
   });
 
-  it('clears controls for empty zone', () => {
-    component.writeValue([{ id: 'pre_1', creativeFlightZones: [{ weight: 1 }] }]);
-    expect(component.zones.controls[0].get('id').value).toEqual('pre_1');
-    expect((component.zones.controls[0].get('creativeFlightZones') as FormArray).controls[0].get('weight').value).toEqual(1);
+  it('validates for non-draft flights', () => {
+    component.flightStatus = 'approved';
     component.writeValue([]);
-    expect(component.zones.controls[0].get('id').value).toEqual('');
-    expect(component.zones.controls[0].get('creativeFlightZones').value).toEqual([]);
+    expect(component.validateHasZones()).toEqual({ noZones: true });
+  });
+
+  it('validates zones for non-draft flights', () => {
+    component.flightStatus = 'approved';
+
+    component.writeValue([{ id: 'pre_1' }]);
+    expect(component.zones.at(0).errors).toEqual({ noCreatives: true });
+
+    component.writeValue([{ id: 'pre_1', creativeFlightZones: [{ enabled: false }] }]);
+    expect(component.zones.at(0).errors).toEqual({ noEnabledCreatives: true });
+  });
+
+  it('validates zones for companion flights', () => {
+    component.flightStatus = 'approved';
+    component.flightIsCompanion = true;
+
+    component.writeValue([
+      { id: 'pre_1', creativeFlightZones: [{}, {}] },
+      { id: 'post_1', creativeFlightZones: [{}] }
+    ]);
+    expect(component.zones.at(1).errors).toEqual({ mismatchedCompanionZones: true });
+
+    component.writeValue([
+      { id: 'pre_1', creativeFlightZones: [{}, {}] },
+      { id: 'post_1', creativeFlightZones: [{}, { disabled: true }] }
+    ]);
+    expect(component.zones.at(1).errors).toEqual({ mismatchedCompanionZones: true });
+
+    component.writeValue([
+      { id: 'pre_1', creativeFlightZones: [{ weight: 50 }] },
+      { id: 'post_1', creativeFlightZones: [{ weight: 100 }] }
+    ]);
+    expect(component.zones.at(1).errors).toEqual({ mismatchedCompanionZones: true });
+
+    component.writeValue([
+      { id: 'pre_1', creativeFlightZones: [{ weight: 10 }] },
+      { id: 'post_1', creativeFlightZones: [{ weight: 10 }] }
+    ]);
+    expect(component.zones.at(1).errors).toBeFalsy();
   });
 });

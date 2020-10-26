@@ -97,6 +97,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     // don't emit while manipulating FormArray with incoming update
     this.emitGuard = true;
     // get the correct number of zone fields and patchValue
+    zones = zones || [];
     while (this.zones.controls.length > zones.length) {
       this.zones.removeAt(this.zones.controls.length - 1);
       this.zones.markAsPristine();
