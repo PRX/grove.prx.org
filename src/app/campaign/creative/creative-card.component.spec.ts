@@ -7,6 +7,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../shared/shared.module';
 import { CreativeCardComponent } from './creative-card.component';
 @Component({
@@ -28,7 +29,7 @@ class ParentFormComponent {
     set_account_uri: '/api/v1/accounts/1',
     set_advertiser_uri: '/some/uri/1'
   };
-  creativeLink = '/campaign/1/flight/2/zone/pre_1/creative/1';
+  creativeLink = '/campaign/1/flight/2/zone/pre_1/creative/';
 
   form = this.fb.group({
     enabled: [true],
@@ -51,7 +52,8 @@ describe('CreativeCardComponent', () => {
         ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSlideToggleModule
+        MatSlideToggleModule,
+        MatIconModule
       ],
       declarations: [ParentFormComponent, CreativeCardComponent]
     })
@@ -65,9 +67,9 @@ describe('CreativeCardComponent', () => {
       });
   }));
 
-  it('shows link to creative if one is provided', () => {
+  it('shows link to creative if it exists', () => {
     expect(de.query(By.css('a')).nativeElement.textContent).toContain(parent.creative.filename);
-    parent.creativeLink = '';
+    parent.creative.id = null;
     fix.detectChanges();
     expect(de.query(By.css('a'))).toBeNull();
   });
