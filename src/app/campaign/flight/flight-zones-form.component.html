@@ -45,6 +45,9 @@
   <mat-error *ngIf="zoneError('noEnabledCreatives')">
     All zones must have at least one enabled creative.
   </mat-error>
+  <mat-error *ngIf="zoneError('mismatchedCompanionZones')">
+    The state/weight/position of companion zone creatives must all line up.
+  </mat-error>
 
   <div class="add-zone">
     <button mat-button color="primary" [matMenuTriggerFor]="addZoneMenu" [disabled]="!canAddZone">

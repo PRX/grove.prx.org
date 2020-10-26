@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { withLatestFrom, map } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { selectCampaignId, selectRoutedFlightId, selectCreativeById } from '../store/selectors';
-import { FlightZone, InventoryZone, filterZones, Creative, DRAFT_STATES } from '../store/models';
+import { FlightZone, InventoryZone, filterZones, Creative, DRAFT_STATES, CreativeFlightZone } from '../store/models';
 
 @Component({
   selector: 'grove-flight-zones',
@@ -17,9 +17,9 @@ import { FlightZone, InventoryZone, filterZones, Creative, DRAFT_STATES } from '
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, OnDestroy {
-  @Input() flightStatus: string;
-  @Input() isCompanion: boolean;
   @Input() zoneOptions: InventoryZone[];
+  @Input() flightStatus: string;
+  @Input() flightIsCompanion: boolean;
   // tslint:disable-next-line: variable-name
   _flightZones: FlightZone[];
   @Input()
@@ -151,13 +151,25 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
   }
 
   validateZone(zone: FormControl) {
-    const creatives = zone.get('creativeFlightZones') as FormArray;
-    if (creatives && creatives.controls && !DRAFT_STATES.includes(this.flightStatus)) {
-      if (creatives.controls.length === 0) {
+    const creatives: CreativeFlightZone[] = zone.value.creativeFlightZones;
+    if (creatives && !DRAFT_STATES.includes(this.flightStatus)) {
+      if (creatives.length === 0) {
         return { noCreatives: true };
       }
-      if (creatives.controls.every(c => !c.get('enabled').value)) {
+      if (creatives.every(c => !c.enabled)) {
         return { noEnabledCreatives: true };
+      }
+      if (this.flightIsCompanion && this.zones.length) {
+        const firstZoneCreatives: CreativeFlightZone[] = this.zones.at(0).value.creativeFlightZones;
+        if (creatives.length !== firstZoneCreatives.length) {
+          return { mismatchedCompanionZones: true };
+        }
+        if (creatives.some((c, idx) => c.enabled !== firstZoneCreatives[idx].enabled)) {
+          return { mismatchedCompanionZones: true };
+        }
+        if (creatives.some((c, idx) => c.weight !== firstZoneCreatives[idx].weight)) {
+          return { mismatchedCompanionZones: true };
+        }
       }
     }
   }
@@ -198,7 +210,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
   }
 
   get addZoneLabel(): string {
-    const type = this.isCompanion ? 'companion' : 'zone';
+    const type = this.flightIsCompanion ? 'companion' : 'zone';
     return `Add a ${type}`;
   }
 

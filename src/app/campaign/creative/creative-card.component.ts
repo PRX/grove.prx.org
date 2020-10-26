@@ -13,13 +13,11 @@ import { Creative } from '../store/models';
       <a *ngIf="creative?.id" class="creative" [routerLink]="creativeLink + creative.id" [class.disabled]="isDisabled()">
         {{ creative?.filename || creative?.url }}
       </a>
-      <fieldset>
-        <mat-form-field appearance="outline" class="weight">
-          <mat-label>Weight</mat-label>
-          <input type="number" required min="1" matInput formControlName="weight" />
-          <span class="suffix" matSuffix>%</span>
-        </mat-form-field>
-      </fieldset>
+      <mat-form-field appearance="outline" class="weight">
+        <mat-label>Weight</mat-label>
+        <input type="number" required min="1" matInput formControlName="weight" />
+        <span class="suffix" matSuffix>%</span>
+      </mat-form-field>
     </div>
     <div *ngIf="canRemove()" class="remove">
       <button mat-button color="warn" (click)="onRemoveCreative()"><mat-icon>close</mat-icon> Remove</button>
