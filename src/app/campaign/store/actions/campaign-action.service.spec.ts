@@ -91,21 +91,26 @@ describe('CampaignActionService', () => {
   });
 
   describe('flight form update', () => {
+    beforeEach(() => jest.useFakeTimers());
+
     it('dispatches updates when the form changes', () => {
       const flight = { ...flightFixture, name: 'new name' };
       service.updateFlightForm(flight, true, true);
+      jest.runAllTimers();
       expect(dispatchSpy).toHaveBeenCalledWith(campaignActions.CampaignFlightFormUpdate({ flight, changed: true, valid: true }));
     });
 
     it('does not dispatch non-changes', () => {
       const flight = { ...flightFixture };
       service.updateFlightForm(flight, true, true);
+      jest.runAllTimers();
       expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
     it('transforms fields for uncapped flights', () => {
       const flight = { ...flightFixture, deliveryMode: 'uncapped', dailyMinimum: 123 };
       service.updateFlightForm(flight, true, true);
+      jest.runAllTimers();
       expect(dispatchSpy).toHaveBeenCalledWith(
         campaignActions.CampaignFlightFormUpdate({ flight: { ...flight, dailyMinimum: null }, changed: true, valid: true })
       );
@@ -120,6 +125,7 @@ describe('CampaignActionService', () => {
         .milliseconds(0);
       const yesterday = moment.utc(today.valueOf()).subtract(1, 'days');
       service.updateFlightForm({ ...flightFixture, endAtFudged: yesterday, contractEndAtFudged: yesterday }, true, true);
+      jest.runAllTimers();
       expect(dispatchSpy.mock.calls[dispatchSpy.mock.calls.length - 1][0]).toMatchObject(
         campaignActions.CampaignFlightFormUpdate({
           flight: { ...flightFixture, endAt: today, endAtFudged: yesterday, contractEndAtFudged: yesterday, contractEndAt: today },
@@ -132,6 +138,7 @@ describe('CampaignActionService', () => {
     it('transforms fields for greedy flights', () => {
       const flight = { ...flightFixture, deliveryMode: 'greedy_uncapped', contractGoal: 123, dailyMinimum: 456 };
       service.updateFlightForm(flight, true, true);
+      jest.runAllTimers();
       expect(dispatchSpy).toHaveBeenCalledWith(
         campaignActions.CampaignFlightFormUpdate({
           flight: { ...flight, contractGoal: null, dailyMinimum: null },
@@ -195,31 +202,37 @@ describe('CampaignActionService', () => {
 
   describe('flight preview', () => {
     beforeEach(() => {
+      jest.useFakeTimers();
       jest.spyOn(service, 'loadFlightPreview');
     });
 
     it('should load flight preview when flight form is updated', () => {
       service.updateFlightForm({ ...flightFixture, totalGoal: 10 }, true, true);
+      jest.runAllTimers();
       expect(service.loadFlightPreview).toHaveBeenCalled();
     });
 
     it('should not load flight preview if just the name is changed', () => {
       service.updateFlightForm({ ...flightFixture, name: 'new name' }, true, true);
+      jest.runAllTimers();
       expect(service.loadFlightPreview).not.toHaveBeenCalled();
     });
 
     it('should load flight preview when total goal is changed', () => {
       service.updateFlightForm({ ...flightFixture, endAt: moment.utc() }, true, true);
+      jest.runAllTimers();
       expect(service.loadFlightPreview).toHaveBeenCalled();
     });
 
     it('should not load flight preview if routed flight id is different from form flight id (route transition)', () => {
       service.updateFlightForm({ ...flightFixture, id: 1234, totalGoal: 10 }, true, true);
+      jest.runAllTimers();
       expect(service.loadFlightPreview).not.toHaveBeenCalled();
     });
 
     it('should load flight preview when delivery mode is changed', () => {
       service.updateFlightForm({ ...flightFixture, deliveryMode: 'uncapped' }, true, true);
+      jest.runAllTimers();
       expect(service.loadFlightPreview).toHaveBeenCalled();
     });
 

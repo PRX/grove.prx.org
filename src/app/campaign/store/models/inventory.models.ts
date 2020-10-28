@@ -3,7 +3,7 @@ import { filterUnderscores } from './haldoc.utils';
 
 export interface Inventory {
   id: number;
-  podcastId: number;
+  podcastId?: number;
   podcastTitle: string;
   zones: InventoryZone[];
   self_uri: string;
