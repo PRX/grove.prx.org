@@ -17,6 +17,11 @@ import { getVelocity } from '../store/models';
         </mat-select>
       </mat-form-field>
 
+      <mat-form-field appearance="outline" *ngIf="isCapped">
+        <mat-label>Priority</mat-label>
+        <input type="number" matInput placeholder="Priority" formControlName="allocationPriority" />
+      </mat-form-field>
+
       <mat-form-field appearance="outline" *ngIf="!isBaked">
         <mat-label>Total Goal</mat-label>
         <input type="number" matInput placeholder="Total Goal" formControlName="totalGoal" />
