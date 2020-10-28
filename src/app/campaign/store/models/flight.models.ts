@@ -1,7 +1,6 @@
 import { HalDoc } from 'ngx-prx-styleguide';
 import { filterUnderscores } from './haldoc.utils';
 import { Moment, utc } from 'moment';
-import { Creative } from './creative.models';
 
 export interface FlightZone {
   id: string;
@@ -30,6 +29,7 @@ export interface Flight {
   dailyMinimum?: number;
   velocity?: string;
   deliveryMode: string;
+  allocationPriority?: number;
   allocationStatus?: string;
   allocationStatusMessage?: string;
   createdAt?: Date;
