@@ -7,6 +7,7 @@ import * as fromCampaign from './reducers/campaign.reducer';
 import * as fromCreative from './reducers/creative.reducer';
 import * as fromFlight from './reducers/flight.reducer';
 import * as fromFlightDays from './reducers/flight-days.reducer';
+import * as fromFlightOverlap from './reducers/flight-overlap.reducer';
 import * as fromInventory from './reducers/inventory.reducer';
 
 export interface CampaignStoreState {
@@ -16,6 +17,7 @@ export interface CampaignStoreState {
   creatives: fromCreative.State;
   flights: fromFlight.State;
   flightDays: fromFlightDays.State;
+  flightOverlap: fromFlightOverlap.State;
   inventory: fromInventory.State;
 }
 
@@ -26,6 +28,7 @@ export const reducers: ActionReducerMap<CampaignStoreState> = {
   creatives: fromCreative.reducer,
   flights: fromFlight.reducer,
   flightDays: fromFlightDays.reducer,
+  flightOverlap: fromFlightOverlap.reducer,
   inventory: fromInventory.reducer
 };
 

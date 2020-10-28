@@ -27,6 +27,7 @@ import { AccountEffects } from './store/effects/account.effects';
 import { AdvertiserEffects } from './store/effects/advertiser.effects';
 import { CampaignEffects } from './store/effects/campaign.effects';
 import { CreativeEffects } from './store/effects/creative.effects';
+import { FlightOverlapEffects } from './store/effects/flight-overlap.effects';
 import { FlightPreviewEffects } from './store/effects/flight-preview.effects';
 import { InventoryEffects } from './store/effects/inventory.effects';
 import { CampaignActionService } from './store/actions/campaign-action.service';
@@ -60,7 +61,15 @@ import { campaignRouting, campaignComponents } from './campaign.routing';
     FancyFormModule,
     campaignRouting,
     StoreModule.forFeature('campaignState', fromCampaignState.reducers, { metaReducers: fromCampaignState.metaReducers }),
-    EffectsModule.forFeature([AccountEffects, AdvertiserEffects, CampaignEffects, CreativeEffects, FlightPreviewEffects, InventoryEffects])
+    EffectsModule.forFeature([
+      AccountEffects,
+      AdvertiserEffects,
+      CampaignEffects,
+      CreativeEffects,
+      FlightOverlapEffects,
+      FlightPreviewEffects,
+      InventoryEffects
+    ])
   ],
   providers: [
     CampaignActionService,
