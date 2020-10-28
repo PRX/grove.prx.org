@@ -19,7 +19,7 @@ import { getVelocity } from '../store/models';
 
       <mat-form-field appearance="outline" *ngIf="isCapped">
         <mat-label>Priority</mat-label>
-        <input type="number" matInput placeholder="Priority" formControlName="allocationPriority" />
+        <input type="number" min="1" matInput placeholder="Priority" formControlName="allocationPriority" />
       </mat-form-field>
 
       <mat-form-field appearance="outline" *ngIf="!isBaked">
