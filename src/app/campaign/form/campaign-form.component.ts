@@ -91,7 +91,6 @@ export class CampaignFormComponent implements OnInit {
     // set_advertiser_uri might be a typeahead advertiser name instead
     // NOTE: this fails if someone types a url as the advertiser name
     const isAdvertiserName = set_advertiser_uri && !set_advertiser_uri.match(/^http(s)?:.+\/api\/v1\//);
-    console.log('updateCampaignForm', isAdvertiserName, set_advertiser_uri);
 
     // only set fields that are present, but allow fields to be explicitly set to null or empty string (new campaign)
     this.campaignForm.patchValue(
