@@ -17,7 +17,7 @@ const _reducer = createReducer(
   on(flightOverlapActions.FlightOverlapLoad, (state, action) => {
     const flightId = action.flight.id;
     const filters = overlapFilters(action.flight);
-    return adapter.upsertOne({ flightId, filters, overlapping: [], loading: true, error: null }, state);
+    return adapter.upsertOne({ flightId, filters, overlapping: null, loading: true, error: null }, state);
   }),
   on(flightOverlapActions.FlightOverlapLoadSuccess, (state, action) => {
     const flightId = action.flight.id;
@@ -33,7 +33,7 @@ const _reducer = createReducer(
     const flightId = action.flight.id;
     const filters = overlapFilters(action.flight);
     if (state.entities[flightId].filters === filters) {
-      return adapter.upsertOne({ flightId, filters, overlapping: [], loading: false, error: action.error }, state);
+      return adapter.upsertOne({ flightId, filters, overlapping: null, loading: false, error: action.error }, state);
     } else {
       return state;
     }

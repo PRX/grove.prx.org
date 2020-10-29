@@ -9,7 +9,7 @@ export interface FlightOverlap {
 }
 
 export const overlapFilters = (flight: Flight): string => {
-  if (flight.set_inventory_uri && flight.zones && flight.zones.length && flight.endAt && flight.startAt) {
+  if (flight && flight.set_inventory_uri && flight.zones && flight.zones.length && flight.endAt && flight.startAt) {
     return [
       `inventory=${flight.set_inventory_uri.split('/').pop()}`,
       `zones=${flight.zones.map(z => z.id).join(',')}`,

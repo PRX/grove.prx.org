@@ -12,8 +12,11 @@ export const selectFlightOverlapIds = createSelector(selectFlightOverlapState, s
 export const selectFlightOverlapEntities = createSelector(selectFlightOverlapState, selectEntities);
 export const selectAllFlightOverlaps = createSelector(selectFlightOverlapState, selectAll);
 
-export const selectCurrentFlightOverlap = createSelector(selectRoutedFlightId, selectFlightOverlapEntities, (flightId, entities) => {
+export const selectFlightOverlap = createSelector(selectRoutedFlightId, selectFlightOverlapEntities, (flightId, entities) => {
   return entities && entities[flightId];
 });
 
-export const selectCurrentFlightOverlapFilters = createSelector(selectCurrentFlightOverlap, overlap => overlap.filters);
+export const selectFlightOverlapFlights = createSelector(selectFlightOverlap, o => o && o.overlapping);
+export const selectFlightOverlapFilters = createSelector(selectFlightOverlap, o => o && o.filters);
+export const selectFlightOverlapIsLoading = createSelector(selectFlightOverlap, o => o && o.loading);
+export const selectFlightOverlapError = createSelector(selectFlightOverlap, o => o && o.error);

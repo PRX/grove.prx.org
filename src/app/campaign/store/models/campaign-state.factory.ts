@@ -181,6 +181,13 @@ export const createFlightDaysState = () => ({
   }
 });
 
+export const createFlightOverlapState = () => ({
+  flightOverlap: {
+    ids: [],
+    entities: {}
+  }
+});
+
 export const inventoryFixture: Inventory[] = [
   {
     id: 1,
@@ -240,6 +247,7 @@ export const createCampaignStoreState = ({
   creativesState = createCreativesState(),
   flightsState = createFlightsState(campaignState.campaign.doc),
   flightDaysState = createFlightDaysState(),
+  flightOverlapState = createFlightOverlapState(),
   inventoryState = createInventoryState()
 } = {}): CampaignStoreState => ({
   ...account,
@@ -248,5 +256,6 @@ export const createCampaignStoreState = ({
   ...creativesState,
   ...flightsState,
   ...flightDaysState,
+  ...flightOverlapState,
   ...inventoryState
 });
