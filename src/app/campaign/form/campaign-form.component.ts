@@ -87,8 +87,12 @@ export class CampaignFormComponent implements OnInit {
 
   updateCampaignForm(campaign: Campaign) {
     const { name, type, repName, notes, set_account_uri, set_advertiser_uri } = campaign;
-    const findAdvertiserByURI =
-      set_advertiser_uri && this.advertisers && this.advertisers.find(adv => adv.set_advertiser_uri === set_advertiser_uri);
+
+    // set_advertiser_uri might be a typeahead advertiser name instead
+    // NOTE: this fails if someone types a url as the advertiser name
+    const isAdvertiserName = set_advertiser_uri && !set_advertiser_uri.match(/^http(s)?:.+\/api\/v1\//);
+    console.log('updateCampaignForm', isAdvertiserName, set_advertiser_uri);
+
     // only set fields that are present, but allow fields to be explicitly set to null or empty string (new campaign)
     this.campaignForm.patchValue(
       {
@@ -97,8 +101,7 @@ export class CampaignFormComponent implements OnInit {
         ...(campaign.hasOwnProperty('repName') && { repName }),
         ...(campaign.hasOwnProperty('notes') && { notes }),
         ...(campaign.hasOwnProperty('set_account_uri') && { set_account_uri }),
-        ...((findAdvertiserByURI && { set_advertiser_uri: findAdvertiserByURI.set_advertiser_uri }) ||
-          (campaign.hasOwnProperty('set_advertiser_uri') && !set_advertiser_uri && { set_advertiser_uri }))
+        ...(!isAdvertiserName && { set_advertiser_uri })
       },
       { emitEvent: false, onlySelf: true }
     );
