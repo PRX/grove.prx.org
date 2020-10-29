@@ -24,6 +24,12 @@ import { Flight, InventoryRollup, InventoryZone } from '../store/models';
           [isLoading]="isLoading"
         ></grove-inventory-table>
       </section>
+      <section>
+        <h3 class="title">Competing Flights</h3>
+        <p *ngIf="flightOverlapIsLoading">Loading...</p>
+        <p *ngIf="flightOverlapError">Error! {{ flightOverlapError }}</p>
+        <p *ngIf="flightOverlap">Overlapping: {{ flightOverlap.length }}</p>
+      </section>
     </ng-template>
   `,
   styleUrls: ['inventory.component.scss'],
@@ -36,6 +42,9 @@ export class InventoryComponent {
   @Input() isPreview: boolean;
   @Input() isLoading: boolean;
   @Input() previewError: any;
+  @Input() flightOverlap: Flight[];
+  @Input() flightOverlapIsLoading: boolean;
+  @Input() flightOverlapError: any;
   @Output() goalChange = new EventEmitter<Flight>();
   zoneWeekExpanded = {};
 

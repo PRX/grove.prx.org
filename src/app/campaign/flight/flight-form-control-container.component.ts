@@ -35,6 +35,9 @@ import moment from 'moment';
         [isPreview]="isPreview"
         [isLoading]="isLoading"
         [previewError]="previewError"
+        [flightOverlap]="flightOverlap"
+        [flightOverlapIsLoading]="flightOverlapIsLoading"
+        [flightOverlapError]="flightOverlapError"
       >
       </grove-inventory>
     </form>
@@ -54,6 +57,9 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() isLoading: boolean;
   @Input() previewError: any;
   @Input() flightActualsDateBoundaries: { startAt: Date; endAt: Date };
+  @Input() flightOverlap: Flight[];
+  @Input() flightOverlapIsLoading: boolean;
+  @Input() flightOverlapError: any;
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
   @Output() flightDuplicate = new EventEmitter<Flight>(true);
   @Output() flightDeleteToggle = new EventEmitter(true);
