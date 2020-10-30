@@ -100,6 +100,7 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     zones: [''],
     targets: [''],
     set_inventory_uri: ['', Validators.required],
+    allocationPriority: ['10', Validators.min(1)],
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
     dailyMinimum: ['', Validators.min(0)],

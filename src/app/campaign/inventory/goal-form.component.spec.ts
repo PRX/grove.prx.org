@@ -21,6 +21,7 @@ class ParentFormComponent {
   @ViewChild('childForm', { static: true }) childForm: GoalFormComponent;
 
   goalForm = this.fb.group({
+    allocationPriority: ['', Validators.min(1)],
     totalGoal: ['', Validators.min(0)],
     contractGoal: ['', Validators.min(0)],
     dailyMinimum: ['', Validators.min(0)],

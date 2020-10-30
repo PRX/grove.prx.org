@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Subject, Subscription } from 'rxjs';
-import { filter, first, map, tap, withLatestFrom } from 'rxjs/operators';
+import { filter, first, map, tap, withLatestFrom, debounceTime } from 'rxjs/operators';
 import { utc } from 'moment';
 import * as campaignActions from './campaign-action.creator';
 import * as flightPreviewActions from './flight-preview-action.creator';
@@ -33,6 +33,8 @@ export class CampaignActionService implements OnDestroy {
     withLatestFrom(this.store.pipe(select(selectRoutedFlight))),
     // re-using the flight form, so check that ids match
     filter(([formState, flightState]) => !flightState || !flightState.localFlight || formState.flight.id === flightState.localFlight.id),
+    // debounce so numeric fields aren't constantly firing previews
+    debounceTime(500),
     tap(([formState, flightState]) => {
       if (
         this.hasPreviewParams(formState.flight) &&
@@ -134,7 +136,17 @@ export class CampaignActionService implements OnDestroy {
   }
 
   havePreviewParamsChanged(a: Flight, b: Flight) {
-    const check = ['startAt', 'endAt', 'set_inventory_uri', 'targets', 'totalGoal', 'dailyMinimum', 'deliveryMode', 'isCompanion'];
+    const check = [
+      'startAt',
+      'endAt',
+      'set_inventory_uri',
+      'targets',
+      'allocationPriority',
+      'totalGoal',
+      'dailyMinimum',
+      'deliveryMode',
+      'isCompanion'
+    ];
     return (
       this.haveZoneIdsChanged(a.zones, b.zones) ||
       check.some(fld => {

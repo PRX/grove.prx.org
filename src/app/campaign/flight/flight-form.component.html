@@ -47,7 +47,7 @@
     <mat-form-field class="flight-form-field" appearance="outline">
       <mat-label>Series</mat-label>
       <mat-select formControlName="set_inventory_uri" required>
-        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastTitle }}</mat-option>
+        <mat-option *ngFor="let inv of inventory" [value]="inv.self_uri">{{ inv.podcastId }}: {{ inv.podcastTitle }}</mat-option>
       </mat-select>
     </mat-form-field>
     <div class="mat-form-field-wrapper flight-zones">
