@@ -8,6 +8,7 @@ export class FlightOverlapService {
   constructor(private augury: AuguryService) {}
 
   loadFlightOverlap(filters: string): Observable<HalDoc[]> {
-    return this.augury.followItems('prx:flights', { per: 999, zoom: 0, filters });
+    const sorts = 'allocationPriority:asc,name:asc';
+    return this.augury.followItems('prx:flights', { per: 999, zoom: 0, filters, sorts });
   }
 }
