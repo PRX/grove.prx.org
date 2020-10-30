@@ -26,9 +26,25 @@ import { Flight, InventoryRollup, InventoryZone } from '../store/models';
       </section>
       <section>
         <h3 class="title">Competing Flights</h3>
-        <p *ngIf="flightOverlapIsLoading">Loading...</p>
-        <p *ngIf="flightOverlapError">Error! {{ flightOverlapError }}</p>
-        <p *ngIf="flightOverlap">Overlapping: {{ flightOverlap.length }}</p>
+        <div class="row head" *ngIf="!flightOverlapError">
+          <div>Flight Name</div>
+          <div>Priority</div>
+        </div>
+        <div *ngIf="flightOverlapIsLoading" class="loading"><mat-spinner diameter="50"></mat-spinner></div>
+        <ng-container *ngFor="let flight of flightOverlap">
+          <div class="row">
+            <div class="name">
+              <a [routerLink]="['/campaign', flight.campaignId, 'flight', flight.id]" target="_blank">{{ flight.name }}</a>
+            </div>
+            <div>{{ flight.allocationPriority }}</div>
+          </div>
+        </ng-container>
+        <div *ngIf="flightOverlap && flightOverlap.length === 0" class="empty">
+          <p>No competing flights</p>
+        </div>
+        <div *ngIf="flightOverlapError" class="errors">
+          <p class="error"><mat-icon>priority_high</mat-icon> {{ flightOverlapError }}</p>
+        </div>
       </section>
     </ng-template>
   `,

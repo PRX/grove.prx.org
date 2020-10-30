@@ -1,10 +1,5 @@
 @import '~src/sass/variables';
 
-$row-line-height: 20px;
-$row-divider-height: 1px;
-$row-divider-border: $row-divider-height solid prx-theme-foreground(divider);
-$row-height: $row-line-height + $row-divider-height;
-
 :host {
   margin: 20px 10px 20px 20px;
 }
@@ -28,4 +23,50 @@ section {
 .error {
   display: flex;
   align-items: center;
+}
+
+.loading {
+  height: 80px;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+  ::ng-deep .mat-spinner circle {
+    stroke: mat-color($prx-gray, 100);
+  }
+}
+
+.empty {
+  height: 80px;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  color: mat-color($prx-gray, 400);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  grid-column-gap: 0.35rem;
+  line-height: 29px;
+  white-space: nowrap;
+  text-align: center;
+  max-width: 100%;
+
+  & + & {
+    border-top: 1px solid prx-theme-foreground(divider);
+  }
+  &.head {
+    background-color: prx-theme-background(table-header);
+    line-height: 30px;
+    > * {
+      font-weight: bold;
+    }
+  }
+  .name {
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 14px;
+  }
 }
