@@ -17,6 +17,7 @@ export interface FlightTarget {
 
 export interface Flight {
   id?: number;
+  campaignId?: number;
   name: string;
   status: string;
   startAt: Moment;
@@ -66,6 +67,7 @@ export const docToFlight = (doc: HalDoc): Flight => {
   const velocity = getVelocity(totalGoal, dailyMinimum);
   flight = {
     ...flight,
+    campaignId: getCampaignId(doc),
     startAt: utc(flight.startAt),
     endAt: utc(flight.endAt),
     // the cutoff is midnight the following day, but want it to appear as if the flight ends on the date it is set to stop serving
@@ -113,4 +115,16 @@ export const duplicateFlightState = (flight: Flight, tempId: number, changed: bo
 
 export const getFlightId = (state: FlightState) => {
   return state.localFlight && state.localFlight.id;
+};
+
+export const getCampaignId = (doc: HalDoc) => {
+  if (doc && doc.has('prx:campaign')) {
+    const id = doc
+      .expand('prx:campaign')
+      .split('/')
+      .pop();
+    return parseInt(id, 10) || null;
+  } else {
+    return null;
+  }
 };
