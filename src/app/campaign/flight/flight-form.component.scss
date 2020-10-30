@@ -63,11 +63,8 @@ mat-card {
   display: flex;
   align-items: center;
 
-  h2 {
-    margin: 0 5px 0 0;
-  }
-
   mat-slide-toggle {
     margin-left: auto;
+    margin-bottom: 0.5em;
   }
 }

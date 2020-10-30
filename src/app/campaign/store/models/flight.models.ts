@@ -6,7 +6,13 @@ import { Creative } from './creative.models';
 export interface FlightZone {
   id: string;
   label?: string;
-  creativeFlightZones?: { creativeId?: number | string; weight?: number; disabled?: boolean }[];
+  creativeFlightZones?: CreativeFlightZone[];
+}
+export interface CreativeFlightZone {
+  creativeId?: number | string;
+  weight?: number;
+  disabled?: boolean;
+  enabled?: boolean;
 }
 export interface FlightTarget {
   type: string;
@@ -48,6 +54,8 @@ export interface FlightState {
   valid: boolean;
   softDeleted?: boolean;
 }
+
+export const DRAFT_STATES = ['draft', 'hold', 'sold'];
 
 export const getVelocity = (goal: number, min: number): string => {
   if (min && min >= goal) {

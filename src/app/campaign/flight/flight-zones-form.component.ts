@@ -4,47 +4,11 @@ import { Observable } from 'rxjs';
 import { withLatestFrom, map } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { selectCampaignId, selectRoutedFlightId, selectCreativeById } from '../store/selectors';
-import { FlightZone, InventoryZone, filterZones, Creative } from '../store/models';
+import { FlightZone, InventoryZone, filterZones, Creative, DRAFT_STATES, CreativeFlightZone } from '../store/models';
 
 @Component({
   selector: 'grove-flight-zones',
-  template: `
-    <fieldset>
-      <div *ngFor="let zone of zones?.controls; let i = index" [formGroup]="zone" class="zone">
-        <div class="inline-fields">
-          <mat-form-field appearance="outline">
-            <mat-label>Zone Name</mat-label>
-            <mat-select formControlName="id" required>
-              <mat-option *ngFor="let opt of zoneOptionsFiltered(i)" [value]="opt.id">{{ opt.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div *ngIf="zones?.controls?.length > 1" class="remove-zone mat-form-field-wrapper">
-            <button mat-icon-button aria-label="Remove zone" (click)="onRemoveZone(i)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </div>
-        <div *ngIf="zoneHasCreatives(zone)" class="flight-zone-creatives">
-          <grove-creative-card
-            *ngFor="let zoneCreative of flightZones[i]?.creativeFlightZones; let creativeIndex = index; trackBy: trackByIndex"
-            [formGroup]="creativeFormGroup(zone, creativeIndex)"
-            [creative]="creatives$[zoneCreative.creativeId] | async"
-            creativeLink="{{ zoneCreative?.creativeId ? (getZoneCreativeRoute(zone) | async) + zoneCreative.creativeId.toString() : '' }}"
-          ></grove-creative-card>
-        </div>
-        <div class="add-creative">
-          <button [disabled]="!zone.get('id').value" mat-button color="primary" [matMenuTriggerFor]="addCreativeMenu">
-            <mat-icon>add</mat-icon> Add a creative
-          </button>
-          <mat-menu #addCreativeMenu="matMenu" xPosition="after">
-            <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'new' }}">Add New</a>
-            <a mat-menu-item routerLink="{{ (getZoneCreativeRoute(zone) | async) + 'list' }}">Add Existing</a>
-            <button mat-menu-item color="primary" (click)="onAddSilentCreative(zone)">Add Silent</button>
-          </mat-menu>
-        </div>
-      </div>
-    </fieldset>
-  `,
+  templateUrl: './flight-zones-form.component.html',
   styleUrls: ['./flight-zones-form.component.scss'],
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FlightZonesFormComponent), multi: true },
@@ -53,8 +17,9 @@ import { FlightZone, InventoryZone, filterZones, Creative } from '../store/model
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, OnDestroy {
-  @Input() isCompanion: boolean;
   @Input() zoneOptions: InventoryZone[];
+  @Input() flightStatus: string;
+  @Input() flightIsCompanion: boolean;
   // tslint:disable-next-line: variable-name
   _flightZones: FlightZone[];
   @Input()
@@ -116,14 +81,14 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
         id: new FormControl(id || '', Validators.required),
         creativeFlightZones: new FormArray((creativeFlightZones || []).map(zoneCreative => this.buildCreativeFormGroup(zoneCreative)))
       },
-      (zoneControl: FormControl) => (this.zoneHasCreatives(zoneControl) ? null : { error: 'Zone must have at least one creative' })
+      (zoneControl: FormControl) => this.validateZone(zoneControl)
     );
   }
 
   buildCreativeFormGroup(zoneCreative): FormGroup {
     return new FormGroup({
       creativeId: new FormControl(zoneCreative.creative && zoneCreative.creativeId),
-      weight: new FormControl(zoneCreative.weight, [Validators.required, Validators.min(1), Validators.pattern(/^[0-9]+$/)]),
+      weight: new FormControl(zoneCreative.weight || 100, [Validators.required, Validators.min(1), Validators.pattern(/^[0-9]+$/)]),
       enabled: new FormControl(!zoneCreative.disabled)
     });
   }
@@ -132,7 +97,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     // don't emit while manipulating FormArray with incoming update
     this.emitGuard = true;
     // get the correct number of zone fields and patchValue
-    zones = zones && zones.length ? zones : [{ id: '', creativeFlightZones: [] }];
+    zones = zones || [];
     while (this.zones.controls.length > zones.length) {
       this.zones.removeAt(this.zones.controls.length - 1);
       this.zones.markAsPristine();
@@ -173,16 +138,54 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
   }
 
   validate(_: FormControl) {
-    return this.zones.valid ? null : { error: 'Invalid zones' };
+    if (!this.zones.valid) {
+      return { invalidZones: true };
+    } else {
+      return this.validateHasZones();
+    }
   }
 
-  get showAddZone() {
+  validateHasZones() {
+    if (this.zones.length === 0 && !DRAFT_STATES.includes(this.flightStatus)) {
+      return { noZones: true };
+    }
+  }
+
+  validateZone(zone: FormControl) {
+    const creatives: CreativeFlightZone[] = zone.value.creativeFlightZones;
+    if (creatives && !DRAFT_STATES.includes(this.flightStatus)) {
+      if (creatives.length === 0) {
+        return { noCreatives: true };
+      }
+      if (creatives.every(c => !c.enabled)) {
+        return { noEnabledCreatives: true };
+      }
+      if (this.flightIsCompanion && this.zones.length) {
+        const firstZoneCreatives: CreativeFlightZone[] = this.zones.at(0).value.creativeFlightZones;
+        if (creatives.length !== firstZoneCreatives.length) {
+          return { mismatchedCompanionZones: true };
+        }
+        if (creatives.some((c, idx) => c.enabled !== firstZoneCreatives[idx].enabled)) {
+          return { mismatchedCompanionZones: true };
+        }
+        if (creatives.some((c, idx) => c.weight !== firstZoneCreatives[idx].weight)) {
+          return { mismatchedCompanionZones: true };
+        }
+      }
+    }
+  }
+
+  zoneError(type: string) {
+    return this.zones.controls.some(z => z.hasError(type));
+  }
+
+  get canAddZone() {
     return this.zones.controls && this.zoneOptions && this.zones.controls.length < this.zoneOptions.length;
   }
 
-  onAddZone() {
+  onAddZone(zone: FlightZone) {
     // this add a control to the form that will result in a single FLIGHT_FORM_UPDATE action from the form's valueChanges stream
-    this.zones.push(this.flightZoneFormGroup(filterZones(this.zoneOptions, this.flightZones as InventoryZone[]).shift()));
+    this.zones.push(this.flightZoneFormGroup(zone));
   }
 
   onRemoveZone(index: number) {
@@ -190,10 +193,14 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     this.zones.removeAt(index);
   }
 
+  onRemoveCreative(zone: FormControl, index: number) {
+    (zone.get('creativeFlightZones') as FormArray).removeAt(index);
+  }
+
   // filters to the zone options remaining (each zone can only be selected once)
-  zoneOptionsFiltered(index: number): InventoryZone[] {
+  get zoneOptionsFiltered(): InventoryZone[] {
     const flightZones = this.flightZones || [];
-    return filterZones(this.zoneOptions, flightZones as InventoryZone[], index);
+    return filterZones(this.zoneOptions, flightZones as InventoryZone[]);
   }
 
   // must implement disabled for the softDelete button
@@ -204,7 +211,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
   }
 
   get addZoneLabel(): string {
-    const type = this.isCompanion ? 'companion' : 'zone';
+    const type = this.flightIsCompanion ? 'companion' : 'zone';
     return `Add a ${type}`;
   }
 
@@ -215,19 +222,28 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
     );
   }
 
+  zoneLabel(zone: FormControl): string {
+    const id = zone.get('id').value;
+    const opt = this.zoneOptions.find(z => z.id === id);
+    return opt ? opt.label : '';
+  }
+
   zoneHasCreatives(zone: FormControl): boolean {
     const creatives = zone.get('creativeFlightZones') as FormArray;
     return creatives && creatives.controls && !!creatives.controls.length;
   }
 
-  creativeFormGroup(zone: FormControl, index) {
+  creativeFormGroup(zone: FormControl, index: number) {
     return (zone.get('creativeFlightZones') as FormArray).controls[index];
   }
 
-  trackByIndex(index) {
-    // use a trackBy on the creative cards ngFor or else
-    // the cards are re-rendered when the weight is changed and UI loses focus as you type
-    return index;
+  getCreative(zoneIndex: number, creativeIndex: number): Observable<Creative> {
+    if (this.flightZones && this.flightZones[zoneIndex]) {
+      const creatives = this.flightZones[zoneIndex].creativeFlightZones;
+      if (creatives && creatives[creativeIndex] && creatives[creativeIndex].creativeId) {
+        return this.creatives$[creatives[creativeIndex].creativeId];
+      }
+    }
   }
 
   onAddSilentCreative(zone: FormControl) {
