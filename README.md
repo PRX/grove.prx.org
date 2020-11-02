@@ -12,7 +12,7 @@ Make sure you're running the node version in `.nvmrc`, and you're off!
 # install dependencies (https://yarnpkg.com/en/docs/install)
 yarn install
 
-# run tests in Chrome
+# run tests
 yarn test
 ```
 
