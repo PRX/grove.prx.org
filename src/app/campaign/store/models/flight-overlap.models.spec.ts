@@ -22,6 +22,6 @@ describe('FlightOverlapModels', () => {
   });
 
   it('generates a filter string', () => {
-    expect(overlapFilters(flight)).toEqual('inventory=1,zones=pre_1,before=2020-02-01T00:00:00.000Z,after=2020-01-01T00:00:00.000Z');
+    expect(overlapFilters(flight)).toEqual('inventory=1,zones=pre_1,before=2020-01-31T23:59:59.999Z,after=2020-01-01T00:00:00.000Z');
   });
 });
