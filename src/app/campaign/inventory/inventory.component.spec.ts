@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { DebugElement, Component, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -50,6 +51,7 @@ describe('InventoryComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         SharedModule,
+        RouterTestingModule,
         NoopAnimationsModule,
         ReactiveFormsModule,
         MatDividerModule,

@@ -5,6 +5,7 @@ import { AuguryService } from './augury.service';
 import { AdvertiserService } from './advertiser/advertiser.service';
 import { CampaignService } from './campaign/campaign.service';
 import { CreativeService } from './creative/creative.service';
+import { FlightOverlapService } from './campaign/flight-overlap.service';
 import { FlightPreviewService } from './campaign/flight-preview.service';
 import { UserService } from './user/user.service';
 import { InventoryService } from './inventory/inventory.service';
@@ -19,6 +20,7 @@ import { InventoryService } from './inventory/inventory.service';
     InventoryService,
     CampaignService,
     CreativeService,
+    FlightOverlapService,
     FlightPreviewService,
     UserService,
     HalService,

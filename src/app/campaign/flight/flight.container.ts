@@ -29,6 +29,9 @@ import {
   selectCurrentInventoryTargetsTypeMap,
   selectCurrentStatusOptions,
   selectFlightActualsDateBoundaries,
+  selectFlightOverlapFlights,
+  selectFlightOverlapIsLoading,
+  selectFlightOverlapError,
   selectCampaignId,
   selectShowCreativeListRoute
 } from '../store/selectors';
@@ -50,6 +53,9 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
           [rollup]="inventoryRollup$ | async"
           [isPreview]="isPreview$ | async"
           [isLoading]="isLoading$ | async"
+          [flightOverlap]="flightOverlap$ | async"
+          [flightOverlapIsLoading]="flightOverlapIsLoading$ | async"
+          [flightOverlapError]="flightOverlapError$ | async"
           [previewError]="flightPreviewError$ | async"
           [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
           (flightUpdate)="flightUpdateFromForm($event)"
@@ -69,6 +75,9 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
   inventoryRollup$: Observable<InventoryRollup>;
   isPreview$: Observable<boolean>;
   isLoading$: Observable<boolean>;
+  flightOverlap$: Observable<Flight[]>;
+  flightOverlapIsLoading$: Observable<boolean>;
+  flightOverlapError$: Observable<any>;
   currentInventoryUri$: Observable<string>;
   flightPreviewError$: Observable<any>;
   inventoryOptions$: Observable<Inventory[]>;
@@ -90,6 +99,9 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
     this.flightChanged$ = this.store.pipe(select(selectRoutedFlightChanged));
     this.currentInventoryUri$ = this.store.pipe(select(selectCurrentInventoryUri));
     this.flightPreviewError$ = this.store.pipe(select(selectRoutedFlightPreviewError));
+    this.flightOverlap$ = this.store.pipe(select(selectFlightOverlapFlights));
+    this.flightOverlapIsLoading$ = this.store.pipe(select(selectFlightOverlapIsLoading));
+    this.flightOverlapError$ = this.store.pipe(select(selectFlightOverlapError));
     this.inventoryRollup$ = this.store.pipe(select(selectFlightDaysRollup));
     this.isPreview$ = this.store.pipe(select(selectIsFlightPreview));
     this.isLoading$ = this.store.pipe(select(selectIsFlightPreviewLoading));
