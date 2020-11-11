@@ -13,7 +13,7 @@ export const overlapFilters = (flight: Flight): string => {
     const endAtInclusive = flight.endAt.clone().subtract(1, 'millisecond');
     return [
       `inventory=${flight.set_inventory_uri.split('/').pop()}`,
-      `zones=${flight.zones.map(z => z.id).join(',')}`,
+      `zone=${flight.zones.map(z => z.id).join(',')}`,
       `before=${endAtInclusive.toISOString()}`,
       `after=${flight.startAt.toISOString()}`
     ].join(',');
