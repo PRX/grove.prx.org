@@ -7,10 +7,10 @@ export const flightStatusTransitions = {
   draft: ['hold', 'sold', 'approved'],
   hold: ['draft', 'sold', 'approved'],
   sold: ['draft', 'hold', 'approved'],
-  approved: ['paused', 'canceled'],
-  paused: ['approved', 'canceled'],
+  approved: ['paused', 'canceled', 'completed'],
+  paused: ['approved', 'canceled', 'completed'],
   completed: ['approved'],
-  unfulfilled: ['approved']
+  unfulfilled: ['approved', 'canceled', 'completed']
 };
 
 export const flightStatusOptions = (status: string): FlightStatusOption[] => {

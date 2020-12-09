@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { DashboardService, DashboardParams, Facets } from '../dashboard.service';
+import { DashboardService, DashboardParams, Facets, COMBINED_STATUS_FACETS } from '../dashboard.service';
 
 @Component({
   selector: 'grove-dashboard-filter',
@@ -41,7 +41,7 @@ import { DashboardService, DashboardParams, Facets } from '../dashboard.service'
       </grove-filter-facet>
       <grove-filter-facet
         facetName="Status"
-        [options]="facets?.status"
+        [options]="statusFacets"
         [selectedOptions]="params?.status"
         (selectedOptionsChange)="routeToParams({ status: $event })"
       >
@@ -68,6 +68,12 @@ export class DashboardFilterComponent {
   @Input() facets: Facets;
 
   constructor(private dashboardService: DashboardService) {}
+
+  get statusFacets() {
+    if (this.facets && this.facets.status) {
+      return COMBINED_STATUS_FACETS.concat(this.facets.status);
+    }
+  }
 
   onDateChange(dates: { before?: Date; after?: Date }) {
     this.routeToParams({ ...dates });
