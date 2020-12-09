@@ -115,7 +115,7 @@ describe('DashboardService', () => {
         representative: 'Mich',
         text: 'Oscorp'
       })
-    ).toEqual('type=house,geo=US,CA,zone=mid_1,pre_1,text=Oscorp,representative=Mich');
+    ).toEqual('type=house,geo=US|CA,zone=mid_1|pre_1,text=Oscorp,representative=Mich');
     const before = new Date();
     const after = new Date();
     expect(
@@ -136,7 +136,15 @@ describe('DashboardService', () => {
         zone: ['mid_1', 'pre_1'],
         representative: 'Mich'
       })
-    ).toEqual('campaign_type=house,geo=US,CA,zone=mid_1,pre_1,campaign_representative=Mich');
+    ).toEqual('campaign_type=house,geo=US|CA,zone=mid_1|pre_1,campaign_representative=Mich');
+  });
+
+  it('should translate combined statuses', () => {
+    expect(
+      dashboardService.getFilters({
+        status: 'all-active'
+      })
+    ).toEqual('status=approved|paused|unfulfilled');
   });
 
   it('should build router params', done => {
