@@ -85,6 +85,18 @@ export interface Campaign {
   actualCount?: number;
 }
 
+export const COMBINED_STATUS_FACETS: Facet[] = [
+  { id: 'all-active', label: 'All Active' },
+  { id: 'all-inactive', label: 'All Inactive' },
+  { id: 'all-draft', label: 'All Drafts' }
+];
+
+export const COMBINED_STATUSES = {
+  'all-active': ['approved', 'paused', 'unfulfilled'],
+  'all-inactive': ['completed', 'canceled'],
+  'all-draft': ['draft', 'hold', 'sold']
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -100,7 +112,7 @@ export class DashboardService {
   // tslint:disable-next-line: variable-name
   private _error = new BehaviorSubject<Error>(null);
   // tslint:disable-next-line: variable-name
-  private _params = new BehaviorSubject<DashboardParams>({ page: 1, view: 'flights' });
+  private _params = new BehaviorSubject<DashboardParams>({ page: 1, view: 'flights', status: 'all-active' });
   // tslint:disable-next-line: variable-name
   private _campaigns = new BehaviorSubject<{ [id: number]: Campaign }>({});
   // tslint:disable-next-line: variable-name
@@ -273,7 +285,7 @@ export class DashboardService {
       ...params,
       per: (params && params.per) || 25,
       sort: (params && params.sort) || 'start_at',
-      direction: (params && params.direction) || 'desc'
+      direction: (params && params.direction) || 'asc'
     })
       .pipe(
         switchMap(([{ count, total, facets }, flightDocs]) => {
@@ -372,7 +384,9 @@ export class DashboardService {
     if (params.podcast) {
       filters += `${filters ? ',' : ''}podcast=${params.podcast}`;
     }
-    if (params.status) {
+    if (COMBINED_STATUSES[params.status]) {
+      filters += `${filters ? ',' : ''}status=${COMBINED_STATUSES[params.status].join('|')}`;
+    } else if (params.status) {
       filters += `${filters ? ',' : ''}status=${params.status}`;
     }
     if (params.type) {
@@ -383,10 +397,10 @@ export class DashboardService {
       }
     }
     if (params.geo && params.geo.length) {
-      filters += `${filters ? ',' : ''}geo=${params.geo.join(',')}`;
+      filters += `${filters ? ',' : ''}geo=${params.geo.join('|')}`;
     }
     if (params.zone && params.zone.length) {
-      filters += `${filters ? ',' : ''}zone=${params.zone.join(',')}`;
+      filters += `${filters ? ',' : ''}zone=${params.zone.join('|')}`;
     }
     if (params.text) {
       filters += `${filters ? ',' : ''}text=${params.text}`;
