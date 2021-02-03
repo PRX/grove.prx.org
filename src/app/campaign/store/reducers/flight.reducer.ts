@@ -154,7 +154,9 @@ const _reducer = createReducer(
             }
           : zone
       );
-    return localFlight ? adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones } } }, state) : state;
+    return localFlight
+      ? adapter.updateOne({ id: localFlight.id, changes: { localFlight: { ...localFlight, zones }, changed: true } }, state)
+      : state;
   })
 );
 
