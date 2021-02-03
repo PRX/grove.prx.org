@@ -56,12 +56,13 @@ describe('Creative Reducer', () => {
     const state = reducer(
       initialState,
       creativeActions.CreativeLoadListSuccess({
-        params: { page: 1 },
+        params: { page: 1, text: 'foo' },
         total: 2,
         docs: creativesFixture.map(doc => ({ creativeDoc: new MockHalDoc(doc), advertiserDoc: new MockHalDoc() }))
       })
     );
     expect(state.params.page).toEqual(1);
+    expect(state.params.text).toEqual('foo');
     expect(state.total).toEqual(2);
     expect(state.ids.length).toEqual(2);
     expect(state.entities[creativesFixture[0].id].creative.url).toEqual(creativesFixture[0].url);

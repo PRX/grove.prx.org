@@ -32,10 +32,17 @@ export const selectCreativeById = createSelector(
 
 export const selectShowCreativeListRoute = createSelector(selectRouterState, state => state && state.url.indexOf('creative/list') > -1);
 export const selectCreativeListCurrentPage = createSelector(selectCreativeParams, params => params && params.page);
-export const selectCreativeListPageOrderedByCreatedAt = createSelector(selectAllCreatives, selectCreativeListCurrentPage, (states, page) =>
-  states
-    // filter out any 'new' temp creatives on the state and filter to creatives on current page
-    .filter(state => state && state.creative && state.creative.createdAt && ((!page && state.page === 1) || state.page === page))
-    .map(state => state.creative)
-    .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
+export const selectCreativeListCurrentText = createSelector(selectCreativeParams, params => params && params.text);
+export const selectCreativeListPageOrderedByCreatedAt = createSelector(
+  selectAllCreatives,
+  selectCreativeListCurrentPage,
+  selectCreativeListCurrentText,
+  (states, page, text) =>
+    states
+      // filter out any 'new' temp creatives on the state and filter to creatives on current page/text
+      .filter(state => state && state.creative && state.creative.createdAt && ((!page && state.page === 1) || state.page === page))
+      // bit hacky, since the store is overwritten on every remote call ... but apply current text filter
+      .filter(state => (!text && state.text === '') || state.text === text)
+      .map(state => state.creative)
+      .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
 );

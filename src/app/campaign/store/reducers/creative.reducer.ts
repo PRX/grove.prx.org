@@ -62,7 +62,8 @@ const _reducer = createReducer(
       action.docs.map(doc => ({
         doc: doc.creativeDoc,
         creative: docToCreative(doc.creativeDoc, doc.advertiserDoc),
-        page: action.params.page || 1
+        page: action.params.page || 1,
+        text: action.params.text || ''
       })),
       { ...state, params: action.params, total: action.total }
     )
