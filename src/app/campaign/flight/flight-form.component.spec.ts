@@ -94,6 +94,8 @@ class ParentFormComponent {
     contractEndAtFudged: [''],
     zones: [''],
     targets: [''],
+    notUniquePerCampaign: [false],
+    notUniquePerAdvertiser: [false],
     set_inventory_uri: ['', Validators.required],
     isCompanion: [false]
   });

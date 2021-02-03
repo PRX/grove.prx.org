@@ -45,6 +45,8 @@ export interface Flight {
   contractEndAt?: Moment;
   contractEndAtFudged?: Moment;
   isCompanion?: boolean;
+  uniquePerCampaign?: boolean;
+  uniquePerAdvertiser?: boolean;
 }
 
 export interface FlightState {

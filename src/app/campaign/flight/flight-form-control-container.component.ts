@@ -105,6 +105,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     isCompanion: [false],
     zones: [''],
     targets: [''],
+    notUniquePerCampaign: [false],
+    notUniquePerAdvertiser: [false],
     set_inventory_uri: ['', Validators.required],
     allocationPriority: ['10', Validators.min(1)],
     totalGoal: ['', Validators.min(0)],
@@ -118,7 +120,11 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.formSubcription = this.flightForm.valueChanges.subscribe(flightFormModel => {
-      this.onFormValueChanges(flightFormModel);
+      this.onFormValueChanges({
+        ...flightFormModel,
+        uniquePerCampaign: !flightFormModel.notUniquePerCampaign,
+        uniquePerAdvertiser: !flightFormModel.notUniquePerAdvertiser
+      });
     });
   }
 
@@ -183,6 +189,9 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   // updates the form from @Input() set flight
   setFlightForm(flight: Flight) {
     // patch values onto the form
-    this.flightForm.patchValue(flight, { emitEvent: false });
+    this.flightForm.patchValue(
+      { ...flight, notUniquePerCampaign: !flight.uniquePerCampaign, notUniquePerAdvertiser: !flight.uniquePerAdvertiser },
+      { emitEvent: false }
+    );
   }
 }
