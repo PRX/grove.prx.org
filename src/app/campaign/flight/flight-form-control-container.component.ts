@@ -100,8 +100,8 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     status: ['', Validators.required],
     startAt: ['', { validators: [Validators.required, this.validateStartAt.bind(this)], updateOn: 'blur' }],
     endAtFudged: ['', { validators: [Validators.required, this.validateEndAt.bind(this)], updateOn: 'blur' }],
-    contractStartAt: ['', { validators: [this.validateContractStartAt.bind(this)], updateOn: 'blur' }],
-    contractEndAtFudged: ['', { validators: [this.validateContractEndAt.bind(this)], updateOn: 'blur' }],
+    contractStartAt: [''],
+    contractEndAtFudged: [''],
     isCompanion: [false],
     zones: [''],
     targets: [''],
@@ -126,14 +126,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
     if (this.formSubcription) {
       this.formSubcription.unsubscribe();
     }
-  }
-
-  validateContractStartAt(startAtCtrl: AbstractControl): { [key: string]: any } | null {
-    return this.validateStartAtDate(startAtCtrl.value, this.flightForm && this.flightForm.get('contractEndAtFudged').value);
-  }
-
-  validateContractEndAt(endAtCtrl: AbstractControl): { [key: string]: any } | null {
-    return this.validateEndAtDate(this.flightForm && this.flightForm.get('contractStartAt').value, endAtCtrl.value);
   }
 
   validateStartAt(startAtCtrl: AbstractControl): { [key: string]: any } | null {

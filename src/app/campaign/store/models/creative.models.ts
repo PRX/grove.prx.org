@@ -19,6 +19,7 @@ export interface CreativeState {
   doc?: HalDoc;
   creative: Creative;
   page?: number;
+  text?: string;
   changed?: boolean;
   valid?: boolean;
 }
