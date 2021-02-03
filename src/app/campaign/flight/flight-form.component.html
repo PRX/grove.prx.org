@@ -72,6 +72,15 @@
         [targetOptionsMap]="targetOptionsMap"
       ></grove-flight-targets>
     </div>
+    <div class="mat-form-field-wrapper flight-advanced">
+      <h2>Advanced</h2>
+      <div class="mat-form-field-wrapper">
+        <mat-checkbox formControlName="notUniquePerCampaign">Allow serving with other flights in this campaign</mat-checkbox>
+      </div>
+      <div class="mat-form-field-wrapper">
+        <mat-checkbox formControlName="notUniquePerAdvertiser">Allow serving with other flights from this same advertiser</mat-checkbox>
+      </div>
+    </div>
   </div>
   <div class="flight-controls-container">
     <button
