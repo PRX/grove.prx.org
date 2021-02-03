@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 import { HalDoc } from 'ngx-prx-styleguide';
 import { AuguryService } from '../augury.service';
@@ -28,13 +28,18 @@ export class CreativeService {
         ...(params.text && { filters: `text=${params.text}` })
       })
       .pipe(
-        mergeMap((creativeDocs: HalDoc[]) =>
-          forkJoin(
-            creativeDocs.map(creativeDoc =>
-              creativeDoc.follow('prx:advertiser').pipe(map(advertiserDoc => ({ creativeDoc, advertiserDoc })))
-            )
-          )
-        )
+        mergeMap((creativeDocs: HalDoc[]) => {
+          // NOTE: forkJoin won't emit if we pass in an empty array
+          if (creativeDocs.length > 0) {
+            return forkJoin(
+              creativeDocs.map(creativeDoc =>
+                creativeDoc.follow('prx:advertiser').pipe(map(advertiserDoc => ({ creativeDoc, advertiserDoc })))
+              )
+            );
+          } else {
+            return of([]);
+          }
+        })
       );
   }
 
