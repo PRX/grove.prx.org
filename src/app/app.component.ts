@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 import { Env } from './core/core.env';
 import { UserService } from './core/user/user.service';
@@ -8,13 +9,19 @@ import { UserService } from './core/user/user.service';
   template: `
     <prx-auth [host]="authHost" [client]="authClient"></prx-auth>
     <prx-header prxSticky="all">
-      <a routerLink="campaign/new">+ Add a campaign</a>
-      <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
+      <prx-navitem *ngIf="userService.loggedIn" route="/" text="Campaigns"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/inventory" text="Series"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/advertisers" text="Advertisers"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/creatives" text="Creatives"></prx-navitem>
+      <prx-navuser  [userinfo]="userService.userinfo">
         <prx-spinner class="user-loading"></prx-spinner>
         <prx-image *ngIf="userService.userDoc | async as userDoc" class="user-loaded" [imageDoc]="userDoc"></prx-image>
       </prx-navuser>
     </prx-header>
     <main>
+      <a routerLink="campaign/new" mat-fab color="green" aria-label="Create a new Campaign">
+        <mat-icon>add</mat-icon> New Campaign
+      </a>
       <article>
         <router-outlet></router-outlet>
       </article>
