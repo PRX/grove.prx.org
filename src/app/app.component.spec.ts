@@ -29,11 +29,11 @@ describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        MatButtonModule,
-        MatIconModule,
         RouterTestingModule,
         CoreModule,
         SharedModule,
+        MatButtonModule,
+        MatIconModule
       ],
       declarations: [
         MockAuthComponent,
