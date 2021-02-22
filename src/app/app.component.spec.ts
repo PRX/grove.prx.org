@@ -8,6 +8,8 @@ import { AuthService, UserinfoService, Userinfo } from 'ngx-prx-styleguide';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Angulartics2 } from 'angulartics2';
 import { Angulartics2GoogleAnalytics } from 'angulartics2/ga';
 
@@ -27,9 +29,11 @@ describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        MatButtonModule,
+        MatIconModule,
         RouterTestingModule,
         CoreModule,
-        SharedModule
+        SharedModule,
       ],
       declarations: [
         MockAuthComponent,

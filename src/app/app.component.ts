@@ -13,15 +13,15 @@ import { UserService } from './core/user/user.service';
       <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/inventory" text="Series"></prx-navitem>
       <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/advertisers" text="Advertisers"></prx-navitem>
       <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/creatives" text="Creatives"></prx-navitem>
-      <prx-navuser  [userinfo]="userService.userinfo">
+      <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
         <prx-spinner class="user-loading"></prx-spinner>
         <prx-image *ngIf="userService.userDoc | async as userDoc" class="user-loaded" [imageDoc]="userDoc"></prx-image>
       </prx-navuser>
     </prx-header>
     <main>
-      <a routerLink="campaign/new" mat-fab color="green" aria-label="Create a new Campaign">
+      <button mat-fab routerLink="campaign/new" color="primary" aria-label="Add a Campaign">
         <mat-icon>add</mat-icon> New Campaign
-      </a>
+      </button>
       <article>
         <router-outlet></router-outlet>
       </article>
