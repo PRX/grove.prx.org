@@ -10,9 +10,9 @@ import { UserService } from './core/user/user.service';
     <prx-auth [host]="authHost" [client]="authClient"></prx-auth>
     <prx-header prxSticky="all">
       <prx-navitem *ngIf="userService.loggedIn" route="/" text="Campaigns"></prx-navitem>
-      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/inventory" text="Series"></prx-navitem>
-      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/advertisers" text="Advertisers"></prx-navitem>
-      <prx-navitem *ngIf="userService.loggedIn" href="//augury.prx.org/creatives" text="Creatives"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="{{auguryHost}}/inventory" text="Series"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="{{auguryHost}}/advertisers" text="Advertisers"></prx-navitem>
+      <prx-navitem *ngIf="userService.loggedIn" href="{{auguryHost}}/creatives" text="Creatives"></prx-navitem>
       <prx-navuser *ngIf="userService.loggedIn" [userinfo]="userService.userinfo">
         <prx-spinner class="user-loading"></prx-spinner>
         <prx-image *ngIf="userService.userDoc | async as userDoc" class="user-loaded" [imageDoc]="userDoc"></prx-image>
@@ -33,6 +33,7 @@ import { UserService } from './core/user/user.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  auguryHost = Env.AUGURY_HOST;
   authHost = Env.AUTH_HOST;
   authClient = Env.AUTH_CLIENT_ID;
 
