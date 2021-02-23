@@ -16,6 +16,8 @@ import {
   MAT_MOMENT_DATE_ADAPTER_OPTIONS,
   MAT_MOMENT_DATE_FORMATS
 } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
@@ -46,6 +48,8 @@ const PREFERRED_DATE_FORMATS = {
     AuthModule,
     CoreModule,
     SharedModule,
+    MatButtonModule,
+    MatIconModule,
     Angulartics2Module.forRoot(),
     CampaignModule,
     BrowserAnimationsModule,
