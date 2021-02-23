@@ -135,7 +135,7 @@
   <mat-paginator
     class="paginator"
     [length]="total"
-    [pageSize]="routedParams?.per || 25"
+    [pageSize]="routedParams?.per || 100"
     [pageIndex]="routedParams?.page - 1 || 0"
     [pageSizeOptions]="pageSizeOptions"
     showFirstLastButtons
