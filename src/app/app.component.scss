@@ -10,9 +10,12 @@ prx-header a {
 
 button[mat-fab] {
   position: fixed;
+  z-index: 999;
+  width: auto;
   right: 20px;
   bottom: 20px;
   background: mat-color($prx-green, 500);
+  padding: 0 10px;
   border-radius: 20px;
   font-size: 14px;
   text-transform: uppercase;
