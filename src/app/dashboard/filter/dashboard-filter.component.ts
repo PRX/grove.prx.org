@@ -17,6 +17,21 @@ import { DashboardService, DashboardParams, Facets, COMBINED_STATUS_FACETS } fro
       >
       </grove-filter-facet>
       <grove-filter-facet
+        facetName="Advertiser"
+        [options]="facets?.advertiser | labelOrder: 'label'"
+        [selectedOptions]="params?.advertiser"
+        (selectedOptionsChange)="routeToParams({ advertiser: $event })"
+      >
+      </grove-filter-facet>
+      <grove-filter-text textName="Campaign" [searchText]="params?.text" (search)="routeToParams({ text: $event })"> </grove-filter-text>
+      <grove-filter-facet
+        facetName="Type"
+        [options]="facets?.type"
+        [selectedOptions]="params?.type"
+        (selectedOptionsChange)="routeToParams({ type: $event })"
+      >
+      </grove-filter-facet>
+      <grove-filter-facet
         facetName="Zone"
         multiple="true"
         [options]="facets?.zone"
@@ -32,13 +47,8 @@ import { DashboardService, DashboardParams, Facets, COMBINED_STATUS_FACETS } fro
         (selectedOptionsChange)="routeToParams({ geo: $event })"
       >
       </grove-filter-facet>
-      <grove-filter-facet
-        facetName="Advertiser"
-        [options]="facets?.advertiser | labelOrder: 'label'"
-        [selectedOptions]="params?.advertiser"
-        (selectedOptionsChange)="routeToParams({ advertiser: $event })"
-      >
-      </grove-filter-facet>
+      <grove-filter-text textName="Rep Name" [searchText]="params?.representative" (search)="routeToParams({ representative: $event })">
+      </grove-filter-text>
       <grove-filter-facet
         facetName="Status"
         [options]="statusFacets"
@@ -46,18 +56,6 @@ import { DashboardService, DashboardParams, Facets, COMBINED_STATUS_FACETS } fro
         (selectedOptionsChange)="routeToParams({ status: $event })"
       >
       </grove-filter-facet>
-      <grove-filter-facet
-        facetName="Type"
-        [options]="facets?.type"
-        [selectedOptions]="params?.type"
-        (selectedOptionsChange)="routeToParams({ type: $event })"
-      >
-      </grove-filter-facet>
-    </div>
-    <div class="text">
-      <grove-filter-text textName="Campaign" [searchText]="params?.text" (search)="routeToParams({ text: $event })"> </grove-filter-text>
-      <grove-filter-text textName="Rep Name" [searchText]="params?.representative" (search)="routeToParams({ representative: $event })">
-      </grove-filter-text>
     </div>
   `,
   styleUrls: ['dashboard-filter.component.scss'],
