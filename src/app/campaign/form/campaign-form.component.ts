@@ -39,6 +39,7 @@ export class CampaignFormComponent implements OnInit {
     name: ['', Validators.required],
     type: ['', Validators.required],
     repName: ['', Validators.required],
+    salesRepName: [''],
     notes: [''],
     set_advertiser_uri: ['', [Validators.required, this.validateAdvertiser.bind(this)]]
   });
@@ -86,7 +87,7 @@ export class CampaignFormComponent implements OnInit {
   }
 
   updateCampaignForm(campaign: Campaign) {
-    const { name, type, repName, notes, set_account_uri, set_advertiser_uri } = campaign;
+    const { name, type, repName, salesRepName, notes, set_account_uri, set_advertiser_uri } = campaign;
 
     // set_advertiser_uri might be a typeahead advertiser name instead
     // NOTE: this fails if someone types a url as the advertiser name
@@ -98,6 +99,7 @@ export class CampaignFormComponent implements OnInit {
         ...(campaign.hasOwnProperty('name') && { name }),
         ...(campaign.hasOwnProperty('type') && { type }),
         ...(campaign.hasOwnProperty('repName') && { repName }),
+        ...(campaign.hasOwnProperty('salesRepName') && { salesRepName }),
         ...(campaign.hasOwnProperty('notes') && { notes }),
         ...(campaign.hasOwnProperty('set_account_uri') && { set_account_uri }),
         ...(!isAdvertiserName && { set_advertiser_uri })
