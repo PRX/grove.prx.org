@@ -17,8 +17,11 @@ const userinfo = new Userinfo();
 userinfo.preferred_username = 'Someone';
 
 /* tslint:disable-next-line:component-selector */
-@Component({selector: 'prx-auth', template: 'mock-prx-auth'})
-class MockAuthComponent { @Input() host: any; @Input() client: any; }
+@Component({ selector: 'prx-auth', template: 'mock-prx-auth' })
+class MockAuthComponent {
+  @Input() host: any;
+  @Input() client: any;
+}
 
 describe('AppComponent', () => {
   let comp: AppComponent;
@@ -28,21 +31,13 @@ describe('AppComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        CoreModule,
-        SharedModule,
-        MatButtonModule,
-        MatIconModule
-      ],
-      declarations: [
-        MockAuthComponent,
-        AppComponent
-      ],
+      imports: [RouterTestingModule, CoreModule, SharedModule, MatButtonModule, MatIconModule],
+      declarations: [MockAuthComponent, AppComponent],
       providers: [
         AuthService,
         {
-          provide: UserinfoService, useValue: {
+          provide: UserinfoService,
+          useValue: {
             config: () => {},
             getUserinfo: () => of(userinfo)
           }
@@ -55,13 +50,15 @@ describe('AppComponent', () => {
         },
         Angulartics2
       ]
-    }).compileComponents().then(() => {
-      fix = TestBed.createComponent(AppComponent);
-      comp = fix.componentInstance;
-      de = fix.debugElement;
-      el = de.nativeElement;
-      fix.detectChanges();
-    });
+    })
+      .compileComponents()
+      .then(() => {
+        fix = TestBed.createComponent(AppComponent);
+        comp = fix.componentInstance;
+        de = fix.debugElement;
+        el = de.nativeElement;
+        fix.detectChanges();
+      });
   }));
 
   it('should create the app', () => {
