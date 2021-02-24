@@ -60,6 +60,8 @@ const _reducer = createReducer(
         endAt,
         endAtFudged: utc(endAt.valueOf()).subtract(1, 'days'),
         deliveryMode: 'capped',
+        uniquePerCampaign: true,
+        uniquePerAdvertiser: true,
         zones: [],
         set_inventory_uri: null
       },

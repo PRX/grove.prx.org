@@ -29,6 +29,11 @@
     </mat-form-field>
 
     <mat-form-field class="campaign-form-field" appearance="outline">
+      <mat-label>Sales Rep</mat-label>
+      <input matInput placeholder="Sales Rep" formControlName="salesRepName" />
+    </mat-form-field>
+
+    <mat-form-field class="campaign-form-field" appearance="outline">
       <mat-label>Owner</mat-label>
       <mat-select formControlName="set_account_uri" required>
         <mat-option *ngFor="let acct of accounts" [value]="acct.self_uri">{{ acct.name }}</mat-option>

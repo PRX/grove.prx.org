@@ -6,6 +6,7 @@ export interface Campaign {
   name: string;
   type: string;
   repName: string;
+  salesRepName?: string;
   notes: string;
   createdAt?: Date;
   set_account_uri: string;

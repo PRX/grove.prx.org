@@ -283,7 +283,7 @@ export class DashboardService {
     this._error.next(null);
     this.loadList('prx:flights', 'prx:campaign,prx:advertiser', {
       ...params,
-      per: (params && params.per) || 25,
+      per: (params && params.per) || 100,
       sort: (params && params.sort) || 'start_at',
       direction: (params && params.direction) || 'asc'
     })

@@ -37,9 +37,3 @@ h1 {
   grid-column-gap: 10px;
   justify-content: space-between;
 }
-.text {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(45vw, 1fr));
-  grid-column-gap: 10px;
-  justify-content: space-between;
-}
