@@ -224,7 +224,7 @@ export class FlightZonesFormComponent implements ControlValueAccessor, OnInit, O
 
   zoneLabel(zone: FormControl): string {
     const id = zone.get('id').value;
-    const opt = this.zoneOptions.find(z => z.id === id);
+    const opt = (this.zoneOptions || []).find(z => z.id === id);
     return opt ? opt.label : '';
   }
 
