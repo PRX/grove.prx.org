@@ -40,9 +40,9 @@ export class CampaignService {
       switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
       switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
         // if total is greater than count, request all flights
-        let params: any;
+        const params: any = { zoom: 'prx:flight-days' };
         if (+flightDocs['total'] > +flightDocs['count']) {
-          params = { per: +flightDocs['total'] };
+          params.per = +flightDocs['total'];
         }
         return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       }),
