@@ -9,7 +9,7 @@ export class AdvertiserService {
   constructor(private auguryService: AuguryService) {}
 
   loadAdvertisers(): Observable<HalDoc[]> {
-    return this.auguryService.followItems(`prx:advertisers`, { per: 999 });
+    return this.auguryService.followItems(`prx:advertisers`, { per: 9999 });
   }
 
   addAdvertiser(name: string): Observable<HalDoc> {
