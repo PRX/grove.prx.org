@@ -8,7 +8,7 @@ export class InventoryService {
   constructor(private augury: AuguryService) {}
 
   loadInventory(): Observable<HalDoc[]> {
-    return this.augury.followItems('prx:inventory', { per: 999 });
+    return this.augury.followItems('prx:inventories', { per: 999 });
   }
 
   loadInventoryTargets(inventory: number | HalDoc): Observable<HalDoc> {
