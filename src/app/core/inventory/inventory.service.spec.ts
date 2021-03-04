@@ -13,7 +13,7 @@ describe('InventoryService', () => {
       { id: 3, podcastTitle: 'title 3' }
     ];
 
-    augury.mockItems('prx:inventory', invs);
+    augury.mockItems('prx:inventories', invs);
 
     service.loadInventory().subscribe(inventory => {
       expect(inventory.length).toEqual(3);
