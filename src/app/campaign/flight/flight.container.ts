@@ -59,8 +59,6 @@ import { CampaignActionService } from '../store/actions/campaign-action.service'
           [previewError]="flightPreviewError$ | async"
           [flightActualsDateBoundaries]="flightActualsDateBoundaries$ | async"
           (flightUpdate)="flightUpdateFromForm($event)"
-          (flightDeleteToggle)="flightDeleteToggle()"
-          (flightDuplicate)="flightDuplicate($event)"
         ></grove-flight>
       </mat-drawer-content>
     </mat-drawer-container>
@@ -149,13 +147,5 @@ export class FlightContainerComponent implements OnInit, OnDestroy {
 
   flightUpdateFromForm({ flight: formFlight, changed, valid }: { flight: Flight; changed: boolean; valid: boolean }) {
     this.campaignAction.updateFlightForm(formFlight, changed, valid);
-  }
-
-  flightDuplicate(flight: Flight) {
-    this.campaignAction.dupFlight(flight);
-  }
-
-  flightDeleteToggle() {
-    this.campaignAction.deleteRoutedFlightToggle();
   }
 }

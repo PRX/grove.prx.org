@@ -22,11 +22,11 @@ import { FlightState } from '../store/models';
       <grove-campaign-report [campaignName]="campaignName" [flights]="flights" [reportData]="reportData"></grove-campaign-report>
       <button mat-menu-item [disabled]="!canDuplicate" (click)="onDuplicate()">
         <mat-icon aria-hidden>file_copy</mat-icon>
-        <span>Duplicate</span>
+        <span>Duplicate Campaign</span>
       </button>
       <button class="menuItem--warn" mat-menu-item [disabled]="!canDelete" (click)="onDelete()" *ngIf="hasNoActuals">
         <mat-icon aria-hidden>delete</mat-icon>
-        <span>Delete</span>
+        <span>Delete Campaign</span>
       </button>
     </mat-menu>
   `,

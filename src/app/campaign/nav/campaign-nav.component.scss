@@ -4,43 +4,71 @@
   padding-top: 0;
 
   .mat-list-item {
-    transition: border-left 100ms ease-out 0ms;
+    position: relative;
     background: prx-theme-background(tab);
     color: prx-theme-foreground(tab);
     font-weight: 700;
     margin: 0 0 2px;
-    border-left: 0 solid $primary;
 
-    .mat-list-item-content {
+    ::ng-deep .mat-list-item-content {
       width: 100%;
+      padding-right: 0;
+    }
+
+    .menuBtn {
+      visibility: hidden;
+    }
+
+    &::before {
+      transition: left 100ms ease-out 0ms;
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: -4px;
+      bottom: 0;
+      width: 4px;
     }
 
     &:hover,
     &.active-link,
     &.changed {
-      border-left-width: 4px;
+      &::before {
+        left: 0;
+        background-color: $primary;
+      }
     }
 
     &.active-link {
       background: prx-theme-background(selected-tab);
       color: prx-theme-foreground(selected-tab);
+
+      .menuBtn {
+        visibility: visible;
+      }
     }
 
     &.changed {
       &.valid {
-        border-left-color: $success;
+        &::before {
+          background-color: $success;
+        }
       }
 
       &.invalid,
       &.error {
-        border-left-color: $warn;
+        &::before {
+          background-color: $warn;
+        }
       }
     }
 
     &.deleted-flight {
       text-decoration: line-through;
       color: $warn;
-      border-left-color: $warn;
+      &::before {
+        background-color: $warn;
+      }
     }
   }
 }
