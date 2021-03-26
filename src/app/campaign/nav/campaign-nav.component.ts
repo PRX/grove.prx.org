@@ -31,9 +31,13 @@ import { Campaign, FlightState } from '../store/models';
         <mat-icon aria-hidden>file_copy</mat-icon>
         <span>Duplicate Flight</span>
       </button>
-      <button class="menuItem--warn" mat-menu-item (click)="onDelete()" *ngIf="canDeleteActiveFlight">
-        <mat-icon aria-hidden>delete</mat-icon>
+      <button class="menuItem--warn" mat-menu-item (click)="onDelete()" *ngIf="canDeleteActiveFlight && !softDeleted">
+        <mat-icon color="warn" aria-hidden>delete</mat-icon>
         <span>Delete Flight</span>
+      </button>
+      <button class="menuItem--primary" mat-menu-item (click)="onDelete()" *ngIf="softDeleted">
+        <mat-icon color="primary" aria-hidden>restore</mat-icon>
+        <span>Restore Flight</span>
       </button>
     </mat-menu>
   `,
@@ -43,6 +47,7 @@ import { Campaign, FlightState } from '../store/models';
 export class CampaignNavComponent {
   @Input() campaign: Campaign;
   @Input() activeFlight: Flight;
+  @Input() softDeleted: Boolean;
   @Input() flights: FlightState[];
   @Input() valid: boolean;
   @Input() changed: boolean;

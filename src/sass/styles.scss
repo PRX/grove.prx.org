@@ -27,6 +27,14 @@ button.mat-button {
     }
   }
 
+  &.menuItem--primary {
+    color: $primary;
+
+    &[disabled] {
+      color: $primary-disabled;
+    }
+  }
+
   &[disabled] {
     background: none;
   }

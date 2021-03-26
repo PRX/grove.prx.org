@@ -14,7 +14,8 @@ import {
   selectChanged,
   selectLocalCampaignActualCount,
   selectCampaignFlightInventoryReportData,
-  selectRoutedLocalFlight
+  selectRoutedLocalFlight,
+  selectRoutedFlightDeleted
 } from './store/selectors';
 import * as accountActions from './store/actions/account-action.creator';
 import * as advertiserActions from './store/actions/advertiser-action.creator';
@@ -44,6 +45,7 @@ import { CampaignErrorService } from './campaign-error.service';
           [campaign]="campaign$ | async"
           [flights]="flights$ | async"
           [activeFlight]="flightLocal$ | async"
+          [softDeleted]="softDeleted$ | async"
           [valid]="valid$ | async"
           [changed]="changed$ | async"
           [isSaving]="campaignSaving$ | async"
@@ -68,6 +70,7 @@ import { CampaignErrorService } from './campaign-error.service';
 export class CampaignComponent implements OnInit, OnDestroy {
   campaign$: Observable<Campaign>;
   flightLocal$: Observable<Flight>;
+  softDeleted$: Observable<boolean>;
   flights$: Observable<FlightState[]>;
   campaignLoaded$: Observable<boolean>;
   campaignLoading$: Observable<boolean>;
@@ -112,6 +115,7 @@ export class CampaignComponent implements OnInit, OnDestroy {
     this.campaignName$ = this.store.pipe(select(selectLocalCampaignName));
     this.campaignActualCount$ = this.store.pipe(select(selectLocalCampaignActualCount));
     this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
+    this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
     this.flights$ = this.store.pipe(select(selectAllFlightsOrderByCreatedAt));
     this.valid$ = this.store.pipe(select(selectValid));
     this.changed$ = this.store.pipe(select(selectChanged));
