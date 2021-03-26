@@ -21,14 +21,16 @@ export class CampaignService {
 
   loadCampaignZoomFlights(id: number): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[] }> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights' }).pipe(
-      switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
-      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
+      switchMap(campaignDoc => campaignDoc.followItems('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
+      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc[] }) => {
         // if total is greater than count, request all flights
-        let params: any;
-        if (+flightDocs['total'] > +flightDocs['count']) {
-          params = { per: +flightDocs['total'] };
+        if (flightDocs.length > 0 && flightDocs[0].total() > flightDocs.length) {
+          return campaignDoc
+            .followItems('prx:flights', { per: flightDocs[0].total() })
+            .pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
+        } else {
+          return of({ campaignDoc, flightDocs });
         }
-        return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       })
     );
   }
@@ -37,14 +39,16 @@ export class CampaignService {
     id: number
   ): Observable<{ campaignDoc: HalDoc; flightDocs: HalDoc[]; flightDaysDocs: { [id: number]: HalDoc[] } }> {
     return this.augury.follow('prx:campaign', { id, zoom: 'prx:flights,prx:flight-days' }).pipe(
-      switchMap(campaignDoc => campaignDoc.follow('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
-      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc }) => {
+      switchMap(campaignDoc => campaignDoc.followItems('prx:flights').pipe(map(flightDocs => ({ campaignDoc, flightDocs })))),
+      switchMap(({ campaignDoc, flightDocs }: { campaignDoc: HalDoc; flightDocs: HalDoc[] }) => {
         // if total is greater than count, request all flights
-        const params: any = { zoom: 'prx:flight-days' };
-        if (+flightDocs['total'] > +flightDocs['count']) {
-          params.per = +flightDocs['total'];
+        if (flightDocs.length > 0 && flightDocs[0].total() > flightDocs.length) {
+          return campaignDoc
+            .followItems('prx:flights', { per: flightDocs[0].total(), zoom: 'prx:flight-days' })
+            .pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
+        } else {
+          return of({ campaignDoc, flightDocs });
         }
-        return campaignDoc.followItems('prx:flights', params).pipe(map(docs => ({ campaignDoc, flightDocs: docs })));
       }),
       switchMap(({ campaignDoc, flightDocs }) =>
         flightDocs.length
