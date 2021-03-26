@@ -31,3 +31,8 @@ button.mat-button {
     background: none;
   }
 }
+
+// make sure snackbar is in above prx-header
+.cdk-overlay-container {
+  z-index: 10000;
+}
