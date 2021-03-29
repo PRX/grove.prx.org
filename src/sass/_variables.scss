@@ -16,12 +16,14 @@ $prx-theme: mat-light-theme($prx-primary, $prx-accent, $prx-warn);
 //// Theme colors
 $primary: mat-color($prx-primary);
 $primary-contrast: mat-color($prx-primary, default-contrast);
+$primary-disabled: lighten($primary, 30%);
 $neutral: mat-color($prx-neutral);
 $neutral-contrast: mat-color($prx-neutral, default-contrast);
 $accent: mat-color($prx-accent);
 $accent-contrast: mat-color($prx-accent, default-contrast);
 $success: mat-color($prx-success);
 $success-contrast: mat-color($prx-success, default-contrast);
+$success-disabled: lighten($success, 30%);
 $warn: mat-color($prx-warn);
 $warn-contrast: mat-color($prx-warn, default-contrast);
 $warn-disabled: lighten($warn, 30%);

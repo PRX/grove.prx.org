@@ -27,6 +27,8 @@ import { CampaignNavComponent } from './nav/campaign-nav.component';
 import { CampaignErrorService } from './campaign-error.service';
 import { TestComponent, campaignRoutes } from '../../testing/test.component';
 import { campaignFixture, flightFixture } from './store/models/campaign-state.factory';
+import * as moment from 'moment';
+import { Flight } from './store/models';
 
 describe('CampaignComponent', () => {
   let component: CampaignComponent;
@@ -159,5 +161,29 @@ describe('CampaignComponent', () => {
     jest.spyOn(campaignActionService, 'addFlight');
     component.createFlight();
     expect(campaignActionService.addFlight).toHaveBeenCalled();
+  });
+
+  it('calls action to delete active flight flight', () => {
+    jest.spyOn(campaignActionService, 'deleteRoutedFlightToggle');
+    component.flightDeleteToggle();
+    expect(campaignActionService.deleteRoutedFlightToggle).toHaveBeenCalled();
+  });
+
+  it('calls action to duplicate active flight flight', () => {
+    const flightFixture: Flight = {
+      name: 'my-flight',
+      status: 'approved',
+      startAt: moment.utc(),
+      endAt: moment.utc(),
+      endAtFudged: moment.utc().subtract(1, 'days'),
+      totalGoal: 123,
+      zones: [{ id: 'pre_1' }],
+      targets: [],
+      set_inventory_uri: '/some/inventory',
+      deliveryMode: 'capped'
+    };
+    jest.spyOn(campaignActionService, 'dupFlight');
+    component.flightDuplicate(flightFixture);
+    expect(campaignActionService.dupFlight).toHaveBeenCalledWith(flightFixture);
   });
 });

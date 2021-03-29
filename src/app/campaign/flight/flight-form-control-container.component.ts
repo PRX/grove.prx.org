@@ -24,9 +24,6 @@ import moment from 'moment';
         [targetOptionsMap]="targetOptionsMap"
         [statusOptions]="statusOptions"
         [flight]="flight"
-        [softDeleted]="softDeleted"
-        (flightDeleteToggle)="flightDeleteToggle.emit($event)"
-        (flightDuplicate)="flightDuplicate.emit($event)"
       ></grove-flight-form>
       <grove-inventory
         [flight]="flight"
@@ -61,8 +58,6 @@ export class FlightFormControlContainerComponent implements OnInit, OnDestroy {
   @Input() flightOverlapIsLoading: boolean;
   @Input() flightOverlapError: any;
   @Output() flightUpdate = new EventEmitter<{ flight: Flight; changed: boolean; valid: boolean }>(true);
-  @Output() flightDuplicate = new EventEmitter<Flight>(true);
-  @Output() flightDeleteToggle = new EventEmitter(true);
   formSubcription: Subscription;
   resetting = false;
 

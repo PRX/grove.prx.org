@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Store, select } from '@ngrx/store';
-import { FlightState, Campaign } from './store/models';
+import { FlightState, Campaign, Flight } from './store/models';
 import {
   selectLocalCampaign,
   selectCampaignLoaded,
@@ -13,7 +13,9 @@ import {
   selectValid,
   selectChanged,
   selectLocalCampaignActualCount,
-  selectCampaignFlightInventoryReportData
+  selectCampaignFlightInventoryReportData,
+  selectRoutedLocalFlight,
+  selectRoutedFlightDeleted
 } from './store/selectors';
 import * as accountActions from './store/actions/account-action.creator';
 import * as advertiserActions from './store/actions/advertiser-action.creator';
@@ -42,10 +44,14 @@ import { CampaignErrorService } from './campaign-error.service';
         <grove-campaign-nav
           [campaign]="campaign$ | async"
           [flights]="flights$ | async"
+          [activeFlight]="flightLocal$ | async"
+          [softDeleted]="softDeleted$ | async"
           [valid]="valid$ | async"
           [changed]="changed$ | async"
           [isSaving]="campaignSaving$ | async"
           (createFlight)="createFlight()"
+          (flightDuplicate)="flightDuplicate($event)"
+          (flightDeleteToggle)="flightDeleteToggle()"
         ></grove-campaign-nav>
       </mat-drawer>
       <mat-drawer-content role="main">
@@ -63,6 +69,8 @@ import { CampaignErrorService } from './campaign-error.service';
 })
 export class CampaignComponent implements OnInit, OnDestroy {
   campaign$: Observable<Campaign>;
+  flightLocal$: Observable<Flight>;
+  softDeleted$: Observable<boolean>;
   flights$: Observable<FlightState[]>;
   campaignLoaded$: Observable<boolean>;
   campaignLoading$: Observable<boolean>;
@@ -106,6 +114,8 @@ export class CampaignComponent implements OnInit, OnDestroy {
     this.campaignSaving$ = this.store.pipe(select(selectCampaignSaving));
     this.campaignName$ = this.store.pipe(select(selectLocalCampaignName));
     this.campaignActualCount$ = this.store.pipe(select(selectLocalCampaignActualCount));
+    this.flightLocal$ = this.store.pipe(select(selectRoutedLocalFlight));
+    this.softDeleted$ = this.store.pipe(select(selectRoutedFlightDeleted));
     this.flights$ = this.store.pipe(select(selectAllFlightsOrderByCreatedAt));
     this.valid$ = this.store.pipe(select(selectValid));
     this.changed$ = this.store.pipe(select(selectChanged));
@@ -132,5 +142,13 @@ export class CampaignComponent implements OnInit, OnDestroy {
 
   createFlight() {
     this.campaignActionService.addFlight();
+  }
+
+  flightDuplicate(flight: Flight) {
+    this.campaignActionService.dupFlight(flight);
+  }
+
+  flightDeleteToggle() {
+    this.campaignActionService.deleteRoutedFlightToggle();
   }
 }

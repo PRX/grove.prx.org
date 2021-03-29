@@ -59,15 +59,7 @@ export const cannotStartInPast = control => (control.value.valueOf() > Date.now(
 @Component({
   template: `
     <form [formGroup]="flightForm">
-      <grove-flight-form
-        #childForm
-        [inventory]="inventory"
-        [zoneOptions]="zoneOptions"
-        [flight]="flight"
-        [softDeleted]="softDeleted"
-        (flightDeleteToggle)="flightDeleteToggle($event)"
-        (flightDuplicate)="flightDuplicate($event)"
-      ></grove-flight-form>
+      <grove-flight-form #childForm [inventory]="inventory" [zoneOptions]="zoneOptions" [flight]="flight"></grove-flight-form>
     </form>
   `
 })
@@ -79,9 +71,6 @@ class ParentFormComponent {
   inventory = inventoryFixture;
   zoneOptions = inventoryFixture[0].zones;
   flight = flightFixture;
-  softDeleted = false;
-  flightDeleteToggle = jest.fn(() => {});
-  flightDuplicate = jest.fn(() => {});
 
   flightForm = this.fb.group({
     id: [],
@@ -150,20 +139,6 @@ describe('FlightFormComponent', () => {
     parent = fixture.componentInstance;
     component = parent.childForm;
     fixture.detectChanges();
-  });
-
-  it('emits flight duplicate', done => {
-    parent.flight = flightFixture;
-    component.flightDuplicate.subscribe(toDup => {
-      expect(toDup).toMatchObject(flightFixture);
-      done();
-    });
-    component.onFlightDuplicate();
-  });
-
-  it('emits flight delete toggle', done => {
-    component.flightDeleteToggle.subscribe(() => done());
-    component.onFlightDeleteToggle();
   });
 
   it('checks for flight form errors', () => {

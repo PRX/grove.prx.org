@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, AbstractControl, ControlContainer } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Flight, Inventory, InventoryZone, InventoryTargetType, InventoryTargetsMap, FlightStatusOption } from '../store/models';
@@ -21,9 +21,6 @@ export class FlightFormComponent implements OnInit {
   @Input() targetTypes: InventoryTargetType[];
   @Input() targetOptionsMap: InventoryTargetsMap;
   @Input() statusOptions: FlightStatusOption[];
-  @Input() softDeleted: boolean;
-  @Output() flightDuplicate = new EventEmitter<Flight>(true);
-  @Output() flightDeleteToggle = new EventEmitter(true);
 
   flightForm: FormGroup;
 
@@ -32,18 +29,6 @@ export class FlightFormComponent implements OnInit {
   }
 
   constructor(private formContainer: ControlContainer) {}
-
-  onFlightDuplicate() {
-    this.flightDuplicate.emit(this.flight);
-  }
-
-  onFlightDeleteToggle() {
-    this.flightDeleteToggle.emit();
-  }
-
-  get canBeDeleted(): boolean {
-    return this.flight && !this.flight.actualCount;
-  }
 
   checkError(fieldName: string, type = 'error') {
     return this.flightForm.get(fieldName).getError(type);
